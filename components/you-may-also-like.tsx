@@ -1,5 +1,5 @@
 import { getAllProducts } from "@/lib/data"
-import { ProductCard } from "./product-card"
+import { ProductCard } from "./product/product-card"
 
 export async function YouMayAlsoLike({ currentId }: { currentId: string }) {
   const all = await getAllProducts()

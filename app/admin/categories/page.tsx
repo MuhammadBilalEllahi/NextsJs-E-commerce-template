@@ -43,15 +43,15 @@ export default function CategoriesAdminPage() {
       let data: any = { name, parent: parent || undefined, description }
 
       // handle image upload (if File object)
-     if (image && image instanceof File) {
-  data.image = image; // Pass File directly
-} else if (typeof image === "string") {
-  data.image = image; // old URL
-}
+      if (image && image instanceof File) {
+        data.image = image; // Pass File directly
+      } else if (typeof image === "string") {
+        data.image = image; // old URL
+      }
 
-      console.log("EDITNG",editing)
+      console.log("EDITNG", editing)
 
-      if (editing) { 
+      if (editing) {
         const updated = await updateCategory({ id: editing._id, ...data })
         setCategories(prev => prev.map(c => c._id === editing._id ? updated : c))
       } else {

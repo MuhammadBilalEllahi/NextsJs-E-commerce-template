@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ProductCard } from "./product-card"
+import { ProductCard } from "./product/product-card"
 import { products } from "@/lib/mock-data"
 import type { Product } from "@/lib/mock-data"
 

@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation"
-import { getAllProducts, getProductBySlug, type Product } from "@/lib/data"
-import { ProductDetailClient } from "@/components/product-detail-client"
+import { getAllProducts, getProductBySlug } from "@/lib/data-service"
+import { ProductDetailClient } from "@/components/product/product-detail-client"
 
 export async function generateStaticParams() {
-  const products = await getAllProducts()
+  const products = await getAllProducts();
+  console.log("products", products);
   return products.map((p) => ({ slug: p.slug }))
 }
 

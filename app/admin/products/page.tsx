@@ -1,189 +1,364 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { downloadCSV, parseCSVProducts } from "@/lib/csv"
-import { getSampleProducts } from "@/lib/admin-sample"
+import { Edit, Trash2, Eye, Plus } from "lucide-react"
+import ProductsCreateAdminUI from "./products-create"
+import ProductsEditAdminUI from "./products-edit"
+import ProductsViewAdminUI from "./products-view"
 
-type ProductDraft = {
-  id?: string
-  title: string
-  description: string
-  price: number
-  quantity: number
-  sku: string
-  type: string
-  ingredients: string
-  instructions: string
-  categories: string[]
-  tags: string[]
-  discount?: number
-  image?: string
-  images?: string[]
-  seoTitle?: string
-  seoDescription?: string
+type Product = {
+  _id: string;
+  name: string;
+  description: string;
+  ingredients?: string;
+  price: number;
+  discount: number;
+  brand: { _id: string; name: string };
+  categories: { _id: string; name: string }[];
+  images: string[];
+  variants: any[];
+  isActive: boolean;
+  isOutOfStock: boolean;
+  slug: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export default function ProductsAdminPage() {
-  const initial = useMemo(()=>getSampleProducts(),[])
-  const [items, setItems] = useState<ProductDraft[]>(initial)
-  const [q, setQ] = useState("")
-  const [showForm, setShowForm] = useState(false)
-  const [editing, setEditing] = useState<ProductDraft | null>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
+export default function ProductsTable() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [error, setError] = useState("")
 
-  const filtered = useMemo(()=>items.filter(p=>p.title.toLowerCase().includes(q.toLowerCase())),[items,q])
+    const [showCreateForm, setShowCreateForm] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null)
 
-  const resetDraft = (): ProductDraft => ({
-    title: "",
-    description: "",
-    price: 0,
-    quantity: 0,
-    sku: "",
-    type: "Spice",
-    ingredients: "",
-    instructions: "",
-    categories: ["Spices"],
-    tags: [],
-    discount: 0,
-    image: "",
-    images: [],
-    seoTitle: "",
-    seoDescription: "",
-  })
 
-  const [draft, setDraft] = useState<ProductDraft>(resetDraft())
-
-  const openNew = () => { setEditing(null); setDraft(resetDraft()); setShowForm(true) }
-  const openEdit = (p: ProductDraft) => { setEditing(p); setDraft(p); setShowForm(true) }
-
-  const save = () => {
-    if (!draft.title) return
-    if (editing) {
-      setItems(prev => prev.map(p => p === editing ? { ...draft } : p))
-    } else {
-      const id = "p"+Math.random().toString(36).slice(2,8)
-      setItems(prev => [{...draft, id}, ...prev])
+  // Fetch products from API
+  const fetchProducts = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch("/api/admin/product")
+      if (!response.ok) {
+        throw new Error("Failed to fetch products")
+      }
+      const data = await response.json()
+      // Add default values for missing fields
+      const productsWithDefaults = (data.products || []).map((product: any) => ({
+        ...product,
+        isOutOfStock: product.isOutOfStock || false,
+        isActive: product.isActive || false
+      }))
+      setProducts(productsWithDefaults)
+    } catch (err: any) {
+      setError(err.message)
+      console.error("Error fetching products:", err)
+    } finally {
+      setLoading(false)
     }
-    setShowForm(false)
   }
 
-  const remove = (id?: string) => setItems(prev => prev.filter(p => p.id !== id))
+  useEffect(() => {
+    fetchProducts()
+  }, [])
 
-  const onBulkCSV = async (f: File) => {
-    const text = await f.text()
-    const newItems = parseCSVProducts(text)
-    setItems(prev => [...newItems, ...prev])
+  // Delete product
+  const deleteProduct = async (productId: string) => {
+    if (!confirm("Are you sure you want to delete this product?")) return
+    
+    try {
+      const response = await fetch(`/api/admin/product?id=${productId}`, {
+        method: "DELETE",
+      })
+      
+      if (!response.ok) {
+        throw new Error("Failed to delete product")
+      }
+      
+      // Refresh the product list
+      fetchProducts()
+      alert("Product deleted successfully")
+    } catch (err: any) {
+      alert("Error deleting product: " + err.message)
+    }
   }
 
-  const exportCSV = () => {
-    const rows = [
-      ["title","description","price","quantity","sku","type","ingredients","instructions","categories","tags","discount","image"],
-      ...items.map(p=>[
-        p.title,p.description,p.price,p.quantity,p.sku,p.type,p.ingredients,p.instructions,
-        p.categories.join("|"), p.tags.join("|"), p.discount ?? 0, p.image ?? ""
-      ])
-    ]
-    downloadCSV(rows, "products.csv")
+  // View product details
+  const viewProduct = (product: Product) => {
+    setViewingProduct(product)
+    setEditingProduct(null)
+    setShowCreateForm(false)
   }
 
-  const imagePreview = (e: React.ChangeEvent<HTMLInputElement>)=>{
-    const file = e.target.files?.[0]; if(!file) return;
-    const reader = new FileReader()
-    reader.onload = () => setDraft(d=>({ ...d, image: reader.result as string }))
-    reader.readAsDataURL(file)
+  // Edit product
+  const editProduct = (product: Product) => {
+    setEditingProduct(product)
+    setViewingProduct(null)
+    setShowCreateForm(false)
+  }
+
+  // Close all forms
+  const closeAllForms = () => {
+    setShowCreateForm(false)
+    setEditingProduct(null)
+    setViewingProduct(null)
+  }
+
+  // Filter products based on search term
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.brand.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Products</CardTitle>
+          <CardDescription>Loading products...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center items-center h-40">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Products</CardTitle>
+          <CardDescription>Error loading products</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-red-500 p-4 bg-red-50 rounded-md">
+            {error}
+          </div>
+          <Button onClick={fetchProducts} className="mt-4">
+            Try Again
+          </Button>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
-    <div className="grid gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Product Management</CardTitle>
-          <CardDescription>Add, edit, bulk upload, and manage inventory</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <Input placeholder="Search products..." value={q} onChange={(e)=>setQ(e.target.value)} />
-            <div className="flex gap-2">
-              <Button className="bg-green-600 hover:bg-green-700" onClick={openNew}>Add Product</Button>
-              <Button variant="outline" onClick={()=>fileRef.current?.click()}>Bulk Upload (CSV)</Button>
-              <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={(e)=>{const f=e.target.files?.[0]; if(f) onBulkCSV(f)}} />
-              <Button variant="outline" onClick={exportCSV}>Export CSV</Button>
-            </div>
-          </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Products Management</CardTitle>
+        <CardDescription>View and manage all products in your store</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {/* Search and Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <Input
+            placeholder="Search products by name, description, or brand..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1"
+          />
+         <Button 
+            className="bg-green-600 hover:bg-green-700"
+            onClick={() => setShowCreateForm(!showCreateForm)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {showCreateForm ? "Cancel" : "Add Product"}
+          </Button>
+        </div>
 
-          {showForm && (
-            <div className="rounded-lg border p-4 grid gap-3">
-              <div className="grid md:grid-cols-2 gap-3">
-                <Input placeholder="Title" value={draft.title} onChange={(e)=>setDraft(d=>({...d,title:e.target.value}))}/>
-                <Input placeholder="SKU" value={draft.sku} onChange={(e)=>setDraft(d=>({...d,sku:e.target.value}))}/>
-                <Input type="number" step="0.01" placeholder="Price" value={draft.price} onChange={(e)=>setDraft(d=>({...d,price:Number(e.target.value)}))}/>
-                <Input type="number" placeholder="Quantity" value={draft.quantity} onChange={(e)=>setDraft(d=>({...d,quantity:Number(e.target.value)}))}/>
-                <Input placeholder="Type" value={draft.type} onChange={(e)=>setDraft(d=>({...d,type:e.target.value}))}/>
-                <Input placeholder="Categories (| separated)" value={draft.categories.join("|")} onChange={(e)=>setDraft(d=>({...d,categories:e.target.value.split("|").filter(Boolean)}))}/>
-                <Input placeholder="Tags (| separated)" value={draft.tags.join("|")} onChange={(e)=>setDraft(d=>({...d,tags:e.target.value.split("|").filter(Boolean)}))}/>
-                <Input type="number" placeholder="Discount %" value={draft.discount ?? 0} onChange={(e)=>setDraft(d=>({...d,discount:Number(e.target.value)}))}/>
-              </div>
-              <Textarea placeholder="Description" value={draft.description} onChange={(e)=>setDraft(d=>({...d,description:e.target.value}))}/>
-              <div className="grid md:grid-cols-2 gap-3">
-                <Textarea placeholder="Ingredients" value={draft.ingredients} onChange={(e)=>setDraft(d=>({...d,ingredients:e.target.value}))}/>
-                <Textarea placeholder="Instructions" value={draft.instructions} onChange={(e)=>setDraft(d=>({...d,instructions:e.target.value}))}/>
-              </div>
-              <div className="grid md:grid-cols-2 gap-3">
-                <Input placeholder="SEO Title" value={draft.seoTitle ?? ""} onChange={(e)=>setDraft(d=>({...d,seoTitle:e.target.value}))}/>
-                <Input placeholder="SEO Description" value={draft.seoDescription ?? ""} onChange={(e)=>setDraft(d=>({...d,seoDescription:e.target.value}))}/>
-              </div>
-              <div className="grid md:grid-cols-[1fr_auto] gap-3 items-center">
-                <Input type="file" accept="image/*" onChange={imagePreview}/>
-                {draft.image ? <img src={draft.image || "/placeholder.svg"} alt="Preview" className="h-16 w-16 rounded object-cover border" /> : <div className="text-xs text-neutral-500">Upload image</div>}
-              </div>
-              <div className="flex gap-2">
-                <Button className="bg-red-600 hover:bg-red-700" onClick={save}>{editing ? "Save Changes" : "Save Product"}</Button>
-                <Button variant="outline" onClick={()=>setShowForm(false)}>Cancel</Button>
-              </div>
-            </div>
-          )}
+         {/* Product Creation Form */}
+        {showCreateForm && (
+          <ProductsCreateAdminUI/>
+        )}
 
-          <div className="overflow-x-auto rounded border">
-            <table className="min-w-full text-sm">
-              <thead className="bg-neutral-50 dark:bg-neutral-900/40">
-                <tr>
-                  <th className="p-3 text-left">Title</th>
-                  <th className="p-3 text-left">SKU</th>
-                  <th className="p-3 text-left">Price</th>
-                  <th className="p-3 text-left">Qty</th>
-                  <th className="p-3 text-left">Type</th>
-                  <th className="p-3 text-left">Actions</th>
+        {/* Product Edit Form */}
+        {editingProduct && (
+          <ProductsEditAdminUI
+            product={editingProduct}
+            onClose={closeAllForms}
+            onUpdate={() => {
+              fetchProducts()
+              closeAllForms()
+            }}
+          />
+        )}
+
+        {/* Product View Form */}
+        {viewingProduct && (
+          <ProductsViewAdminUI
+            product={viewingProduct}
+            onClose={closeAllForms}
+            onEdit={() => editProduct(viewingProduct)}
+          />
+        )}
+        {/* Products Table */}
+        <div className="rounded-md border">
+          <div className="relative w-full overflow-auto">
+            <table className="w-full caption-bottom text-sm">
+              <thead className="border-b">
+                <tr className="bg-muted/50">
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Product</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Brand</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Categories</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Price</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Variants</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Created</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((p)=>(
-                  <tr key={p.id ?? p.title+Math.random()} className="border-t">
-                    <td className="p-3">{p.title}</td>
-                    <td className="p-3">{p.sku}</td>
-                    <td className="p-3">${Number(p.price).toFixed(2)}</td>
-                    <td className="p-3">{p.quantity}</td>
-                    <td className="p-3">{p.type}</td>
-                    <td className="p-3">
-                      <div className="flex gap-3">
-                        <button className="text-green-700 hover:underline" onClick={()=>openEdit(p)}>Edit</button>
-                        <button className="text-red-600 hover:underline" onClick={()=>remove(p.id)}>Delete</button>
-                      </div>
+                {filteredProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="p-8 text-center text-muted-foreground">
+                      {searchTerm ? "No products found matching your search" : "No products found"}
                     </td>
                   </tr>
-                ))}
-                {!filtered.length && (
-                  <tr><td colSpan={6} className="p-4 text-center text-neutral-500">No products found</td></tr>
+                ) : (
+                  filteredProducts.map((product) => (
+                    <tr key={product._id} className="border-b hover:bg-muted/50">
+                      <td className="p-4 align-middle">
+                        <div className="flex items-center gap-3">
+                          {product.images && product.images.length > 0 ? (
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              className="h-10 w-10 rounded-md object-cover"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center">
+                              <span className="text-xs text-gray-500">No image</span>
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-medium">{product.name}</div>
+                            <div className="text-sm text-muted-foreground line-clamp-1">
+                              {product.description}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 align-middle">
+                        {product.brand?.name || "No brand"}
+                      </td>
+                      <td className="p-4 align-middle">
+                        <div className="flex flex-wrap gap-1">
+                          {product.categories && product.categories.length > 0 ? (
+                            product.categories.slice(0, 2).map((category) => (
+                              <span
+                                key={category._id}
+                                className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800"
+                              >
+                                {category.name}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-muted-foreground text-xs">No categories</span>
+                          )}
+                          {product.categories && product.categories.length > 2 && (
+                            <span className="text-xs text-muted-foreground">
+                              +{product.categories.length - 2} more
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4 align-middle">
+                        ${product.price.toFixed(2)}
+                      </td>
+                      <td className="p-4 align-middle">
+                        <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                          product.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        }`}>
+                          {product.isActive ? "Active" : "Inactive"}
+                        </span>
+                        <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ml-2 ${
+                          product.isOutOfStock ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"
+                        }`}>
+                          {product.isOutOfStock ? "Out of Stock" : "In Stock"}
+                        </span>
+                      </td>
+                      <td className="p-4 align-middle">
+                        {product.variants?.length || 0} variants
+                      </td>
+                      <td className="p-4 align-middle">
+                        {new Date(product.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="p-4 align-middle">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => viewProduct(product)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => editProduct(product)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => deleteProduct(product._id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-neutral-500">Tip: Wire these actions to your CMS/DB and add image storage.</p>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        {/* Pagination (optional) */}
+        {filteredProducts.length > 0 && (
+          <div className="flex items-center justify-between mt-4">
+            <div className="text-sm text-muted-foreground">
+              Showing {filteredProducts.length} of {products.length} products
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" disabled>
+                Previous
+              </Button>
+              <Button variant="outline" size="sm" disabled>
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

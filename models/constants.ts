@@ -7,6 +7,11 @@ export const MODELS = {
     RESERVATION: "Reservation",
     ORDER: "Order",
     ABANDONED_CART: "AbandonedCart",
+    BRAND: "Brand",
+    REVIEW: "Review",
+    FAQ: "FAQ",
+    BRAND_PRODUCTS: "BrandProducts",
+    CATEGORY_PRODUCTS: "CategoryProducts"
 }
 
 export const ORDER_TYPE = {

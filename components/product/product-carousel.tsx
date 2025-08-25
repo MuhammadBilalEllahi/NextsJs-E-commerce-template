@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { ProductCard } from "./product-card"
+import { ProductCard } from "@/components/product/product-card"
 import type { Product } from "@/lib/data"
 
 export function ProductCarousel({ products = [] as Product[] }) {

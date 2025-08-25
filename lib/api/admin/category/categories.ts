@@ -9,13 +9,27 @@ export const fetchCategories = async () => {
 };
 
 // create a new category
-export const createCategory = async (category: { name: string; parent?: string }) => {
-  console.log("[createCategory]")
-  const res = await fetch(API_URL_CATEGORY_ADMIN, {
+export const createCategory = async (category: { name: string; parent?: string;description?:string, image: File }) => {
+  console.log("[createCategory]", category)
+
+
+  const formData = new FormData();
+  // formData.append("id", category.id);
+  if (category.name) formData.append("name", category.name);
+  if (category.parent !== undefined) formData.append("parent", category.parent);
+  if (category.description) formData.append("description", category.description);
+
+  if (category.image && category.image instanceof File) {
+    formData.append("image", category.image);
+  }
+
+  console.log("[createCategory]", formData)
+  const res = await fetch(`${API_URL_CATEGORY_ADMIN}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(category),
+    body: formData,
   });
+
+
   if (!res.ok) throw new Error("Failed to create category");
   const data = await res.json();
   return data.category;
@@ -40,7 +54,7 @@ export const updateCategory = async (category: {
     formData.append("image", category.image);
   }
 
-  console.log("[updateCategory]",formData)
+  console.log("[updateCategory]", formData)
   const res = await fetch(`${API_URL_CATEGORY_ADMIN}`, {
     method: "PUT",
     body: formData,

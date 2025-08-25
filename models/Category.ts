@@ -8,6 +8,10 @@ const CategorySchema = new mongoose.Schema({
   parent: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.CATEGORY, default: null },
   description: String,
   image: String,
+  isActive: {
+        type: Boolean,
+        default: false
+    },
   createdAt: { type: Date, default: Date.now }
 });
 

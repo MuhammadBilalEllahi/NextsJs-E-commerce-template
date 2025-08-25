@@ -31,18 +31,23 @@ export async function POST(req: Request) {
   const session = await mongoose.startSession();
 
   try {
-    // Parse multipart/form-data using formidable
-    const data: { fields: formidable.Fields; files: formidable.Files } = await new Promise((resolve, reject) => {
-      const form = formidable({ multiples: false });
-      form.parse(req as any, (err, fields, files) => (err ? reject(err) : resolve({ fields, files })));
-    });
+   
+      // Convert NextRequest to Node-like request for formidable
+    const formData = await req.formData();
+    
+    // Since we can't easily use formidable with App Router, let's process manually
+    const name = formData.get('name')?.toString();
+    const slug = formData.get('slug')?.toString();
+    const parent = formData.get('parent')?.toString() || null;
+    const description = formData.get('description')?.toString();
+    const imageData = formData.get('image') as File | null;
 
     // Validate fields
     const validated = categorySchema.parse({
-      name: data.fields.name,
-      slug: data.fields.slug,
-      parent: data.fields.parent || null,
-      description: data.fields.description,
+      name: name,
+      slug: slug,
+      parent: parent || null,
+      description: description,
     });
 
     // Auto-generate slug if not provided
@@ -55,11 +60,42 @@ export async function POST(req: Request) {
 
     // Upload image if present
     let imageUrl: string | undefined;
-    const file = data.files.image as formidable.File | formidable.File[] | undefined;
-    if (file) {
-      const singleFile = Array.isArray(file) ? file[0] : file;
-      imageUrl = await uploadFileToS3(singleFile, "categories");
-      validated.image = imageUrl;
+    // const file = imageFile as formidable.File | formidable.File[] | undefined;
+  if (imageData && imageData instanceof Blob) {
+      
+      // Create uploads directory if it doesn't exist
+      const uploadDir = path.join(process.cwd(), 'uploads', 'temp');
+      try {
+        await mkdir(uploadDir, {recursive: true});
+      } catch (err) {
+        console.log("Upload directory already exists or couldn't be created");
+      }
+
+      // Convert File to buffer
+      const arrayBuffer = await imageData.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      
+      // Generate unique filename
+      const originalFilename = (imageData as any).name || `file-${Date.now()}.jpg`;
+      const fileExt = path.extname(originalFilename) || '.jpg';
+      const safeFilename = originalFilename.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const tempFileName = `temp-${Date.now()}-${safeFilename}`;
+      const tempFilePath = path.join(uploadDir, tempFileName);
+
+      // Save buffer to disk (uses disk storage, not RAM)
+      await writeFile(tempFilePath, buffer);
+      console.log("File saved to disk:", tempFilePath);
+
+      console.log("tempFilePath",tempFilePath)
+      console.log("")
+
+       imageUrl = await uploadFileToS3({
+        filepath: tempFilePath,
+        originalFilename: originalFilename,
+        mimetype: (imageData as any).type || "application/octet-stream"
+      }, "categories");
+
+      // imageUrl = await uploadFileToS3({ buffer, originalFilename: originalFilename, mimetype: imageData.type }, "categories");
     }
 
     // Start transaction
@@ -71,8 +107,9 @@ export async function POST(req: Request) {
     session.endSession();
     return NextResponse.json({ success: true, category: newCategory[0] });
   } catch (err: any) {
-    await session.abortTransaction();
+    // await session.abortTransaction();
     session.endSession();
+    console.error("ERR", err)
 
     if (err instanceof z.ZodError) {
       return NextResponse.json({ success: false, errors: err.message }, { status: 400 });

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { AddToWishlistButton } from "./wishlist-button"
+import { AddToWishlistButton } from "@/components/wishlist-button"
 import { useCart } from "@/lib/cart-store"
 import type { Product } from "@/lib/mock-data"
 import { Star } from 'lucide-react'

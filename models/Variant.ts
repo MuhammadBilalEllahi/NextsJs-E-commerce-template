@@ -1,7 +1,7 @@
 
 import mongoose from "mongoose";
 import { MODELS } from "@/models/constants";
-import {z} from "zod";
+import { z } from "zod";
 
 // Variant Schema
 const VariantSchema = new mongoose.Schema({
@@ -12,6 +12,16 @@ const VariantSchema = new mongoose.Schema({
   discount: { type: Number, default: 0 },
   stock: { type: Number, default: 0 },
   images: [String],
+
+  isActive: {
+    type: Boolean,
+    default: false
+  },
+  isOutOfStock: {
+    type: Boolean,
+    default: false
+  },
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
