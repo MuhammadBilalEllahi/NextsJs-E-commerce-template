@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Review from "@/models/Review";
 import { reviewZodSchema } from "@/models/Review";
-import dbConnect from "@/lib/mongodb";
+import dbConnect from "@/database/mongodb";
 
 
 export async function GET(request: NextRequest) {

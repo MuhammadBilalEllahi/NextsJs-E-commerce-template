@@ -11,6 +11,7 @@ import { Plus, X } from "lucide-react"
 import { API_URL_CATEGORY_ADMIN } from "@/lib/api/admin/category/categories"
 import { fetchCategories, createCategory, updateCategory } from "@/lib/api/admin/category/categories"
 import { createBrand } from "@/lib/api/admin/brand/brand"
+import { createProduct } from "@/lib/api/admin/product/products"
 
 type Brand = { _id: string; name: string; description?: string; logo?: string }
 type Category = { _id: string; name: string; parent?: { _id: string; name: string } | string | null; description?: string; image?: string }
@@ -57,48 +58,38 @@ export default function ProductsCreateAdminUI() {
 
     console.log(form)
 
-    const fd = new FormData()
-    fd.append("name", form.name)
-    fd.append("description", form.description)
-    fd.append("ingredients", form.ingredients)
-    fd.append("price", String(form.price))
-    fd.append("discount", String(form.discount))
-    fd.append("isActive", String(form.isActive))
-    fd.append("isOutOfStock", String(form.isOutOfStock))
-    if (form.brand) fd.append("brand", form.brand)
-    
-    // Append each category individually
-    form.categories.forEach(categoryId => {
-      fd.append("categories", categoryId)
-    })
-    
-    // Append all product images
-    form.images.forEach((file, index) => {
-      fd.append("images", file)
-    })
+    try {
+      // Prepare product data for the service
+      const productData = {
+        name: form.name,
+        description: form.description,
+        ingredients: form.ingredients,
+        price: form.price,
+        discount: form.discount,
+        isActive: form.isActive,
+        isOutOfStock: form.isOutOfStock,
+        brand: form.brand,
+        categories: form.categories,
+        images: form.images,
+        variants: variants.map(v => ({
+          sku: v.sku, 
+          label: v.label, 
+          price: v.price, 
+          stock: v.stock, 
+          discount: v.discount
+        }))
+      }
 
-    // send variants metadata and files
-    fd.append("variants", JSON.stringify(variants.map(v => ({
-      sku: v.sku, label: v.label, price: v.price, stock: v.stock, discount: v.discount
-    }))))
-    
-    // Append all variant images
-    variants.forEach((v, variantIndex) => {
-      v.images.forEach((file, imageIndex) => {
-        fd.append(`variantImages[${variantIndex}]`, file)
-      })
-    })
-
-    const res = await fetch("/api/admin/product", { method: "POST", body: fd })
-    if (!res.ok) {
-      const err = await res.json().catch(() => null)
-      alert(err?.error || "Failed to create product")
-      return
+      // Use the service to create product
+      await createProduct(productData)
+      
+      alert("Product created ✅")
+      // reset
+      setForm({ name: "", description: "", ingredients: "", price: 0, discount: 0, brand: "", categories: [], images: [], isActive: false, isOutOfStock: false })
+      setVariants([])
+    } catch (err: any) {
+      alert(err.message || "Failed to create product")
     }
-    alert("Product created ✅")
-    // reset
-    setForm({ name: "", description: "", ingredients: "", price: 0, discount: 0, brand: "", categories: [], images: [], isActive: false, isOutOfStock: false })
-    setVariants([])
   }
 
   // ===== create BRAND (name, description, logo) =====

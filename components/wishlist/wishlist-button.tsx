@@ -1,6 +1,6 @@
 "use client"
 
-import { useWishlist } from "@/lib/wishlist-store"
+import { useWishlist } from "@/lib/providers/wishlistProvider"
 import { Heart } from 'lucide-react'
 
 export function AddToWishlistButton({ productId, small = false }: { productId: string; small?: boolean }) {

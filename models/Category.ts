@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import {z} from "zod";
-import { MODELS } from "./constants";
+import { MODELS } from "@/models/constants";
 
 const CategorySchema = new mongoose.Schema({
   name: { type: String, required: true },

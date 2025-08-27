@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Search } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { Category } from "@/lib/mock-data"
+import type { Category } from "@/mock_data/mock-data"
 
 export function HomeSearchBar({ categories }: { categories: Category[] }) {
   const [q, setQ] = useState("")

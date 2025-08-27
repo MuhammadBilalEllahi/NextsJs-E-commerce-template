@@ -1,10 +1,10 @@
-import dbConnect from "@/lib/mongodb";
+import dbConnect from "@/database/mongodb";
 import Variant from "@/models/Variant";
 import { variantZodSchema } from "@/models/Variant";
 import Product from "@/models/Product";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
-import { uploadFileToS3 } from "@/lib/api/aws/aws";
+import { uploadFileToS3 } from "@/lib/utils/aws/aws";
 
 export async function POST(req: Request) {
   await dbConnect();

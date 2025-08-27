@@ -1,39 +1,39 @@
 // Import all models to ensure they are registered with Mongoose
 // Import dependencies before models that reference them
-import './User';
-import './Category';
-import './Brand';
-import './Variant';
-import './Review';
-import './Product';
-import './FAQ';
-import './Cart';
-import './Order';
-import './Address';
-import './Reservation';
-import './AbandonCartInfo';
-import './BrandProducts';
-import './CategoryProducts';
+import '@/models/User';
+import '@/models/Category';
+import '@/models/Brand';
+import '@/models/Variant';
+import '@/models/Review';
+import '@/models/Product';
+import '@/models/FAQ';
+import '@/models/Cart';
+import '@/models/Order';
+import '@/models/Address';
+import '@/models/Reservation';
+import '@/models/AbandonCartInfo';
+import '@/models/BrandProducts';
+import '@/models/CategoryProducts';
 
 // Export all models for convenience
-export { default as User } from './User';
-export { default as Product } from './Product';
-export { default as Category } from './Category';
-export { default as Brand } from './Brand';
-export { default as Review } from './Review';
-export { default as FAQ } from './FAQ';
-export { default as Variant } from './Variant';
-export { default as Cart } from './Cart';
-export { default as Order } from './Order';
-export { AddressSubSchema } from './Address';
-export { default as Reservation } from './Reservation';
-export { default as AbandonCartInfo } from './AbandonCartInfo';
-export { default as BrandProducts } from './BrandProducts';
-export { default as CategoryProducts } from './CategoryProducts';
+export { default as User } from '@/models/User';
+export { default as Product } from '@/models/Product';
+export { default as Category } from '@/models/Category';
+export { default as Brand } from '@/models/Brand';
+export { default as Review } from '@/models/Review';
+export { default as FAQ } from '@/models/FAQ';
+export { default as Variant } from '@/models/Variant';
+export { default as Cart } from '@/models/Cart';
+export { default as Order } from '@/models/Order';
+export { AddressSubSchema } from '@/models/Address';
+export { default as Reservation } from '@/models/Reservation';
+export { default as AbandonCartInfo } from '@/models/AbandonCartInfo';
+export { default as BrandProducts } from '@/models/BrandProducts';
+export { default as CategoryProducts } from '@/models/CategoryProducts';
 
 // Export Zod schemas
-export { brandZodSchema } from './Brand';
-export { categorySchema } from './Category';
-export { productZodSchema } from './Product';
-export { variantZodSchema } from './Variant';
-export { reviewZodSchema } from './Review';
+export { brandZodSchema } from '@/models/Brand';
+export { categorySchema } from '@/models/Category';
+export { productZodSchema } from '@/models/Product';
+export { variantZodSchema } from '@/models/Variant';
+export { reviewZodSchema } from '@/models/Review';

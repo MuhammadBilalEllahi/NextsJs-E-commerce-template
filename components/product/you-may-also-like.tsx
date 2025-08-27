@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ProductCard } from "./product/product-card"
-import { getAllProducts } from "@/lib/data"
+import { ProductCard } from "@/components/product/product-card"
+import { getAllProducts } from "@/mock_data/data"
 
 export function YouMayAlsoLike({ currentId }: { currentId: string }) {
   const [products, setProducts] = useState<any[]>([])

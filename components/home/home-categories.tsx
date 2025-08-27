@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Category } from "@/lib/mock-data"
+import { Category } from "@/mock_data/mock-data"
 
 export function HomeCategories({ categories }: { categories: Category[] }) {
   return (

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ShopLocations } from "@/lib/mock-data"
+import { ShopLocations } from "@/mock_data/mock-data"
 import { ExternalLink } from "lucide-react"
 
 export function HomeShopLocations({ shopLocation }: { shopLocation: ShopLocations[] }) {

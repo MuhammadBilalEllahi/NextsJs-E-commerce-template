@@ -1,5 +1,5 @@
-export { ReviewsEnhanced } from './reviews-enhanced'
-export { default as Reviews } from '../reviews'
+export { ReviewsEnhanced } from '@/components/reviews/reviews-enhanced2'
+export { default as Reviews } from '@/components/reviews'
 
 
 

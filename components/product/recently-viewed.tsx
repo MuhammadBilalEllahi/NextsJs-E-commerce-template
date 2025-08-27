@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ProductCard } from "./product/product-card"
-import { products } from "@/lib/mock-data"
-import type { Product } from "@/lib/mock-data"
+import { ProductCard } from "@/components/product/product-card"
+import { products } from "@/mock_data/mock-data"
+import type { Product } from "@/mock_data/mock-data"
 
 export function RecentlyViewed({ currentId }: { currentId: string }) {
   const [recentProducts, setRecentProducts] = useState<Product[]>([])

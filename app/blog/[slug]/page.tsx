@@ -1,4 +1,4 @@
-import { getAllBlogs } from "@/lib/data"
+import { getAllBlogs } from "@/mock_data/data"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 

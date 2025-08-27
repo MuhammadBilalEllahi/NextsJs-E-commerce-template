@@ -4,7 +4,7 @@ import { HomeFeaturedProducts } from "@/components/home/home-featured-products"
 import { HomeCategories } from "@/components/home/home-categories"
 import { HomeBlogPreview } from "@/components/home/home-blog-preview"
 import { HomeTestimonials } from "@/components/home/home-testimonials"
-import { getFeaturedProducts, getFeaturedBlogs, getCategories, shopLocations } from "@/lib/mock-data"
+import { getFeaturedProducts, getFeaturedBlogs, getCategories, shopLocations } from "@/mock_data/mock-data"
 import { HomeShopLocations } from "@/components/home/home-shops-preview"
 import { HomeNewsletter } from "@/components/home/home-newsletter"
 

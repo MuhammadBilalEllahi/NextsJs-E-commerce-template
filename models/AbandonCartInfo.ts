@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { MODELS } from "./constants";
+import { MODELS } from "@/models/constants";
 
 const ABANDONED_CART_STATUS = {
     PENDING: "pending",
@@ -40,4 +40,4 @@ const abandonedCartSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-export default mongoose.models[MODELS.ABANDONED_CART] || mongoose.model(MODELS.ABANDONED_CART, abandonedCartSchema);
+export default mongoose.models[MODELS.ABANDONED_CART] || mongoose.model(MODELS.ABANDONED_CART.toString(), abandonedCartSchema);

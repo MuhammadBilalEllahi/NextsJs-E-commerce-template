@@ -1,11 +1,11 @@
 'use client'
 
-import { CartProvider, useCart } from "@/lib/cart-store"
+import { CartProvider, useCart } from "@/lib/providers/cartProvider"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Minus, Plus, Trash2 } from 'lucide-react'
-import { RootProviders } from "@/components/root-providers"
+import { RootProviders } from "@/lib/providers/rootProvider"
 
 export default function CartPage() {
   // Important: do NOT call useCart here. Wrap children with providers first.

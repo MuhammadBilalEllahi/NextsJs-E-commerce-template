@@ -2,8 +2,8 @@
 
 import { useRef, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Product } from "@/lib/mock-data"
-import { ProductCard } from "../product/product-card"
+import { Product } from "@/mock_data/mock-data"
+import { ProductCard } from "@/components/product/product-card"
 
 export function HomeFeaturedProducts({
   bestSellings,

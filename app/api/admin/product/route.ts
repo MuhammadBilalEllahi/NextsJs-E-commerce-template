@@ -1,15 +1,21 @@
-import { uploadFileToS3 } from "@/lib/api/aws/aws";
-import dbConnect from "@/lib/mongodb";
+
 import Product from "@/models/Product";
 import { productZodSchema } from "@/models/Product";
 import Variant from "@/models/Variant";
 import BrandProducts from "@/models/BrandProducts";
 import CategoryProducts from "@/models/CategoryProducts";
+
+import { Brand } from "@/models";
+
+
+
+
+import { uploadFileToS3 } from "@/lib/utils/aws/aws";
+import dbConnect from "@/database/mongodb";
 import { mkdir, writeFile } from "fs/promises";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import path from "path";
-
 // ============================
 //  CREATE PRODUCT
 // ============================
@@ -30,6 +36,7 @@ export async function POST(req: Request) {
       categories: formData.getAll("categories").map(c => c.toString()),
       brand: formData.get("brand")?.toString(),
       slug: formData.get("slug")?.toString(),
+      // images: formData.getAll("images").map(i => i.toString()),
       variants: JSON.parse(formData.get("variants")?.toString() || "[]"),
       isActive: formData.get("isActive")?.toString() === "true",
       isOutOfStock: formData.get("isOutOfStock")?.toString() === "true",
@@ -72,6 +79,7 @@ export async function POST(req: Request) {
 
     // Upload product images
     const productImageFiles = formData.getAll("images") as File[];
+    console.log("[POST] productImageFiles:", productImageFiles);
     const uploadedProductImages: string[] = [];
     for (const file of productImageFiles) {
       if (file instanceof Blob) {
@@ -113,6 +121,7 @@ export async function POST(req: Request) {
           },
           `products/${newProduct._id}`
         );
+        console.log("[POST] uploadedProductImages:", uploadedProductImages);
         uploadedProductImages.push(url);
       }
     }
@@ -177,9 +186,26 @@ export async function POST(req: Request) {
 export async function GET() {
   await dbConnect();
   try {
-    const products = await Product.find({}).populate("brand categories variants").lean();
+    const products = await Product.find().populate([
+      {
+        path: "brand",
+        model: "Brand",
+        // select: "name"
+      },
+      {
+        path: "categories",
+        model: "Category",
+        // select: "name"
+      },
+      {
+        path: "variants",
+        model: "Variant",
+        // select: "sku label price stock discount images"
+      }
+    ]).lean();
     return NextResponse.json({ products }, { status: 200 });
   } catch (err: any) {
+    console.error("Error fetching products:", err);
     return NextResponse.json({ error: err.message || "Failed to fetch products" }, { status: 500 });
   }
 }
@@ -194,6 +220,7 @@ export async function PUT(req: Request) {
 
   try {
     const formData = await req.formData();
+    console.log("[PUT] formData:", formData);
     const productId = formData.get("id")?.toString();
     if (!productId) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
@@ -301,7 +328,7 @@ export async function DELETE(req: Request) {
   session.startTransaction();
 
   try {
-    const { id } = await req.json();
+    const id = req.nextUrl.searchParams.get("id");
     if (!id) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
     }

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { MODELS } from "./constants";
+import { MODELS } from "@/models/constants";
 
 const BrandProductsSchema = new mongoose.Schema({
   _id: { 

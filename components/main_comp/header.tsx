@@ -4,9 +4,9 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ShoppingCart, Sun, Moon, Heart } from 'lucide-react'
 import { useEffect, useState } from "react"
-import { useCart } from "@/lib/cart-store"
-import { useWishlist } from "@/lib/wishlist-store"
-import { CartSheet } from "@/components/cart-sheet"
+import { useCart } from "@/lib/providers/cartProvider"
+import { useWishlist } from "@/lib/providers/wishlistProvider"
+import { CartSheet } from "@/components/cart/cart-sheet"
 
 export function Header() {
   const pathname = usePathname()

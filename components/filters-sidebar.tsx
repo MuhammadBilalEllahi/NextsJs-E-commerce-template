@@ -6,7 +6,7 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import type { Product } from "@/lib/mock-data"
+import type { Product } from "@/mock_data/mock-data"
 
 const spiceOptions = [
   { key: "mild", label: "Mild (1–2)" },

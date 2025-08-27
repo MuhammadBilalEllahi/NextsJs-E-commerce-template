@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ProductCard } from "@/components/product/product-card"
-import type { Product } from "@/lib/data"
+import type { Product } from "@/mock_data/data"
 
 export function ProductCarousel({ products = [] as Product[] }) {
   const [index, setIndex] = useState(0)

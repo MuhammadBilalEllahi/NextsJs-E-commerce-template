@@ -13,6 +13,7 @@ import { Plus, X, Edit, Eye, Save, ArrowLeft } from "lucide-react"
 import { API_URL_CATEGORY_ADMIN } from "@/lib/api/admin/category/categories"
 import { fetchCategories, createCategory, updateCategory } from "@/lib/api/admin/category/categories"
 import { createBrand } from "@/lib/api/admin/brand/brand"
+import { updateProduct } from "@/lib/api/admin/product/products"
 
 type Brand = { _id: string; name: string; description?: string; logo?: string }
 type Category = { _id: string; name: string; parent?: { _id: string; name: string } | string | null; description?: string; image?: string }
@@ -112,7 +113,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
   }, [])
 
   // ===== UPDATE PRODUCT =====
-  const updateProduct = async () => {
+  const handleUpdateProduct = async () => {
     if (!form.name || !form.price || form.categories.length === 0) {
       alert("Please fill in all required fields")
       return
@@ -120,36 +121,30 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
 
     setLoading(true)
     try {
-      const fd = new FormData()
-      fd.append("id", product._id)
-      fd.append("name", form.name)
-      fd.append("description", form.description)
-      fd.append("ingredients", form.ingredients)
-      fd.append("price", String(form.price))
-      fd.append("discount", String(form.discount))
-      fd.append("isActive", String(form.isActive))
-      fd.append("isOutOfStock", String(form.isOutOfStock))
-      if (form.brand) fd.append("brand", form.brand)
-      
-      // Append each category individually
-      form.categories.forEach(categoryId => {
-        fd.append("categories", categoryId)
-      })
-      
-      // Append new product images if any
-      form.images.forEach((image, index) => {
-        if (typeof image === 'string') {
-          fd.append("existingImages", image)
-        } else {
-          fd.append("images", image)
-        }
-      })
-
-      const res = await fetch("/api/admin/product", { method: "PUT", body: fd })
-      if (!res.ok) {
-        const err = await res.json().catch(() => null)
-        throw new Error(err?.error || "Failed to update product")
+      // Prepare product data for the service
+      const productData = {
+        _id: product._id,
+        name: form.name,
+        description: form.description,
+        ingredients: form.ingredients,
+        price: form.price,
+        discount: form.discount,
+        isActive: form.isActive,
+        isOutOfStock: form.isOutOfStock,
+        brand: form.brand,
+        categories: form.categories,
+        images: form.images,
+        variants: variants.map(v => ({
+          sku: v.sku, 
+          label: v.label, 
+          price: v.price, 
+          stock: v.stock, 
+          discount: v.discount
+        }))
       }
+
+      // Use the service to update product
+      await updateProduct(productData)
       
       alert("Product updated successfully ✅")
       onUpdate()
@@ -357,7 +352,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
           </div>
           <Button 
             className="bg-green-600 hover:bg-green-700" 
-            onClick={updateProduct}
+            onClick={handleUpdateProduct}
             disabled={loading}
           >
             <Save className="h-4 w-4 mr-2" />

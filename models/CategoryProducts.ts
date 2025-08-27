@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { MODELS } from "./constants";
+import { MODELS } from "@/models/constants";
 
 const CategoryProductsSchema = new mongoose.Schema({
   _id: { 
@@ -28,4 +28,4 @@ CategoryProductsSchema.pre('save', function(next) {
   next();
 });
 
-export default mongoose.models[MODELS.CATEGORY_PRODUCTS] || mongoose.model(MODELS.CATEGORY_PRODUCTS, CategoryProductsSchema);
+export default mongoose.models[MODELS.CATEGORY_PRODUCTS] || mongoose.model(MODELS.CATEGORY_PRODUCTS.toString(), CategoryProductsSchema);

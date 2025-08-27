@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getTestimonials } from "@/lib/data"
+import { getTestimonials } from "@/mock_data/data"
 
 export function TestimonialsSlider() {
   const [index, setIndex] = useState(0)

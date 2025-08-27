@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import Category from "@/models/Category";
 import { categorySchema } from "@/models/Category";
 import { z } from "zod";
-import dbConnect from "@/lib/mongodb"; // your DB helper
-import { uploadFileToS3 } from "@/lib/api/aws/aws";
+import dbConnect from "@/database/mongodb"; // your DB helper
+import { uploadFileToS3 } from "@/lib/utils/aws/aws";
 import formidable from "formidable";
 import fs from "fs";
 import path from "path";

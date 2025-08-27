@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/utils"
 import { LayoutDashboard, Package, Tags, ShoppingCart, Users, Megaphone, FileText, MessageCircle, CreditCard, Shield, LogOut } from 'lucide-react'
 import { useAppContext } from "@/context/AppContext"
 

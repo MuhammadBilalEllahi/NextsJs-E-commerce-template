@@ -1,11 +1,11 @@
 "use client"
 
-import { useWishlist } from "@/lib/wishlist-store"
-import { useCart } from "@/lib/cart-store"
+import { useWishlist } from "@/lib/providers/wishlistProvider"
+import { useCart } from "@/lib/providers/cartProvider"
 import { Button } from "@/components/ui/button"
 import { Heart, Trash2 } from 'lucide-react'
 import Link from "next/link"
-import { products } from "@/lib/mock-data"
+import { products } from "@/mock_data/mock-data"
 
 export default function WishlistPage() {
   const { ids, remove } = useWishlist()

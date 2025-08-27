@@ -5,7 +5,7 @@ import Brand from "@/models/Brand";
 import Review from "@/models/Review";
 import FAQ from "@/models/FAQ";
 import Variant from "@/models/Variant";
-import dbConnect from "@/lib/mongodb";
+import dbConnect from "@/database/mongodb";
 
 
 

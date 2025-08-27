@@ -5,7 +5,7 @@ import { Star } from 'lucide-react'
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 
-export function Reviews({
+export default function Reviews({
   productId = "",
   initialReviews = [] as { user: string; rating: number; text: string }[],
 }) {

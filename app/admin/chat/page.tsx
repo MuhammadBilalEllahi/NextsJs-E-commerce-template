@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { getSampleInquiries } from "@/lib/admin-sample"
+import { getSampleInquiries } from "@/mock_data/admin-sample"
 
 type Inquiry = { id: string; name: string; email?: string; message: string; channel: "Chat"|"WhatsApp"|"Email"; status: "Open"|"Closed"; createdAt: string; thread?: { from: "user"|"admin"; text: string; at: string }[] }
 

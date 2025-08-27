@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getAllBlogs } from "@/lib/data"
+import { getAllBlogs } from "@/mock_data/data"
 import { Input } from "@/components/ui/input"
 
 export const metadata = {

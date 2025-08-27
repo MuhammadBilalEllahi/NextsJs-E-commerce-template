@@ -1,10 +1,11 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "@/app/globals.css";
+
 
 import type { Metadata } from "next"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { RootProviders } from "@/components/root-providers"
+import { Header } from "@/components/main_comp/header"
+import { Footer } from "@/components/main_comp/footer"
+import { RootProviders } from "@/lib/providers/rootProvider"
 import { AppProviderWrapper } from "@/components/app-provider-wrapper";
 
 export const metadata: Metadata = {

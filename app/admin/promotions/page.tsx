@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { getSampleCoupons } from "@/lib/admin-sample"
+import { getSampleCoupons } from "@/mock_data/admin-sample"
 
 type Coupon = { code: string; type: "percent"|"fixed"; amount: number; starts?: string; ends?: string; restrict?: string }
 

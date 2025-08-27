@@ -5,82 +5,31 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Edit, Trash2, Eye, Plus } from "lucide-react"
-import ProductsCreateAdminUI from "./products-create"
-import ProductsEditAdminUI from "./products-edit"
-import ProductsViewAdminUI from "./products-view"
-
-type Product = {
-  _id: string;
-  name: string;
-  description: string;
-  ingredients?: string;
-  price: number;
-  discount: number;
-  brand: { _id: string; name: string };
-  categories: { _id: string; name: string }[];
-  images: string[];
-  variants: any[];
-  isActive: boolean;
-  isOutOfStock: boolean;
-  slug: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import ProductsCreateAdminUI from "@/components/admin/product/products-create"
+import ProductsEditAdminUI from "@/components/admin/product/products-edit"
+import ProductsViewAdminUI from "@/components/admin/product/products-view"
+import { useProducts, Product } from "@/lib/api/admin/product/products"
 
 export default function ProductsTable() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [error, setError] = useState("")
-
-    const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null)
 
-
-  // Fetch products from API
-  const fetchProducts = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch("/api/admin/product")
-      if (!response.ok) {
-        throw new Error("Failed to fetch products")
-      }
-      const data = await response.json()
-      // Add default values for missing fields
-      const productsWithDefaults = (data.products || []).map((product: any) => ({
-        ...product,
-        isOutOfStock: product.isOutOfStock || false,
-        isActive: product.isActive || false
-      }))
-      setProducts(productsWithDefaults)
-    } catch (err: any) {
-      setError(err.message)
-      console.error("Error fetching products:", err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Use the products service hook
+  const { products, loading, error, loadProducts, removeProduct } = useProducts()
 
   useEffect(() => {
-    fetchProducts()
+    loadProducts()
   }, [])
 
   // Delete product
-  const deleteProduct = async (productId: string) => {
+  const handleDeleteProduct = async (productId: string) => {
+    // console.log("[handleDeleteProduct] productId:", productId);
     if (!confirm("Are you sure you want to delete this product?")) return
     
     try {
-      const response = await fetch(`/api/admin/product?id=${productId}`, {
-        method: "DELETE",
-      })
-      
-      if (!response.ok) {
-        throw new Error("Failed to delete product")
-      }
-      
-      // Refresh the product list
-      fetchProducts()
+      await removeProduct(productId)
       alert("Product deleted successfully")
     } catch (err: any) {
       alert("Error deleting product: " + err.message)
@@ -142,7 +91,7 @@ export default function ProductsTable() {
           <div className="text-red-500 p-4 bg-red-50 rounded-md">
             {error}
           </div>
-          <Button onClick={fetchProducts} className="mt-4">
+          <Button onClick={loadProducts} className="mt-4">
             Try Again
           </Button>
         </CardContent>
@@ -185,7 +134,7 @@ export default function ProductsTable() {
             product={editingProduct}
             onClose={closeAllForms}
             onUpdate={() => {
-              fetchProducts()
+              loadProducts()
               closeAllForms()
             }}
           />
@@ -313,7 +262,7 @@ export default function ProductsTable() {
                             variant="outline"
                             size="icon"
                             className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => deleteProduct(product._id)}
+                            onClick={() => handleDeleteProduct(product._id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

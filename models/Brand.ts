@@ -26,4 +26,4 @@ export  const brandZodSchema = z.object({
 })
 
 
-export default mongoose.models[MODELS.BRAND] || mongoose.model(MODELS.BRAND, brandSchema)
+export default mongoose.models[MODELS.BRAND] || mongoose.model(MODELS.BRAND.toString(), brandSchema)

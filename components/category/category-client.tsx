@@ -2,14 +2,14 @@
 
 import { useMemo, useState, useEffect, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { type Product } from "@/lib/mock-data"
-import { FiltersSidebar } from "./filters-sidebar"
-import { MobileFiltersSheet } from "./mobile-filters-sheet"
-import { ViewControls } from "./view-controls"
+import { type Product } from "@/mock_data/mock-data"
+import { FiltersSidebar } from "@/components/filters-sidebar"
+import { MobileFiltersSheet } from "@/components/mobile-filters-sheet"
+import { ViewControls } from "@/components/view-controls"
 
 import { Button } from "@/components/ui/button"
 import { Filter } from 'lucide-react'
-import { ProductGrid } from "./product/product-grid"
+import { ProductGrid } from "@/components/product/product-grid"
 
 const spiceLabelToRange: Record<string, [number, number]> = {
   mild: [1, 2],

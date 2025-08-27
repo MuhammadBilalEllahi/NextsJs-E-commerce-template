@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { FiltersSidebar } from "./filters-sidebar"
-import type { Product } from "@/lib/mock-data"
+import { FiltersSidebar } from "@/components/filters-sidebar"
+import type { Product } from "@/mock_data/mock-data"
 
 export function MobileFiltersSheet({
   slug,

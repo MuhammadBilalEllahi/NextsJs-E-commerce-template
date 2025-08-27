@@ -1,6 +1,7 @@
-import { RootProviders } from "@/components/root-providers"
-import { CategoryClient } from "@/components/category-client"
-import { getAllProducts } from "@/lib/mock-data"
+import { RootProviders } from "@/lib/providers/rootProvider"
+import { CategoryClient } from "@/components/category/category-client"
+import { getAllProducts } from "@/database/data-service"
+
 
 export const dynamic = "force-dynamic"
 

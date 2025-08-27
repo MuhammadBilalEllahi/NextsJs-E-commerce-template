@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { downloadCSV } from "@/lib/csv"
-import { getSampleOrders } from "@/lib/admin-sample"
+import { getSampleOrders } from "@/mock_data/admin-sample"
 
 type Order = {
   id: string; customer: string; total: number; status: "Pending"|"Processing"|"Completed"|"Refunded"

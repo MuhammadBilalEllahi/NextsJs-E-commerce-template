@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import type { Blog } from "@/lib/mock-data"
+import type { Blog } from "@/mock_data/mock-data"
 
 export function HomeBlogPreview({ blogs }: { blogs: Blog[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)

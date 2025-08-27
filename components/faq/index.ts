@@ -1,4 +1,4 @@
-export { FAQEnhanced } from './faq-enhanced'
+export { FAQEnhanced } from '@/components/faq/faq-enhanced'
 
 
 

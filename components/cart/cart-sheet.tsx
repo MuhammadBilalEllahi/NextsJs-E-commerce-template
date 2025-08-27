@@ -1,6 +1,6 @@
 "use client"
 
-import { useCart } from "@/lib/cart-store"
+import { useCart } from "@/lib/providers/cartProvider"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"

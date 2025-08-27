@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { getSampleCustomers } from "@/lib/admin-sample"
+import { getSampleCustomers } from "@/mock_data/admin-sample"
 
 type Customer = { id: string; name: string; email: string; orders: number; total: number; blocked?: boolean; tags: string[] }
 

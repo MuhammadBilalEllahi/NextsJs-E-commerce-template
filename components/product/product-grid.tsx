@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState, useRef } from "react"
 import { ProductCard } from "@/components/product/product-card"
-import { cn } from "@/lib/utils"
-import type { Product } from "@/lib/mock-data"
+import { cn } from "@/lib/utils/utils"
+import type { Product } from "@/mock_data/mock-data"
 
 export function ProductGrid({
   products = [],

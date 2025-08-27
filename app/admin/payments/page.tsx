@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { getSamplePayments } from "@/lib/admin-sample"
+import { getSamplePayments } from "@/mock_data/admin-sample"
 import { Button } from "@/components/ui/button"
 
 type Payment = { id: string; method: "COD"|"JazzCash"|"Easypaisa"|"Stripe"; status: "Paid"|"Failed"|"Refunded"; amount: number; date: string; orderId: string }

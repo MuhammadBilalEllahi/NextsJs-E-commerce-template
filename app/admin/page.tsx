@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, BarChart, Bar } from "recharts"
 import { useMemo } from "react"
-import { getSampleAnalytics } from "@/lib/admin-sample"
+import { getSampleAnalytics } from "@/mock_data/admin-sample"
 
 export default function AdminDashboardPage() {
   const { revenueByMonth, ordersByStatus, topProducts, lowStock } = useMemo(()=>getSampleAnalytics(),[])

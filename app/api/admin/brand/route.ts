@@ -1,5 +1,5 @@
-import { uploadFileToS3 } from "@/lib/api/aws/aws";
-import dbConnect from "@/lib/mongodb";
+import { uploadFileToS3 } from "@/lib/utils/aws/aws";
+import dbConnect from "@/database/mongodb";
 import Brand from "@/models/Brand";
 import { brandZodSchema } from "@/models/Brand";
 import { mkdir, writeFile } from "fs/promises";

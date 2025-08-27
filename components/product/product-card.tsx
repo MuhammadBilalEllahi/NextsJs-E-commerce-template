@@ -2,9 +2,9 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { AddToWishlistButton } from "@/components/wishlist-button"
-import { useCart } from "@/lib/cart-store"
-import type { Product } from "@/lib/mock-data"
+import { AddToWishlistButton } from "@/components/wishlist/wishlist-button"
+import { useCart } from "@/lib/providers/cartProvider"
+import type { Product } from "@/mock_data/mock-data"
 import { Star } from 'lucide-react'
 
 export function ProductCard({

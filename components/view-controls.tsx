@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { SortDropdown } from "./sort-dropdown"
+import { SortDropdown } from "@/components/sort-dropdown"
 import { List, Grid2X2, Grid3X3, Grid } from 'lucide-react'
 
 interface ViewControlsProps {

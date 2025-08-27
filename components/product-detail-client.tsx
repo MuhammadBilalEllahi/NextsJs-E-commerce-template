@@ -6,14 +6,14 @@ import { Separator } from "@/components/ui/separator"
 import { Star, Truck, ShieldCheck, Share2, SendHorizontal, Facebook, Twitter, ChevronDown, Minus, Plus } from 'lucide-react'
 import Link from "next/link"
 import { ProductImages } from "@/components/product/product-images"
-import { AddToWishlistButton } from "@/components/wishlist-button"
-import { ReviewsEnhanced } from "@/components/reviews-enhanced"
+import { AddToWishlistButton } from "@/components/wishlist/wishlist-button"
+import { ReviewsEnhanced } from "@/components/reviews/reviews-enhanced"
 import { FAQEnhanced } from "@/components/faq-enhanced"
-import { YouMayAlsoLike } from "@/components/you-may-also-like"
-import { RecentlyViewed } from "@/components/recently-viewed"
+import { YouMayAlsoLike } from "@/components/product/you-may-also-like"
+import { RecentlyViewed } from "@/components/product/recently-viewed"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { useCart } from "@/lib/cart-store"
-import type { Product } from "@/lib/data"
+import { useCart } from "@/lib/providers/cartProvider"
+import type { Product } from "@/mock_data/data"
 
 interface ProductDetailClientProps {
   product: Product

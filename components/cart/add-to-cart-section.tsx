@@ -1,11 +1,11 @@
 "use client"
 
-import { useCart } from "@/lib/cart-store"
-import type { Product } from "@/lib/data"
+import { useCart } from "@/lib/providers/cartProvider"
+import type { Product } from "@/mock_data/data"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { Heart } from 'lucide-react'
-import { useWishlist } from "@/lib/wishlist-store"
+import { useWishlist } from "@/lib/providers/wishlistProvider"
 import { Input } from "@/components/ui/input"
 
 export function AddToCartSection({ product }: { product: Product }) {

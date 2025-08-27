@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { ProductDetailClient } from "@/components/product/product-detail-client"
-import { getAllProducts, getProductBySlug } from "@/lib/data-service";
+import { getAllProducts, getProductBySlug } from "@/database/data-service";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();

@@ -55,4 +55,4 @@ export const productZodSchema = z.object({
   isOutOfStock: z.boolean().optional()
 });
 
-export default mongoose.models[MODELS.PRODUCT] || mongoose.model(MODELS.PRODUCT, ProductSchema);
+export default mongoose.models[MODELS.PRODUCT] || mongoose.model(MODELS.PRODUCT.toString(), ProductSchema);
