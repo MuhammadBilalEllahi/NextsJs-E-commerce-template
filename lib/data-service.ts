@@ -1,9 +1,13 @@
+// Import specific models for use
 import Product from "@/models/Product";
 import Category from "@/models/Category";
 import Brand from "@/models/Brand";
 import Review from "@/models/Review";
 import FAQ from "@/models/FAQ";
+import Variant from "@/models/Variant";
 import dbConnect from "@/lib/mongodb";
+
+
 
 // Product data functions
 export async function getAllProducts() {
@@ -13,34 +17,43 @@ export async function getAllProducts() {
       .populate("brand", "name")
       .populate("categories", "name")
       .populate("variants")
-      .populate("reviews")
+    //   .populate("reviews")
       .sort({ createdAt: -1 })
       .lean();
+
+    console.log("product s in getAllProducts", JSON.stringify(products, null, 2));
     
-    return products.map(product => ({
-      id: product._id,
-      slug: product.slug,
-      title: product.name,
-      description: product.description,
-      price: product.price,
-      images: product.images,
-      rating: product.ratingAvg,
-      spiceLevel: 3, // Default value, can be added to product model later
-      vegetarian: true, // Default value, can be added to product model later
-      ingredients: product.ingredients,
-      instructions: "", // Can be added to product model later
-      category: product.categories?.[0]?.name || "spices",
-      brand: product.brand?.name || "Delhi Mirch",
-      stock: product.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0,
-      tags: [], // Can be added to product model later
-      reviews: product.reviews?.map(review => ({
-        id: review._id,
-        user: review.user?.name || "Anonymous",
-        rating: review.rating,
-        comment: review.comment,
-        date: review.createdAt
-      })) || []
-    }));
+         return products.map(product => ({
+       id: String(product._id),
+       slug: product.slug,
+       title: product.name,
+       description: product.description,
+       price: product.price,
+       images: product.images,
+       rating: product.ratingAvg,
+       ingredients: product.ingredients,
+       instructions: "", // Can be added to product model later
+       category: product.categories?.[0]?.name || "spices",
+       brand: product.brand?.name || "Delhi Mirch",
+       stock: product.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0,
+       tags: [], // Can be added to product model later
+       variants: product.variants?.map(variant => ({
+         _id: String(variant._id),
+         label: variant.label,
+         price: variant.price,
+         stock: variant.stock,
+         isActive: variant.isActive,
+         isOutOfStock: variant.isOutOfStock,
+         images: variant.images
+       })) || [],
+       reviews: product.reviews?.map(review => ({
+         id: String(review._id),
+         user: review.user?.name || "Anonymous",
+         rating: review.rating,
+         comment: review.comment,
+         date: review.createdAt
+       })) || []
+     }));
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
@@ -54,35 +67,43 @@ export async function getProductBySlug(slug: string) {
       .populate("brand", "name")
       .populate("categories", "name")
       .populate("variants")
-      .populate("reviews")
+    //   .populate("reviews")
       .lean();
-    
+    console.log("product in getProductBySlug", product);
     if (!product) return null;
     
-    return {
-      id: product._id,
-      slug: product.slug,
-      title: product.name,
-      description: product.description,
-      price: product.price,
-      images: product.images,
-      rating: product.ratingAvg,
-      spiceLevel: 3, // Default value
-      vegetarian: true, // Default value
-      ingredients: product.ingredients,
-      instructions: "", // Can be added later
-      category: product.categories?.[0]?.name || "spices",
-      brand: product.brand?.name || "Delhi Mirch",
-      stock: product.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0,
-      tags: [], // Can be added later
-      reviews: product.reviews?.map(review => ({
-        id: review._id,
-        user: review.user?.name || "Anonymous",
-        rating: review.rating,
-        comment: review.comment,
-        date: review.createdAt
-      })) || []
-    };
+    console.log("product in getProductBySlug", product);
+         return {
+       id: String(product._id),
+       slug: product.slug,
+       title: product.name,
+       description: product.description,
+       price: product.price,
+       images: product.images,
+       rating: product.ratingAvg,
+       ingredients: product.ingredients,
+       instructions: "", // Can be added later
+       category: product.categories?.[0]?.name || "spices",
+       brand: product.brand?.name || "Delhi Mirch",
+       stock: product.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0,
+       tags: [], // Can be added later
+       variants: product.variants?.map(variant => ({
+         _id: String(variant._id),
+         label: variant.label,
+         price: variant.price,
+         stock: variant.stock,
+         isActive: variant.isActive,
+         isOutOfStock: variant.isOutOfStock,
+         images: variant.images
+       })) || [],
+       reviews: product.reviews?.map(review => ({
+         id: String(review._id),
+         user: review.user?.name || "Anonymous",
+         rating: review.rating,
+         comment: review.comment,
+         date: review.createdAt
+       })) || []
+     };
   } catch (error) {
     console.error("Error fetching product by slug:", error);
     return null;
@@ -98,16 +119,16 @@ export async function getAllCategories() {
       .sort({ order: 1, name: 1 })
       .lean();
     
-    return categories.map(category => ({
-      id: category._id,
+         return categories.map(category => ({
+       id: String(category._id),
       name: category.name,
       slug: category.slug,
       description: category.description,
       image: category.image,
-      parent: category.parent ? {
-        id: category.parent._id,
-        name: category.parent.name
-      } : null,
+             parent: category.parent ? {
+         id: String(category.parent._id),
+         name: category.parent.name
+       } : null,
       productCount: 0 // Can be populated later if needed
     }));
   } catch (error) {
@@ -124,8 +145,8 @@ export async function getAllBrands() {
       .sort({ name: 1 })
       .lean();
     
-    return brands.map(brand => ({
-      id: brand._id,
+         return brands.map(brand => ({
+       id: String(brand._id),
       name: brand.name,
       description: brand.description,
       logo: brand.logo
@@ -157,9 +178,9 @@ export async function getProductReviews(productId: string, limit = 10, page = 1)
       isActive: true 
     });
     
-    return {
-      reviews: reviews.map(review => ({
-        id: review._id,
+           return {
+         reviews: reviews.map(review => ({
+           id: String(review._id),
         user: review.user?.name || "Anonymous",
         rating: review.rating,
         title: review.title,

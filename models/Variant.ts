@@ -34,7 +34,10 @@ export const variantZodSchema = z.object({
   price: z.number().positive("Price must be greater than 0"),
   discount: z.number().min(0).max(100).optional(),
   stock: z.number().int().nonnegative(),
+  isActive: z.boolean().optional(),
+  isOutOfStock: z.boolean().optional(),
   images: z.array(z.string().url()).optional()
 });
+
 
 export default mongoose.models[MODELS.VARIANT] || mongoose.model(MODELS.VARIANT, VariantSchema);

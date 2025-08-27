@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
-import Category, { categorySchema } from "@/models/Category";
+import Category from "@/models/Category";
+import { categorySchema } from "@/models/Category";
 import { z } from "zod";
 import dbConnect from "@/lib/mongodb"; // your DB helper
 import { uploadFileToS3 } from "@/lib/api/aws/aws";

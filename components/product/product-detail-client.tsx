@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Star, Truck, ShieldCheck, Share2, SendHorizontal, Facebook, Twitter, ChevronDown, Minus, Plus } from 'lucide-react'
@@ -16,22 +16,85 @@ import { useCart } from "@/lib/cart-store"
 import type { Product } from "@/lib/data"
 
 interface ProductDetailClientProps {
-  product: Product
+  product: Product & {
+    variants?: Array<{
+      _id: string;
+      label: string;
+      price: number;
+      stock: number;
+      isActive: boolean;
+      isOutOfStock: boolean;
+      images: string[];
+    }>;
+  }
 }
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
-  const [packSize, setPackSize] = useState("20 Tablets")
+  const [selectedVariant, setSelectedVariant] = useState<{
+    _id: string;
+    label: string;
+    price: number;
+    stock: number;
+    isActive: boolean;
+    isOutOfStock: boolean;
+    images: string[];
+  } | null>(null)
   const [quantity, setQuantity] = useState(1)
+  const [isInitialized, setIsInitialized] = useState(false)
   const { add, isAdding } = useCart()
 
+  // Set default variant if available
+  React.useEffect(() => {
+    if (product.variants && product.variants.length > 0) {
+      const defaultVariant = product.variants.find(v => v.isActive && !v.isOutOfStock) || product.variants[0];
+      setSelectedVariant(defaultVariant);
+    }
+    setIsInitialized(true);
+  }, [product.variants]);
+
+  // Get current price and images based on selected variant
+  const currentPrice = selectedVariant?.price || product.price;
+  const currentImages = selectedVariant?.images && selectedVariant.images.length > 0 ? selectedVariant.images : product.images;
+  
+  // Ensure we have valid data
+  if (!product || !product.id) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center text-red-600">
+          Product not found or invalid data
+        </div>
+      </div>
+    );
+  }
+
+
+  console.log("product in ProductDetailClient", product);
+  
+  // Don't render until component is initialized
+  if (!isInitialized) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-2 gap-8">
+          <div className="h-96 bg-neutral-200 animate-pulse rounded-lg"></div>
+          <div className="space-y-4">
+            <div className="h-8 bg-neutral-200 animate-pulse rounded"></div>
+            <div className="h-6 bg-neutral-200 animate-pulse rounded"></div>
+            <div className="h-12 bg-neutral-200 animate-pulse rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   const handleAddToCart = () => {
-    if (isAdding) return
+    if (isAdding || !selectedVariant) return
     add(
       { 
         id: String(product.id), 
-        title: product.title, 
-        price: product.price, 
-        image: product.images[0] 
+        title: `${product.title} - ${selectedVariant.label}`, 
+        price: selectedVariant.price, 
+        image: currentImages[0] || product.images[0],
+
       }, 
       quantity
     )
@@ -43,12 +106,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     window.location.href = "/checkout"
   }
 
-  const subtotal = product.price * quantity
+  const subtotal = currentPrice * quantity
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid lg:grid-cols-2 gap-8">
-        <ProductImages images={product.images} title={product.title} />
+        <ProductImages images={currentImages} title={product.title} />
         <div>
           <div className="flex items-start justify-between gap-4">
             <h1 className="text-2xl md:text-3xl font-bold">{product.title}</h1>
@@ -61,45 +124,70 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <span>{product.rating.toFixed(1)}</span>
               <span className="opacity-70">({product.reviews.length})</span>
             </div>
-            <span>•</span>
-            <span>{`Spice Level: ${"🌶".repeat(product.spiceLevel)}${"🌶".repeat(
-              Math.max(0, 5 - product.spiceLevel)
-            )}`}</span>
-            <span>•</span>
-            <span>{product.vegetarian ? "Vegetarian" : "Non-Veg"}</span>
+            
           </div>
 
           <div className="mt-4 text-3xl font-extrabold text-red-600">
-            ${product.price.toFixed(2)}
+            ${currentPrice.toFixed(2)}
+            {selectedVariant && selectedVariant.price !== product.price && (
+              <span className="text-lg text-neutral-500 line-through ml-2">
+                ${product.price.toFixed(2)}
+              </span>
+            )}
           </div>
-
-          {/* Pack Size Selection */}
-          <div className="mt-6">
-            <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Pack Size</h3>
-            <div className="flex gap-2">
-              <Button
-                variant={packSize === "20 Tablets" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setPackSize("20 Tablets")}
-              >
-                20 Tablets
-              </Button>
-              <Button
-                variant={packSize === "50 Tablets" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setPackSize("50 Tablets")}
-              >
-                50 Tablets
-              </Button>
-              <Button
-                variant={packSize === "100 Tablets" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setPackSize("100 Tablets")}
-              >
-                100 Tablets
-              </Button>
+          
+          {/* Stock Indicator */}
+          {selectedVariant && (
+            <div className="mt-2 text-sm">
+              {selectedVariant.stock > 0 ? (
+                <span className="text-green-600">
+                  In Stock: {selectedVariant.stock} available
+                </span>
+              ) : (
+                <span className="text-red-600">
+                  Out of Stock
+                </span>
+              )}
             </div>
-          </div>
+          )}
+          
+          {/* Variant Price Info */}
+          {selectedVariant && selectedVariant.price !== product.price && (
+            <div className="mt-2 text-sm text-neutral-600">
+              <span className="font-medium">{selectedVariant.label}:</span> ${selectedVariant.price.toFixed(2)}
+            </div>
+          )}
+
+          {/* Variant Selection */}
+          {product.variants && product.variants.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Variants</h3>
+              <div className="flex flex-wrap gap-2">
+                {product.variants.map((variant) => {
+                  const isSelected = selectedVariant?._id === variant._id;
+                  const isAvailable = variant.isActive && !variant.isOutOfStock && variant.stock > 0;
+                  
+                  return (
+                    <Button
+                      key={variant._id}
+                      variant={isSelected ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => isAvailable && setSelectedVariant(variant)}
+                      disabled={!isAvailable}
+                      className={`relative ${!isAvailable ? 'opacity-50' : ''}`}
+                    >
+                      {variant.label}
+                      {!isAvailable && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-full h-0.5 bg-red-500 transform rotate-45"></div>
+                        </div>
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Quantity Selector */}
           <div className="mt-6">
@@ -132,17 +220,25 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <Button
               className="flex-1 bg-neutral-800 hover:bg-neutral-900 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 h-12"
               onClick={handleAddToCart}
-              disabled={isAdding}
+              disabled={isAdding || !selectedVariant || selectedVariant.stock === 0 || !selectedVariant.isActive || selectedVariant.isOutOfStock}
             >
-              {isAdding ? "Adding..." : "ADD TO CART"}
+              {isAdding ? "Adding..." : 
+               !selectedVariant ? "Select Variant" :
+               selectedVariant.stock === 0 ? "Out of Stock" :
+               !selectedVariant.isActive ? "Variant Unavailable" :
+               "ADD TO CART"}
             </Button>
             <Button
               variant="outline"
               className="flex-1 h-12"
               onClick={handleBuyNow}
-              disabled={isAdding}
+              disabled={isAdding || !selectedVariant || selectedVariant.stock === 0 || !selectedVariant.isActive || selectedVariant.isOutOfStock}
             >
-              BUY IT NOW
+              {isAdding ? "Processing..." : 
+               !selectedVariant ? "Select Variant" :
+               selectedVariant.stock === 0 ? "Out of Stock" :
+               !selectedVariant.isActive ? "Variant Unavailable" :
+               "BUY IT NOW"}
             </Button>
           </div>
 

@@ -14,7 +14,7 @@ import { createBrand } from "@/lib/api/admin/brand/brand"
 
 type Brand = { _id: string; name: string; description?: string; logo?: string }
 type Category = { _id: string; name: string; parent?: { _id: string; name: string } | string | null; description?: string; image?: string }
-type VariantDraft = { sku: string; label: string; price: number; stock: number; images: File[] }
+type VariantDraft = { sku: string; label: string; price: number; stock: number; discount: number; images: File[] }
 
 export default function ProductsCreateAdminUI() {
   const [brands, setBrands] = useState<Brand[]>([])
@@ -26,6 +26,7 @@ export default function ProductsCreateAdminUI() {
     description: "",
     ingredients: "",
     price: 0,
+    discount: 0,
     brand: "",
     categories: [] as string[],
     images: [] as File[],
@@ -54,11 +55,14 @@ export default function ProductsCreateAdminUI() {
   const saveProduct = async () => {
     if (!form.name || !form.price || form.categories.length === 0) return
 
+    console.log(form)
+
     const fd = new FormData()
     fd.append("name", form.name)
     fd.append("description", form.description)
     fd.append("ingredients", form.ingredients)
     fd.append("price", String(form.price))
+    fd.append("discount", String(form.discount))
     fd.append("isActive", String(form.isActive))
     fd.append("isOutOfStock", String(form.isOutOfStock))
     if (form.brand) fd.append("brand", form.brand)
@@ -75,7 +79,7 @@ export default function ProductsCreateAdminUI() {
 
     // send variants metadata and files
     fd.append("variants", JSON.stringify(variants.map(v => ({
-      sku: v.sku, label: v.label, price: v.price, stock: v.stock
+      sku: v.sku, label: v.label, price: v.price, stock: v.stock, discount: v.discount
     }))))
     
     // Append all variant images
@@ -93,7 +97,7 @@ export default function ProductsCreateAdminUI() {
     }
     alert("Product created ✅")
     // reset
-    setForm({ name: "", description: "", ingredients: "", price: 0, brand: "", categories: [], images: [], isActive: false, isOutOfStock: false })
+    setForm({ name: "", description: "", ingredients: "", price: 0, discount: 0, brand: "", categories: [], images: [], isActive: false, isOutOfStock: false })
     setVariants([])
   }
 
@@ -181,7 +185,7 @@ export default function ProductsCreateAdminUI() {
 
   // ===== VARIANT FUNCTIONS =====
   const addVariant = () =>
-    setVariants(v => [...v, { sku: "", label: "", price: 0, stock: 0, images: [] }])
+    setVariants(v => [...v, { sku: "", label: "", price: 0, stock: 0, discount: 0, images: [] }])
 
   const removeVariant = (idx: number) =>
     setVariants(v => v.filter((_, i) => i !== idx))
@@ -217,6 +221,7 @@ export default function ProductsCreateAdminUI() {
         <Textarea placeholder="Description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
         <Textarea placeholder="Ingredients & Nutritional Info (optional)" value={form.ingredients} onChange={e => setForm(f => ({ ...f, ingredients: e.target.value }))} />
         <Input type="number" step="0.01" placeholder="Price" value={form.price || "" as any} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} />
+        <Input type="number" step="0.01" min="0" max="100" placeholder="Discount (%)" value={form.discount || "" as any} onChange={e => setForm(f => ({ ...f, discount: Number(e.target.value) }))} />
 
         {/* Status toggles */}
         <div className="flex items-center gap-4">
@@ -428,6 +433,15 @@ export default function ProductsCreateAdminUI() {
                   placeholder="Price" 
                   value={v.price || "" as any} 
                   onChange={e => setVariants(prev => prev.map((x, j) => j === variantIndex ? { ...x, price: Number(e.target.value) } : x))} 
+                />
+                <Input 
+                  type="number" 
+                  step="0.01" 
+                  min="0" 
+                  max="100" 
+                  placeholder="Discount (%)" 
+                  value={v.discount || "" as any} 
+                  onChange={e => setVariants(prev => prev.map((x, j) => j === variantIndex ? { ...x, discount: Number(e.target.value) } : x))} 
                 />
                 <Input 
                   type="number" 

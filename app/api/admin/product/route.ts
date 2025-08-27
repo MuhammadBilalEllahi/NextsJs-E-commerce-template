@@ -1,6 +1,7 @@
 import { uploadFileToS3 } from "@/lib/api/aws/aws";
 import dbConnect from "@/lib/mongodb";
-import Product, { productZodSchema } from "@/models/Product";
+import Product from "@/models/Product";
+import { productZodSchema } from "@/models/Product";
 import Variant from "@/models/Variant";
 import BrandProducts from "@/models/BrandProducts";
 import CategoryProducts from "@/models/CategoryProducts";
@@ -23,11 +24,15 @@ export async function POST(req: Request) {
     const raw = {
       name: formData.get("name")?.toString(),
       description: formData.get("description")?.toString() ?? "",
+      ingredients: formData.get("ingredients")?.toString() ?? "",
       price: Number(formData.get("price")),
+      discount: Number(formData.get("discount") || 0),
       categories: formData.getAll("categories").map(c => c.toString()),
       brand: formData.get("brand")?.toString(),
       slug: formData.get("slug")?.toString(),
       variants: JSON.parse(formData.get("variants")?.toString() || "[]"),
+      isActive: formData.get("isActive")?.toString() === "true",
+      isOutOfStock: formData.get("isOutOfStock")?.toString() === "true",
     };
 
     const parsed = productZodSchema.safeParse(raw);
@@ -35,14 +40,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: parsed.error.message }, { status: 400 });
     }
 
-    let { name, description, price, categories, brand, slug, variants } = parsed.data;
+    let { name, description, ingredients, price, discount, categories, brand, slug, variants, isActive, isOutOfStock } = parsed.data;
 
     if (!slug) {
       slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
     }
 
     const newProduct = await Product.create(
-      [{ name, description, price, slug, categories }],
+      [{ name, description, ingredients, price, discount, slug, categories, isActive, isOutOfStock }],
       { session }
     ).then(res => res[0]);
 
@@ -146,6 +151,7 @@ export async function POST(req: Request) {
               label: v.label,
               price: v.price,
               stock: v.stock,
+              discount: v.discount || 0,
               images: uploadedVariantImages,
             },
           ],
@@ -201,7 +207,9 @@ export async function PUT(req: Request) {
     // Update fields
     if (formData.get("name")) product.name = formData.get("name")!.toString();
     if (formData.get("description")) product.description = formData.get("description")!.toString();
+    if (formData.get("ingredients")) product.ingredients = formData.get("ingredients")!.toString();
     if (formData.get("price")) product.price = Number(formData.get("price"));
+    if (formData.get("discount")) product.discount = Number(formData.get("discount"));
     if (formData.get("slug")) product.slug = formData.get("slug")!.toString();
     if (formData.get("isActive") !== null) product.isActive = formData.get("isActive")!.toString() === "true";
     if (formData.get("isOutOfStock") !== null) product.isOutOfStock = formData.get("isOutOfStock")!.toString() === "true";

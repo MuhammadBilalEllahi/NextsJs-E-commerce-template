@@ -9,7 +9,7 @@ import { ViewControls } from "./view-controls"
 
 import { Button } from "@/components/ui/button"
 import { Filter } from 'lucide-react'
-import { ProductGrid } from "./product-grid"
+import { ProductGrid } from "./product/product-grid"
 
 const spiceLabelToRange: Record<string, [number, number]> = {
   mild: [1, 2],

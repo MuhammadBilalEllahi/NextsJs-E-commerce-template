@@ -31,6 +31,7 @@ type Product = {
   images: string[];
   variants: Variant[];
   isActive: boolean;
+  isOutOfStock: boolean;
   slug: string;
   createdAt: string;
   updatedAt: string;

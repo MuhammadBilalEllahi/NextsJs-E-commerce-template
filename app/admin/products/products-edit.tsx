@@ -220,6 +220,8 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
         fd.append("price", String(editingVariant.price))
         fd.append("stock", String(editingVariant.stock))
         fd.append("discount", String(editingVariant.discount))
+        fd.append("isActive", String(editingVariant.isActive))
+        fd.append("isOutOfStock", String(editingVariant.isOutOfStock))
         
         // Append images if any
         editingVariant.newImages?.forEach(file => {

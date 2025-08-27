@@ -40,7 +40,4 @@ const abandonedCartSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-export default mongoose.model(
-    MODELS.ABANDONED_CART,
-    abandonedCartSchema
-);
+export default mongoose.models[MODELS.ABANDONED_CART] || mongoose.model(MODELS.ABANDONED_CART, abandonedCartSchema);

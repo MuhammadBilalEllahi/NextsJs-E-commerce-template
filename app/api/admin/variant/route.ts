@@ -1,9 +1,9 @@
 import dbConnect from "@/lib/mongodb";
 import Variant from "@/models/Variant";
-import mongoose from "mongoose";
-import { NextResponse } from "next/server";
 import { variantZodSchema } from "@/models/Variant";
 import Product from "@/models/Product";
+import mongoose from "mongoose";
+import { NextResponse } from "next/server";
 import { uploadFileToS3 } from "@/lib/api/aws/aws";
 
 export async function POST(req: Request) {
@@ -20,6 +20,9 @@ export async function POST(req: Request) {
       label: formData.get("label")?.toString(),
       price: Number(formData.get("price")),
       stock: Number(formData.get("stock")),
+      discount: Number(formData.get("discount") || 0),
+      isActive: formData.get("isActive")?.toString() === "true" || true,
+      isOutOfStock: formData.get("isOutOfStock")?.toString() === "true" || false,
     };
 
     const parsed = variantZodSchema.safeParse(raw);
@@ -28,11 +31,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: parsed.error.message }, { status: 400 });
     }
 
-    const { product, sku, label, price, stock } = parsed.data;
+    const { product, sku, label, price, stock, discount, isActive, isOutOfStock } = parsed.data;
 // product is the id of the product
 
     const newVariant = await Variant.create(
-      [{ product, sku, label, price, stock }],
+      [{ product, sku, label, price, stock, discount, isActive, isOutOfStock }],
       { session }
     ).then((res: any) => res[0]);
 

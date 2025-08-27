@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
-import { getAllProducts, getProductBySlug } from "@/lib/data-service"
 import { ProductDetailClient } from "@/components/product/product-detail-client"
+import { getAllProducts, getProductBySlug } from "@/lib/data-service";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -11,7 +11,7 @@ export async function generateStaticParams() {
 export default async function Page({ params }: { params: { slug: string } }) {
   const {slug}  = await params;
   const product = await getProductBySlug(slug)
-
+  console.log("product", product);
   if (!product) {
     return notFound()
   }

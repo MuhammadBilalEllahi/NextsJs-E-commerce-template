@@ -35,3 +35,5 @@ export const faqZodSchema = z.object({
 
 export default mongoose.models[MODELS.FAQ] || mongoose.model(MODELS.FAQ, FAQSchema);
 
+
+

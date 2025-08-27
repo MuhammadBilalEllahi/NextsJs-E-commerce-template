@@ -1,6 +1,7 @@
 import { uploadFileToS3 } from "@/lib/api/aws/aws";
 import dbConnect from "@/lib/mongodb";
-import Brand, { brandZodSchema } from "@/models/Brand";
+import Brand from "@/models/Brand";
+import { brandZodSchema } from "@/models/Brand";
 import { mkdir, writeFile } from "fs/promises";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
