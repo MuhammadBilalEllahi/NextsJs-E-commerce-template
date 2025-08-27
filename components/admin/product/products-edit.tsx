@@ -13,7 +13,6 @@ import { Plus, X, Edit, Eye, Save, ArrowLeft } from "lucide-react"
 import { API_URL_CATEGORY_ADMIN } from "@/lib/api/admin/category/categories"
 import { fetchCategories, createCategory, updateCategory } from "@/lib/api/admin/category/categories"
 import { createBrand } from "@/lib/api/admin/brand/brand"
-import { updateProduct } from "@/lib/api/admin/product/products"
 
 type Brand = { _id: string; name: string; description?: string; logo?: string }
 type Category = { _id: string; name: string; parent?: { _id: string; name: string } | string | null; description?: string; image?: string }
@@ -121,30 +120,56 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
 
     setLoading(true)
     try {
-      // Prepare product data for the service
-      const productData = {
-        _id: product._id,
-        name: form.name,
-        description: form.description,
-        ingredients: form.ingredients,
-        price: form.price,
-        discount: form.discount,
-        isActive: form.isActive,
-        isOutOfStock: form.isOutOfStock,
-        brand: form.brand,
-        categories: form.categories,
-        images: form.images,
-        variants: variants.map(v => ({
+      // Prepare form data for the API
+      const formData = new FormData();
+      formData.append("id", product._id);
+      formData.append("name", form.name);
+      formData.append("description", form.description);
+      formData.append("ingredients", form.ingredients);
+      formData.append("price", form.price.toString());
+      formData.append("discount", form.discount.toString());
+      formData.append("isActive", form.isActive.toString());
+      formData.append("isOutOfStock", form.isOutOfStock.toString());
+      if (form.brand) formData.append("brand", form.brand);
+      
+      // Append each category individually
+      form.categories.forEach(categoryId => {
+        formData.append("categories", categoryId)
+      })
+      
+      // Handle existing images (preserve them)
+      const existingImages = form.images.filter(img => typeof img === 'string') as string[];
+      existingImages.forEach(img => {
+        formData.append("existingImages", img);
+      });
+      
+      // Handle new image files
+      const newImageFiles = form.images.filter(img => img instanceof File) as File[];
+      newImageFiles.forEach(file => {
+        formData.append("images", file);
+      });
+      
+      // Handle variants
+      if (variants.length > 0) {
+        formData.append("variants", JSON.stringify(variants.map(v => ({
           sku: v.sku, 
           label: v.label, 
           price: v.price, 
           stock: v.stock, 
           discount: v.discount
-        }))
+        }))))
       }
 
-      // Use the service to update product
-      await updateProduct(productData)
+      // Send the request directly to the API
+      const response = await fetch(`/api/admin/product?id=${product._id}`, {
+        method: "PUT",
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        throw new Error(error?.error || "Failed to update product");
+      }
       
       alert("Product updated successfully ✅")
       onUpdate()

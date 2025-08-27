@@ -121,64 +121,6 @@ export const createProduct = async (productData: CreateProductData): Promise<Pro
   }
 };
 
-// Update an existing product
-export const updateProduct = async (productData: UpdateProductData): Promise<Product> => {
-  try {
-    console.log("[updateProduct] productData:", productData);
-    const formData = new FormData();
-    if (productData._id) formData.append("id", productData._id);
-    if (productData.name) formData.append("name", productData.name);
-    if (productData.description) formData.append("description", productData.description);
-    if (productData.ingredients) formData.append("ingredients", productData.ingredients);
-    if (productData.price) formData.append("price", productData.price.toString());
-    if (productData.discount) formData.append("discount", productData.discount.toString());
-    if (productData.brand) formData.append("brand", productData.brand);
-    // if (productData.categories) formData.append("categories", productData.categories.join(","));
-    // if (productData.images) formData.append("images", productData.images.join(","));
-    // if (productData.variants) formData.append("variants", productData.variants.join(","));
-    if (productData.isActive) formData.append("isActive", productData.isActive.toString());
-    if (productData.isOutOfStock) formData.append("isOutOfStock", productData.isOutOfStock.toString());
-
-    if (productData.categories) {
-      // Append each category individually
-      productData.categories.forEach(categoryId => {
-        formData.append("categories", categoryId)
-      })
-    }
-    if (productData.images) {
-      // Append all product images
-      productData.images.forEach((file, index) => {
-        formData.append("images", file)
-      })
-    }
-    if (productData.variants) {
-      // send variants metadata and files
-      formData.append("variants", JSON.stringify(productData.variants.map(v => ({
-        sku: v.sku, label: v.label, price: v.price, stock: v.stock, discount: v.discount
-      }))))
-    }
-    console.log("[updateProduct] formData:", formData);
-      
-    const response = await fetch(`${API_URL_PRODUCT_ADMIN}?id=${productData._id}`, {
-      method: "PUT",
-      // headers: {
-      //   "Content-Type": "application/json",
-      // },
-      body: formData,
-    });
-    
-    if (!response.ok) {
-      throw new Error("Failed to update product");
-    }
-    
-    const data = await response.json();
-    return data.product;
-  } catch (err: any) {
-    console.error("Error updating product:", err);
-    throw new Error(err.message || "Failed to update product");
-  }
-};
-
 // Delete a product
 export const deleteProduct = async (productId: string): Promise<void> => {
   try {
@@ -244,18 +186,6 @@ export const useProducts = () => {
     }
   };
 
-  const editProduct = async (productData: UpdateProductData) => {
-    try {
-      const updatedProduct = await updateProduct(productData);
-      setProducts((prev: Product[]) => prev.map((p: Product) => p._id === productData._id ? updatedProduct : p));
-      return updatedProduct;
-    } catch (err: any) {
-      console.error("[useProducts] Error editing product:", err);
-      setError(err.message);
-      throw err;
-    }
-  };
-
   const removeProduct = async (productId: string) => {
     try {
       await deleteProduct(productId);
@@ -273,7 +203,6 @@ export const useProducts = () => {
     error,
     loadProducts,
     addProduct,
-    editProduct,
     removeProduct,
   };
 };

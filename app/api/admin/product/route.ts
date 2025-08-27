@@ -285,26 +285,63 @@ export async function PUT(req: Request) {
       product.categories = newCategories;
     }
 
-    // Replace product images if new ones are uploaded
+    // Handle product images - preserve existing ones and add new ones
+    const existingImages = formData.getAll("existingImages") as string[];
     const newImageFiles = formData.getAll("images") as File[];
+    
+    // Start with existing images that weren't removed
+    let finalImages = existingImages || [];
+    
+    // Add new uploaded images
     if (newImageFiles.length > 0) {
       const uploaded: string[] = [];
-      for (const file of newImageFiles) {
-        if (file instanceof Blob) {
-          const buffer = Buffer.from(await file.arrayBuffer());
+      
+    for (const file of newImageFiles) {
+      if (file instanceof Blob) {
+
+        // Create uploads directory if it doesn't exist
+        const uploadDir = path.join(process.cwd(), 'uploads', 'temp');
+        try {
+          await mkdir(uploadDir, { recursive: true });
+        } catch (err) {
+          console.log("Upload directory already exists or couldn't be created");
+        }
+
+        // Convert File to buffer
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        // Generate unique filename
+        const originalFilename = (file as any).name || `file-${Date.now()}.jpg`;
+        const fileExt = path.extname(originalFilename) || '.jpg';
+        const safeFilename = originalFilename.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const tempFileName = `temp-${Date.now()}-${safeFilename}`;
+        const tempFilePath = path.join(uploadDir, tempFileName);
+
+        // Save buffer to disk (uses disk storage, not RAM)
+        await writeFile(tempFilePath, buffer);
+        console.log("File saved to disk:", tempFilePath);
+
+        console.log("tempFilePath", tempFilePath)
+        console.log("")
+
+
           const url = await uploadFileToS3(
             {
-              buffer,
-              originalFilename: (file as any).name || `${Date.now()}.jpg`,
-              mimetype: file.type,
+              filepath: tempFilePath,
+              originalFilename: originalFilename,
+              mimetype: (file as any).type || "application/octet-stream"
+
             },
             `products/${product._id}`
           );
-          uploaded.push(url);
+          finalImages.push(url);
         }
       }
-      product.images = uploaded;
     }
+    
+    // Update product images
+    product.images = finalImages;
 
     await product.save({ session });
     await session.commitTransaction();
