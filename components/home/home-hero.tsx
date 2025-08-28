@@ -4,33 +4,33 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-type Slide = {
-  title: string
-  subtitle: string
-  cta?: { label: string; href: string }
-  image: string
-}
+// type Slide = {
+//   title: string
+//   subtitle: string
+//   cta?: { label: string; href: string }
+//   image: string
+// }
 
-const slides: Slide[] = [
-  {
-    title: "Summer Heat Sale",
-    subtitle: "Up to 30% off select spices & masalas",
-    cta: { label: "Shop Now", href: "/category/all" },
-    image: "/spice-banner-red.png",
-  },
-  {
-    title: "Pickle Perfection",
-    subtitle: "Tangy, spicy, homemade-style pickles",
-    cta: { label: "Explore Pickles", href: "/category/pickles" },
-    image: "/dehli-mirch-ecommerce-banner.png",
-  },
-  {
-    title: "Snack Attack",
-    subtitle: "Crunchy namkeen for your chai breaks",
-    cta: { label: "Browse Snacks", href: "/category/snacks" },
-    image: "/snacks-banner-orange.png",
-  },
-]
+// const slides: Slide[] = [
+//   {
+//     title: "Summer Heat Sale",
+//     subtitle: "Up to 30% off select spices & masalas",
+//     cta: { label: "Shop Now", href: "/category/all" },
+//     image: "/spice-banner-red.png",
+//   },
+//   {
+//     title: "Pickle Perfection",
+//     subtitle: "Tangy, spicy, homemade-style pickles",
+//     cta: { label: "Explore Pickles", href: "/category/pickles" },
+//     image: "/dehli-mirch-ecommerce-banner.png",
+//   },
+//   {
+//     title: "Snack Attack",
+//     subtitle: "Crunchy namkeen for your chai breaks",
+//     cta: { label: "Browse Snacks", href: "/category/snacks" },
+//     image: "/snacks-banner-orange.png",
+//   },
+// ]
 
 export function HomeHero() {
   const [index, setIndex] = useState(0)

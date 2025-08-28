@@ -6,12 +6,12 @@ import { z } from "zod"
 const Schema = mongoose.Schema;
 
 const BannerSchema = new Schema({
-    title: { type: String, required: true },
-    description: { type: String, required: true },
+    title: { type: String },
+    description: { type: String },
     image: { type: String },
-    link: { type: String, required: true },
+    link: { type: String },
     isActive: { type: Boolean, default: true },
-    expiresAt: { type: Date, required: true },
+    expiresAt: { type: Date },
     showTitle: { type: Boolean, default: true },
     showLink: { type: Boolean, default: true },
     showDescription: { type: Boolean, default: true },
@@ -19,12 +19,12 @@ const BannerSchema = new Schema({
 });
 
 export const zodBannerSchema = z.object({
-    title: z.string().min(1, "Title is required"),
+    title: z.string(),//.min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
-    image: z.string().min(1, "Image is required"),
-    link: z.string().min(1, "Link is required"),
+    // image: z.string().min(1, "Image is required"),
+    link: z.string(),//.min(1, "Link is required"),
     isActive: z.boolean().default(true),
-    expiresAt: z.date().default(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
+    expiresAt: z.date().optional(),//.default(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
     showTitle: z.boolean().default(false),
     showDescription: z.boolean().default(false),
     showLink: z.boolean().default(false),

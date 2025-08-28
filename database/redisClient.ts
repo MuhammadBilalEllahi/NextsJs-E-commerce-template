@@ -9,7 +9,9 @@ class RedisClient {
 
   private static getClient(): Redis.Redis {
     if (!RedisClient.instance) {
+      // console.log('Creating new Redis client', process.env.REDIS_URL);
       RedisClient.instance = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+      // console.log('Redis client created', RedisClient.instance);
     }
     // let cached : {conn: any , promise: any} = global.redis || {conn:null, promise: null};
     // if(cached.conn) return cached.conn;

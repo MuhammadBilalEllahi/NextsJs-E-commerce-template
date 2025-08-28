@@ -10,7 +10,7 @@ const nav = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/brands", label: "Brands", icon: Tags },
-  { href: "/admin/banners", label: "Banners", icon: Tags },
+  { href: "/admin/banner", label: "Banners", icon: Megaphone },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/promotions", label: "Promotions", icon: Megaphone },

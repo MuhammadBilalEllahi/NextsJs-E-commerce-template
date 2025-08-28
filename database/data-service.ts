@@ -6,6 +6,23 @@ import Review from "@/models/Review";
 import FAQ from "@/models/FAQ";
 import Variant from "@/models/Variant";
 import dbConnect from "@/database/mongodb";
+import RedisClient from "@/database/redisClient";
+import Banner from "@/models/Banner";
+
+export async function getAllBanners(){
+  try {
+    await dbConnect();
+    const banners = await Banner.find({ isActive: true }).sort({ createdAt: -1 }).lean();
+    if(await RedisClient.get("banners") !== null){
+      await RedisClient.del("banners");
+    }
+    await RedisClient.set("banners", JSON.stringify(banners));
+    return banners;
+  } catch (error) {
+    console.error("Error fetching banners:", error);
+    return [];
+  }
+}
 
 // getAllTopSellingProducts
 export async function getAllTopSellingProducts() {

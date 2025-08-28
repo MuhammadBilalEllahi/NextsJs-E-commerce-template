@@ -26,16 +26,22 @@ export async function POST(req: Request) {
 
     try {
         const formData = await req.formData();
+
+        console.log(formData);
         const raw = {
             title: formData.get("title"),
             description: formData.get("description"),
             // image: formData.get("image"),
             link: formData.get("link"),
-            isActive: formData.get("isActive"),
-            expiresAt: formData.get("expiresAt"),
-            showTitle: formData.get('showTitle') ?? false,
-            showLink: formData.get('showLink') ?? false,
-            showDescription: formData.get('showDescription') ?? false
+            isActive: formData.get("isActive") === 'true' ? true : false,
+            
+            showTitle: formData.get('showTitle') === 'true' ? true : false,
+            showLink: formData.get('showLink') === 'true' ? true : false,
+            showDescription: formData.get('showDescription') ==='true' ?true: false
+        }
+        console.log(formData.get("expiresAt"), formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null);
+        if(formData.get("expiresAt") && formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null && formData.get("expiresAt") !== undefined){
+            raw.expiresAt = new Date(formData.get("expiresAt") as string);
         }
         const parsed = zodBannerSchema.safeParse(raw);
         if (!parsed.success) {
@@ -63,6 +69,12 @@ export async function POST(req: Request) {
             mimeType: uploadedImages[0].mimetype
         }, { session, upsert: true, new: true });
 
+        await session.commitTransaction();
+
+        if(await RedisClient.get("banners") !== null){
+            await RedisClient.del("banners");
+        }
+
         return NextResponse.json(banner);
 
     } catch (err: any) {
@@ -81,8 +93,9 @@ export async function POST(req: Request) {
 
 
 export async function GET() {
-
+    
     try {
+        await dbConnect();
         const value = await RedisClient.get("banners");
 
         if (value) {
@@ -92,7 +105,7 @@ export async function GET() {
 
         const banners = await Banner.find().lean();
         if (!banners) {
-            return NextResponse.error()
+            return NextResponse.json({ banners: [] })
         }
 
         await RedisClient.set('banners', JSON.stringify(banners), 36000);
@@ -100,7 +113,25 @@ export async function GET() {
         return NextResponse.json({ banners })
 
     } catch (error) {
+        console.error("Error fetching banners:", error);
+        return NextResponse.json({ error: "Failed to fetch banners" }, { status: 500 });
+    }
+}
 
+// Redis purge endpoint
+export async function PATCH(req: Request) {
+    try {
+        const { action } = await req.json();
+        
+        if (action === 'purge') {
+            await RedisClient.del("banners");
+            return NextResponse.json({ message: "Redis cache purged successfully" });
+        }
+        
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+    } catch (error) {
+        console.error("Error purging Redis:", error);
+        return NextResponse.json({ error: "Failed to purge Redis cache" }, { status: 500 });
     }
 }
 
