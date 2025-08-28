@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     
     // For demo purposes, we'll use a simple check
     // In production, you'd validate against your database
-    if (email === 'admin@delhimirch.com' && password === 'admin123') {
+    if (email === 'admin@dehlimirch.com' && password === 'admin123') {
       // Set a session cookie
       const cookieStore = await cookies()
       cookieStore.set('session-token', 'demo-admin-token', {

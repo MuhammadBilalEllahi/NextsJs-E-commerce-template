@@ -9,21 +9,21 @@ import { RootProviders } from "@/lib/providers/rootProvider"
 import { AppProviderWrapper } from "@/components/app-provider-wrapper";
 
 export const metadata: Metadata = {
-  title: "Delhi Mirch — Authentic Spices, Pickles, Snacks",
+  title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
   description:
-    "Delhi Mirch brings authentic South Asian flavors: premium spices, masalas, pickles, and snacks. Heat you can taste, tradition you can trust.",
+    "Dehli Mirch brings authentic South Asian flavors: premium spices, masalas, pickles, and snacks. Heat you can taste, tradition you can trust.",
   openGraph: {
-    title: "Delhi Mirch — Authentic Spices, Pickles, Snacks",
+    title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
     description:
       "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
-    images: ["/delhi-mirch-og-banner.png"],
+    images: ["/dehli-mirch-og-banner.png"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Delhi Mirch — Authentic Spices, Pickles, Snacks",
+    title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
     description:
       "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
-    images: ["/delhi-mirch-og-banner.png"],
+    images: ["/dehli-mirch-og-banner.png"],
   },
 }
 

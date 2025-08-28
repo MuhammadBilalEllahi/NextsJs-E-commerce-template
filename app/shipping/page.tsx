@@ -178,7 +178,7 @@ export default function ShippingPolicyPage() {
                 <div className="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4">
                   <h3 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Customer Service</h3>
                   <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    Email: support@delhimirch.com<br />
+                    Email: support@dehlimirch.com<br />
                     Phone: +92 321 4375872
                   </p>
                 </div>

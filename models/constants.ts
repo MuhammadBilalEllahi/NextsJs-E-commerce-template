@@ -11,7 +11,8 @@ export const MODELS = {
     REVIEW: "Review",
     FAQ: "FAQ",
     BRAND_PRODUCTS: "BrandProducts",
-    CATEGORY_PRODUCTS: "CategoryProducts"
+    CATEGORY_PRODUCTS: "CategoryProducts",
+    BANNER: "Banner"
 }
 
 export const ORDER_TYPE = {

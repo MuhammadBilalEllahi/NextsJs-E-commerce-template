@@ -1,6 +1,6 @@
 # Relationship Schemas and Enhanced Product Management
 
-This document describes the new relationship schemas and enhanced features added to the Delhi Mirch e-commerce platform.
+This document describes the new relationship schemas and enhanced features added to the Dehli Mirch e-commerce platform.
 
 ## New Schemas
 

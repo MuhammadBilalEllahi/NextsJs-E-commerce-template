@@ -13,7 +13,7 @@ type Banner = { title: string; link?: string; start?: string; end?: string; imag
 
 export default function ContentAdminPage() {
   const [blog, setBlog] = useState<Blog>({ title: "", tags: [], content: "" })
-  const [faqList, setFaqList] = useState<FAQ[]>([{ q: "What is Delhi Mirch?", a: "Authentic spices and condiments." }])
+  const [faqList, setFaqList] = useState<FAQ[]>([{ q: "What is Dehli Mirch?", a: "Authentic spices and condiments." }])
   const [policies, setPolicies] = useState<Policy[]>([
     { key: "Return Policy", content: "You may return within 7 days..." },
     { key: "Privacy Policy", content: "We respect your privacy..." },

@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-10 grid gap-8 md:grid-cols-4">
         <div>
           <div className="font-extrabold text-lg tracking-tight mb-2">
-            <span className="text-red-600">Delhi</span> <span className="text-green-600">Mirch</span>
+            <span className="text-red-600">Dehli</span> <span className="text-green-600">Mirch</span>
           </div>
           <p className="text-sm text-neutral-600 dark:text-neutral-400">
             Heat you can taste, tradition you can trust.
@@ -47,7 +47,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t py-4 text-center text-xs text-neutral-600 dark:text-neutral-400">
-        © {new Date().getFullYear()} Delhi Mirch. All rights reserved.
+        © {new Date().getFullYear()} Dehli Mirch. All rights reserved.
       </div>
     </footer>
   )

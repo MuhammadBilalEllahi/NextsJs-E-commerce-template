@@ -148,7 +148,7 @@ export default function DisclaimersPage() {
               <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-4">Limitation of Liability</h2>
               <div className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <p>
-                  To the maximum extent permitted by law, Delhi Mirch shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our products or services.
+                  To the maximum extent permitted by law, Dehli Mirch shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our products or services.
                 </p>
                 <p>
                   Our total liability to you for any claims arising from the use of our products or services shall not exceed the amount you paid for the specific product or service in question.
@@ -180,7 +180,7 @@ export default function DisclaimersPage() {
               </p>
               <div className="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4">
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                  <strong>Email:</strong> legal@delhimirch.com<br />
+                  <strong>Email:</strong> legal@dehlimirch.com<br />
                   <strong>Phone:</strong> +92 321 4375872<br />
                   <strong>Address:</strong> 17-B-1, Shop No. 4, Chowdry Chowk, College Road, Township, Lahore, Pakistan
                 </p>

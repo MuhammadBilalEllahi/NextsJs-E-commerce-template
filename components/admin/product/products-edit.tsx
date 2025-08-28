@@ -41,6 +41,10 @@ type Product = {
   variants: Variant[];
   isActive: boolean;
   isOutOfStock: boolean;
+  isFeatured: boolean;
+  isTopSelling: boolean;
+  isNewArrival: boolean;
+  isBestSelling: boolean;
   slug: string;
   createdAt: string;
   updatedAt: string;
@@ -69,6 +73,10 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
     images: product.images || [],
     isActive: product.isActive || false,
     isOutOfStock: product.isOutOfStock || false,
+    isFeatured: product.isFeatured || false,
+    isTopSelling: product.isTopSelling || false,
+    isNewArrival: product.isNewArrival || false,
+    isBestSelling: product.isBestSelling || false,
     slug: product.slug
   } as {
     name: string;
@@ -81,6 +89,10 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
     images: (string | File)[];
     isActive: boolean;
     isOutOfStock: boolean;
+    isFeatured: boolean;
+    isTopSelling: boolean;
+    isNewArrival: boolean;
+    isBestSelling: boolean;
     slug: string;
   })
 
@@ -130,6 +142,10 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
       formData.append("discount", form.discount.toString());
       formData.append("isActive", form.isActive.toString());
       formData.append("isOutOfStock", form.isOutOfStock.toString());
+      formData.append("isFeatured", form.isFeatured.toString());
+      formData.append("isTopSelling", form.isTopSelling.toString());
+      formData.append("isNewArrival", form.isNewArrival.toString());
+      formData.append("isBestSelling", form.isBestSelling.toString());
       if (form.brand) formData.append("brand", form.brand);
       
       // Append each category individually
@@ -482,11 +498,49 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
           </div>
         </div>
 
+        <div className="grid gap-4">
+          <h3 className="text-lg font-semibold border-b pb-2">Product Settings</h3>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="isFeatured" 
+              checked={form.isFeatured}
+              onCheckedChange={(checked) => setForm(f => ({ ...f, isFeatured: checked as boolean }))}
+            />
+            <Label htmlFor="isFeatured">Product is featured</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="isTopSelling" 
+              checked={form.isTopSelling}
+              onCheckedChange={(checked) => setForm(f => ({ ...f, isTopSelling: checked as boolean }))}
+            />
+            <Label htmlFor="isTopSelling">Product is top selling</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="isNewArrival" 
+              checked={form.isNewArrival}
+              onCheckedChange={(checked) => setForm(f => ({ ...f, isNewArrival: checked as boolean }))}
+            />
+            <Label htmlFor="isNewArrival">Product is new arrival</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="isBestSelling" 
+              checked={form.isBestSelling}
+              onCheckedChange={(checked) => setForm(f => ({ ...f, isBestSelling: checked as boolean }))}
+            />
+            <Label htmlFor="isBestSelling">Product is best selling</Label>
+          </div>
+        </div>
+
         {/* Brand and Categories */}
         <div className="grid gap-4">
           <h3 className="text-lg font-semibold border-b pb-2">Brand & Categories</h3>
           
           {/* Brand selector + modal */}
+         
           <div className="flex items-center gap-2">
             <div className="flex-1 space-y-2">
               <Label htmlFor="brand">Brand</Label>

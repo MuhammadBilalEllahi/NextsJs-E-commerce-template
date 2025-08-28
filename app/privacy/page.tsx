@@ -206,7 +206,7 @@ export default function PrivacyPage() {
                     <li>• Unsubscribe link in email communications</li>
                     <li>• Account settings preferences</li>
                     <li>• Contact customer service</li>
-                    <li>• Email us at privacy@delhimirch.com</li>
+                    <li>• Email us at privacy@dehlimirch.com</li>
                   </ul>
                 </div>
               </div>
@@ -240,7 +240,7 @@ export default function PrivacyPage() {
                   </div>
                 </div>
                 <p>
-                  To exercise these rights, please contact us at privacy@delhimirch.com. We will respond to your request within 30 days.
+                  To exercise these rights, please contact us at privacy@dehlimirch.com. We will respond to your request within 30 days.
                 </p>
               </div>
             </section>
@@ -318,7 +318,7 @@ export default function PrivacyPage() {
                 <div className="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4">
                   <h3 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Privacy Officer</h3>
                   <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    Email: privacy@delhimirch.com<br />
+                    Email: privacy@dehlimirch.com<br />
                     Phone: +92 321 4375872<br />
                     Address: 17-B-1, Shop No. 4, Chowdry Chowk, College Road, Township, Lahore, Pakistan
                   </p>
@@ -327,7 +327,7 @@ export default function PrivacyPage() {
                   <h3 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Data Protection</h3>
                   <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     For data protection inquiries<br />
-                    Email: dpo@delhimirch.com<br />
+                    Email: dpo@dehlimirch.com<br />
                     Response Time: Within 30 days
                   </p>
                 </div>

@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
+const Schema = mongoose.Schema;
 import { MODELS } from "@/models/constants";
 import {z} from "zod";
 
-const brandSchema = new mongoose.Schema({
+const brandSchema = new Schema({
     name: {
         type: String,
         required: true

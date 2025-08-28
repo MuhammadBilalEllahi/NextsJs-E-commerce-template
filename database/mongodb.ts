@@ -1,5 +1,6 @@
 // lib/mongodb.js
 import mongoose from 'mongoose';
+import "@/models"
 
 declare global {
   // eslint-disable-next-line no-var

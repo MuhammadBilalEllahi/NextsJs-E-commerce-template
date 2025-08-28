@@ -51,6 +51,7 @@ export async function POST(req: Request) {
 
     if (!slug) {
       slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+      slug = slug.concat("-", Date.now().toString());
     }
 
     const newProduct = await Product.create(
@@ -222,6 +223,7 @@ export async function PUT(req: Request) {
     const formData = await req.formData();
     console.log("[PUT] formData:", formData);
     const productId = formData.get("id")?.toString();
+    console.log("[PUT] productId:", productId);
     if (!productId) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
     }
@@ -240,6 +242,10 @@ export async function PUT(req: Request) {
     if (formData.get("slug")) product.slug = formData.get("slug")!.toString();
     if (formData.get("isActive") !== null) product.isActive = formData.get("isActive")!.toString() === "true";
     if (formData.get("isOutOfStock") !== null) product.isOutOfStock = formData.get("isOutOfStock")!.toString() === "true";
+    if (formData.get("isFeatured") !== null) product.isFeatured = formData.get("isFeatured")!.toString() === "true";
+    if (formData.get("isTopSelling") !== null) product.isTopSelling = formData.get("isTopSelling")!.toString() === "true";
+    if (formData.get("isNewArrival") !== null) product.isNewArrival = formData.get("isNewArrival")!.toString() === "true";
+    if (formData.get("isBestSelling") !== null) product.isBestSelling = formData.get("isBestSelling")!.toString() === "true";
     
     // Handle brand changes
     const newBrand = formData.get("brand")?.toString();
@@ -365,6 +371,7 @@ export async function DELETE(req: Request) {
   session.startTransaction();
 
   try {
+    // @ts-ignore
     const id = req.nextUrl.searchParams.get("id");
     if (!id) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 });

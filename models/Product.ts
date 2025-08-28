@@ -1,9 +1,10 @@
 // models/Item.js
 import mongoose from 'mongoose';
+const Schema = mongoose.Schema;
 import { z } from "zod";
 import { MODELS } from '@/models/constants';
 
-const ProductSchema = new mongoose.Schema({
+const ProductSchema = new Schema({
   name: { type: String, required: true },
   slug: { type: String, unique: true },
   description: String,
@@ -12,6 +13,12 @@ const ProductSchema = new mongoose.Schema({
   discount: { type: Number, default: 0 }, // percentage
   categories: [{ type: mongoose.Schema.Types.ObjectId, ref: MODELS.CATEGORY }],
   images: [String],
+
+  isFeatured: { type: Boolean, default: false },
+  isTopSelling: { type: Boolean, default: false },
+  isNewArrival: { type: Boolean, default: false },
+  isBestSelling: { type: Boolean, default: false },
+  
   brand: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.BRAND },
 
   variants: [{ type: mongoose.Schema.Types.ObjectId, ref: MODELS.VARIANT }],
@@ -52,7 +59,11 @@ export const productZodSchema = z.object({
   brand: z.string().optional(),
   variants: z.array(z.object()).optional(), // list of Variant IDs
   isActive: z.boolean().optional(),
-  isOutOfStock: z.boolean().optional()
+  isOutOfStock: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+  isTopSelling: z.boolean().optional(),
+  isNewArrival: z.boolean().optional(),
+  isBestSelling: z.boolean().optional()
 });
 
-export default mongoose.models[MODELS.PRODUCT] || mongoose.model(MODELS.PRODUCT.toString(), ProductSchema);
+export default mongoose.models[MODELS.PRODUCT] || mongoose.model(MODELS.PRODUCT.toString(), ProductSchema)

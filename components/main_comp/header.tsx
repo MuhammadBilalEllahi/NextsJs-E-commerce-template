@@ -41,7 +41,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b bg-white/85 dark:bg-neutral-950/85 backdrop-blur">
       <div className="container mx-auto px-4 h-14 flex items-center gap-4">
         <Link href="/" className="font-extrabold text-lg tracking-tight">
-          <span className="text-red-600">Delhi</span> <span className="text-green-600">Mirch</span>
+          <span className="text-red-600">Dehli</span> <span className="text-green-600">Mirch</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">

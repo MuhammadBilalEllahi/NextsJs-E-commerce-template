@@ -9,6 +9,8 @@ const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/categories", label: "Categories", icon: Tags },
+  { href: "/admin/brands", label: "Brands", icon: Tags },
+  { href: "/admin/banners", label: "Banners", icon: Tags },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/promotions", label: "Promotions", icon: Megaphone },
@@ -30,7 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="border-b bg-gradient-to-r from-red-600 via-orange-500 to-green-600 text-white">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <Link href="/" className="font-bold tracking-wide">
-            Delhi Mirch Admin
+            Dehli Mirch Admin
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
             {nav.slice(0,6).map((n)=>(

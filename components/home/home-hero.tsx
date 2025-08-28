@@ -22,7 +22,7 @@ const slides: Slide[] = [
     title: "Pickle Perfection",
     subtitle: "Tangy, spicy, homemade-style pickles",
     cta: { label: "Explore Pickles", href: "/category/pickles" },
-    image: "/delhi-mirch-ecommerce-banner.png",
+    image: "/dehli-mirch-ecommerce-banner.png",
   },
   {
     title: "Snack Attack",

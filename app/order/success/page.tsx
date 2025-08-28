@@ -16,7 +16,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
           <Button className="bg-red-600 hover:bg-red-700">Track Order</Button>
         </Link>
         <a
-          href={`https://wa.me/923001234567?text=${encodeURIComponent(`Hello Delhi Mirch, I need help with my order ${orderId ?? ""}.`)}`}
+          href={`https://wa.me/923001234567?text=${encodeURIComponent(`Hello Dehli Mirch, I need help with my order ${orderId ?? ""}.`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-md border px-4 py-2"

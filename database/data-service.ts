@@ -7,8 +7,101 @@ import FAQ from "@/models/FAQ";
 import Variant from "@/models/Variant";
 import dbConnect from "@/database/mongodb";
 
+// getAllTopSellingProducts
+export async function getAllTopSellingProducts() {
+  try {
+    await dbConnect();
+    const products = await Product.find({ isActive: true, isTopSelling: true })
+      // .populate("brand", "name")
+      // .populate("categories", "name")
+      .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
+      .sort({ createdAt: -1 })
+      .lean();
+    return products.map(product => ({
+      id: String(product._id),
+      slug: product.slug,
+      title: product.name,
+      description: product.description,
+      price: product?.variants?.[0]?.price ?? product?.price  ?? 0,
+      images: product.images,
+      rating: product.ratingAvg,
+      isTopSelling: product.isTopSelling,
+      // ingredients: product.ingredients,
+      instructions: "", // Can be added to product model later
+      // category: product.categories?.[0]?.name || "spices",
+      // brand: product.brand?.name || "Dehli Mirch",
+      // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+      tags: [], // Can be added to product model later
+      variants: product?.variants?.map((variant: any) => ({
+        _id: String(variant._id),
+        label: variant.label,
+        // price: variant.price,
+        // stock: variant.stock,
+        // isActive: variant.isActive,
+        // isOutOfStock: variant.isOutOfStock,
+        // images: variant.images
+      })) || [],
+      // reviews: product.reviews?.map(review => ({
+      //   id: String(review._id),
+      //   user: review.user?.name || "Anonymous",
+      //   rating: review.rating,
+      //   comment: review.comment,
+      //   date: review.createdAt
+      // })) || []
+    }));
+  } catch (error) {
+    console.error("Error fetching top selling products:", error);
+    return [];
+  }
+}
 
 
+export async function getAllNewArrivalsProducts() {
+  try {
+    await dbConnect();
+    const products = await Product.find({ isActive: true, isNewArrival: true })
+      // .populate("brand", "name")
+      // .populate("categories", "name")
+      .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
+      .sort({ createdAt: -1 })
+      .lean();
+    return products.map(product => ({
+      id: String(product._id),
+      slug: product.slug,
+      title: product.name,
+      description: product.description,
+      price: product?.variants?.[0]?.price ?? product?.price  ?? 0,
+      images: product.images,
+      rating: product.ratingAvg,
+      isNewArrival: product.isNewArrival,
+      // ingredients: product.ingredients,
+      instructions: "", // Can be added to product model later
+      // category: product.categories?.[0]?.name || "spices",
+      // brand: product.brand?.name || "Dehli Mirch",
+      // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+      tags: [], // Can be added to product model later
+      variants: product?.variants?.map((variant: any) => ({
+        _id: String(variant._id),
+        label: variant.label,
+        // price: variant.price,
+        // stock: variant.stock,
+        // isActive: variant.isActive,
+        // isOutOfStock: variant.isOutOfStock,
+        // images: variant.images
+      })) || [],
+      // reviews: product.reviews?.map(review => ({
+      //   id: String(review._id),
+      //   user: review.user?.name || "Anonymous",
+      //   rating: review.rating,
+      //   comment: review.comment,
+      //   date: review.createdAt
+      // })) || []
+    }));
+  } catch (error) {
+    console.error("Error fetching top selling products:", error);
+    return [];
+  }
+}
 // Product data functions
 export async function getAllProducts() {
   try {
@@ -34,10 +127,10 @@ export async function getAllProducts() {
        ingredients: product.ingredients,
        instructions: "", // Can be added to product model later
        category: product.categories?.[0]?.name || "spices",
-       brand: product.brand?.name || "Delhi Mirch",
-       stock: product.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0,
+       brand: product.brand?.name || "Dehli Mirch",
+       stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
        tags: [], // Can be added to product model later
-       variants: product.variants?.map(variant => ({
+       variants: product.variants?.map((variant: any) => ({
          _id: String(variant._id),
          label: variant.label,
          price: variant.price,
@@ -46,7 +139,7 @@ export async function getAllProducts() {
          isOutOfStock: variant.isOutOfStock,
          images: variant.images
        })) || [],
-       reviews: product.reviews?.map(review => ({
+       reviews: product.reviews?.map(review: any => ({
          id: String(review._id),
          user: review.user?.name || "Anonymous",
          rating: review.rating,
@@ -84,7 +177,7 @@ export async function getProductBySlug(slug: string) {
        ingredients: product.ingredients,
        instructions: "", // Can be added later
        category: product.categories?.[0]?.name || "spices",
-       brand: product.brand?.name || "Delhi Mirch",
+       brand: product.brand?.name || "Dehli Mirch",
        stock: product.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0,
        tags: [], // Can be added later
        variants: product.variants?.map(variant => ({

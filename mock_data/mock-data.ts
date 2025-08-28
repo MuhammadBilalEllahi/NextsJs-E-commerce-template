@@ -103,7 +103,7 @@ export const testimonials: Testimonial[] = [
 ]
 
 // Product dataset
-const brands = ["Delhi Mirch", "Khana Khazana", "Masala Co", "Desi Choice"]
+const brands = ["Dehli Mirch", "Khana Khazana", "Masala Co", "Desi Choice"]
 const types = ["Powder", "Whole", "Mixes", "Pickle", "Snack"]
 const cats = ["powder", "whole", "mixes", "pickle", "snack"]
 

@@ -24,7 +24,7 @@ export default function TermsPage() {
                 Agreement to Terms
               </h2>
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                By accessing and using Delhi Mirch's website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                By accessing and using Dehli Mirch's website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
               </p>
             </div>
           </div>
@@ -38,7 +38,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-4">1. Acceptance of Terms</h2>
               <div className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <p>
-                  These Terms of Service ("Terms") govern your use of the Delhi Mirch website and services. By accessing or using our website, you agree to be bound by these Terms and all applicable laws and regulations.
+                  These Terms of Service ("Terms") govern your use of the Dehli Mirch website and services. By accessing or using our website, you agree to be bound by these Terms and all applicable laws and regulations.
                 </p>
                 <p>
                   If you do not agree with any of these terms, you are prohibited from using or accessing this site. The materials contained in this website are protected by applicable copyright and trademark law.
@@ -51,13 +51,13 @@ export default function TermsPage() {
               <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-4">2. Use License</h2>
               <div className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <p>
-                  Permission is granted to temporarily download one copy of the materials (information or software) on Delhi Mirch's website for personal, non-commercial transitory viewing only.
+                  Permission is granted to temporarily download one copy of the materials (information or software) on Dehli Mirch's website for personal, non-commercial transitory viewing only.
                 </p>
                 <p>This is the grant of a license, not a transfer of title, and under this license you may not:</p>
                 <ul className="list-disc list-inside space-y-1 ml-4">
                   <li>modify or copy the materials</li>
                   <li>use the materials for any commercial purpose or for any public display</li>
-                  <li>attempt to reverse engineer any software contained on Delhi Mirch's website</li>
+                  <li>attempt to reverse engineer any software contained on Dehli Mirch's website</li>
                   <li>remove any copyright or other proprietary notations from the materials</li>
                   <li>transfer the materials to another person or "mirror" the materials on any other server</li>
                 </ul>
@@ -156,7 +156,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-4">8. Intellectual Property</h2>
               <div className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <p>
-                  The Service and its original content, features, and functionality are and will remain the exclusive property of Delhi Mirch and its licensors.
+                  The Service and its original content, features, and functionality are and will remain the exclusive property of Dehli Mirch and its licensors.
                 </p>
                 <p>
                   The Service is protected by copyright, trademark, and other laws. Our trademarks and trade dress may not be used in connection with any product or service without our prior written consent.
@@ -169,7 +169,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-4">9. Limitation of Liability</h2>
               <div className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <p>
-                  In no event shall Delhi Mirch, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from:
+                  In no event shall Dehli Mirch, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from:
                 </p>
                 <ul className="list-disc list-inside space-y-1 ml-4">
                   <li>your use or inability to use the Service</li>
@@ -231,7 +231,7 @@ export default function TermsPage() {
               </p>
               <div className="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4">
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                  <strong>Email:</strong> legal@delhimirch.com<br />
+                  <strong>Email:</strong> legal@dehlimirch.com<br />
                   <strong>Phone:</strong> +92 321 4375872<br />
                   <strong>Address:</strong> 17-B-1, Shop No. 4, Chowdry Chowk, College Road, Township, Lahore, Pakistan
                 </p>

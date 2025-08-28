@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 type AdminUser = { id: string; name: string; email: string; role: "Super Admin"|"Product Manager"|"Content Editor" }
 export default function AccessAdminPage() {
   const [admins, setAdmins] = useState<AdminUser[]>([
-    { id:"a1", name:"Super Admin", email:"admin@delhimirch.com", role:"Super Admin"},
+    { id:"a1", name:"Super Admin", email:"admin@dehlimirch.com", role:"Super Admin"},
     { id:"a2", name:"Ayesha Khan", email:"ayesha@example.com", role:"Product Manager"},
   ])
   const [draft, setDraft] = useState<Partial<AdminUser>>({ name:"", email:"", role:"Content Editor" })

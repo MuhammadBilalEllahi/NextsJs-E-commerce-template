@@ -4,7 +4,7 @@ import { Slider } from "@/components/ui/slider"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
-const brands = ["Delhi Mirch", "Khana Khazana", "Masala Co", "Desi Choice"]
+const brands = ["Dehli Mirch", "Khana Khazana", "Masala Co", "Desi Choice"]
 const types = ["Powder", "Whole", "Pickle", "Snack"]
 
 export function FiltersBar() {

@@ -17,7 +17,7 @@ export default function ProfilePage() {
       >
         <div>
           <Label htmlFor="name">Name</Label>
-          <Input id="name" defaultValue="Delhi Mirch Lover" />
+          <Input id="name" defaultValue="Dehli Mirch Lover" />
         </div>
         <div>
           <Label htmlFor="email">Email</Label>

@@ -106,7 +106,7 @@ const products: Product[] = [
     instructions:
       "Use 1-2 tsp for curries and gravies. Store in an airtight container away from moisture and sunlight.",
     category: "ground-spices",
-    brand: "Delhi Mirch",
+    brand: "Dehli Mirch",
     stock: 124,
     tags: ["vegan", "gluten-free", "color-rich"],
     reviews: [
@@ -146,7 +146,7 @@ const products: Product[] = [
     instructions:
       "Add 1/2-1 tsp at the end of cooking for deep aroma. Store airtight.",
     category: "mixes",
-    brand: "Delhi Mirch",
+    brand: "Dehli Mirch",
     stock: 82,
     tags: ["aromatic", "finishing-spice"],
     reviews: [
@@ -177,7 +177,7 @@ const products: Product[] = [
     instructions:
       "Toast lightly in oil or ghee until aromatic. Store cool and dry.",
     category: "whole-spices",
-    brand: "Delhi Mirch",
+    brand: "Dehli Mirch",
     stock: 210,
     tags: ["tempering", "pantry-basic"],
     reviews: [],
@@ -198,7 +198,7 @@ const products: Product[] = [
     ingredients: "Cumin, coriander, black salt, amchur, pepper, chili.",
     instructions: "Sprinkle to taste. Great on raita and chaats.",
     category: "mixes",
-    brand: "Delhi Mirch",
+    brand: "Dehli Mirch",
     stock: 60,
     tags: ["tangy", "snacks"],
     reviews: [],
@@ -220,7 +220,7 @@ const products: Product[] = [
     instructions:
       "Use 1/4-1/2 tsp to color curries and rice. Avoid staining surfaces.",
     category: "ground-spices",
-    brand: "Delhi Mirch",
+    brand: "Dehli Mirch",
     stock: 300,
     tags: ["daily", "color"],
     reviews: [],
@@ -244,7 +244,7 @@ const products: Product[] = [
     instructions:
       "Serve as a condiment with parathas and curries. Use clean dry spoon.",
     category: "condiments",
-    brand: "Delhi Mirch",
+    brand: "Dehli Mirch",
     stock: 45,
     tags: ["tangy", "spicy"],
     reviews: [],

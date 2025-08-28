@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       authenticated: true,
       user: {
         id: '1',
-        email: 'admin@delhimirch.com',
+        email: 'admin@dehlimirch.com',
         name: 'Admin User',
         role: 'admin'
       }

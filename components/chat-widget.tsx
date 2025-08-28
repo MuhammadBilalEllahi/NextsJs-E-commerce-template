@@ -68,7 +68,7 @@ export function ChatWidget() {
             </div>
             <div className="mt-2 flex items-center justify-between">
               <a
-                href={`https://wa.me/923001234567?text=${encodeURIComponent("Hello Delhi Mirch! I need help.")}`}
+                href={`https://wa.me/923001234567?text=${encodeURIComponent("Hello Dehli Mirch! I need help.")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-green-700 underline"

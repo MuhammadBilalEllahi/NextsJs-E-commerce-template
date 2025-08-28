@@ -56,7 +56,7 @@ export default function ReturnsPage() {
               <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-4">Return Policy Overview</h2>
               <div className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <p>
-                  At Delhi Mirch, we stand behind the quality of our products. If you're not completely satisfied with your purchase, we offer a 7-day return window for most items.
+                  At Dehli Mirch, we stand behind the quality of our products. If you're not completely satisfied with your purchase, we offer a 7-day return window for most items.
                 </p>
                 <p>
                   To be eligible for a return, your item must be unused, in its original packaging, and in the same condition that you received it. You must also have the receipt or proof of purchase.
@@ -108,7 +108,7 @@ export default function ReturnsPage() {
                   <div>
                     <h3 className="font-semibold text-neutral-800 dark:text-neutral-200">Contact Customer Service</h3>
                     <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                      Email us at returns@delhimirch.com or call +92 321 4375872 with your order number and reason for return
+                      Email us at returns@dehlimirch.com or call +92 321 4375872 with your order number and reason for return
                     </p>
                   </div>
                 </div>
@@ -203,7 +203,7 @@ export default function ReturnsPage() {
                 </p>
                 <p>
                   <strong>Return Address:</strong><br />
-                  Delhi Mirch Returns<br />
+                  Dehli Mirch Returns<br />
                   17-B-1, Shop No. 4, Chowdry Chowk<br />
                   College Road, Township, Lahore, Pakistan
                 </p>
@@ -220,7 +220,7 @@ export default function ReturnsPage() {
                 <div className="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4">
                   <h3 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Customer Service</h3>
                   <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    Email: returns@delhimirch.com<br />
+                    Email: returns@dehlimirch.com<br />
                     Phone: +92 321 4375872<br />
                     Hours: Mon-Sat 9:00 AM - 8:00 PM
                   </p>

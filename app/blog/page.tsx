@@ -3,7 +3,7 @@ import { getAllBlogs } from "@/mock_data/data"
 import { Input } from "@/components/ui/input"
 
 export const metadata = {
-  title: "Delhi Mirch Blog",
+  title: "Dehli Mirch Blog",
   description: "Recipes, tips, and spice stories.",
 }
 
