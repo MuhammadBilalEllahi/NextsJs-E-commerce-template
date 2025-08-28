@@ -13,11 +13,22 @@ export async function getAllBanners(){
   try {
     await dbConnect();
     const banners = await Banner.find({ isActive: true }).sort({ createdAt: -1 }).lean();
+    
+    // Filter out expired banners
+    const activeBanners = banners.filter(banner => {
+      if (banner.expiresAt) {
+        const expiryDate = new Date(banner.expiresAt);
+        const now = new Date();
+        return expiryDate > now;
+      }
+      return true;
+    });
+    
     if(await RedisClient.get("banners") !== null){
       await RedisClient.del("banners");
     }
-    await RedisClient.set("banners", JSON.stringify(banners));
-    return banners;
+    await RedisClient.set("banners", JSON.stringify(activeBanners));
+    return activeBanners;
   } catch (error) {
     console.error("Error fetching banners:", error);
     return [];
@@ -127,43 +138,42 @@ export async function getAllProducts() {
       .populate("brand", "name")
       .populate("categories", "name")
       .populate("variants")
-    //   .populate("reviews")
       .sort({ createdAt: -1 })
       .lean();
 
-    console.log("product s in getAllProducts", JSON.stringify(products, null, 2));
+    console.log("products in getAllProducts", JSON.stringify(products, null, 2));
     
-         return products.map(product => ({
-       id: String(product._id),
-       slug: product.slug,
-       title: product.name,
-       description: product.description,
-       price: product.price,
-       images: product.images,
-       rating: product.ratingAvg,
-       ingredients: product.ingredients,
-       instructions: "", // Can be added to product model later
-       category: product.categories?.[0]?.name || "spices",
-       brand: product.brand?.name || "Dehli Mirch",
-       stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-       tags: [], // Can be added to product model later
-       variants: product.variants?.map((variant: any) => ({
-         _id: String(variant._id),
-         label: variant.label,
-         price: variant.price,
-         stock: variant.stock,
-         isActive: variant.isActive,
-         isOutOfStock: variant.isOutOfStock,
-         images: variant.images
-       })) || [],
-       reviews: product.reviews?.map(review: any => ({
-         id: String(review._id),
-         user: review.user?.name || "Anonymous",
-         rating: review.rating,
-         comment: review.comment,
-         date: review.createdAt
-       })) || []
-     }));
+    return products.map(product => ({
+      id: String(product._id),
+      slug: product.slug,
+      title: product.name,
+      description: product.description,
+      price: product.price,
+      images: product.images,
+      rating: product.ratingAvg,
+      ingredients: product.ingredients,
+      instructions: "", // Can be added to product model later
+      category: product.categories?.[0]?.name || "spices",
+      brand: product.brand?.name || "Dehli Mirch",
+      stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+      tags: [], // Can be added to product model later
+      variants: product.variants?.map((variant: any) => ({
+        _id: String(variant._id),
+        label: variant.label,
+        price: variant.price,
+        stock: variant.stock,
+        isActive: variant.isActive,
+        isOutOfStock: variant.isOutOfStock,
+        images: variant.images
+      })) || [],
+      reviews: product.reviews?.map((review: any) => ({
+        id: String(review._id),
+        user: review.user?.name || "Anonymous",
+        rating: review.rating,
+        comment: review.comment,
+        date: review.createdAt
+      })) || []
+    }));
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
@@ -177,43 +187,41 @@ export async function getProductBySlug(slug: string) {
       .populate("brand", "name")
       .populate("categories", "name")
       .populate("variants")
-    //   .populate("reviews")
       .lean();
-    console.log("product in getProductBySlug", product);
+    
     if (!product) return null;
     
-    console.log("product in getProductBySlug", product);
-         return {
-       id: String(product._id),
-       slug: product.slug,
-       title: product.name,
-       description: product.description,
-       price: product.price,
-       images: product.images,
-       rating: product.ratingAvg,
-       ingredients: product.ingredients,
-       instructions: "", // Can be added later
-       category: product.categories?.[0]?.name || "spices",
-       brand: product.brand?.name || "Dehli Mirch",
-       stock: product.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0,
-       tags: [], // Can be added later
-       variants: product.variants?.map(variant => ({
-         _id: String(variant._id),
-         label: variant.label,
-         price: variant.price,
-         stock: variant.stock,
-         isActive: variant.isActive,
-         isOutOfStock: variant.isOutOfStock,
-         images: variant.images
-       })) || [],
-       reviews: product.reviews?.map(review => ({
-         id: String(review._id),
-         user: review.user?.name || "Anonymous",
-         rating: review.rating,
-         comment: review.comment,
-         date: review.createdAt
-       })) || []
-     };
+    return {
+      id: String(product._id),
+      slug: product.slug,
+      title: product.name,
+      description: product.description,
+      price: product.price,
+      images: product.images,
+      rating: product.ratingAvg,
+      ingredients: product.ingredients,
+      instructions: "", // Can be added later
+      category: product.categories?.[0]?.name || "spices",
+      brand: product.brand?.name || "Dehli Mirch",
+      stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+      tags: [], // Can be added later
+      variants: product.variants?.map((variant: any) => ({
+        _id: String(variant._id),
+        label: variant.label,
+        price: variant.price,
+        stock: variant.stock,
+        isActive: variant.isActive,
+        isOutOfStock: variant.isOutOfStock,
+        images: variant.images
+      })) || [],
+      reviews: product.reviews?.map((review: any) => ({
+        id: String(review._id),
+        user: review.user?.name || "Anonymous",
+        rating: review.rating,
+        comment: review.comment,
+        date: review.createdAt
+      })) || []
+    };
   } catch (error) {
     console.error("Error fetching product by slug:", error);
     return null;

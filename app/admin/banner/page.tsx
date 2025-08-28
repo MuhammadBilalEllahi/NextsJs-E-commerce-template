@@ -375,8 +375,15 @@ function BannerCreateForm({ onClose, onSuccess }: { onClose: () => void; onSucce
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.title || !form.description || !form.image || !form.link) {
-      alert("Please fill in all required fields")
+    if(requiredTitle && !form.title){
+      alert("Title is required")
+      return
+    }
+    if(requiredDescription && !form.description){
+      alert("Description is required")
+    }
+    if(requiredLink && !form.link){
+      alert("Link is required")
       return
     }
 
@@ -422,26 +429,26 @@ function BannerCreateForm({ onClose, onSuccess }: { onClose: () => void; onSucce
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Title *</Label>
+              <Label htmlFor="title">Title {requiredTitle ? "*" : ""}</Label>
               <Input
                 id="title"
                 value={form.title}
                 onChange={(e) => {
                   setForm(f => ({ ...f, title: e.target.value }))
-                  setRequiredTitle(e.target.value !== "")
+                  
                 }}
                 placeholder="Banner title"
                 required={requiredTitle}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="link">Link *</Label>
+              <Label htmlFor="link">Link {requiredLink ? "*" : ""}</Label>
               <Input
                 id="link"
                 value={form.link}
                 onChange={(e) => {
                   setForm(f => ({ ...f, link: e.target.value }))
-                  setRequiredLink(e.target.value !== "")
+                  
                 }}
                 placeholder="https://example.com"
                 required={requiredLink}
@@ -450,13 +457,13 @@ function BannerCreateForm({ onClose, onSuccess }: { onClose: () => void; onSucce
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
+            <Label htmlFor="description">Description {requiredDescription ? "*" : ""}</Label>
             <Textarea
               id="description"
               value={form.description}
               onChange={(e) => {
                 setForm(f => ({ ...f, description: e.target.value }))
-                setRequiredDescription(e.target.value !== "")
+                
               }}
               placeholder="Banner description"
               rows={3}
@@ -501,7 +508,10 @@ function BannerCreateForm({ onClose, onSuccess }: { onClose: () => void; onSucce
                 <Checkbox
                   id="showTitle"
                   checked={form.showTitle}
-                  onCheckedChange={(checked) => setForm(f => ({ ...f, showTitle: checked as boolean }))}
+                  onCheckedChange={(checked) => {
+                    setForm(f => ({ ...f, showTitle: checked as boolean }))
+                    setRequiredTitle(checked as boolean)
+                  }}
                 />
                 <Label htmlFor="showTitle">Show Title</Label>
               </div>
@@ -509,7 +519,10 @@ function BannerCreateForm({ onClose, onSuccess }: { onClose: () => void; onSucce
                 <Checkbox
                   id="showDescription"
                   checked={form.showDescription}
-                  onCheckedChange={(checked) => setForm(f => ({ ...f, showDescription: checked as boolean }))}
+                  onCheckedChange={(checked) => {
+                    setForm(f => ({ ...f, showDescription: checked as boolean }))
+                    setRequiredDescription(checked as boolean)
+                  }}
                 />
                 <Label htmlFor="showDescription">Show Description</Label>
               </div>
@@ -564,14 +577,25 @@ function BannerEditForm({ banner, onClose, onSuccess }: { banner: Banner; onClos
   })
   const [newImage, setNewImage] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
+  const [requiredTitle, setRequiredTitle] = useState(true);
+  const [requiredDescription, setRequiredDescription] = useState(true);
+  const [requiredLink, setRequiredLink] = useState(true);
+  // const [requiredExpire, setRequiredExpire] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.title || !form.description || !form.link) {
-      alert("Please fill in all required fields")
+    if(requiredTitle && !form.title){
+      alert("Title is required")
       return
     }
-
+    if(requiredDescription && !form.description){
+      alert("Description is required")
+    }
+    if(requiredLink && !form.link){
+      alert("Link is required")
+      return
+    }
+   
     setLoading(true)
     try {
       const formData = new FormData()
@@ -618,36 +642,36 @@ function BannerEditForm({ banner, onClose, onSuccess }: { banner: Banner; onClos
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-title">Title *</Label>
+              <Label htmlFor="edit-title">Title {requiredTitle ? "*" : ""}</Label>
               <Input
                 id="edit-title"
                 value={form.title}
                 onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
                 placeholder="Banner title"
-                required
+                required={requiredTitle}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-link">Link *</Label>
+              <Label htmlFor="edit-link">Link {requiredLink ? "*" : ""}</Label>
               <Input
                 id="edit-link"
                 value={form.link}
                 onChange={(e) => setForm(f => ({ ...f, link: e.target.value }))}
                 placeholder="https://example.com"
-                required
+                required={requiredLink}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-description">Description *</Label>
+            <Label htmlFor="edit-description">Description {requiredDescription ? "*" : ""}</Label>
             <Textarea
               id="edit-description"
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Banner description"
               rows={3}
-              required
+              required={requiredDescription}
             />
           </div>
 
@@ -697,7 +721,10 @@ function BannerEditForm({ banner, onClose, onSuccess }: { banner: Banner; onClos
                 <Checkbox
                   id="edit-showTitle"
                   checked={form.showTitle}
-                  onCheckedChange={(checked) => setForm(f => ({ ...f, showTitle: checked as boolean }))}
+                  onCheckedChange={(checked) => {
+                    setForm(f => ({ ...f, showTitle: checked as boolean }))
+                    setRequiredTitle(checked as boolean)
+                  }}
                 />
                 <Label htmlFor="edit-showTitle">Show Title</Label>
               </div>
@@ -705,7 +732,10 @@ function BannerEditForm({ banner, onClose, onSuccess }: { banner: Banner; onClos
                 <Checkbox
                   id="edit-showDescription"
                   checked={form.showDescription}
-                  onCheckedChange={(checked) => setForm(f => ({ ...f, showDescription: checked as boolean }))}
+                  onCheckedChange={(checked) => {
+                    setForm(f => ({ ...f, showDescription: checked as boolean }))
+                    setRequiredDescription(checked as boolean)
+                  }}
                 />
                 <Label htmlFor="edit-showDescription">Show Description</Label>
               </div>
@@ -713,7 +743,10 @@ function BannerEditForm({ banner, onClose, onSuccess }: { banner: Banner; onClos
                 <Checkbox
                   id="edit-showLink"
                   checked={form.showLink}
-                  onCheckedChange={(checked) => setForm(f => ({ ...f, showLink: checked as boolean }))}
+                  onCheckedChange={(checked) => {
+                    setForm(f => ({ ...f, showLink: checked as boolean }))
+                    setRequiredLink(checked as boolean)
+                  }}
                 />
                 <Label htmlFor="edit-showLink">Show Link</Label>
               </div>

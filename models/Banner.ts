@@ -19,10 +19,10 @@ const BannerSchema = new Schema({
 });
 
 export const zodBannerSchema = z.object({
-    title: z.string(),//.min(1, "Title is required"),
-    description: z.string().min(1, "Description is required"),
+    title: z.string().optional(),//.min(1, "Title is required"),
+    description: z.string().optional(),//.min(1, "Description is required"),
     // image: z.string().min(1, "Image is required"),
-    link: z.string(),//.min(1, "Link is required"),
+    link: z.string().optional(),
     isActive: z.boolean().default(true),
     expiresAt: z.date().optional(),//.default(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
     showTitle: z.boolean().default(false),
