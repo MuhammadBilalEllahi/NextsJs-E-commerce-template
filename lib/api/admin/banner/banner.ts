@@ -1,6 +1,7 @@
 export const API_URL_BANNER_ADMIN = "/api/admin/banner";
+export const API_URL_GLOBAL_SETTINGS = "/api/admin/global-settings";
 
-export const createBanner = async (banner: { title: string; description: string; image: File; link: string; isActive: boolean; expiresAt: string; showTitle: boolean; showLink: boolean; showDescription: boolean }) => {
+export const createBanner = async (banner: { title: string; description: string; image: File; link: string; isActive: boolean; expiresAt: string; showTitle: boolean; showLink: boolean; showDescription: boolean; timeout?: number }) => {
     if (!banner.title || !banner.description || !banner.image || !banner.link) {
         throw new Error("Missing required fields");
     }
@@ -15,6 +16,9 @@ export const createBanner = async (banner: { title: string; description: string;
     fd.append("showTitle", banner.showTitle.toString())
     fd.append("showLink", banner.showLink.toString())
     fd.append("showDescription", banner.showDescription.toString())
+    if (banner.timeout) {
+        fd.append("timeout", banner.timeout.toString())
+    }
 
     const res = await fetch(API_URL_BANNER_ADMIN, { method: "POST", body: fd })
     
@@ -27,7 +31,7 @@ export const createBanner = async (banner: { title: string; description: string;
     return data.banner || data;
 }
 
-export const updateBanner = async (bannerId: string, bannerData: { title: string; description: string; link: string; isActive: boolean; expiresAt: string; showTitle: boolean; showLink: boolean; showDescription: boolean; image?: File }) => {
+export const updateBanner = async (bannerId: string, bannerData: { title: string; description: string; link: string; isActive: boolean; expiresAt: string; showTitle: boolean; showLink: boolean; showDescription: boolean; timeout?: number; image?: File }) => {
     const fd = new FormData()
     fd.append("_id", bannerId)
     fd.append("title", bannerData.title)
@@ -38,6 +42,9 @@ export const updateBanner = async (bannerId: string, bannerData: { title: string
     fd.append("showTitle", bannerData.showTitle.toString())
     fd.append("showLink", bannerData.showLink.toString())
     fd.append("showDescription", bannerData.showDescription.toString())
+    if (bannerData.timeout) {
+        fd.append("timeout", bannerData.timeout.toString())
+    }
     
     if (bannerData.image) {
         fd.append("image", bannerData.image)
@@ -82,6 +89,23 @@ export const fetchBanners = async () => {
     return data.banners || []
 }
 
+export const fetchGlobalSettings = async () => {
+    try {
+        const res = await fetch(API_URL_GLOBAL_SETTINGS);
+        
+        if (!res.ok) {
+            throw new Error("Failed to fetch global settings");
+        }
+        
+        const data = await res.json();
+        return data.settings;
+    } catch (error) {
+        console.error("Error fetching global settings:", error);
+        return null;
+    }
+};
+
+
 export const purgeRedisCache = async () => {
     const res = await fetch(API_URL_BANNER_ADMIN, {
         method: "PATCH",
@@ -97,3 +121,9 @@ export const purgeRedisCache = async () => {
     const data = await res.json()
     return data;
 }
+
+export type GlobalSettings = {
+    _id: string;
+    bannerScrollTime: number;
+    updatedAt: string;
+};

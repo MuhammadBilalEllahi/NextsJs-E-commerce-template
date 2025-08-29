@@ -4,17 +4,41 @@ import { HomeFeaturedProducts } from "@/components/home/home-featured-products"
 import { HomeCategories } from "@/components/home/home-categories"
 import { HomeBlogPreview } from "@/components/home/home-blog-preview"
 import { HomeTestimonials } from "@/components/home/home-testimonials"
-import { getFeaturedProducts, getFeaturedBlogs, getCategories, shopLocations } from "@/mock_data/mock-data"
+import {  getFeaturedBlogs, getCategories, shopLocations } from "@/mock_data/mock-data"
 import { HomeShopLocations } from "@/components/home/home-shops-preview"
 import { HomeNewsletter } from "@/components/home/home-newsletter"
+import { getAllBanners, getAllNewArrivalsProducts, getAllTopSellingProducts, getGlobalSettings } from "@/database/data-service"
+
+
+// interface Banner {
+//   _id: string;
+//   title: string;
+//   description: string;
+//   image: string;
+//   link: string;
+// }
+
+// interface GlobalSettings {
+//   _id: string;
+//   bannerScrollTime: number;
+// }
+
 
 export default async function HomePage() {
   // Server Component fetching placeholder data. Interactive sections are client components.
-  const [featured, blogs, categories] = await Promise.all([
-    getFeaturedProducts(),
+  const [fetchedBanners, fetchedSettings,newArrivals, topSelling, blogs, categories] = await Promise.all([
+    
+    getAllBanners(),
+    getGlobalSettings(),
+    getAllNewArrivalsProducts(),
+    getAllTopSellingProducts(), 
     getFeaturedBlogs(),
     getCategories(),
   ])
+
+
+  console.log("Fetched banners:", fetchedBanners)
+  console.log("Fetched global settings:", fetchedSettings)
 
   return (
     <div>
@@ -24,11 +48,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <HomeHero />
+      <HomeHero banners={fetchedBanners as any} globalSettings={fetchedSettings as any} />
 
       <section className="container mx-auto px-4 py-10 md:py-14">
        
-        <HomeFeaturedProducts bestSellings={featured} newArrivals={[...featured].reverse()} />
+        <HomeFeaturedProducts bestSellings={topSelling} newArrivals={newArrivals} />
       </section>
 
       <HomeShopLocations shopLocation={shopLocations}/>

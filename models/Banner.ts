@@ -15,7 +15,8 @@ const BannerSchema = new Schema({
     showTitle: { type: Boolean, default: true },
     showLink: { type: Boolean, default: true },
     showDescription: { type: Boolean, default: true },
-    mimeType: { type: String, default: "" }
+    mimeType: { type: String, default: "" },
+    timeout: { type: Number, default: null } // Individual banner timeout in milliseconds
 });
 
 export const zodBannerSchema = z.object({
@@ -28,7 +29,8 @@ export const zodBannerSchema = z.object({
     showTitle: z.boolean().default(false),
     showDescription: z.boolean().default(false),
     showLink: z.boolean().default(false),
-    mimeType: z.string().optional()
+    mimeType: z.string().optional(),
+    timeout: z.number().optional() // Individual banner timeout in milliseconds
 })
 
 BannerSchema.pre("save", function (next) {

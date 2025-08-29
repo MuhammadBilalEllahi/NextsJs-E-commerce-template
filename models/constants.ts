@@ -12,7 +12,8 @@ export const MODELS = {
     FAQ: "FAQ",
     BRAND_PRODUCTS: "BrandProducts",
     CATEGORY_PRODUCTS: "CategoryProducts",
-    BANNER: "Banner"
+    BANNER: "Banner",
+    GLOBAL_SETTINGS: "GlobalSettings"
 }
 
 export const ORDER_TYPE = {

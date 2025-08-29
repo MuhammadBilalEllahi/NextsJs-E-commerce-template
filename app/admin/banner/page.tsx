@@ -5,10 +5,22 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Edit, Trash2, Eye, Plus, RefreshCw, Calendar, Link, Image as ImageIcon, Settings } from "lucide-react"
+import { Edit, Trash2, Eye, Plus, RefreshCw, Calendar, Link, Image as ImageIcon, Settings, Clock } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { API_URL_BANNER_ADMIN, purgeRedisCache } from "@/lib/api/admin/banner/banner"
+import { 
+  API_URL_BANNER_ADMIN, 
+  purgeRedisCache, 
+  fetchBanners, 
+  fetchGlobalSettings, 
+  
+  createBanner, 
+  updateBanner, 
+  deleteBanner,
+  GlobalSettings 
+} from "@/lib/api/admin/banner/banner"
+import { updateGlobalSettings } from "@/lib/api/admin/global-settings/global-settings"
+
 
 interface Banner {
   _id: string;
@@ -22,6 +34,7 @@ interface Banner {
   showLink: boolean;
   showDescription: boolean;
   mimeType: string;
+  timeout?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -36,6 +49,7 @@ interface CreateBannerData {
   showTitle: boolean;
   showLink: boolean;
   showDescription: boolean;
+  timeout?: number;
 }
 
 export default function BannerAdminPage() {
@@ -46,22 +60,41 @@ export default function BannerAdminPage() {
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
   const [viewingBanner, setViewingBanner] = useState<Banner | null>(null)
   const [purgingRedis, setPurgingRedis] = useState(false)
+  const [globalSettings, setGlobalSettings] = useState<GlobalSettings | null>(null)
+  const [showGlobalSettings, setShowGlobalSettings] = useState(false)
+  const [updatingSettings, setUpdatingSettings] = useState(false)
 
-  // Fetch banners
-  const fetchBanners = async () => {
+  // Fetch banners and global settings
+  const fetchData = async () => {
     try {
       setLoading(true)
-      const response = await fetch(API_URL_BANNER_ADMIN)
-      if (!response.ok) {
-        throw new Error("Failed to fetch banners")
-      }
-      const data = await response.json()
-      setBanners(data.banners || [])
+      const [fetchedBanners, settings] = await Promise.all([
+        fetchBanners(),
+        fetchGlobalSettings()
+      ])
+      
+      setBanners(fetchedBanners || [])
+      setGlobalSettings(settings)
     } catch (err: any) {
       setError(err.message)
-      console.error("Error fetching banners:", err)
+      console.error("Error fetching data:", err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Update global settings
+  const handleUpdateGlobalSettings = async (bannerScrollTime: number) => {
+    try {
+      setUpdatingSettings(true)
+      await updateGlobalSettings({ bannerScrollTime })
+      await fetchData() // Refresh data
+      alert("Global settings updated successfully!")
+      setShowGlobalSettings(false)
+    } catch (err: any) {
+      alert("Error updating global settings: " + err.message)
+    } finally {
+      setUpdatingSettings(false)
     }
   }
 
@@ -71,7 +104,7 @@ export default function BannerAdminPage() {
       setPurgingRedis(true)
       await purgeRedisCache()
       alert("Redis cache purged successfully!")
-      await fetchBanners() // Refresh data
+      await fetchData() // Refresh data
     } catch (err: any) {
       alert("Error purging Redis cache: " + err.message)
     } finally {
@@ -80,25 +113,16 @@ export default function BannerAdminPage() {
   }
 
   useEffect(() => {
-    fetchBanners()
+    fetchData()
   }, [])
 
   // Delete banner
-  const deleteBanner = async (bannerId: string) => {
+  const handleDeleteBanner = async (bannerId: string) => {
     if (!confirm("Are you sure you want to delete this banner?")) return
     
     try {
-      const response = await fetch(API_URL_BANNER_ADMIN, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ _id: bannerId })
-      })
-      
-      if (!response.ok) {
-        throw new Error("Failed to delete banner")
-      }
-      
-      await fetchBanners()
+      await deleteBanner(bannerId)
+      await fetchData()
       alert("Banner deleted successfully")
     } catch (err: any) {
       alert("Error deleting banner: " + err.message)
@@ -153,7 +177,7 @@ export default function BannerAdminPage() {
           <div className="text-red-500 p-4 bg-red-50 rounded-md">
             {error}
           </div>
-          <Button onClick={fetchBanners} className="mt-4">
+          <Button onClick={fetchData} className="mt-4">
             Try Again
           </Button>
         </CardContent>
@@ -174,6 +198,13 @@ export default function BannerAdminPage() {
             <div className="flex gap-2">
               <Button 
                 variant="outline"
+                onClick={() => setShowGlobalSettings(!showGlobalSettings)}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Global Settings
+              </Button>
+              <Button 
+                variant="outline"
                 onClick={handlePurgeRedisCache}
                 disabled={purgingRedis}
               >
@@ -192,12 +223,67 @@ export default function BannerAdminPage() {
         </CardHeader>
       </Card>
 
+      {/* Global Settings */}
+      {showGlobalSettings && globalSettings && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Global Banner Settings</CardTitle>
+            <CardDescription>Configure overall banner behavior</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="bannerScrollTime">
+                  Overall Banner Scroll Time (milliseconds)
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="bannerScrollTime"
+                    type="number"
+                    min="1000"
+                    max="30000"
+                    step="1000"
+                    value={globalSettings.bannerScrollTime}
+                    onChange={(e) => setGlobalSettings({
+                      ...globalSettings,
+                      bannerScrollTime: Number(e.target.value)
+                    })}
+                    className="w-32"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    ({Math.round(globalSettings.bannerScrollTime / 1000)} seconds)
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  This time applies to banners that don't have individual timeout settings.
+                  Range: 1-30 seconds.
+                </p>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowGlobalSettings(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => handleUpdateGlobalSettings(globalSettings.bannerScrollTime)}
+                  disabled={updatingSettings}
+                >
+                  {updatingSettings ? "Updating..." : "Update Settings"}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Create Banner Form */}
       {showCreateForm && (
         <BannerCreateForm 
           onClose={() => setShowCreateForm(false)}
           onSuccess={() => {
-            fetchBanners()
+            fetchData()
             setShowCreateForm(false)
           }}
         />
@@ -209,7 +295,7 @@ export default function BannerAdminPage() {
           banner={editingBanner}
           onClose={closeAllForms}
           onSuccess={() => {
-            fetchBanners()
+            fetchData()
             closeAllForms()
           }}
         />
@@ -238,6 +324,7 @@ export default function BannerAdminPage() {
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Link</th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Expires</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Timeout</th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Settings</th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
                   </tr>
@@ -245,7 +332,7 @@ export default function BannerAdminPage() {
                 <tbody>
                   {banners.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="p-8 text-center text-muted-foreground">
+                      <td colSpan={9} className="p-8 text-center text-muted-foreground">
                         No banners found. Create your first banner to get started.
                       </td>
                     </tr>
@@ -295,6 +382,20 @@ export default function BannerAdminPage() {
                           </div>
                         </td>
                         <td className="p-4 align-middle">
+                          <div className="text-sm">
+                            {banner.timeout ? (
+                              <span className="inline-flex items-center gap-1 text-blue-600">
+                                <Clock className="h-3 w-3" />
+                                {Math.round(banner.timeout / 1000)}s
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">
+                                Default ({Math.round((globalSettings?.bannerScrollTime || 5000) / 1000)}s)
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-4 align-middle">
                           <div className="flex flex-wrap gap-1">
                             {banner.showTitle && (
                               <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
@@ -335,7 +436,7 @@ export default function BannerAdminPage() {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => deleteBanner(banner._id)}
+                              onClick={() => handleDeleteBanner(banner._id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -389,26 +490,22 @@ function BannerCreateForm({ onClose, onSuccess }: { onClose: () => void; onSucce
 
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append("title", form.title)
-      formData.append("description", form.description)
-      formData.append("image", form.image)
-      formData.append("link", form.link)
-      formData.append("isActive", form.isActive.toString())
-      formData.append("expiresAt", form.expiresAt)
-      formData.append("showTitle", form.showTitle.toString())
-      formData.append("showLink", form.showLink.toString())
-      formData.append("showDescription", form.showDescription.toString())
-
-      const response = await fetch(API_URL_BANNER_ADMIN, {
-        method: "POST",
-        body: formData
-      })
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => null)
-        throw new Error(error?.error || "Failed to create banner")
+      if (!form.image) {
+        throw new Error("Image is required")
       }
+
+      const response = await createBanner({
+        title: form.title,
+        description: form.description,
+        image: form.image,
+        link: form.link,
+        isActive: form.isActive,
+        expiresAt: form.expiresAt,
+        showTitle: form.showTitle,
+        showLink: form.showLink,
+        showDescription: form.showDescription,
+        timeout: form.timeout
+      })
 
       alert("Banner created successfully!")
       onSuccess()
@@ -493,6 +590,32 @@ function BannerCreateForm({ onClose, onSuccess }: { onClose: () => void; onSucce
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="timeout">Individual Timeout (Optional)</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="timeout"
+                type="number"
+                min="1000"
+                max="30000"
+                step="1000"
+                value={form.timeout || ""}
+                onChange={(e) => setForm(f => ({ 
+                  ...f, 
+                  timeout: e.target.value ? Number(e.target.value) : undefined 
+                }))}
+                placeholder="Leave empty for default"
+                className="w-32"
+              />
+              <span className="text-sm text-muted-foreground">
+                {form.timeout ? `(${Math.round(form.timeout / 1000)}s)` : "(Default)"}
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Set individual timeout for this banner in milliseconds. Leave empty to use global default.
+            </p>
+          </div>
+
           <div className="space-y-4">
             <h4 className="font-medium">Display Settings</h4>
             <div className="grid sm:grid-cols-3 gap-4">
@@ -573,7 +696,8 @@ function BannerEditForm({ banner, onClose, onSuccess }: { banner: Banner; onClos
     expiresAt: new Date(banner.expiresAt).toISOString().split('T')[0],
     showTitle: banner.showTitle,
     showLink: banner.showLink,
-    showDescription: banner.showDescription
+    showDescription: banner.showDescription,
+    timeout: banner.timeout
   })
   const [newImage, setNewImage] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
@@ -598,30 +722,18 @@ function BannerEditForm({ banner, onClose, onSuccess }: { banner: Banner; onClos
    
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append("_id", banner._id)
-      formData.append("title", form.title)
-      formData.append("description", form.description)
-      formData.append("link", form.link)
-      formData.append("isActive", form.isActive.toString())
-      formData.append("expiresAt", form.expiresAt)
-      formData.append("showTitle", form.showTitle.toString())
-      formData.append("showLink", form.showLink.toString())
-      formData.append("showDescription", form.showDescription.toString())
-      
-      if (newImage) {
-        formData.append("image", newImage)
-      }
-
-      const response = await fetch(API_URL_BANNER_ADMIN, {
-        method: "PUT",
-        body: formData
+      const response = await updateBanner(banner._id, {
+        title: form.title,
+        description: form.description,
+        link: form.link,
+        isActive: form.isActive,
+        expiresAt: form.expiresAt,
+        showTitle: form.showTitle,
+        showLink: form.showLink,
+        showDescription: form.showDescription,
+        timeout: form.timeout,
+        image: newImage || undefined
       })
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => null)
-        throw new Error(error?.error || "Failed to update banner")
-      }
 
       alert("Banner updated successfully!")
       onSuccess()
@@ -704,6 +816,32 @@ function BannerEditForm({ banner, onClose, onSuccess }: { banner: Banner; onClos
               onChange={(e) => setForm(f => ({ ...f, expiresAt: e.target.value }))}
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-timeout">Individual Timeout (Optional)</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="edit-timeout"
+                type="number"
+                min="1000"
+                max="30000"
+                step="1000"
+                value={form.timeout || ""}
+                onChange={(e) => setForm(f => ({ 
+                  ...f, 
+                  timeout: e.target.value ? Number(e.target.value) : undefined 
+                }))}
+                placeholder="Leave empty for default"
+                className="w-32"
+              />
+              <span className="text-sm text-muted-foreground">
+                {form.timeout ? `(${Math.round(form.timeout / 1000)}s)` : "(Default)"}
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Set individual timeout for this banner in milliseconds. Leave empty to use global default.
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -892,6 +1030,19 @@ function BannerViewForm({ banner, onClose, onEdit }: { banner: Banner; onClose: 
                   banner.showLink ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                 }`}>
                   {banner.showLink ? "Yes" : "No"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-muted-foreground">Individual Timeout</Label>
+                <span className="text-sm">
+                  {banner.timeout ? (
+                    <span className="inline-flex items-center gap-1 text-blue-600">
+                      <Clock className="h-3 w-3" />
+                      {Math.round(banner.timeout / 1000)}s
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">Default (Global setting)</span>
+                  )}
                 </span>
               </div>
             </div>

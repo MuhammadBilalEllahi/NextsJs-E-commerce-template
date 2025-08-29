@@ -34,10 +34,10 @@ export async function POST(req: Request) {
             // image: formData.get("image"),
             link: formData.get("link"),
             isActive: formData.get("isActive") === 'true' ? true : false,
-            
             showTitle: formData.get('showTitle') === 'true' ? true : false,
-            showLink: formData.get('showLink') === 'true' ? true : false,
-            showDescription: formData.get('showDescription') ==='true' ?true: false
+            showLink: formData.get('showLink') === 'true' ?true: false,
+            showDescription: formData.get('showDescription') ==='true' ?true: false,
+            timeout: formData.get("timeout") ? Number(formData.get("timeout")) : null
         }
         console.log(formData.get("expiresAt"), formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null);
         if(formData.get("expiresAt") && formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null && formData.get("expiresAt") !== undefined){
@@ -48,13 +48,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: parsed.error.message }, { status: 400 });
         }
 
-        let { title, description, link, isActive, expiresAt, showDescription, showTitle, showLink } = parsed.data;
-
-
+        let { title, description, link, isActive, expiresAt, showDescription, showTitle, showLink, timeout } = parsed.data;
 
         zodBannerSchema.parse(raw);
         const banner = await Banner.create(
-            [{ title, description, link, isActive, expiresAt, showDescription, showTitle, showLink }],
+            [{ title, description, link, isActive, expiresAt, showDescription, showTitle, showLink, timeout }],
             { session }).then(res => res[0]);
 
         const image = formData.get("image") as File;
@@ -154,7 +152,8 @@ export async function PUT(req: Request) {
             expiresAt: new Date(formData.get("expiresAt") as string),
             showTitle: formData.get("showTitle") === "true",
             showLink: formData.get("showLink") === "true",
-            showDescription: formData.get("showDescription") === "true"
+            showDescription: formData.get("showDescription") === "true",
+            timeout: formData.get("timeout") ? Number(formData.get("timeout")) : null
         };
 
         const parsed = zodBannerSchema.safeParse(raw);

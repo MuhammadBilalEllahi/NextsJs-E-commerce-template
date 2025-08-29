@@ -4,20 +4,24 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { fetchBanners, Banner } from "@/lib/api/banner/banner"
+import { fetchGlobalSettings, GlobalSettings } from "@/lib/api/admin/global-settings/global-settings"
 
-export function HomeHero() {
-  const [banners, setBanners] = useState<Banner[]>([])
+
+
+  export function HomeHero({banners, globalSettings}: {banners: Banner[], globalSettings: GlobalSettings}) {
+  // const [banners, setBanners] = useState<Banner[]>([])
   const [index, setIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  // const [globalSettings, setGlobalSettings] = useState<GlobalSettings | null>(null)
 
-  // Fetch banners on component mount
+  // Fetch banners and global settings on component mount
   useEffect(() => {
-    const loadBanners = async () => {
+    const loadData = async () => {
       try {
-        const fetchedBanners = await fetchBanners()
-        console.log("Fetched banners:", fetchedBanners)
+        
+        
         // Filter only active banners and those that haven't expired
-        const activeBanners = fetchedBanners.filter((banner: Banner) => {
+        const activeBanners = banners.filter((banner: Banner) => {
           if (!banner.isActive) return false
           if (banner.expiresAt) {
             const expiryDate = new Date(banner.expiresAt)
@@ -26,58 +30,74 @@ export function HomeHero() {
           }
           return true
         })
+        
         console.log("Active banners:", activeBanners)
-        setBanners(activeBanners)
+        // setBanners(activeBanners)
+        // setGlobalSettings(fetchedSettings)
       } catch (error) {
-        console.error("Error loading banners:", error)
+        console.error("Error loading data:", error)
         // Fallback to default banners if API fails
-        setBanners([
-          {
-            _id: "fallback-1",
-            title: "Summer Heat Sale",
-            description: "Up to 30% off select spices & masalas",
-            image: "/spice-banner-red.png",
-            link: "/category/all",
-            isActive: true,
-            expiresAt: "",
-            showTitle: true,
-            showLink: true,
-            showDescription: true,
-            mimeType: "",
-            createdAt: "",
-            updatedAt: ""
-          },
-          {
-            _id: "fallback-2",
-            title: "Pickle Perfection",
-            description: "Tangy, spicy, homemade-style pickles",
-            image: "/dehli-mirch-ecommerce-banner.png",
-            link: "/category/pickles",
-            isActive: true,
-            expiresAt: "",
-            showTitle: true,
-            showLink: true,
-            showDescription: true,
-            mimeType: "",
-            createdAt: "",
-            updatedAt: ""
-          }
-        ])
+        // setBanners([
+        //   {
+        //     _id: "fallback-1",
+        //     title: "Summer Heat Sale",
+        //     description: "Up to 30% off select spices & masalas",
+        //     image: "/spice-banner-red.png",
+        //     link: "/category/all",
+        //     isActive: true,
+        //     expiresAt: "",
+        //     showTitle: true,
+        //     showLink: true,
+        //     showDescription: true,
+        //     mimeType: "",
+        //     timeout: undefined,
+        //     createdAt: "",
+        //     updatedAt: ""
+        //   },
+        //   {
+        //     _id: "fallback-2",
+        //     title: "Pickle Perfection",
+        //     description: "Tangy, spicy, homemade-style pickles",
+        //     image: "/dehli-mirch-ecommerce-banner.png",
+        //     link: "/category/pickles",
+        //     isActive: true,
+        //     expiresAt: "",
+        //     showTitle: true,
+        //     showLink: true,
+        //     showDescription: true,
+        //     mimeType: "",
+        //     timeout: undefined,
+        //     createdAt: "",
+        //     updatedAt: ""
+        //   }
+        // ])
+        // Set default global settings
+        // setGlobalSettings({
+        //   _id: "default",
+        //   bannerScrollTime: 5000,
+        //   updatedAt: new Date().toISOString()
+        // })
       } finally {
         setLoading(false)
       }
     }
 
-    loadBanners()
+    loadData()
   }, [])
 
-  // Auto-advance slides
+  // Auto-advance slides with individual banner timeouts
   useEffect(() => {
-    if (banners.length <= 1) return
+    if (banners.length <= 1 || !globalSettings) return
     
-    const t = setInterval(() => setIndex((i) => (i + 1) % banners.length), 5000)
+    const currentBanner = banners[index]
+    const timeout = currentBanner.timeout || globalSettings.bannerScrollTime
+    
+    const t = setInterval(() => {
+      setIndex((i) => (i + 1) % banners.length)
+    }, timeout)
+    
     return () => clearInterval(t)
-  }, [banners.length])
+  }, [banners, index, globalSettings])
 
   // Don't render if no banners or still loading
   if (loading) {

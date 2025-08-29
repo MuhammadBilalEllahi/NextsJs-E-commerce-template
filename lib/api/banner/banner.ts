@@ -28,6 +28,7 @@ export type Banner = {
     showLink: boolean;
     showDescription: boolean;
     mimeType: string;
+    timeout?: number; // Individual banner timeout in milliseconds
     createdAt: string;
     updatedAt: string;
 };

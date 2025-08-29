@@ -8,6 +8,19 @@ import Variant from "@/models/Variant";
 import dbConnect from "@/database/mongodb";
 import RedisClient from "@/database/redisClient";
 import Banner from "@/models/Banner";
+import GlobalSettings from "@/models/GlobalSettings";
+
+
+export async function getGlobalSettings(){
+  try {
+    await dbConnect();
+    const globalSettings = await GlobalSettings.findOne({}).lean();
+    return globalSettings;
+  } catch (error) {
+    console.error("Error fetching global settings:", error);
+    return null;
+  } 
+}
 
 export async function getAllBanners(){
   try {
@@ -45,6 +58,7 @@ export async function getAllTopSellingProducts() {
       .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
       .sort({ createdAt: -1 })
       .lean();
+      console.log("products in getAllTopSellingProducts", JSON.stringify(products, null, 2));
     return products.map(product => ({
       id: String(product._id),
       slug: product.slug,
@@ -93,6 +107,7 @@ export async function getAllNewArrivalsProducts() {
       .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
       .sort({ createdAt: -1 })
       .lean();
+      console.log("products in getAllNewArrivalsProducts", JSON.stringify(products, null, 2));
     return products.map(product => ({
       id: String(product._id),
       slug: product.slug,
