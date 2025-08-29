@@ -51,7 +51,15 @@ export async function POST(req: Request) {
 
     if (!slug) {
       slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
-      slug = slug.concat("-", Date.now().toString());
+      // Add 6-digit random suffix for uniqueness
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      slug = `${slug}-${randomSuffix}`;
+    }
+
+    // Check if slug already exists
+    const existingProduct = await Product.findOne({ slug }).session(session);
+    if (existingProduct) {
+      return NextResponse.json({ error: "A product with this slug already exists" }, { status: 400 });
     }
 
     const newProduct = await Product.create(
@@ -153,11 +161,21 @@ export async function POST(req: Request) {
           }
         }
 
+        // Generate variant slug if not provided
+        let variantSlug = v.slug;
+        if (!variantSlug) {
+          variantSlug = `${v.sku}-${v.label || "variant"}`.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+          // Add 6-character random suffix for uniqueness
+          const randomSuffix = Math.random().toString(36).substring(2, 8);
+          variantSlug = `${variantSlug}-${randomSuffix}`;
+        }
+
         await Variant.create(
           [
             {
               product: newProduct._id,
               sku: v.sku,
+              slug: variantSlug,
               label: v.label,
               price: v.price,
               stock: v.stock,
@@ -239,7 +257,16 @@ export async function PUT(req: Request) {
     if (formData.get("ingredients")) product.ingredients = formData.get("ingredients")!.toString();
     if (formData.get("price")) product.price = Number(formData.get("price"));
     if (formData.get("discount")) product.discount = Number(formData.get("discount"));
-    if (formData.get("slug")) product.slug = formData.get("slug")!.toString();
+    // Handle slug changes with validation
+    const newSlug = formData.get("slug")?.toString();
+    if (newSlug && newSlug !== product.slug) {
+      // Check if new slug already exists
+      const existingProduct = await Product.findOne({ slug: newSlug, _id: { $ne: productId } }).session(session);
+      if (existingProduct) {
+        return NextResponse.json({ error: "A product with this slug already exists" }, { status: 400 });
+      }
+      product.slug = newSlug;
+    }
     if (formData.get("isActive") !== null) product.isActive = formData.get("isActive")!.toString() === "true";
     if (formData.get("isOutOfStock") !== null) product.isOutOfStock = formData.get("isOutOfStock")!.toString() === "true";
     if (formData.get("isFeatured") !== null) product.isFeatured = formData.get("isFeatured")!.toString() === "true";

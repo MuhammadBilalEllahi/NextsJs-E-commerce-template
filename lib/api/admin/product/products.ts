@@ -29,6 +29,7 @@ export interface CreateProductData {
   brand: string;
   categories: string[];
   images: (string | File)[];
+  slug?: string;
   variants: any[];
   isActive: boolean;
   isOutOfStock: boolean;
@@ -74,6 +75,7 @@ export const createProduct = async (productData: CreateProductData): Promise<Pro
     if (productData.price) formData.append("price", productData.price.toString());
     if (productData.discount) formData.append("discount", productData.discount.toString());
     if (productData.brand) formData.append("brand", productData.brand);
+    if (productData.slug) formData.append("slug", productData.slug);
     // if (productData.categories) formData.append("categories", productData.categories.join(","));
     // if (productData.images) formData.append("images", productData.images.join(","));
     // if (productData.variants) formData.append("variants", productData.variants.join(","));
@@ -91,12 +93,12 @@ export const createProduct = async (productData: CreateProductData): Promise<Pro
         formData.append("images", file)
       })
     }
-    if (productData.variants) {
-      // send variants metadata and files
-      formData.append("variants", JSON.stringify(productData.variants.map(v => ({
-        sku: v.sku, label: v.label, price: v.price, stock: v.stock, discount: v.discount
-      }))))
-    }
+          if (productData.variants) {
+        // send variants metadata and files
+        formData.append("variants", JSON.stringify(productData.variants.map(v => ({
+          sku: v.sku, slug: v.slug, label: v.label, price: v.price, stock: v.stock, discount: v.discount
+        }))))
+      }
     console.log("[createProduct] formData:", formData);
     
     const response = await fetch(API_URL_PRODUCT_ADMIN, {

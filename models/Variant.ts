@@ -7,6 +7,7 @@ import { z } from "zod";
 const VariantSchema = new mongoose.Schema({
   product: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.PRODUCT, required: true },
   sku: { type: String, unique: true },
+  slug: { type: String, unique: true }, // Variant slug for URLs
   label: String, // "500g", "1kg", "2kg"
   price: { type: Number, required: true },
   discount: { type: Number, default: 0 },
@@ -30,6 +31,7 @@ const VariantSchema = new mongoose.Schema({
 export const variantZodSchema = z.object({
   product: z.string().min(1, "Product ID is required"), // ObjectId as string
   sku: z.string().min(1, "SKU is required"),
+  slug: z.string().optional(), // Variant slug (optional, will auto-generate if not provided)
   label: z.string().optional(),
   price: z.number().positive("Price must be greater than 0"),
   discount: z.number().min(0).max(100).optional(),

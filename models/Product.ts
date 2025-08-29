@@ -57,7 +57,14 @@ export const productZodSchema = z.object({
   categories: z.array(z.string()).optional(), // ObjectIds as strings
   images: z.array(z.string().url()).optional(),
   brand: z.string().optional(),
-  variants: z.array(z.object()).optional(), // list of Variant IDs
+  variants: z.array(z.object({
+    sku: z.string(),
+    slug: z.string().optional(),
+    label: z.string().optional(),
+    price: z.number(),
+    stock: z.number(),
+    discount: z.number().optional()
+  })).optional(), // list of Variant objects
   isActive: z.boolean().optional(),
   isOutOfStock: z.boolean().optional(),
   isFeatured: z.boolean().optional(),

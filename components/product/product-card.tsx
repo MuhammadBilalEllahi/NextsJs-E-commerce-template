@@ -16,9 +16,29 @@ export function ProductCard({
 }) {
   const { add, isAdding } = useCart()
 
+  // Get the first available image: variant image -> product images -> product image -> placeholder
+  const getDisplayImage = () => {
+    if (product.variants && product.variants.length > 0 && product.variants[0].images && product.variants[0].images.length > 0) {
+      return product.variants[0].images[0]
+    }
+    if (product.images && product.images.length > 0) {
+      return product.images[0]
+    }
+    if (product.image) {
+      return product.image
+    }
+    return "/placeholder.svg?height=176&width=320&query=grid product"
+  }
+
+  // Get variant labels for display
+  const getVariantLabels = () => {
+    if (!product.variants || product.variants.length === 0) return []
+    return product.variants.map(v => v.label).slice(0, 3) // Show max 3 labels
+  }
+
   const handleAddToCart = () => {
     if (isAdding) return // Prevent duplicate clicks
-    add({ id: product.id, title: product.title, price: product.price, image: product.image }, 1)
+    add({ id: product.id, title: product.title, price: product.price, image: getDisplayImage() }, 1)
   }
 
   if (variant === "list") {
@@ -26,7 +46,7 @@ export function ProductCard({
       <div className="rounded-xl border overflow-hidden bg-white dark:bg-neutral-950 flex">
         <Link href={`/product/${product.slug}`} className="block">
           <img
-            src={product.image || "/placeholder.svg?height=160&width=200&query=list product"}
+            src={getDisplayImage()}
             alt={product.title}
             className="h-40 w-52 object-cover"
           />
@@ -61,10 +81,26 @@ export function ProductCard({
   }
 
   return (
-    <div className="group rounded-2xl border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition">
+    <div className="group rounded-2xl border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition relative">
+      {/* Variant labels overlay - shown on hover */}
+      {product.variants && product.variants.length > 0 && (
+        <div className="absolute top-2 left-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="flex flex-wrap gap-1">
+            {getVariantLabels().map((label, index) => (
+              <span
+                key={index}
+                className="bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      
       <Link href={`/product/${product.slug}`} className="block">
         <img
-          src={product.image || "/placeholder.svg?height=176&width=320&query=grid product"}
+          src={getDisplayImage()}
           alt={product.title}
           className="h-44 w-full object-cover group-hover:scale-[1.01] transition-transform"
         />

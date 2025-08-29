@@ -1,63 +1,90 @@
-import dbConnect from "@/database/mongodb";
-import Variant from "@/models/Variant";
-import { variantZodSchema } from "@/models/Variant";
-import Product from "@/models/Product";
-import mongoose from "mongoose";
 import { NextResponse } from "next/server";
-import { uploadFileToS3 } from "@/lib/utils/aws/aws";
+import Variant from "@/models/Variant";
+import Product from "@/models/Product";
+import { uploaderFiles } from "@/lib/utils/imageUploader/awsImageUploader";
+import dbConnect from "@/database/mongodb";
+import mongoose from "mongoose";
 
 export async function POST(req: Request) {
-  await dbConnect();
-  const session = await mongoose.startSession();
-  session.startTransaction();
+    await dbConnect();
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-  try {
-    const formData = await req.formData();
+    try {
+        const formData = await req.formData();
+        
+        const productId = formData.get("product")?.toString();
+        const sku = formData.get("sku")?.toString();
+        const label = formData.get("label")?.toString();
+        const slug = formData.get("slug")?.toString();
+        const price = Number(formData.get("price"));
+        const stock = Number(formData.get("stock"));
+        const discount = Number(formData.get("discount"));
+        const isActive = formData.get("isActive") === "true";
+        const isOutOfStock = formData.get("isOutOfStock") === "true";
 
-    const raw = {
-      product: formData.get("product")?.toString(),
-      sku: formData.get("sku")?.toString(),
-      label: formData.get("label")?.toString(),
-      price: Number(formData.get("price")),
-      stock: Number(formData.get("stock")),
-      discount: Number(formData.get("discount") || 0),
-      isActive: formData.get("isActive")?.toString() === "true" || true,
-      isOutOfStock: formData.get("isOutOfStock")?.toString() === "true" || false,
-    };
+        if (!productId || !sku || price <= 0) {
+            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        }
 
-    const parsed = variantZodSchema.safeParse(raw);
+        // Generate slug if not provided
+        let finalSlug = slug;
+        if (!finalSlug) {
+            finalSlug = `${sku}-${label || "variant"}`.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+            // Add 6-character random suffix for uniqueness
+            const randomSuffix = Math.random().toString(36).substring(2, 8);
+            finalSlug = `${finalSlug}-${randomSuffix}`;
+        }
 
-    if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.message }, { status: 400 });
+        // Check if slug already exists
+        const existingVariantBySlug = await Variant.findOne({ slug: finalSlug });
+        if (existingVariantBySlug) {
+            return NextResponse.json({ error: "A variant with this slug already exists" }, { status: 400 });
+        }
+
+        // Check if SKU already exists for this product
+        const existingVariantBySku = await Variant.findOne({ product: productId, sku });
+        if (existingVariantBySku) {
+            return NextResponse.json({ error: "SKU already exists for this product" }, { status: 400 });
+        }
+
+        // Create variant
+        const variant = await Variant.create([{
+            product: productId,
+            sku,
+            slug: finalSlug,
+            label,
+            price,
+            stock,
+            discount,
+            isActive,
+            isOutOfStock
+        }], { session });
+
+        // Handle image uploads
+        const images = formData.getAll("images") as File[];
+        if (images.length > 0) {
+            const uploadedImages = await uploaderFiles('variants', images, variant[0]._id);
+            const imageUrls = uploadedImages.map(img => img.url);
+            
+            await Variant.findByIdAndUpdate(variant[0]._id, {
+                images: imageUrls
+            }, { session });
+        }
+
+        await session.commitTransaction();
+
+        const createdVariant = await Variant.findById(variant[0]._id).populate('product');
+        return NextResponse.json({ variant: createdVariant });
+
+    } catch (err: any) {
+        await session.abortTransaction();
+        console.error("Error creating variant:", err);
+        return NextResponse.json({ error: err.message || "Failed to create variant" }, { status: 500 });
+    } finally {
+        session.endSession();
     }
-
-    const { product, sku, label, price, stock, discount, isActive, isOutOfStock } = parsed.data;
-// product is the id of the product
-
-    const newVariant = await Variant.create(
-      [{ product, sku, label, price, stock, discount, isActive, isOutOfStock }],
-      { session }
-    ).then((res: any) => res[0]);
-
-
-    const productUpdate = await Product.findByIdAndUpdate(product, { $push: { variants: newVariant._id } }, { session });
-
-    await session.commitTransaction();
-    return NextResponse.json({ message: "Variant created successfully", variant: newVariant }, { status: 201 });
-
-
-  }
-
-  catch (err: any) {
-    await session.abortTransaction();
-    console.error("Error creating variant:", err);
-    return NextResponse.json({ error: err.message || "Failed to create variant" }, { status: 500 });
-  }
-  finally {
-    session.endSession();
-  }
 }
-
 
 export async function PUT(req: Request) {
     await dbConnect();
@@ -66,100 +93,70 @@ export async function PUT(req: Request) {
 
     try {
         const formData = await req.formData();
-        const id = formData.get("id")?.toString();
-        const isActive = formData.get("isActive")?.toString() === "true";
-        const isOutOfStock = formData.get("isOutOfStock")?.toString() === "true";
-        const stock = Number(formData.get("stock"));
-        const price = Number(formData.get("price"));
-        const discount = Number(formData.get("discount"));
-        const label = formData.get("label")?.toString();
-        const images = formData.getAll("images") as File[];
-
-        const variant = await Variant.findById(id).session(session);
-        if (!variant) {
-            return NextResponse.json({ error: "Variant not found" }, { status: 404 });
+        
+        const variantId = formData.get("id")?.toString();
+        if (!variantId) {
+            return NextResponse.json({ error: "Missing variant ID" }, { status: 400 });
         }
 
-        // Handle image uploads if any
-        let uploadedImages: string[] = [];
-        if (images && images.length > 0) {
-            for (const file of images) {
-                if (file instanceof Blob) {
-                    const buffer = Buffer.from(await file.arrayBuffer());
-                    const url = await uploadFileToS3(
-                        {
-                            buffer,
-                            originalFilename: (file as any).name || `${Date.now()}.jpg`,
-                            mimetype: file.type,
-                        },
-                        `variants/${id}`
-                    );
-                    uploadedImages.push(url);
+        const updateData: any = {};
+        
+        if (formData.has("label")) updateData.label = formData.get("label");
+        if (formData.has("price")) updateData.price = Number(formData.get("price"));
+        if (formData.has("stock")) updateData.stock = Number(formData.get("stock"));
+        if (formData.has("discount")) updateData.discount = Number(formData.get("discount"));
+        if (formData.has("isActive")) updateData.isActive = formData.get("isActive") === "true";
+        if (formData.has("isOutOfStock")) updateData.isOutOfStock = formData.get("isOutOfStock") === "true";
+
+        // Handle slug updates with validation
+        if (formData.has("slug")) {
+            const newSlug = formData.get("slug")?.toString();
+            if (newSlug && newSlug !== updateData.slug) {
+                // Check if new slug already exists
+                const existingVariantBySlug = await Variant.findOne({ slug: newSlug, _id: { $ne: variantId } });
+                if (existingVariantBySlug) {
+                    return NextResponse.json({ error: "A variant with this slug already exists" }, { status: 400 });
                 }
+                updateData.slug = newSlug;
             }
         }
 
-        // Merge existing images with new ones
-        const finalImages = uploadedImages.length > 0 ? uploadedImages : variant.images;
+        // Handle existing images (preserve them)
+        const existingImages = formData.getAll("existingImages") as string[];
+        
+        // Handle new image uploads
+        const newImages = formData.getAll("images") as File[];
+        if (newImages.length > 0) {
+            const uploadedImages = await uploaderFiles('variants', newImages, variantId);
+            const newImageUrls = uploadedImages.map(img => img.url);
+            
+            // Combine existing and new images
+            updateData.images = [...existingImages, ...newImageUrls];
+        } else if (existingImages.length > 0) {
+            // Only preserve existing images if no new ones
+            updateData.images = existingImages;
+        }
 
-        const updatedVariant = await Variant.findByIdAndUpdate(id, { 
-            $set: { 
-                isActive, 
-                isOutOfStock, 
-                stock, 
-                price, 
-                discount, 
-                label, 
-                images: finalImages 
-            } 
-        }, { session, new: true });
+        const updatedVariant = await Variant.findByIdAndUpdate(variantId, updateData, {
+            new: true,
+            session
+        });
+
+        if (!updatedVariant) {
+            throw new Error("Variant not found");
+        }
 
         await session.commitTransaction();
-        return NextResponse.json({ variant: updatedVariant }, { status: 200 });
-    }
+        return NextResponse.json({ variant: updatedVariant });
 
-    catch (err: any) {
+    } catch (err: any) {
         await session.abortTransaction();
         console.error("Error updating variant:", err);
         return NextResponse.json({ error: err.message || "Failed to update variant" }, { status: 500 });
-    }
-    finally {
+    } finally {
         session.endSession();
     }
 }
-
-
-export async function GET(req: Request) {
-    await dbConnect();
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-            const formData = await req.formData();
-        const id = formData.get("id")?.toString();
-        const productId = formData.get("productId")?.toString();
-
-        if(id){
-            const variant = await Variant.findById(id).session(session);
-            return NextResponse.json({ variant }, { status: 200 });
-        }
-        if(productId){
-            const variants = await Variant.find({product: productId}).session(session);
-            return NextResponse.json({ variants }, { status: 200 });
-        }
-        return NextResponse.json({ error: "No id or productId provided" }, { status: 400 });
-    }
-
-    catch (err: any) {
-        await session.abortTransaction();
-        console.error("Error getting variant:", err);
-        return NextResponse.json({ error: err.message || "Failed to get variant" }, { status: 500 });
-    }
-    finally {
-        session.endSession();
-    }
-}
-
 
 export async function DELETE(req: Request) {
     await dbConnect();
@@ -168,28 +165,25 @@ export async function DELETE(req: Request) {
 
     try {
         const formData = await req.formData();
-        const id = formData.get("id")?.toString();
-        if (!id) {
-            return NextResponse.json({ error: "Variant ID is required" }, { status: 400 });
+        const variantId = formData.get("id")?.toString();
+
+        if (!variantId) {
+            return NextResponse.json({ error: "Missing variant ID" }, { status: 400 });
         }
 
-        const variant = await Variant.findByIdAndDelete(id).session(session);
-        const product = await Product.findByIdAndUpdate(variant?.product, { $pull: { variants: id } }, { session });
-
-        if (!variant || !product) {
-            return NextResponse.json({ error: "Variant or product not found" }, { status: 404 });
+        const deletedVariant = await Variant.findByIdAndDelete(variantId, { session });
+        if (!deletedVariant) {
+            return NextResponse.json({ error: "Variant not found" }, { status: 404 });
         }
 
         await session.commitTransaction();
-        return NextResponse.json({ message: "Variant deleted successfully", variant: variant }, { status: 200 });
-    }
+        return NextResponse.json({ message: "Variant deleted successfully" });
 
-    catch (err: any) {
+    } catch (err: any) {
         await session.abortTransaction();
         console.error("Error deleting variant:", err);
         return NextResponse.json({ error: err.message || "Failed to delete variant" }, { status: 500 });
-    }
-    finally {
+    } finally {
         session.endSession();
     }
 }

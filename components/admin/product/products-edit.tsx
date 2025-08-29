@@ -19,6 +19,7 @@ type Category = { _id: string; name: string; parent?: { _id: string; name: strin
 type Variant = { 
   _id?: string; 
   sku: string; 
+  slug: string;
   label: string; 
   price: number; 
   stock: number; 
@@ -61,6 +62,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
   const [categories, setCategories] = useState<Category[]>([])
   const [variants, setVariants] = useState<Variant[]>([])
   const [loading, setLoading] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
   const [form, setForm] = useState({
     name: product.name,
@@ -140,6 +142,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
       formData.append("ingredients", form.ingredients);
       formData.append("price", form.price.toString());
       formData.append("discount", form.discount.toString());
+      formData.append("slug", form.slug);
       formData.append("isActive", form.isActive.toString());
       formData.append("isOutOfStock", form.isOutOfStock.toString());
       formData.append("isFeatured", form.isFeatured.toString());
@@ -200,6 +203,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
   const addVariant = () => {
     setEditingVariant({
       sku: "",
+      slug: "",
       label: "",
       price: 0,
       stock: 0,
@@ -235,6 +239,12 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
         fd.append("price", String(editingVariant.price))
         fd.append("discount", String(editingVariant.discount))
         fd.append("label", editingVariant.label)
+        if (editingVariant.slug) fd.append("slug", editingVariant.slug)
+        
+        // Append current images (preserve existing ones)
+        editingVariant.images?.forEach(img => {
+          fd.append("existingImages", img)
+        })
         
         // Append new images if any
         editingVariant.newImages?.forEach(file => {
@@ -253,6 +263,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
         fd.append("product", product._id)
         fd.append("sku", editingVariant.sku)
         fd.append("label", editingVariant.label)
+        if (editingVariant.slug) fd.append("slug", editingVariant.slug)
         fd.append("price", String(editingVariant.price))
         fd.append("stock", String(editingVariant.stock))
         fd.append("discount", String(editingVariant.discount))
@@ -451,9 +462,12 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
                 id="slug"
                 placeholder="product-slug" 
                 value={form.slug} 
-                disabled
-                className="bg-gray-50"
+                onChange={e => setForm(f => ({ ...f, slug: e.target.value }))}
+                className="bg-white"
               />
+              <p className="text-xs text-muted-foreground">
+                Must be unique across all products. Changing this will affect the product URL.
+              </p>
             </div>
           </div>
 
@@ -747,6 +761,11 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
                         {variant.label || variant.sku || `Variant ${index + 1}`}
                       </h4>
                       <span className="text-sm text-muted-foreground">({variant.sku})</span>
+                      {variant.slug && (
+                        <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                          {variant.slug}
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -800,12 +819,22 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
                       <span className="text-sm font-medium">Images:</span>
                       <div className="flex gap-2 mt-2">
                         {variant.images.map((img, imgIndex) => (
-                          <img 
+                          <div 
                             key={imgIndex}
-                            src={img} 
-                            className="w-12 h-12 rounded object-cover border" 
-                            alt={`Variant image ${imgIndex + 1}`}
-                          />
+                            className="relative group cursor-pointer"
+                            onClick={() => setSelectedImage(img)}
+                          >
+                            <img 
+                              src={img} 
+                              className="w-16 h-16 rounded object-cover border hover:border-blue-400 transition-colors" 
+                              alt={`Variant image ${imgIndex + 1}`}
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded flex items-center justify-center">
+                              <span className="text-white opacity-0 group-hover:opacity-100 text-xs font-medium">
+                                Click to view
+                              </span>
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -849,6 +878,19 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
                     onChange={e => setEditingVariant(prev => prev ? { ...prev, label: e.target.value } : prev)} 
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="variant-slug">Slug (optional - will auto-generate if empty)</Label>
+                <Input 
+                  id="variant-slug"
+                  placeholder="variant-slug" 
+                  value={editingVariant.slug || ""} 
+                  onChange={e => setEditingVariant(prev => prev ? { ...prev, slug: e.target.value } : prev)} 
+                />
+                <p className="text-xs text-muted-foreground">
+                  Leave empty to auto-generate. Must be unique across all variants.
+                </p>
               </div>
               
               <div className="grid sm:grid-cols-3 gap-4">
@@ -912,38 +954,72 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
               
               <div className="space-y-2">
                 <Label>Variant Images</Label>
-                <Input 
-                  type="file" 
-                  multiple 
-                  accept="image/*" 
-                  onChange={e => setEditingVariant(prev => prev ? { 
-                    ...prev, 
-                    newImages: Array.from(e.target.files || [])
-                  } : prev)}
-                />
-                {editingVariant.newImages && editingVariant.newImages.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {editingVariant.newImages.map((file, index) => (
-                      <div key={index} className="relative group">
-                        <img 
-                          src={URL.createObjectURL(file)} 
-                          className="w-16 h-16 rounded object-cover border" 
-                          alt={`New image ${index + 1}`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setEditingVariant(prev => prev ? { 
-                            ...prev, 
-                            newImages: prev.newImages?.filter((_, i) => i !== index) 
-                          } : prev)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
+                
+                {/* Existing Images */}
+                {editingVariant.images && editingVariant.images.length > 0 && (
+                  <div className="mb-3">
+                    <span className="text-sm font-medium text-muted-foreground">Current Images:</span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {editingVariant.images.map((img, index) => (
+                        <div key={index} className="relative group">
+                          <img 
+                            src={img} 
+                            className="w-16 h-16 rounded object-cover border cursor-pointer hover:border-blue-400 transition-colors" 
+                            alt={`Current image ${index + 1}`}
+                            onClick={() => setSelectedImage(img)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setEditingVariant(prev => prev ? { 
+                              ...prev, 
+                              images: prev.images?.filter((_, i) => i !== index) || []
+                            } : prev)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
+                
+                {/* Add New Images */}
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">Add New Images:</span>
+                  <Input 
+                    type="file" 
+                    multiple 
+                    accept="image/*" 
+                    onChange={e => setEditingVariant(prev => prev ? { 
+                      ...prev, 
+                      newImages: Array.from(e.target.files || [])
+                    } : prev)}
+                  />
+                  {editingVariant.newImages && editingVariant.newImages.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {editingVariant.newImages.map((file, index) => (
+                        <div key={index} className="relative group">
+                          <img 
+                            src={URL.createObjectURL(file)} 
+                            className="w-16 h-16 rounded object-cover border" 
+                            alt={`New image ${index + 1}`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setEditingVariant(prev => prev ? { 
+                              ...prev, 
+                              newImages: prev.newImages?.filter((_, i) => i !== index) 
+                            } : prev)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="flex justify-end gap-2 pt-4">
@@ -958,6 +1034,30 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-full">
+            <img 
+              src={selectedImage} 
+              alt="Full size view"
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </Card>
   )
 }

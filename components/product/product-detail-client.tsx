@@ -56,6 +56,48 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const currentPrice = selectedVariant?.price || product.price;
   const currentImages = selectedVariant?.images && selectedVariant.images.length > 0 ? selectedVariant.images : product.images;
   
+  // Create mapping between images and variant labels
+  const getVariantLabelsForImages = () => {
+    const variantLabels: Array<{ imageIndex: number; label: string }> = [];
+    
+    if (selectedVariant?.images && selectedVariant.images.length > 0) {
+      // If showing variant images, all images are from the selected variant
+      selectedVariant.images.forEach((_, index) => {
+        variantLabels.push({
+          imageIndex: index,
+          label: selectedVariant.label
+        });
+      });
+    } else if (product.variants && product.variants.length > 0) {
+      // If showing product images, check which images belong to which variants
+      let imageIndex = 0;
+      product.variants.forEach(variant => {
+        if (variant.images && variant.images.length > 0) {
+          variant.images.forEach(() => {
+            variantLabels.push({
+              imageIndex: imageIndex,
+              label: variant.label
+            });
+            imageIndex++;
+          });
+        }
+      });
+    }
+    
+    return variantLabels;
+  };
+  
+  const variantLabels = getVariantLabelsForImages();
+  
+  // Handle variant selection with validation
+  const handleVariantSelect = (variant: any) => {
+    // Don't allow selection of out-of-stock variants
+    if (variant.isOutOfStock || variant.stock <= 0) {
+      return;
+    }
+    setSelectedVariant(variant);
+  };
+  
   // Ensure we have valid data
   if (!product || !product.id) {
     return (
@@ -111,7 +153,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid lg:grid-cols-2 gap-8">
-        <ProductImages images={currentImages} title={product.title} />
+        <ProductImages images={currentImages} title={product.title} variantLabels={variantLabels} />
         <div>
           <div className="flex items-start justify-between gap-4">
             <h1 className="text-2xl md:text-3xl font-bold">{product.title}</h1>
@@ -172,7 +214,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                       key={variant._id}
                       variant={isSelected ? "default" : "outline"}
                       size="sm"
-                      onClick={() => isAvailable && setSelectedVariant(variant)}
+                      onClick={() => handleVariantSelect(variant)}
                       disabled={!isAvailable}
                       className={`relative ${!isAvailable ? 'opacity-50' : ''}`}
                     >

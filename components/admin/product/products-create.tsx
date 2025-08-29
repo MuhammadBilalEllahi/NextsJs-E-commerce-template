@@ -15,7 +15,7 @@ import { createProduct } from "@/lib/api/admin/product/products"
 
 type Brand = { _id: string; name: string; description?: string; logo?: string }
 type Category = { _id: string; name: string; parent?: { _id: string; name: string } | string | null; description?: string; image?: string }
-type VariantDraft = { sku: string; label: string; price: number; stock: number; discount: number; images: File[] }
+type VariantDraft = { sku: string; slug: string; label: string; price: number; stock: number; discount: number; images: File[] }
 
 export default function ProductsCreateAdminUI() {
   const [brands, setBrands] = useState<Brand[]>([])
@@ -31,6 +31,7 @@ export default function ProductsCreateAdminUI() {
     brand: "",
     categories: [] as string[],
     images: [] as File[],
+    slug: "",
     isActive: false,
     isOutOfStock: false
   })
@@ -71,6 +72,7 @@ export default function ProductsCreateAdminUI() {
         brand: form.brand,
         categories: form.categories,
         images: form.images,
+        slug: form.slug || undefined,
         variants: variants.map(v => ({
           sku: v.sku, 
           label: v.label, 
@@ -85,7 +87,7 @@ export default function ProductsCreateAdminUI() {
       
       alert("Product created ✅")
       // reset
-      setForm({ name: "", description: "", ingredients: "", price: 0, discount: 0, brand: "", categories: [], images: [], isActive: false, isOutOfStock: false })
+      setForm({ name: "", description: "", ingredients: "", price: 0, discount: 0, brand: "", categories: [], images: [], slug: "", isActive: false, isOutOfStock: false })
       setVariants([])
     } catch (err: any) {
       alert(err.message || "Failed to create product")
@@ -176,7 +178,7 @@ export default function ProductsCreateAdminUI() {
 
   // ===== VARIANT FUNCTIONS =====
   const addVariant = () =>
-    setVariants(v => [...v, { sku: "", label: "", price: 0, stock: 0, discount: 0, images: [] }])
+    setVariants(v => [...v, { sku: "", slug: "", label: "", price: 0, stock: 0, discount: 0, images: [] }])
 
   const removeVariant = (idx: number) =>
     setVariants(v => v.filter((_, i) => i !== idx))
@@ -213,6 +215,19 @@ export default function ProductsCreateAdminUI() {
         <Textarea placeholder="Ingredients & Nutritional Info (optional)" value={form.ingredients} onChange={e => setForm(f => ({ ...f, ingredients: e.target.value }))} />
         <Input type="number" step="0.01" placeholder="Price" value={form.price || "" as any} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} />
         <Input type="number" step="0.01" min="0" max="100" placeholder="Discount (%)" value={form.discount || "" as any} onChange={e => setForm(f => ({ ...f, discount: Number(e.target.value) }))} />
+
+        {/* Slug input */}
+        <div className="grid gap-2">
+          <label className="text-sm font-medium">Slug (optional - will auto-generate if empty)</label>
+          <Input 
+            placeholder="product-slug" 
+            value={form.slug || ""} 
+            onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} 
+          />
+          <p className="text-xs text-muted-foreground">
+            Leave empty to auto-generate. Must be unique across all products.
+          </p>
+        </div>
 
         {/* Status toggles */}
         <div className="flex items-center gap-4">
@@ -418,6 +433,21 @@ export default function ProductsCreateAdminUI() {
                   value={v.label} 
                   onChange={e => setVariants(prev => prev.map((x, j) => j === variantIndex ? { ...x, label: e.target.value } : x))} 
                 />
+              </div>
+              
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Slug (optional - will auto-generate if empty)</label>
+                <Input 
+                  placeholder="variant-slug" 
+                  value={v.slug || ""} 
+                  onChange={e => setVariants(prev => prev.map((x, j) => j === variantIndex ? { ...x, slug: e.target.value } : x))} 
+                />
+                <p className="text-xs text-muted-foreground">
+                  Leave empty to auto-generate. Must be unique across all variants.
+                </p>
+              </div>
+              
+              <div className="grid sm:grid-cols-3 gap-2">
                 <Input 
                   type="number" 
                   step="0.01" 
@@ -457,8 +487,14 @@ export default function ProductsCreateAdminUI() {
                       <div key={imageIndex} className="relative group">
                         <img 
                           src={URL.createObjectURL(file)} 
-                          className="w-14 h-14 rounded object-cover border" 
+                          className="w-16 h-16 rounded object-cover border cursor-pointer hover:border-blue-400 transition-colors" 
                           alt={`Variant image ${imageIndex + 1}`}
+                          onClick={() => {
+                            // Create a temporary URL for preview
+                            const url = URL.createObjectURL(file);
+                            // Open in new tab for now (could be enhanced with modal)
+                            window.open(url, '_blank');
+                          }}
                         />
                         <button
                           type="button"

@@ -14,7 +14,7 @@ export function PackagingPreview() {
 
     const base = new Image()
     base.crossOrigin = "anonymous"
-    base.src = "/placeholder-5lb61.png"
+    base.src = "https://www.dehlimirchmasalajaat.com/public/uploads/all/8fh5fEL5ia9Xse93GmKq2lZy0K1AW7G2bVokpoxt.jpg"
     base.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       ctx.drawImage(base, 0, 0, canvas.width, canvas.height)

@@ -55,7 +55,17 @@ export type Product = {
   popularity?: number
   createdAt?: string
   image?: string
+  images?: string[] // Array of product images
   tags?: string[]
+  variants?: Array<{
+    _id: string
+    label: string
+    price?: number
+    stock?: number
+    isActive?: boolean
+    isOutOfStock?: boolean
+    images?: string[]
+  }>
 }
 
 export type Blog = { slug: string; title: string; excerpt: string; image: string; date?: string }
