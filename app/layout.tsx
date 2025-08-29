@@ -1,12 +1,14 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono,Poppins } from "next/font/google";
 import "@/app/globals.css";
 
 
 import type { Metadata } from "next"
 import { Header } from "@/components/main_comp/header"
+import { Navbar } from "@/components/main_comp/navbar"
 import { Footer } from "@/components/main_comp/footer"
 import { RootProviders } from "@/lib/providers/rootProvider"
 import { AppProviderWrapper } from "@/components/app-provider-wrapper";
+
 
 export const metadata: Metadata = {
   title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
@@ -27,6 +29,12 @@ export const metadata: Metadata = {
   },
 }
 
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -45,12 +53,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${poppins.variable} ${geistMono.variable} antialiased`}
       >
         <AppProviderWrapper>
           <div className="min-h-screen flex flex-col bg-white dark:bg-neutral-950">
             <RootProviders>
-              <Header />
+              {/* <Header /> */}
+              
               <main className="flex-1">{children}</main>
             </RootProviders>
             <Footer />

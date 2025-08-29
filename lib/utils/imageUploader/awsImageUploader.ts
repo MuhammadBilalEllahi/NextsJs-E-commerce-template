@@ -7,8 +7,15 @@ interface UploadResult {
   mimetype: string;
 }
 
+/**
+ * Uploads files to S3
+ * @param uploadAWSPath - The aws path to upload the files to
+ * @param files - The file or files to upload
+ * @param uploadFolderId - The folder ID to upload the files to
+ * @returns The uploaded files
+ */
 export async function uploaderFiles(
-  uploadDirectoryPath: string,
+  uploadAWSPath: string,
   files: File | File[],
   uploadFolderId: string // E.g. product ID or any identifier to be used in the S3 path
 ): Promise<UploadResult[]> {
@@ -40,7 +47,7 @@ export async function uploaderFiles(
         originalFilename,
         mimetype
       },
-      `${uploadDirectoryPath}/${uploadFolderId}`
+      `${uploadAWSPath}/${uploadFolderId}`
     );
 
     uploadedFiles.push({ url, mimetype });

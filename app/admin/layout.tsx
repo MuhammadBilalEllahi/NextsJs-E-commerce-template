@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { cn } from "@/lib/utils/utils"
-import { LayoutDashboard, Package, Tags, ShoppingCart, Users, Megaphone, FileText, MessageCircle, CreditCard, Shield, LogOut } from 'lucide-react'
+import { LayoutDashboard, Package, Tags, ShoppingCart, Users, Megaphone, FileText, MessageCircle, CreditCard, Shield, LogOut, Building2 } from 'lucide-react'
 import { useAppContext } from "@/context/AppContext"
 
 const nav = [
@@ -11,6 +11,7 @@ const nav = [
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/brands", label: "Brands", icon: Tags },
   { href: "/admin/banner", label: "Banners", icon: Megaphone },
+  { href: "/admin/branches", label: "Branches", icon: Building2 },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/promotions", label: "Promotions", icon: Megaphone },
@@ -18,6 +19,7 @@ const nav = [
   { href: "/admin/chat", label: "Chat & Inquiries", icon: MessageCircle },
   { href: "/admin/payments", label: "Payments & Refunds", icon: CreditCard },
   { href: "/admin/access", label: "Access Control", icon: Shield },
+  { href: "/admin/testpage", label: "Test", icon: Package },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

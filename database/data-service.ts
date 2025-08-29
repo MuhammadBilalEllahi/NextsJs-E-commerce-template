@@ -1,3 +1,4 @@
+"use server"
 // Import specific models for use
 import Product from "@/models/Product";
 import Category from "@/models/Category";
@@ -9,8 +10,27 @@ import dbConnect from "@/database/mongodb";
 import RedisClient from "@/database/redisClient";
 import Banner from "@/models/Banner";
 import GlobalSettings from "@/models/GlobalSettings";
-import { CACHE_BANNER_KEY, CACHE_GLOBAL_SETTINGS_KEY } from "@/lib/cacheConstants";  
-import { CACHE_EXPIRE_TIME } from "@/lib/cacheConstants";
+import { CACHE_EXPIRE_TIME,CACHE_BANNER_KEY, CACHE_BRANCH_KEY, CACHE_GLOBAL_SETTINGS_KEY } from "@/lib/cacheConstants";  
+import Branch from "@/models/Branches";
+
+
+export async function getAllBranches(){
+  try {
+    await dbConnect();
+    const cachedBranches = await RedisClient.get(CACHE_BRANCH_KEY);
+    if(cachedBranches){
+      return JSON.parse(cachedBranches);
+    }
+    const branches = await Branch.find({ isActive: true }).lean();
+    if(branches.length > 0){
+      await RedisClient.set(CACHE_BRANCH_KEY, JSON.stringify(branches), CACHE_EXPIRE_TIME);
+    }
+    return branches;
+  } catch (error) {
+    console.error("Error fetching branches:", error);
+    return [];
+  }
+}
 
 export async function getGlobalSettings(){
   try {
@@ -185,10 +205,10 @@ export async function getAllNewArrivalsProducts() {
 export async function getAllProducts() {
   try {
     await dbConnect();
-    const products = await Product.find({ isActive: true })
+    const products = await Product.find({ isActive: true, isOutOfStock: false })
       .populate("brand", "name")
       .populate("categories", "name")
-      .populate("variants")
+      .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
       .sort({ createdAt: -1 })
       .lean();
 
@@ -427,11 +447,11 @@ export async function getFAQs(category = "all", search = "") {
 }
 
 // Testimonials (can be moved to a separate model later)
-export function getTestimonials() {
-  return [
-    { author: "Priya S.", quote: "The spices are incredibly fresh and aromatic." },
-    { author: "Rajesh K.", quote: "Best quality spices I've ever used in my cooking." },
-    { author: "Fatima Z.", quote: "Fast delivery and great packaging." },
-  ];
-}
+// export function getTestimonials() {
+//   return [
+//     { author: "Priya S.", quote: "The spices are incredibly fresh and aromatic." },
+//     { author: "Rajesh K.", quote: "Best quality spices I've ever used in my cooking." },
+//     { author: "Fatima Z.", quote: "Fast delivery and great packaging." },
+//   ];
+// }
 

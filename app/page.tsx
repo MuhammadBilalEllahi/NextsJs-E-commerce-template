@@ -1,13 +1,14 @@
-import { HomeSearchBar } from "@/components/home/home-search-bar"
 import { HomeHero } from "@/components/home/home-hero"
 import { HomeFeaturedProducts } from "@/components/home/home-featured-products"
 import { HomeCategories } from "@/components/home/home-categories"
 import { HomeBlogPreview } from "@/components/home/home-blog-preview"
 import { HomeTestimonials } from "@/components/home/home-testimonials"
-import {  getFeaturedBlogs, getCategories, shopLocations } from "@/mock_data/mock-data"
+import {  getFeaturedBlogs, getCategories, shopLocations,  } from "@/mock_data/mock-data"
 import { HomeShopLocations } from "@/components/home/home-shops-preview"
 import { HomeNewsletter } from "@/components/home/home-newsletter"
-import { getAllBanners, getAllNewArrivalsProducts, getAllTopSellingProducts, getGlobalSettings } from "@/database/data-service"
+import { getAllBanners, getAllNewArrivalsProducts, getAllTopSellingProducts, getGlobalSettings, getAllBranches } from "@/database/data-service"
+import { HeaderWithCategories } from "@/components/main_comp/header-with-categories"
+import { Navbar } from "@/components/main_comp/navbar"
 
 
 // interface Banner {
@@ -26,7 +27,7 @@ import { getAllBanners, getAllNewArrivalsProducts, getAllTopSellingProducts, get
 
 export default async function HomePage() {
   // Server Component fetching placeholder data. Interactive sections are client components.
-  const [fetchedBanners, fetchedSettings,newArrivals, topSelling, blogs, categories] = await Promise.all([
+  const [fetchedBanners, fetchedSettings,newArrivals, topSelling, blogs, categories, branches] = await Promise.all([
     
     getAllBanners(),
     getGlobalSettings(),
@@ -34,6 +35,7 @@ export default async function HomePage() {
     getAllTopSellingProducts(), 
     getFeaturedBlogs(),
     getCategories(),
+    getAllBranches(),
   ])
 
 
@@ -42,12 +44,8 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="border-b bg-neutral-50/60 dark:bg-neutral-900/30">
-        <div className="container mx-auto px-4 py-3">
-          <HomeSearchBar categories={categories} />
-        </div>
-      </section>
-
+      <HeaderWithCategories categories={categories} />
+      <Navbar />
       <HomeHero banners={fetchedBanners as any} globalSettings={fetchedSettings as any} />
 
       <section className="container mx-auto px-4 py-10 md:py-14">
@@ -55,7 +53,7 @@ export default async function HomePage() {
         <HomeFeaturedProducts bestSellings={topSelling} newArrivals={newArrivals} />
       </section>
 
-      <HomeShopLocations shopLocation={shopLocations}/>
+      <HomeShopLocations shopLocation={branches}/>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
         <h2 className="text-2xl font-bold mb-6">Shop by Category</h2>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { ProductCard } from "@/components/product/product-card"
-import { getAllProducts } from "@/mock_data/data"
+import { getAllProducts } from "@/database/data-service"
 
 export function YouMayAlsoLike({ currentId }: { currentId: string }) {
   const [products, setProducts] = useState<any[]>([])
