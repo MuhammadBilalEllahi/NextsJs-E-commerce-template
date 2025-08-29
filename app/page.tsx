@@ -44,8 +44,6 @@ export default async function HomePage() {
 
   return (
     <div>
-      <HeaderWithCategories categories={categories} />
-      <Navbar />
       <HomeHero banners={fetchedBanners as any} globalSettings={fetchedSettings as any} />
 
       <section className="container mx-auto px-4 py-10 md:py-14">

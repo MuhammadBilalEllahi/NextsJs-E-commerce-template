@@ -230,10 +230,16 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                 {branch.openingHours && (
                   <div>
                     <Label className="text-sm font-medium text-gray-600">Opening Hours</Label>
-                    <p className="text-gray-900 flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      {branch.openingHours}
-                    </p>
+                    <div className="space-y-2">
+                      {Object.entries(branch.openingHours).map(([day, hours]) => (
+                        <div key={day} className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-gray-500" />
+                          <span className="text-gray-900 capitalize">
+                            {day}: {hours.isOpen ? `${hours.open} - ${hours.close}` : 'Closed'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

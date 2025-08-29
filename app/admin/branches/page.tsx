@@ -332,7 +332,15 @@ export default function BranchesAdminPage() {
                         {branch.openingHours && (
                           <div className="flex items-center gap-2">
                             <Clock className="h-4 w-4" />
-                            <span>{branch.openingHours}</span>
+                            <div className="text-xs">
+                              {Object.entries(branch.openingHours)
+                                .filter(([_, hours]) => hours.isOpen)
+                                .map(([day, hours]) => (
+                                  <div key={day} className="capitalize">
+                                    {day}: {hours.open} - {hours.close}
+                                  </div>
+                                ))}
+                            </div>
                           </div>
                         )}
                         {branch.website && (

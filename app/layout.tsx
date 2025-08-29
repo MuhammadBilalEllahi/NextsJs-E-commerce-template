@@ -8,6 +8,7 @@ import { Navbar } from "@/components/main_comp/navbar"
 import { Footer } from "@/components/main_comp/footer"
 import { RootProviders } from "@/lib/providers/rootProvider"
 import { AppProviderWrapper } from "@/components/app-provider-wrapper";
+import { HeaderWithCategories } from "@/components/main_comp/header-with-categories";
 
 
 export const metadata: Metadata = {
@@ -59,6 +60,9 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col bg-white dark:bg-neutral-950">
             <RootProviders>
               {/* <Header /> */}
+              
+      <HeaderWithCategories  />
+      <Navbar />
               
               <main className="flex-1">{children}</main>
             </RootProviders>

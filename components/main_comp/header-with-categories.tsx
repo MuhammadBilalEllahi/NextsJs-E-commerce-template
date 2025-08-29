@@ -1,8 +1,12 @@
-"use client"
+// "use client"
 
-import { Header } from "./header"
-import type { Category } from "@/mock_data/mock-data"
+import { getAllCategories } from "@/database/data-service"
+import { Header } from "@/components/main_comp/header"
 
-export function HeaderWithCategories({ categories }: { categories: Category[] }) {
-  return <Header categories={categories} />
+export async function HeaderWithCategories() {
+  const [categories] = await Promise.all([
+    getAllCategories()
+  ])
+
+  return <Header categories={categories as any} />
 }

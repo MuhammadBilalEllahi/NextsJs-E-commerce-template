@@ -17,7 +17,15 @@ export interface Branch {
   country: string;
   postalCode: string;
   manager?: string;
-  openingHours?: string;
+  openingHours: {
+    monday: { open: string; close: string; isOpen: boolean };
+    tuesday: { open: string; close: string; isOpen: boolean };
+    wednesday: { open: string; close: string; isOpen: boolean };
+    thursday: { open: string; close: string; isOpen: boolean };
+    friday: { open: string; close: string; isOpen: boolean };
+    saturday: { open: string; close: string; isOpen: boolean };
+    sunday: { open: string; close: string; isOpen: boolean };
+  };
   description?: string;
   coordinates?: {
     latitude: number;
@@ -41,7 +49,15 @@ export interface CreateBranchData {
   country?: string;
   postalCode: string;
   manager?: string;
-  openingHours?: string;
+  openingHours: {
+    monday: { open: string; close: string; isOpen: boolean };
+    tuesday: { open: string; close: string; isOpen: boolean };
+    wednesday: { open: string; close: string; isOpen: boolean };
+    thursday: { open: string; close: string; isOpen: boolean };
+    friday: { open: string; close: string; isOpen: boolean };
+    saturday: { open: string; close: string; isOpen: boolean };
+    sunday: { open: string; close: string; isOpen: boolean };
+  };
   description?: string;
   coordinates?: {
     latitude: number;
@@ -117,7 +133,12 @@ export const createBranch = async (branchData: CreateBranchData): Promise<Branch
     
     if (branchData.country) formData.append("country", branchData.country);
     if (branchData.manager) formData.append("manager", branchData.manager);
-    if (branchData.openingHours) formData.append("openingHours", branchData.openingHours);
+    // Handle opening hours - send each day's data separately
+    Object.entries(branchData.openingHours).forEach(([day, hours]) => {
+      formData.append(`${day}_open`, hours.open);
+      formData.append(`${day}_close`, hours.close);
+      formData.append(`${day}_isOpen`, hours.isOpen.toString());
+    });
     if (branchData.description) formData.append("description", branchData.description);
     if (branchData.website) formData.append("website", branchData.website);
     if (branchData.whatsapp) formData.append("whatsapp", branchData.whatsapp);
@@ -169,7 +190,14 @@ export const updateBranch = async (branchData: UpdateBranchData): Promise<Branch
     if (branchData.country) formData.append("country", branchData.country);
     if (branchData.postalCode) formData.append("postalCode", branchData.postalCode);
     if (branchData.manager !== undefined) formData.append("manager", branchData.manager);
-    if (branchData.openingHours !== undefined) formData.append("openingHours", branchData.openingHours);
+    // Handle opening hours updates - send each day's data separately
+    if (branchData.openingHours !== undefined) {
+      Object.entries(branchData.openingHours).forEach(([day, hours]) => {
+        formData.append(`${day}_open`, hours.open);
+        formData.append(`${day}_close`, hours.close);
+        formData.append(`${day}_isOpen`, hours.isOpen.toString());
+      });
+    }
     if (branchData.description !== undefined) formData.append("description", branchData.description);
     if (branchData.website !== undefined) formData.append("website", branchData.website);
     if (branchData.whatsapp !== undefined) formData.append("whatsapp", branchData.whatsapp);

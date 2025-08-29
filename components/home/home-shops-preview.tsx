@@ -1,12 +1,13 @@
 import Link from "next/link"
 import { ShopLocations } from "@/mock_data/mock-data"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, PhoneIcon } from "lucide-react"
 
 export function HomeShopLocations({ shopLocation }: { shopLocation: ShopLocations[] }) {
+  console.log("shopLocation",shopLocation);
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-10 my-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mx-10 my-8">
       {shopLocation.map((c) => (
-      <div key={c.id}
+      <div key={c._id}
       className="relative group rounded-2xl border bg-white dark:bg-neutral-900 p-6 hover:shadow-xl transition-all duration-200">
           <img
             src={c.logo || "/placeholder.svg"}
@@ -32,7 +33,7 @@ export function HomeShopLocations({ shopLocation }: { shopLocation: ShopLocation
         </Link>
           </p>
           <a href={`tel:${c.phoneNumber}`} className="flex mt-2 text-sm text-gray-800 dark:text-gray-300 justify-center">
-            📞 {c.phoneNumber}
+            <PhoneIcon size={15} className="m-0.5 inline-block"/> {c.phoneNumber}
           </a>
             
         </div>

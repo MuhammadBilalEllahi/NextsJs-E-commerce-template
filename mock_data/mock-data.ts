@@ -10,36 +10,36 @@ export type ShopLocations = {
   branchNumber: string, // 1,2,3
   location: string, // google maps
 }
-// AGP 4627
-export const shopLocations: ShopLocations[] = [
-  {
-    id: "1",
-    name: "Dehli Masala Jaat (1995) – College Road",
-    logo: "https://www.dehlimirchmasalajaat.com/public/uploads/all/FcvSACK7Q0VEtrune9EDzARZHXkPlEDsoiTgbrXU.png",
-    address: "17-B-1, Shop No. 4, Chowdry Chowk, College Road, Township, Lahore",
-    phoneNumber: "0321-4375872",
-    branchNumber: "1",
-    location: "https://maps.app.goo.gl/Cz3unrgyfjQxsR3v5",
-  },
-  {
-    id: "2",
-    name: "Dehli Mirch Masala Jaat Since 1995 – PCSIR",
-    logo: "https://www.dehlimirchmasalajaat.com/public/uploads/all/FcvSACK7Q0VEtrune9EDzARZHXkPlEDsoiTgbrXU.png",
-    address: "145-B, PCSIR, Near Bervo Bakery, College Road, Lahore",
-    phoneNumber: "0307-4023077",
-    branchNumber: "2",
-    location: "https://maps.app.goo.gl/rWP88sLx3trziMQt7",
-  },
-  {
-    id: "3",
-    name: "DEHLI mirch masala jaat 1995 – Wapda Town",
-    logo: "https://www.dehlimirchmasalajaat.com/public/uploads/all/FcvSACK7Q0VEtrune9EDzARZHXkPlEDsoiTgbrXU.png",
-    address: "335-K-2, Chashma Road, Near Jami Water, Rehmat Chowk, Wapda Town, Lahore",
-    phoneNumber: "0300-7111898",
-    branchNumber: "3",
-    location: "https://maps.app.goo.gl/3Bccd3MY8XZJTYw5A",
-  }
-];
+
+// export const shopLocations: ShopLocations[] = [
+//   {
+//     id: "1",
+//     name: "Dehli Masala Jaat (1995) – College Road",
+//     logo: "https://www.dehlimirchmasalajaat.com/public/uploads/all/FcvSACK7Q0VEtrune9EDzARZHXkPlEDsoiTgbrXU.png",
+//     address: "17-B-1, Shop No. 4, Chowdry Chowk, College Road, Township, Lahore",
+//     phoneNumber: "0321-4375872",
+//     branchNumber: "1",
+//     location: "https://maps.app.goo.gl/Cz3unrgyfjQxsR3v5",
+//   },
+//   {
+//     id: "2",
+//     name: "Dehli Mirch Masala Jaat Since 1995 – PCSIR",
+//     logo: "https://www.dehlimirchmasalajaat.com/public/uploads/all/FcvSACK7Q0VEtrune9EDzARZHXkPlEDsoiTgbrXU.png",
+//     address: "145-B, PCSIR, Near Bervo Bakery, College Road, Lahore",
+//     phoneNumber: "0307-4023077",
+//     branchNumber: "2",
+//     location: "https://maps.app.goo.gl/rWP88sLx3trziMQt7",
+//   },
+//   {
+//     id: "3",
+//     name: "DEHLI mirch masala jaat 1995 – Wapda Town",
+//     logo: "https://www.dehlimirchmasalajaat.com/public/uploads/all/FcvSACK7Q0VEtrune9EDzARZHXkPlEDsoiTgbrXU.png",
+//     address: "335-K-2, Chashma Road, Near Jami Water, Rehmat Chowk, Wapda Town, Lahore",
+//     phoneNumber: "0300-7111898",
+//     branchNumber: "3",
+//     location: "https://maps.app.goo.gl/3Bccd3MY8XZJTYw5A",
+//   }
+// ];
 
 export type Product = {
   id: string

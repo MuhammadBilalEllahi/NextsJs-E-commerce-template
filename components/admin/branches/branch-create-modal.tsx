@@ -26,10 +26,18 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
     location: "",
     city: "",
     state: "",
-    country: "India",
+    country: "Pakistan",
     postalCode: "",
     manager: "",
-    openingHours: "",
+    openingHours: {
+      monday: { open: "09:00", close: "18:00", isOpen: true },
+      tuesday: { open: "09:00", close: "18:00", isOpen: true },
+      wednesday: { open: "09:00", close: "18:00", isOpen: true },
+      thursday: { open: "09:00", close: "18:00", isOpen: true },
+      friday: { open: "09:00", close: "18:00", isOpen: true },
+      saturday: { open: "09:00", close: "18:00", isOpen: true },
+      sunday: { open: "09:00", close: "18:00", isOpen: true }
+    },
     description: "",
     website: "",
     whatsapp: "",
@@ -48,6 +56,19 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }))
     }
+  }
+
+  const handleOpeningHoursChange = (day: keyof typeof formData.openingHours, field: 'open' | 'close' | 'isOpen', value: string | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      openingHours: {
+        ...prev.openingHours,
+        [day]: {
+          ...prev.openingHours[day],
+          [field]: value
+        }
+      }
+    }))
   }
 
   const handleLogoChange = (file: File | null) => {
@@ -111,10 +132,18 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
         location: "",
         city: "",
         state: "",
-        country: "India",
+        country: "Pakistan",
         postalCode: "",
         manager: "",
-        openingHours: "",
+        openingHours: {
+          monday: { open: "09:00", close: "18:00", isOpen: true },
+          tuesday: { open: "09:00", close: "18:00", isOpen: true },
+          wednesday: { open: "09:00", close: "18:00", isOpen: true },
+          thursday: { open: "09:00", close: "18:00", isOpen: true },
+          friday: { open: "09:00", close: "18:00", isOpen: true },
+          saturday: { open: "09:00", close: "18:00", isOpen: true },
+          sunday: { open: "09:00", close: "18:00", isOpen: true }
+        },
         description: "",
         website: "",
         whatsapp: "",
@@ -141,10 +170,18 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
       location: "",
       city: "",
       state: "",
-      country: "India",
+      country: "Pakistan",
       postalCode: "",
       manager: "",
-      openingHours: "",
+      openingHours: {
+        monday: { open: "09:00", close: "18:00", isOpen: true },
+        tuesday: { open: "09:00", close: "18:00", isOpen: true },
+        wednesday: { open: "09:00", close: "18:00", isOpen: true },
+        thursday: { open: "09:00", close: "18:00", isOpen: true },
+        friday: { open: "09:00", close: "18:00", isOpen: true },
+        saturday: { open: "09:00", close: "18:00", isOpen: true },
+        sunday: { open: "09:00", close: "18:00", isOpen: true }
+      },
       description: "",
       website: "",
       whatsapp: "",
@@ -338,13 +375,13 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
           </div>
 
           {/* Additional Information */}
-          <div className="space-y-4">
+          <div className="space-y-4 ">
             <h3 className="text-lg font-medium flex items-center gap-2">
               <Building2 className="h-5 w-5" />
               Additional Information
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col">
               <div className="space-y-2">
                 <Label htmlFor="manager">Manager</Label>
                 <Input
@@ -355,14 +392,39 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="openingHours">Opening Hours</Label>
-                <Input
-                  id="openingHours"
-                  value={formData.openingHours}
-                  onChange={(e) => handleInputChange("openingHours", e.target.value)}
-                  placeholder="e.g., 9:00 AM - 8:00 PM"
-                />
+              <div className="space-y-2 w-full">
+                <Label>Opening Hours</Label>
+                <div className="space-y-3">
+                  {Object.entries(formData.openingHours).map(([day, hours]) => (
+                    <div key={day} className="flex items-center gap-3 p-3 border rounded-lg w-full">
+                      <Checkbox
+                        id={`${day}_isOpen`}
+                        checked={hours.isOpen}
+                        onCheckedChange={(checked) => handleOpeningHoursChange(day as keyof typeof formData.openingHours, 'isOpen', checked as boolean)}
+                      />
+                      <Label htmlFor={`${day}_isOpen`} className="w-20 capitalize font-medium">
+                        {day}
+                      </Label>
+                      {hours.isOpen && (
+                        <>
+                          <Input
+                            type="time"
+                            value={hours.open}
+                            onChange={(e) => handleOpeningHoursChange(day as keyof typeof formData.openingHours, 'open', e.target.value)}
+                            className="w-fit"
+                          />
+                          <span className="text-gray-500">to</span>
+                          <Input
+                            type="time"
+                            value={hours.close}
+                            onChange={(e) => handleOpeningHoursChange(day as keyof typeof formData.openingHours, 'close', e.target.value)}
+                            className="w-fit"
+                          />
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

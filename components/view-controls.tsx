@@ -29,36 +29,83 @@ export function ViewControls({
         <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">VIEW AS</span>
         <div className="flex items-center gap-1">
           <Button
-            variant={view === "list" ? "default" : "outline"}
+            variant={view === "list" ?  "outline": "ghost" }
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 border-[1.9px] rounded-none transition-all duration-200 ${
+              view === "list" 
+                ? "border-black" 
+                : "border-gray-300 dark:border-gray-600 opacity-50"
+            }`}
             onClick={() => onViewChange("list")}
           >
-            <List className="h-4 w-4" />
+            <img 
+              src="/bars/three-lines-horz.svg" 
+              className={`h-8 w-8 object-contain transition-all duration-200 ${
+                view === "list" 
+                  ? "opacity-100" 
+                  : "opacity-40 grayscale"
+              }`} 
+            />
           </Button>
           <Button
-            variant={view === "grid-2" ? "default" : "outline"}
+            variant={view === "grid-2" ?  "outline": "ghost" }
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-8 w-5 p-0 border-[1.9px] rounded-none transition-all duration-200 ${
+              view === "grid-2" 
+                ? "border-black" 
+                : "border-gray-300 dark:border-gray-600 opacity-50"
+            }`}
             onClick={() => onViewChange("grid-2")}
           >
-            <Grid2X2 className="h-4 w-4" />
+            <img 
+              src="/bars/three-lines-vert.svg" 
+              className={`h-8 ml-2 w-8 object-cover transition-all duration-200 ${
+                view === "grid-2" 
+                  ? "opacity-100" 
+                  : "opacity-40 grayscale"
+              }`} 
+              style={{
+                clipPath: "inset(0 33.333% 0 0)" 
+              }} 
+            />
           </Button>
           <Button
-            variant={view === "grid-3" ? "default" : "outline"}
+            variant={view === "grid-3" ?  "outline": "ghost" }
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 border-[1.9px] rounded-none transition-all duration-200 ${
+              view === "grid-3" 
+                ? "border-black" 
+                : "border-gray-300 dark:border-gray-600 opacity-50"
+            }`}
             onClick={() => onViewChange("grid-3")}
           >
-            <Grid3X3 className="h-4 w-4" />
+            <img 
+              src="/bars/three-lines-vert.svg" 
+              className={`h-8 w-8 object-contain transition-all duration-200 ${
+                view === "grid-3" 
+                  ? "opacity-100" 
+                  : "opacity-40 grayscale"
+              }`} 
+            />
           </Button>
           <Button
-            variant={view === "grid-4" ? "default" : "outline"}
+            variant={view === "grid-4" ?  "outline": "ghost" }
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 border-[1.9px] rounded-none transition-all duration-200 ${
+              view === "grid-4" 
+                ? "border-black" 
+                : "border-gray-300 dark:border-gray-600 opacity-50"
+            }`}
             onClick={() => onViewChange("grid-4")}
           >
-            <Grid className="h-4 w-4" />
+            <img 
+              src="/bars/four-lines-horz.svg" 
+              className={`h-8 w-8 p-1 object-contain rotate-90 transition-all duration-200 ${
+                view === "grid-4" 
+                  ? "opacity-100" 
+                  : "opacity-40 grayscale"
+              }`} 
+            />
           </Button>
         </div>
       </div>

@@ -9,17 +9,25 @@ const BranchSchema = new Schema({
     phoneNumber: { type: String, required: true },
     email: { type: String, required: true },
     isActive: { type: Boolean, default: true },
-    logo: { type: String, required: true },
+    logo: { type: String },
     branchNumber: { type: String, required: true, unique: true },
     location: { type: String, required: true },
     
     // Additional fields for better management
     city: { type: String, required: true },
     state: { type: String, required: true },
-    country: { type: String, default: "India" },
-    postalCode: { type: String, required: true },
+    country: { type: String, default: "Pakistan" },
+    postalCode: { type: String},
     manager: { type: String },
-    openingHours: { type: String },
+    openingHours: {
+        monday: { open: String, close: String, isOpen: { type: Boolean, default: true } },
+        tuesday: { open: String, close: String, isOpen: { type: Boolean, default: true } },
+        wednesday: { open: String, close: String, isOpen: { type: Boolean, default: true } },
+        thursday: { open: String, close: String, isOpen: { type: Boolean, default: true } },
+        friday: { open: String, close: String, isOpen: { type: Boolean, default: true } },
+        saturday: { open: String, close: String, isOpen: { type: Boolean, default: true } },
+        sunday: { open: String, close: String, isOpen: { type: Boolean, default: true } }
+    },
     description: { type: String },
     
     // Coordinates for mapping (optional)
@@ -48,15 +56,23 @@ export const zodBranchSchema = z.object({
     phoneNumber: z.string().min(1, "Phone number is required"),
     email: z.string().email("Invalid email format"),
     isActive: z.boolean().default(true),
-    logo: z.string().url("Invalid logo URL"),
+    logo: z.string().url("Invalid logo URL").optional(),
     branchNumber: z.string().min(1, "Branch number is required"),
     location: z.string().min(1, "Location is required"),
     city: z.string().min(1, "City is required"),
     state: z.string().min(1, "State is required"),
-    country: z.string().default("India"),
-    postalCode: z.string().min(1, "Postal code is required"),
+    country: z.string().default("Pakistan"),
+    postalCode: z.string().optional(),
     manager: z.string().optional(),
-    openingHours: z.string().optional(),
+    openingHours: z.object({
+        monday: z.object({ open: z.string(), close: z.string(), isOpen: z.boolean().default(true) }),
+        tuesday: z.object({ open: z.string(), close: z.string(), isOpen: z.boolean().default(true) }),
+        wednesday: z.object({ open: z.string(), close: z.string(), isOpen: z.boolean().default(true) }),
+        thursday: z.object({ open: z.string(), close: z.string(), isOpen: z.boolean().default(true) }),
+        friday: z.object({ open: z.string(), close: z.string(), isOpen: z.boolean().default(true) }),
+        saturday: z.object({ open: z.string(), close: z.string(), isOpen: z.boolean().default(true) }),
+        sunday: z.object({ open: z.string(), close: z.string(), isOpen: z.boolean().default(true) })
+    }),
     description: z.string().optional(),
     coordinates: z.object({
         latitude: z.number().optional(),

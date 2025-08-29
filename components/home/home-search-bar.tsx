@@ -22,7 +22,7 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
 
   return (
     <form onSubmit={onSubmit} className="flex items-center gap-2 w-full">
-      <div className="w-32">
+      {/* <div className="w-32">
         <Select value={cat} onValueChange={(v) => setCat(v)}>
           <SelectTrigger className="h-10 text-sm">
             <SelectValue placeholder="Category" />
@@ -36,22 +36,18 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-neutral-500" />
+        <Search type="submit" className="absolute left-3 top-3 h-4 w-4 text-neutral-500 text-red-600 hover:text-red-700 transition-colors" />
         <Input
           placeholder="Search spices, pickles, snacks…"
           className="pl-10 h-10 text-sm"
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
+        
       </div>
-      <button
-        type="submit"
-        className="h-10 px-4 rounded-md bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors"
-      >
-        Search
-      </button>
+      
     </form>
   )
 }

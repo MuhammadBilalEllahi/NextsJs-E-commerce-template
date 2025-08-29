@@ -28,10 +28,18 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
     location: "",
     city: "",
     state: "",
-    country: "India",
+    country: "Pakistan",
     postalCode: "",
     manager: "",
-    openingHours: "",
+    openingHours: {
+      monday: { open: "09:00", close: "18:00", isOpen: true },
+      tuesday: { open: "09:00", close: "18:00", isOpen: true },
+      wednesday: { open: "09:00", close: "18:00", isOpen: true },
+      thursday: { open: "09:00", close: "18:00", isOpen: true },
+      friday: { open: "09:00", close: "18:00", isOpen: true },
+      saturday: { open: "09:00", close: "18:00", isOpen: true },
+      sunday: { open: "09:00", close: "18:00", isOpen: true }
+    },
     description: "",
     website: "",
     whatsapp: "",
@@ -59,7 +67,15 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
         country: branch.country,
         postalCode: branch.postalCode,
         manager: branch.manager || "",
-        openingHours: branch.openingHours || "",
+        openingHours: branch.openingHours || {
+      monday: { open: "09:00", close: "18:00", isOpen: true },
+      tuesday: { open: "09:00", close: "18:00", isOpen: true },
+      wednesday: { open: "09:00", close: "18:00", isOpen: true },
+      thursday: { open: "09:00", close: "18:00", isOpen: true },
+      friday: { open: "09:00", close: "18:00", isOpen: true },
+      saturday: { open: "09:00", close: "18:00", isOpen: true },
+      sunday: { open: "09:00", close: "18:00", isOpen: true }
+    },
         description: branch.description || "",
         website: branch.website || "",
         whatsapp: branch.whatsapp || "",
@@ -77,6 +93,19 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }))
     }
+  }
+
+  const handleOpeningHoursChange = (day: keyof typeof formData.openingHours, field: 'open' | 'close' | 'isOpen', value: string | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      openingHours: {
+        ...prev.openingHours,
+        [day]: {
+          ...prev.openingHours[day],
+          [field]: value
+        }
+      }
+    }))
   }
 
   const handleLogoChange = (file: File | null) => {
@@ -367,13 +396,38 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="openingHours">Opening Hours</Label>
-                <Input
-                  id="openingHours"
-                  value={formData.openingHours}
-                  onChange={(e) => handleInputChange("openingHours", e.target.value)}
-                  placeholder="e.g., 9:00 AM - 8:00 PM"
-                />
+                <Label>Opening Hours</Label>
+                <div className="space-y-3">
+                  {Object.entries(formData.openingHours).map(([day, hours]) => (
+                    <div key={day} className="flex items-center gap-3 p-3 border rounded-lg">
+                      <Checkbox
+                        id={`${day}_isOpen`}
+                        checked={hours.isOpen}
+                        onCheckedChange={(checked) => handleOpeningHoursChange(day as keyof typeof formData.openingHours, 'isOpen', checked as boolean)}
+                      />
+                      <Label htmlFor={`${day}_isOpen`} className="w-20 capitalize font-medium">
+                        {day}
+                      </Label>
+                      {hours.isOpen && (
+                        <>
+                          <Input
+                            type="time"
+                            value={hours.open}
+                            onChange={(e) => handleOpeningHoursChange(day as keyof typeof formData.openingHours, 'open', e.target.value)}
+                            className="w-24"
+                          />
+                          <span className="text-gray-500">to</span>
+                          <Input
+                            type="time"
+                            value={hours.close}
+                            onChange={(e) => handleOpeningHoursChange(day as keyof typeof formData.openingHours, 'close', e.target.value)}
+                            className="w-24"
+                          />
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

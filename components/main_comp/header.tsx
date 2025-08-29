@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ShoppingCart, Heart } from 'lucide-react'
+import { ShoppingCart, Heart, ShoppingBag } from 'lucide-react'
 import { useCart } from "@/lib/providers/cartProvider"
 import { useWishlist } from "@/lib/providers/wishlistProvider"
 import { CartSheet } from "@/components/cart/cart-sheet"
@@ -33,6 +33,29 @@ export function Header({ categories }: { categories?: Category[] }) {
 
         {/* Cart and Wishlist Icons */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          
+
+          <CartSheet>
+            <button
+              className={`relative flex flex-row items-center gap-2 px-3 py-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${isAdding ? 'bg-green-100 dark:bg-green-900' : ''
+                }`}
+              aria-label="Cart"
+              title="View Cart"
+              disabled={isAdding}
+            >
+              <ShoppingBag className="h-6 w-6 text-black dark:text-gray-300" />
+              <div className="flex flex-col items-start">
+                {count > 0 && (
+                  <span className="h-5 min-w-[1.7rem] rounded-full bg-black dark:bg-gray-300 text-white dark:text-gray-900 text-[10px] grid place-items-center px-1">
+                    {count}
+                  </span>
+                )}
+                <p className="text-sm font-medium text-black dark:text-gray-300 tracking-wide">Cart</p>
+              </div>
+            </button>
+          </CartSheet>
+
+
           <Link href="/account/wishlist">
             <button
               className="relative h-10 w-10 inline-flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
@@ -47,29 +70,6 @@ export function Header({ categories }: { categories?: Category[] }) {
               )}
             </button>
           </Link>
-          
-          <CartSheet>
-            <button
-              className={`relative h-10 w-10 inline-flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${
-                isAdding ? 'bg-green-100 dark:bg-green-900' : ''
-              }`}
-              aria-label="Cart"
-              title="View Cart"
-              disabled={isAdding}
-            >
-              <ShoppingCart className={`h-5 w-5 ${isAdding ? 'text-green-600' : 'text-green-700'}`} />
-              {count > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 min-w-[1.25rem] rounded-full bg-green-600 text-white text-[10px] grid place-items-center px-1">
-                  {count}
-                </span>
-              )}
-              {isAdding && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="h-3 w-3 animate-spin rounded-full border border-green-600 border-t-transparent"></div>
-                </div>
-              )}
-            </button>
-          </CartSheet>
         </div>
       </div>
     </header>
