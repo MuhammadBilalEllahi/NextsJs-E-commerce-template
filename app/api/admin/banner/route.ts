@@ -4,7 +4,8 @@ import { uploaderFiles } from "@/lib/utils/imageUploader/awsImageUploader";
 import dbConnect from "@/database/mongodb";
 import mongoose from "mongoose";
 import RedisClient from "@/database/redisClient";
-
+import { CACHE_BANNER_KEY, CACHE_GLOBAL_SETTINGS_KEY } from "@/lib/cacheConstants";
+import { CACHE_EXPIRE_TIME } from "@/lib/cacheConstants";
 interface Banner {
     _id: string,
     title: string
@@ -69,8 +70,8 @@ export async function POST(req: Request) {
 
         await session.commitTransaction();
 
-        if(await RedisClient.get("banners") !== null){
-            await RedisClient.del("banners");
+        if(await RedisClient.get(CACHE_BANNER_KEY) !== null){
+            await RedisClient.del(CACHE_BANNER_KEY);
         }
 
         return NextResponse.json(banner);
@@ -80,10 +81,10 @@ export async function POST(req: Request) {
         console.error("Error creating banner:", err);
         return NextResponse.json({ error: err.message || "Failed to create product" }, { status: 500 });
     } finally {
-        const value = await RedisClient.get("banners");
+        const value = await RedisClient.get(CACHE_BANNER_KEY);
 
         if (value) {
-            await RedisClient.del("banners")
+            await RedisClient.del(CACHE_BANNER_KEY)
         }
         session.endSession();
     }
@@ -94,7 +95,7 @@ export async function GET() {
     
     try {
         await dbConnect();
-        const value = await RedisClient.get("banners");
+        const value = await RedisClient.get(CACHE_BANNER_KEY);
 
         if (value) {
             const banners = JSON.parse(value)
@@ -106,7 +107,7 @@ export async function GET() {
             return NextResponse.json({ banners: [] })
         }
 
-        await RedisClient.set('banners', JSON.stringify(banners), 36000);
+        await RedisClient.set(CACHE_BANNER_KEY, JSON.stringify(banners), CACHE_EXPIRE_TIME);
 
         return NextResponse.json({ banners })
 
@@ -122,7 +123,7 @@ export async function PATCH(req: Request) {
         const { action } = await req.json();
         
         if (action === 'purge') {
-            await RedisClient.del("banners");
+            await RedisClient.del(CACHE_BANNER_KEY);
             return NextResponse.json({ message: "Redis cache purged successfully" });
         }
         
@@ -187,7 +188,7 @@ export async function PUT(req: Request) {
         await session.commitTransaction();
 
         // Invalidate Redis cache
-        await RedisClient.del("banners");
+        await RedisClient.del(CACHE_BANNER_KEY);
 
         return NextResponse.json(updatedBanner);
     } catch (err: any) {
@@ -221,7 +222,7 @@ export async function DELETE(req: Request) {
         await session.commitTransaction();
 
         // Invalidate Redis cache
-        await RedisClient.del("banners");
+            await RedisClient.del(CACHE_BANNER_KEY);
 
         return NextResponse.json({ message: "Banner deleted", banner: deletedBanner });
     } catch (err: any) {

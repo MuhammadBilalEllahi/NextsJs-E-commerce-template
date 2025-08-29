@@ -2,10 +2,16 @@ import { NextResponse } from "next/server";
 import GlobalSettings, { zodGlobalSettingsSchema } from "@/models/GlobalSettings";
 import dbConnect from "@/database/mongodb";
 import RedisClient from "@/database/redisClient";
+import { CACHE_BANNER_KEY, CACHE_GLOBAL_SETTINGS_KEY } from "@/lib/cacheConstants";
+import { CACHE_EXPIRE_TIME } from "@/lib/cacheConstants";
 
 export async function GET() {
     try {
         await dbConnect();
+            const cachedSettings = await RedisClient.get(CACHE_GLOBAL_SETTINGS_KEY);
+        if(cachedSettings){
+            return NextResponse.json({ settings: JSON.parse(cachedSettings) });
+        }
         
         // Get or create default global settings
         let settings = await GlobalSettings.findOne().lean();
@@ -16,6 +22,8 @@ export async function GET() {
                 bannerScrollTime: 5000
             });
         }
+        
+        await RedisClient.set(CACHE_GLOBAL_SETTINGS_KEY, JSON.stringify(settings), CACHE_EXPIRE_TIME);
         
         return NextResponse.json({ settings });
     } catch (error) {
@@ -44,7 +52,9 @@ export async function PUT(req: Request) {
         );
         
         // Invalidate Redis cache for banners since scroll time affects them
-        await RedisClient.del("banners");
+        await RedisClient.del(CACHE_BANNER_KEY);
+        await RedisClient.set(CACHE_GLOBAL_SETTINGS_KEY, JSON.stringify(settings), CACHE_EXPIRE_TIME);
+        await RedisClient.del(CACHE_GLOBAL_SETTINGS_KEY);
         
         return NextResponse.json({ settings });
     } catch (error) {

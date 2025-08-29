@@ -9,12 +9,20 @@ import dbConnect from "@/database/mongodb";
 import RedisClient from "@/database/redisClient";
 import Banner from "@/models/Banner";
 import GlobalSettings from "@/models/GlobalSettings";
-
+import { CACHE_BANNER_KEY, CACHE_GLOBAL_SETTINGS_KEY } from "@/lib/cacheConstants";  
+import { CACHE_EXPIRE_TIME } from "@/lib/cacheConstants";
 
 export async function getGlobalSettings(){
   try {
     await dbConnect();
+    const cachedSettings = await RedisClient.get(CACHE_GLOBAL_SETTINGS_KEY);
+    if(cachedSettings){
+      return JSON.parse(cachedSettings);
+    }
     const globalSettings = await GlobalSettings.findOne({}).lean();
+    if(globalSettings){
+      await RedisClient.set(CACHE_GLOBAL_SETTINGS_KEY, JSON.stringify(globalSettings), CACHE_EXPIRE_TIME);
+    }
     return globalSettings;
   } catch (error) {
     console.error("Error fetching global settings:", error);
@@ -25,6 +33,10 @@ export async function getGlobalSettings(){
 export async function getAllBanners(){
   try {
     await dbConnect();
+    const cachedBanners = await RedisClient.get(CACHE_BANNER_KEY);
+    if(cachedBanners){
+      return JSON.parse(cachedBanners);
+    }
     const banners = await Banner.find({ isActive: true }).sort({ createdAt: -1 }).lean();
     
     // Filter out expired banners
@@ -37,10 +49,12 @@ export async function getAllBanners(){
       return true;
     });
     
-    if(await RedisClient.get("banners") !== null){
-      await RedisClient.del("banners");
+    if(activeBanners.length > 0){
+      if(await RedisClient.get(CACHE_BANNER_KEY) !== null){
+        await RedisClient.del(CACHE_BANNER_KEY);
+      }
+      await RedisClient.set(CACHE_BANNER_KEY, JSON.stringify(activeBanners), CACHE_EXPIRE_TIME);
     }
-    await RedisClient.set("banners", JSON.stringify(activeBanners));
     return activeBanners;
   } catch (error) {
     console.error("Error fetching banners:", error);
