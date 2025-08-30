@@ -1,4 +1,13 @@
-export type Category = { slug: string; title: string; image: string }
+export type Category = {
+  id: string,
+  name: string,
+  slug: string,
+  parent: string,
+  description: string,
+  image: string,
+  isActive: boolean,
+  createdAt: string,
+}
 
 export type ShopLocations = {
   id: string,
@@ -50,7 +59,6 @@ export type Product = {
   brand?: string
   type?: string // "Powder" | "Whole" | "Mixes" | "Pickle" | "Snack"
   category?: string // "powder" | "whole" | "mixes" | "pickle" | "snack"
-  spiceLevel?: number // 1-5
   rating?: number
   popularity?: number
   createdAt?: string
@@ -66,19 +74,15 @@ export type Product = {
     isOutOfStock?: boolean
     images?: string[]
   }>
+  isOutOfStock?: boolean
+  stock?: number
 }
 
 export type Blog = { slug: string; title: string; excerpt: string; image: string; date?: string }
 export type Testimonial = { name: string; rating: number; quote: string; avatar?: string }
 
 // Categories
-export const categories: Category[] = [
-  { slug: "spices", title: "Spices", image: "/assorted-spices.png" },
-  { slug: "masalas", title: "Masalas", image: "/assorted-masalas.png" },
-  { slug: "pickles", title: "Pickles", image: "/jar-of-pickles.png" },
-  { slug: "snacks", title: "Snacks", image: "/variety-of-snacks.png" },
-  { slug: "gifts", title: "Gift Boxes", image: "/colorful-gift-box.png" },
-]
+export const categories: Category[] = []
 
 // Blogs
 export const blogs: Blog[] = [

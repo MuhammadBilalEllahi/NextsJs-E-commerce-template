@@ -1,184 +1,336 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useRef } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import type { Product } from "@/mock_data/mock-data"
-
-const spiceOptions = [
-  { key: "mild", label: "Mild (1–2)" },
-  { key: "medium", label: "Medium (2–3)" },
-  { key: "hot", label: "Hot (3–4)" },
-  { key: "extra-hot", label: "Extra Hot (4–5)" },
-]
+import type { Category, Product } from "@/mock_data/mock-data"
+import { Loader2 } from "lucide-react"
 
 export function FiltersSidebar({
   slug,
-  allProducts,
   initial,
   onApply,
+  categories,
+  availableTypes,
+  availableBrands,
 }: {
   slug: string
-  allProducts: Product[]
-  initial: { pmin: number; pmax: number; type: string; brands: string[]; spice: string[] }
+  initial: { pmin: number; pmax: number; type: string; brands: string[]; category: string[] }
   onApply: (entries: Record<string, string | number | undefined | null>) => void
+  categories: Category[]
+  availableTypes: string[]
+  availableBrands: string[]
 }) {
   const [pmin, setPmin] = useState(initial.pmin)
   const [pmax, setPmax] = useState(initial.pmax)
   const [type, setType] = useState(initial.type)
   const [brands, setBrands] = useState<string[]>(initial.brands || [])
-  const [spice, setSpice] = useState<string[]>(initial.spice || [])
+  const [category, setCategory] = useState<string[]>(initial.category || [])
+
+  // Auto-apply timer ref
+  const autoApplyTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const [isAutoApplying, setIsAutoApplying] = useState(false)
+
+  console.log("categories", categories)
+  console.log("availableTypes", availableTypes)
+  console.log("availableBrands", availableBrands)
 
   useEffect(() => {
     setPmin(initial.pmin)
     setPmax(initial.pmax)
     setType(initial.type)
     setBrands(initial.brands || [])
-    setSpice(initial.spice || [])
-  }, [initial.pmin, initial.pmax, initial.type, JSON.stringify(initial.brands), JSON.stringify(initial.spice)])
+    setCategory(initial.category || [])
+  }, [initial.pmin, initial.pmax, initial.type, JSON.stringify(initial.brands), JSON.stringify(initial.category)])
 
-  const availableTypes = useMemo(() => {
-    const set = new Set(allProducts.map((p) => p.type))
-    return Array.from(set)
-  }, [allProducts])
+  // Function to schedule auto-apply
+  // const scheduleAutoApply = () => {
+  //   // Clear existing timer
+  //   if (autoApplyTimerRef.current) {
+  //     clearTimeout(autoApplyTimerRef.current)
+  //   }
 
-  const availableBrands = useMemo(() => {
-    const set = new Set(allProducts.map((p) => p.brand))
-    return Array.from(set)
-  }, [allProducts])
+  //   // Show auto-applying state
+  //   setIsAutoApplying(true)
 
-  const apply = () => {
-    onApply({
+  //   // Set new timer for 1 second
+  //   autoApplyTimerRef.current = setTimeout(() => {
+  //     apply()
+  //   }, 1000)
+  // }
+
+  // // Function to apply filters
+  // const apply = () => {
+  //   // Clear any pending auto-apply timer
+  //   if (autoApplyTimerRef.current) {
+  //     clearTimeout(autoApplyTimerRef.current)
+  //     autoApplyTimerRef.current = null
+  //   }
+
+  //   // Hide auto-applying state
+  //   setIsAutoApplying(false)
+
+  //   // Apply filters immediately
+  //   onApply({
+  //     pmin,
+  //     pmax: pmax === 9999 ? undefined : pmax,
+  //     type,
+  //     brands: brands.length ? brands.join(",") : undefined,
+  //     category: category.length ? category.join(",") : undefined,
+  //     page: undefined, // reset pagination
+  //   })
+  // }
+
+  const scheduleAutoApply = (nextFilters: {
+    pmin?: number
+    pmax?: number
+    type?: string
+    brands?: string[]
+    category?: string[]
+  }) => {
+    if (autoApplyTimerRef.current) {
+      clearTimeout(autoApplyTimerRef.current)
+    }
+
+    setIsAutoApplying(true)
+
+    autoApplyTimerRef.current = setTimeout(() => {
+      apply(nextFilters)
+    }, 1000)
+  }
+
+  const apply = (overrides: Partial<{
+    pmin: number
+    pmax: number
+    type: string
+    brands: string[]
+    category: string[]
+  }> = {}) => {
+    if (autoApplyTimerRef.current) {
+      clearTimeout(autoApplyTimerRef.current)
+      autoApplyTimerRef.current = null
+    }
+
+    setIsAutoApplying(false)
+
+    const filters = {
       pmin,
       pmax: pmax === 9999 ? undefined : pmax,
       type,
       brands: brands.length ? brands.join(",") : undefined,
-      spice: spice.length ? spice.join(",") : undefined,
-      page: undefined, // reset pagination
-    })
+      category: category.length ? category.join(",") : undefined,
+      ...overrides, // override with the latest change
+    }
+
+    onApply(filters)
   }
+
 
   const reset = () => {
     setPmin(0)
     setPmax(9999)
     setType("")
     setBrands([])
-    setSpice([])
-    onApply({ pmin: undefined, pmax: undefined, type: undefined, brands: undefined, spice: undefined, page: undefined })
+    setCategory([])
+
+    // Clear auto-apply timer and apply immediately
+    if (autoApplyTimerRef.current) {
+      clearTimeout(autoApplyTimerRef.current)
+      autoApplyTimerRef.current = null
+    }
+
+    // Hide auto-applying state
+    setIsAutoApplying(false)
+
+    onApply({ pmin: undefined, pmax: undefined, type: undefined, brands: undefined, category: undefined, page: undefined })
   }
+
+
+  // const toggleBrand = (b: string) => {
+
+  //   const newBrands = brands.includes(b ?? "") 
+  //     ? brands.filter((x) => x !== b) 
+  //     : [...brands, b]
+
+  //   setBrands(newBrands)
+  //   scheduleAutoApply()
+  // }
+
+  // const toggleCategory = (s: string) => {
+
+  //   const newCategories = category.includes(s) 
+  //     ? category.filter((x) => x !== s) 
+  //     : [...category, s]
+
+  //   setCategory(newCategories)
+  //   scheduleAutoApply()
+  // }
 
   const toggleBrand = (b: string) => {
-    setBrands((prev) => (prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b]))
+    const newBrands = brands.includes(b)
+      ? brands.filter((x) => x !== b)
+      : [...brands, b]
+
+    setBrands(newBrands)
+    scheduleAutoApply({ brands: newBrands })
   }
 
-  const toggleSpice = (s: string) => {
-    setSpice((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
+  const toggleCategory = (s: string) => {
+    const newCategories = category.includes(s)
+      ? category.filter((x) => x !== s)
+      : [...category, s]
+
+    setCategory(newCategories)
+    scheduleAutoApply({ category: newCategories })
   }
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoApplyTimerRef.current) {
+        clearTimeout(autoApplyTimerRef.current)
+      }
+    }
+  }, [])
 
   return (
-    <div className="rounded-2xl border bg-white dark:bg-neutral-950 p-4 sticky top-4 h-fit">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">Filters</h2>
-      </div>
-      <Accordion type="multiple" defaultValue={["price", "type", "brand", "spice"]} className="w-full">
-        <AccordionItem value="price">
-          <AccordionTrigger>Price</AccordionTrigger>
-          <AccordionContent>
-            <div className="px-1 py-2">
-              <Slider
-                defaultValue={[Math.min(0, pmin), Math.max(10, Math.min(9999, pmax))]}
-                min={0}
-                max={5000}
-                step={10}
-                onValueChange={(v) => {
-                  setPmin(v[0] ?? 0)
-                  setPmax(v[1] ?? 5000)
-                }}
-              />
-              <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{`$${pmin} – $${pmax === 9999 ? "Max" : pmax}`}</div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+    <>
+      {/* Full screen loader with 20% opacity background */}
+      {isAutoApplying && (
+        <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 shadow-lg flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-black" />
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              Auto-applying filters in 1 second...
+            </p>
+          </div>
+        </div>
+      )}
 
-        <AccordionItem value="type">
-          <AccordionTrigger>Product Type</AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-1 gap-2">
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="type"
-                  value=""
-                  checked={type === ""}
-                  onChange={() => setType("")}
-                />
-                <span className="text-sm">All</span>
-              </label>
-              {availableTypes.map((t) => (
-                <label key={t} className="flex items-center gap-2">
+      <div className="bg-white dark:bg-neutral-950 p-4 sticky top-4 h-fit">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Filters</h2>
+          {isAutoApplying && (
+            <div className="mt-2 text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              Auto-applying in 1 second...
+            </div>
+          )}
+        </div>
+
+        <Accordion type="multiple" defaultValue={["price", "type", "brand", "category"]} className="w-full">
+          <AccordionItem value="category">
+            <AccordionTrigger>Category</AccordionTrigger>
+            <AccordionContent>
+              <div className="grid grid-cols-1 gap-2">
+                {categories.map((s: Category) => (
+                  <label key={s.name} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`category-${s.name}`}
+                      checked={category.includes(s.name)}
+                      onCheckedChange={() => toggleCategory(s.name)}
+                    />
+                    <Label htmlFor={`category-${s.name}`} className="text-sm">
+                      {s.name}
+                    </Label>
+                  </label>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="type">
+            <AccordionTrigger>Product Type</AccordionTrigger>
+            <AccordionContent>
+              <div className="grid grid-cols-1 gap-2">
+                <label className="flex items-center gap-2">
                   <input
                     type="radio"
                     name="type"
-                    value={t}
-                    checked={type === t}
-                    onChange={() => setType(t)}
+                    value=""
+                    checked={type === ""}
+                    onChange={() => {
+                      setType("")
+                      scheduleAutoApply()
+                    }}
                   />
-                  <span className="text-sm">{t}</span>
+                  <span className="text-sm">All</span>
                 </label>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+                {availableTypes.map((t) => (
+                  <label key={t} className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="type"
+                      value={t}
+                      checked={type === t}
+                      onChange={() => {
+                        setType(t ?? "")
+                        scheduleAutoApply()
+                      }}
+                    />
+                    <span className="text-sm">{t}</span>
+                  </label>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
 
-        <AccordionItem value="brand">
-          <AccordionTrigger>Brand</AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-1 gap-2">
-              {availableBrands.map((b) => (
-                <label key={b} className="flex items-center gap-2">
-                  <Checkbox
-                    id={`brand-${b}`}
-                    checked={brands.includes(b)}
-                    onCheckedChange={() => toggleBrand(b)}
-                  />
-                  <Label htmlFor={`brand-${b}`} className="text-sm">
-                    {b}
-                  </Label>
-                </label>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+          <AccordionItem value="brand">
+            <AccordionTrigger>Brand</AccordionTrigger>
+            <AccordionContent>
+              <div className="grid grid-cols-1 gap-2">
+                {availableBrands.map((b) => (
+                  <label key={b} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`brand-${b}`}
+                      checked={brands.includes(b ?? "")}
+                      onCheckedChange={() => toggleBrand(b ?? "")}
+                    />
+                    <Label htmlFor={`brand-${b}`} className="text-sm">
+                      {b}
+                    </Label>
+                  </label>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
 
-        <AccordionItem value="spice">
-          <AccordionTrigger>Spice Level</AccordionTrigger>
-          <AccordionContent>
-            <div className="grid grid-cols-1 gap-2">
-              {spiceOptions.map((s) => (
-                <label key={s.key} className="flex items-center gap-2">
-                  <Checkbox
-                    id={`spice-${s.key}`}
-                    checked={spice.includes(s.key)}
-                    onCheckedChange={() => toggleSpice(s.key)}
-                  />
-                  <Label htmlFor={`spice-${s.key}`} className="text-sm">
-                    {s.label}
-                  </Label>
-                </label>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          <AccordionItem value="price">
+            <AccordionTrigger>Price</AccordionTrigger>
+            <AccordionContent>
+              <div className="px-1 py-2">
+                <Slider
+                  defaultValue={[Math.min(0, pmin), Math.max(10, Math.min(9999, pmax))]}
+                  min={0}
+                  max={5000}
+                  step={10}
+                  onValueChange={(v) => {
+                    setPmin(v[0] ?? 0)
+                    setPmax(v[1] ?? 5000)
+                    scheduleAutoApply()
+                  }}
+                />
+                <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{`$${pmin} – $${pmax === 9999 ? "Max" : pmax}`}</div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
-      <div className="mt-4 flex gap-2">
-        <Button className="bg-green-600 hover:bg-green-700 w-full" onClick={apply}>
-          Apply Filters
-        </Button>
+        <div className="mt-4 flex gap-2">
+          <Button
+            className={`w-full transition-all duration-200 ${isAutoApplying
+                ? 'bg-blue-500 hover:bg-blue-600'
+                : 'bg-black hover:bg-gray-800'
+              }`}
+            onClick={apply}
+          >
+            {isAutoApplying ? 'Auto-applying...' : 'Apply Filters'}
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

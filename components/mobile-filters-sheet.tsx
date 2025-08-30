@@ -1,27 +1,31 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
+import type { Product, Category } from "@/mock_data/mock-data"
 import { FiltersSidebar } from "@/components/filters-sidebar"
-import type { Product } from "@/mock_data/mock-data"
 
 export function MobileFiltersSheet({
   slug,
   initial,
   onApply,
-  allProducts,
+  categories,
+  availableTypes,
+  availableBrands,
 }: {
   slug: string
-  initial: { pmin: number; pmax: number; type: string; brands: string[]; spice: string[] }
+  initial: { pmin: number; pmax: number; type: string; brands: string[]; category: string[] }
   onApply: (entries: Record<string, string | number | undefined | null>) => void
-  allProducts: Product[]
+  categories: Category[]
+  availableTypes: string[]
+  availableBrands: string[]
 }) {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
     const openListener = () => setOpen(true)
-    const resetListener = () => onApply({ pmin: undefined, pmax: undefined, type: undefined, brands: undefined, spice: undefined, page: undefined })
+    const resetListener = () => onApply({ pmin: undefined, pmax: undefined, type: undefined, brands: undefined, category: undefined, page: undefined })
     window.addEventListener("open-filters", openListener as any)
     window.addEventListener("reset-filters", resetListener as any)
     return () => {
@@ -45,11 +49,13 @@ export function MobileFiltersSheet({
           <FiltersSidebar
             slug={slug}
             initial={initial}
-            onApply={(e) => {
+            onApply={(e: any) => {
               onApply(e)
               setOpen(false)
             }}
-            allProducts={allProducts}
+            categories={categories}
+            availableTypes={availableTypes}
+            availableBrands={availableBrands}
           />
         </div>
       </SheetContent>

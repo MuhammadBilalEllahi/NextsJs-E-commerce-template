@@ -2,19 +2,29 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon, ShoppingBag } from 'lucide-react'
 import { useEffect, useState } from "react"
+import { CartSheet } from "../cart/cart-sheet"
+import { useCart } from "@/lib/providers/cartProvider"
 
 export function Navbar() {
   const pathname = usePathname()
   const [theme, setTheme] = useState<"light" | "dark">("light")
-
+  const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
     const stored = (typeof window !== "undefined" && localStorage.getItem("dm-theme")) as "light" | "dark" | null
     const initial =
       stored ?? (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
     setTheme(initial)
     if (typeof document !== "undefined") document.documentElement.classList.toggle("dark", initial === "dark")
+  }, [])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 0)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const toggleTheme = () => {
@@ -24,6 +34,7 @@ export function Navbar() {
     if (typeof document !== "undefined") document.documentElement.classList.toggle("dark", next === "dark")
   }
 
+  const { count, isAdding } = useCart()
   const nav = [
     { href: "/", label: "Home" },
     { href: "/category/all", label: "Shop" },
@@ -50,6 +61,28 @@ export function Navbar() {
           ))}
         </div>
 
+
+        <div className="flex items-center gap-2">
+        {scrolled &&
+        (<CartSheet>
+          <button
+            className={`relative flex flex-row items-center gap-2 px-3 py-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${isAdding ? 'bg-green-100 dark:bg-green-900' : ''
+              }`}
+            aria-label="Cart"
+            title="View Cart"
+            disabled={isAdding}
+          >
+            <ShoppingBag className="h-6 w-6 text-black dark:text-gray-300" />
+            <div className="flex flex-col items-start">
+              {count > 0 && (
+                <span className="h-5 min-w-[1.7rem] rounded-full bg-black dark:bg-gray-300 text-white dark:text-gray-900 text-[10px] grid place-items-center px-1">
+                  {count}
+                </span>
+              )}
+              <p className="text-sm font-medium text-black dark:text-gray-300 tracking-wide">Cart</p>
+            </div>
+          </button>
+        </CartSheet>)}
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
@@ -58,6 +91,7 @@ export function Navbar() {
         >
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
+        </div>
       </div>
     </nav>
   )

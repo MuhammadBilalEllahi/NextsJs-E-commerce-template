@@ -122,7 +122,7 @@ export function ProductCard({
             className="ml-2 rounded-sm w-10 h-10"
             variant="gradient"
             onClick={handleAddToCart}
-            disabled={isAdding}
+            disabled={isAdding || product.isOutOfStock || product.stock === 0}
           >
             <ShoppingCart size={16} className="h-4 w-4" />
           </Button>
@@ -178,7 +178,7 @@ export function ProductCard({
             ref={descriptionRef}
             className={cn(
               "font-mono text-xs text-neutral-600 dark:text-neutral-400",
-              !isExpanded && "line-clamp-3"
+              !isExpanded && "line-clamp-2"
             )}
           >
             {product.description}
@@ -186,7 +186,7 @@ export function ProductCard({
           {showReadMore && (
             <button 
               onClick={toggleReadMore}
-              className="text-red-600 hover:text-red-700 text-xs mt-1"
+              className="text-red-600 hover:text-red-700 text-xs "
             >
               {isExpanded ? "Read Less" : "Read More"}
             </button>
@@ -229,7 +229,7 @@ export function ProductCard({
             className="ml-2 rounded-sm w-10 h-10"
             variant="gradient"
             onClick={handleAddToCart}
-            disabled={isAdding}
+            disabled={isAdding || product.isOutOfStock || product.stock === 0}
           >
             <ShoppingCart size={16} className="h-4 w-4" />
           </Button>
