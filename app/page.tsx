@@ -2,8 +2,8 @@ import { HomeHero } from "@/components/home/home-hero"
 import { HomeFeaturedProducts } from "@/components/home/home-featured-products"
 import { HomeCategories } from "@/components/home/home-categories"
 import { HomeBlogPreview } from "@/components/home/home-blog-preview"
-import { HomeTestimonials } from "@/components/home/home-testimonials"
-import {  getFeaturedBlogs, getCategories, shopLocations,  } from "@/mock_data/mock-data"
+// import { HomeTestimonials } from "@/components/home/home-testimonials"
+import {  getFeaturedBlogs, getCategories,   } from "@/mock_data/mock-data"
 import { HomeShopLocations } from "@/components/home/home-shops-preview"
 import { HomeNewsletter } from "@/components/home/home-newsletter"
 import { getAllBanners, getAllNewArrivalsProducts, getAllTopSellingProducts, getGlobalSettings, getAllBranches } from "@/database/data-service"
@@ -63,7 +63,7 @@ export default async function HomePage() {
       </section>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
-        <HomeTestimonials />
+        {/* <HomeTestimonials /> */}
       </section>
 
       <section className="bg-neutral-50 dark:bg-neutral-900/40">

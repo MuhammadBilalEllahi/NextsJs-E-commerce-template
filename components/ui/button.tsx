@@ -22,6 +22,12 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        addToCart:
+        "border-[#727272] hover:border-black bg-white hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1",
+        viewProduct:
+          "border-[#727272] hover:border-black bg-white hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1",
+          gradient:
+          "bg-gradient-to-r from-[#2b2b2b] to-[#1a1a1a] text-white shadow-md hover:from-[#3b3b3b] hover:to-[#2a2a2a] border border-[#727272] hover:border-black rounded-lg",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

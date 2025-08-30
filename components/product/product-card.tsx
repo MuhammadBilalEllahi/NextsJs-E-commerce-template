@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import { AddToWishlistButton } from "@/components/wishlist/wishlist-button"
 import { useCart } from "@/lib/providers/cartProvider"
 import type { Product } from "@/mock_data/mock-data"
-import { Star } from 'lucide-react'
+import { ShoppingCart, Star } from 'lucide-react'
+import { cn } from "@/lib/utils/utils"
+import { useState, useRef, useEffect } from "react"
 
 export function ProductCard({
   product,
@@ -15,6 +17,9 @@ export function ProductCard({
   variant?: "grid" | "list"
 }) {
   const { add, isAdding } = useCart()
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showReadMore, setShowReadMore] = useState(false)
+  const descriptionRef = useRef<HTMLDivElement>(null)
 
   // Get the first available image: variant image -> product images -> product image -> placeholder
   const getDisplayImage = () => {
@@ -41,6 +46,20 @@ export function ProductCard({
     add({ id: product.id, title: product.title, price: product.price, image: getDisplayImage() }, 1)
   }
 
+  // Check if description text overflows 3 lines
+  useEffect(() => {
+    if (descriptionRef.current) {
+      const element = descriptionRef.current
+      const lineHeight = parseInt(window.getComputedStyle(element).lineHeight)
+      const maxHeight = lineHeight * 3 // 3 lines
+      setShowReadMore(element.scrollHeight > maxHeight)
+    }
+  }, [product.description])
+
+  const toggleReadMore = () => {
+    setIsExpanded(!isExpanded)
+  }
+
   if (variant === "list") {
     return (
       <div className="rounded-xl border overflow-hidden bg-white dark:bg-neutral-950 flex">
@@ -48,32 +67,67 @@ export function ProductCard({
           <img
             src={getDisplayImage()}
             alt={product.title}
-            className="h-40 w-52 object-cover"
+            className="h-full w-52 object-cover"
           />
         </Link>
         <div className="flex-1 p-4">
           <div className="flex justify-between gap-2">
+            <div className="flex flex-col">
             <Link href={`/product/${product.slug}`} className="font-semibold hover:text-red-600">
               {product.title}
             </Link>
-            <AddToWishlistButton productId={product.id} />
-          </div>
-          <div className="mt-1 text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
-            {product.description}
-          </div>
-          <div className="mt-2 flex items-center gap-2 text-amber-500">
-            <Star className="h-4 w-4 fill-amber-500" />
+            <div className="flex items-center gap-2 text-[#121212]">
+            {Array.from({length: 5}).map((_, index) => (
+              <Star key={index} className="h-3 w-3 fill-[#121212]" />
+            ))}
             <span className="text-sm">{product.rating?.toFixed(1) ?? "4.5"}</span>
           </div>
-          <div className="mt-3 flex items-center justify-between">
-            <div className="font-semibold text-red-600">${product.price.toFixed(2)}</div>
-            <Button
-              className="bg-green-600 hover:bg-green-700"
-              onClick={handleAddToCart}
-              disabled={isAdding}
+            </div>
+            <AddToWishlistButton productId={product.id} />
+          </div>
+          <div className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+            <div 
+              ref={descriptionRef}
+              className={cn(
+                "font-mono text-xs text-neutral-600 dark:text-neutral-400",
+                !isExpanded && "line-clamp-2"
+              )}
             >
-              {isAdding ? "Adding..." : "Add to Cart"}
-            </Button>
+              {product.description}
+            </div>
+            {showReadMore && (
+              <button 
+                onClick={toggleReadMore}
+                className="text-red-600 hover:text-red-700 text-xs mt-1"
+              >
+                {isExpanded ? "Read Less" : "Read More"}
+              </button>
+            )}
+          </div>
+          
+          <div className="font-bold text-red-600">Rs.{product.price}</div>
+          <div className="mt-3 flex items-center justify-between">
+
+          <a
+            className="w-full rounded-sm px-4 py-2 text-center  font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
+            aria-label="View Product"
+            title="View Product"
+            href={`/product/${product.slug}`}
+          >
+            View Product
+          </a>
+
+          <Button
+            size="sm"
+            className="ml-2 rounded-sm w-10 h-10"
+            variant="gradient"
+            onClick={handleAddToCart}
+            disabled={isAdding}
+          >
+            <ShoppingCart size={16} className="h-4 w-4" />
+          </Button>
+
+            
           </div>
         </div>
       </div>
@@ -81,7 +135,7 @@ export function ProductCard({
   }
 
   return (
-    <div className="group rounded-2xl border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition relative">
+    <div className="p-1 mb-auto group rounded-md border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition relative">
       {/* Variant labels overlay - shown on hover */}
       {product.variants && product.variants.length > 0 && (
         <div className="absolute top-2 left-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -97,33 +151,87 @@ export function ProductCard({
           </div>
         </div>
       )}
-      
+
       <Link href={`/product/${product.slug}`} className="block">
         <img
           src={getDisplayImage()}
           alt={product.title}
-          className="h-44 w-full object-cover group-hover:scale-[1.01] transition-transform"
+          className="h-44 w-full rounded-sm object-cover group-hover:scale-[1.01] transition-transform"
         />
       </Link>
-      <div className="p-3">
-        <div className="flex items-start justify-between gap-2">
-          <Link href={`/product/${product.slug}`} className="font-medium line-clamp-1 hover:text-red-600">
+      <div className="p-1">
+        <div className="flex items-end justify-between gap-2">
+          <Link href={`/product/${product.slug}`} className="font-semibold text-lg line-clamp-1 hover:text-black dark:hover:text-white hover:underline hover:underline-offset-4 hover:decoration-red-600">
             {product.title}
           </Link>
           <AddToWishlistButton productId={product.id} small />
         </div>
-        <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
-          {product.brand} • Spice {product.spiceLevel}/5
+        <div className="flex items-center gap-2 text-[#121212]">
+            {Array.from({length: 5}).map((_, index) => (
+              <Star key={index} className="h-3 w-3 fill-[#121212]" />
+            ))}
+            <span className="text-sm">{product.rating?.toFixed(1) ?? "4.5"}</span>
+          </div>
+        
+        <div className="font-mono text-xs text-neutral-600 dark:text-neutral-400">
+          <div 
+            ref={descriptionRef}
+            className={cn(
+              "font-mono text-xs text-neutral-600 dark:text-neutral-400",
+              !isExpanded && "line-clamp-3"
+            )}
+          >
+            {product.description}
+          </div>
+          {showReadMore && (
+            <button 
+              onClick={toggleReadMore}
+              className="text-red-600 hover:text-red-700 text-xs mt-1"
+            >
+              {isExpanded ? "Read Less" : "Read More"}
+            </button>
+          )}
         </div>
+        <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+          Brand: {product.brand}
+        </div>
+        <div className="font-bold text-red-600">Rs.{product.price}</div>
+
         <div className="mt-2 flex items-center justify-between">
-          <div className="font-semibold text-red-600">${product.price.toFixed(2)}</div>
+
+
+          <a
+            className="w-full rounded-sm px-4 py-2 text-center  font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
+            aria-label="View Product"
+            title="View Product"
+            href={`/product/${product.slug}`}
+          >
+            View Product
+          </a>
+          {/* <a
+  className={cn(
+    "w-full rounded-md px-4 py-2 text-center font-semibold border transition-colors duration-300",
+    // Light mode
+    "bg-gradient-to-r from-[#2b2b2b] to-[#1a1a1a] text-white border-black/30 hover:from-[#3b3b3b] hover:to-[#2a2a2a]",
+    // Dark mode
+    "dark:bg-gradient-to-r dark:from-[#f5f5f5] dark:to-[#d9d9d9] dark:text-black dark:border-gray-400 dark:hover:from-[#e8e8e8] dark:hover:to-[#cfcfcf]"
+  )} 
+  aria-label="View Product"
+  title="View Product"
+  href={`/product/${product.slug}`}
+>
+  {isAdding ? "Adding..." : "View Product"}
+</a> */}
+
+
           <Button
             size="sm"
-            className="bg-green-600 hover:bg-green-700"
+            className="ml-2 rounded-sm w-10 h-10"
+            variant="gradient"
             onClick={handleAddToCart}
             disabled={isAdding}
           >
-            {isAdding ? "Adding..." : "Add to Cart"}
+            <ShoppingCart size={16} className="h-4 w-4" />
           </Button>
         </div>
       </div>
