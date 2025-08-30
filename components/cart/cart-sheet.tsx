@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Minus, Plus, Trash2, X } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { formatCurrency, calculateShippingCost, calculateTotalWithShipping } from "@/lib/constants/currency"
 
 interface CartSheetProps {
   children: React.ReactNode
@@ -83,7 +84,7 @@ export function CartSheet({ children }: CartSheetProps) {
                             <Plus className="h-3 w-3" />
                           </button>
                         </div>
-                        <div className="font-semibold text-sm">${(item.price * item.qty).toFixed(2)}</div>
+                        <div className="font-semibold text-sm">{formatCurrency(item.price * item.qty)}</div>
                       </div>
                     </div>
                   </div>
@@ -94,15 +95,15 @@ export function CartSheet({ children }: CartSheetProps) {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>{formatCurrency(subtotal)}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span>Shipping</span>
-                    <span>${subtotal > 50 ? "0.00" : "4.99"}</span>
+                    <span>{formatCurrency(calculateShippingCost(subtotal))}</span>
                   </div>
                   <div className="flex items-center justify-between font-semibold">
                     <span>Total</span>
-                    <span>${(subtotal + (subtotal > 50 ? 0 : 4.99)).toFixed(2)}</span>
+                    <span>{formatCurrency(calculateTotalWithShipping(subtotal))}</span>
                   </div>
                 </div>
                 

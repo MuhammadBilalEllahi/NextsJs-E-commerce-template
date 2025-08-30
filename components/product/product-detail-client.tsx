@@ -14,6 +14,7 @@ import { RecentlyViewed } from "@/components/product/recently-viewed"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useCart } from "@/lib/providers/cartProvider"
 import type { Product } from "@/mock_data/data"
+import { formatCurrency } from "@/lib/constants/currency"
 
 interface ProductDetailClientProps {
   product: Product & {
@@ -170,10 +171,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           </div>
 
           <div className="mt-4 text-3xl font-extrabold text-red-600">
-            ${currentPrice.toFixed(2)}
+                            {formatCurrency(currentPrice)}
             {selectedVariant && selectedVariant.price !== product.price && (
               <span className="text-lg text-neutral-500 line-through ml-2">
-                ${product.price.toFixed(2)}
+                                 {formatCurrency(product.price)}
               </span>
             )}
           </div>
@@ -196,7 +197,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           {/* Variant Price Info */}
           {selectedVariant && selectedVariant.price !== product.price && (
             <div className="mt-2 text-sm text-neutral-600">
-              <span className="font-medium">{selectedVariant.label}:</span> ${selectedVariant.price.toFixed(2)}
+                              <span className="font-medium">{selectedVariant.label}:</span> {formatCurrency(selectedVariant.price)}
             </div>
           )}
 
@@ -252,7 +253,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 </button>
               </div>
               <div className="text-sm text-neutral-600 dark:text-neutral-400">
-                Subtotal: <span className="font-semibold text-red-600">${subtotal.toFixed(2)}</span>
+                                 Subtotal: <span className="font-semibold text-red-600">{formatCurrency(subtotal)}</span>
               </div>
             </div>
           </div>

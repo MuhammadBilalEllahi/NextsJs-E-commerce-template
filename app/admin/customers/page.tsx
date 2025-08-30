@@ -43,7 +43,7 @@ export default function CustomersAdminPage() {
                     <td className="p-3">{c.name}</td>
                     <td className="p-3">{c.email}</td>
                     <td className="p-3">{c.orders}</td>
-                    <td className="p-3">${c.total.toFixed(2)}</td>
+                    <td className="p-3">Rs. {c.total.toFixed(2)}</td>
                     <td className="p-3">
                       <Input className="h-8 w-56" defaultValue={c.tags.join("|")} onBlur={(e)=>setTags(c.id, e.target.value)} />
                     </td>

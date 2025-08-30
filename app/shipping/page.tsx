@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Truck, Clock, Shield, MapPin } from 'lucide-react'
+import { CURRENCY, formatCurrency } from "@/lib/constants/currency"
 
 export default function ShippingPolicyPage() {
   return (
@@ -23,7 +24,7 @@ export default function ShippingPolicyPage() {
               <h3 className="font-semibold text-neutral-800 dark:text-neutral-200">Free Shipping</h3>
             </div>
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Free delivery on orders over $50 across Pakistan
+              Free delivery on orders over {formatCurrency(CURRENCY.FREE_SHIPPING_THRESHOLD)} across Pakistan
             </p>
           </div>
 
@@ -88,13 +89,13 @@ export default function ShippingPolicyPage() {
                   <div>
                     <h3 className="font-semibold text-green-600 mb-2">Free Shipping</h3>
                     <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                      Orders over $50 qualify for free standard delivery
+                      Orders over {formatCurrency(CURRENCY.FREE_SHIPPING_THRESHOLD)} qualify for free standard delivery
                     </p>
                   </div>
                   <div>
                     <h3 className="font-semibold text-neutral-800 dark:text-neutral-200 mb-2">Standard Shipping</h3>
                     <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                      $4.99 for orders under $50
+                      {formatCurrency(CURRENCY.STANDARD_SHIPPING_COST)} for orders under {formatCurrency(CURRENCY.FREE_SHIPPING_THRESHOLD)}
                     </p>
                   </div>
                 </div>

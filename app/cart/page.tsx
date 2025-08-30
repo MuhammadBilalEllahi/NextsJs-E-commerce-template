@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Minus, Plus, Trash2 } from 'lucide-react'
+import { formatCurrency, CURRENCY, calculateShippingCost, calculateTotalWithShipping } from "@/lib/constants/currency"
 import { RootProviders } from "@/lib/providers/rootProvider"
 
 export default function CartPage() {
@@ -73,7 +74,7 @@ function CartContent() {
                         <Plus className="h-4 w-4" />
                       </button>
                     </div>
-                    <div className="font-semibold">${(it.price * it.qty).toFixed(2)}</div>
+                    <div className="font-semibold">{formatCurrency(it.price * it.qty)}</div>
                   </div>
                 </div>
               </div>
@@ -83,11 +84,11 @@ function CartContent() {
             <h2 className="font-semibold mb-3">Order Summary</h2>
             <div className="flex items-center justify-between text-sm">
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>{formatCurrency(subtotal)}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span>Estimated Delivery</span>
-              <span>${subtotal > 50 ? "0.00" : "4.99"}</span>
+              <span>{formatCurrency(calculateShippingCost(subtotal))}</span>
             </div>
             {/* <div className="my-3">
               <label className="text-sm font-medium">Promo code</label>

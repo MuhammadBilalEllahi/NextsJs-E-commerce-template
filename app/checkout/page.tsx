@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { ArrowLeft, HelpCircle, Lock } from 'lucide-react'
 import Link from "next/link"
+import { formatCurrency, calculateShippingCost, calculateTotalWithShipping } from "@/lib/constants/currency"
 
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart()
@@ -47,8 +48,8 @@ export default function CheckoutPage() {
     )
   }
 
-  const shippingCost = subtotal > 50 ? 0 : 4.99
-  const total = subtotal + shippingCost
+  const shippingCost = calculateShippingCost(subtotal)
+  const total = calculateTotalWithShipping(subtotal)
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
@@ -244,7 +245,7 @@ export default function CheckoutPage() {
                       <h3 className="font-medium text-sm truncate">{item.title}</h3>
                       <p className="text-xs text-neutral-600 dark:text-neutral-400">Quantity: {item.qty}</p>
                     </div>
-                    <div className="text-sm font-medium">${(item.price * item.qty).toFixed(2)}</div>
+                    <div className="text-sm font-medium">{formatCurrency(item.price * item.qty)}</div>
                   </div>
                 ))}
                 {items.length > 3 && (
@@ -266,7 +267,7 @@ export default function CheckoutPage() {
               <div className="space-y-3 border-t pt-4">
                 <div className="flex items-center justify-between text-sm">
                   <span>Subtotal • {items.length} items</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-1">
@@ -277,7 +278,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex items-center justify-between text-lg font-bold border-t pt-3">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{formatCurrency(total)}</span>
                 </div>
               </div>
             </div>

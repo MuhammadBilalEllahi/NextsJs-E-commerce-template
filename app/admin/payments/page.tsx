@@ -35,7 +35,7 @@ export default function PaymentsAdminPage() {
                   <td className="p-3">{p.id}</td>
                   <td className="p-3">{p.orderId}</td>
                   <td className="p-3">{p.method}</td>
-                  <td className="p-3">${p.amount.toFixed(2)}</td>
+                  <td className="p-3">Rs. {p.amount.toFixed(2)}</td>
                   <td className="p-3">{p.date}</td>
                   <td className={"p-3 "+(p.status==="Failed"?"text-red-600": p.status==="Refunded"?"text-orange-600":"text-green-700")}>{p.status}</td>
                   <td className="p-3">

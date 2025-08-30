@@ -69,7 +69,7 @@ export default function OrdersAdminPage() {
                     <td className="p-3">{o.id}</td>
                     <td className="p-3">{o.date}</td>
                     <td className="p-3">{o.customer}</td>
-                    <td className="p-3">${o.total.toFixed(2)}</td>
+                    <td className="p-3">Rs. {o.total.toFixed(2)}</td>
                     <td className="p-3">{o.items}</td>
                     <td className="p-3">{o.payment}</td>
                     <td className="p-3">

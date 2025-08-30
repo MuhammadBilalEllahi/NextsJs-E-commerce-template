@@ -91,7 +91,7 @@ export default function WishlistPage() {
                 {product.brand} • Spice {product.spiceLevel}/5
               </div>
               <div className="mt-2 flex items-center justify-between">
-                <div className="font-semibold text-red-600">${product.price.toFixed(2)}</div>
+                <div className="font-semibold text-red-600">Rs. {product.price.toFixed(2)}</div>
                 <Button
                   size="sm"
                   className="bg-green-600 hover:bg-green-700"

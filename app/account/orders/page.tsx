@@ -21,7 +21,7 @@ export default function OrdersPage() {
               <tr key={o.id} className="border-t">
                 <td className="p-3">{o.id}</td>
                 <td className="p-3">{o.date}</td>
-                <td className="p-3">${o.total.toFixed(2)}</td>
+                <td className="p-3">Rs. {o.total.toFixed(2)}</td>
                 <td className="p-3">{o.status}</td>
               </tr>
             ))}

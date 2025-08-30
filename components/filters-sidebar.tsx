@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import type { Category, Product } from "@/mock_data/mock-data"
 import { Loader2 } from "lucide-react"
+import { formatPriceRange } from "@/lib/constants/currency"
 
 export function FiltersSidebar({
   slug,
@@ -313,7 +314,7 @@ export function FiltersSidebar({
                     scheduleAutoApply()
                   }}
                 />
-                <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{`$${pmin} – $${pmax === 9999 ? "Max" : pmax}`}</div>
+                <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{formatPriceRange(pmin, pmax === 9999 ? "Max" : pmax)}</div>
               </div>
             </AccordionContent>
           </AccordionItem>

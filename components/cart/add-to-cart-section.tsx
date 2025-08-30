@@ -5,6 +5,7 @@ import type { Product } from "@/mock_data/data"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { Heart } from 'lucide-react'
+import { formatCurrency } from "@/lib/constants/currency"
 import { useWishlist } from "@/lib/providers/wishlistProvider"
 import { Input } from "@/components/ui/input"
 
@@ -57,7 +58,7 @@ export function AddToCartSection({ product }: { product: Product }) {
       {/* Mobile sticky bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 p-3 md:hidden">
         <div className="container mx-auto flex items-center gap-2">
-          <div className="font-semibold text-red-600">${product.price.toFixed(2)}</div>
+                          <div className="font-semibold text-red-600">{formatCurrency(product.price)}</div>
           <Button className="ml-auto w-full bg-green-600 hover:bg-green-700" onClick={handleAddToCart} disabled={isAdding}>
             {isAdding ? "Adding..." : "Add to Cart"}
           </Button>

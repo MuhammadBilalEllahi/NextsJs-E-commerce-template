@@ -1,3 +1,5 @@
+import { CURRENCY, formatCurrency } from "@/lib/constants/currency"
+
 export default function LoyaltyPage() {
   const coins = 420
   return (
@@ -7,7 +9,7 @@ export default function LoyaltyPage() {
         <div className="text-sm">Your balance</div>
         <div className="text-4xl font-extrabold text-orange-600">{coins} DM Coins</div>
         <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300">
-          Earn 1 coin per $1. Reach 500 coins for 5% off.
+          Earn {CURRENCY.LOYALTY_RATE} coin per {formatCurrency(CURRENCY.LOYALTY_RATE)}. Reach {CURRENCY.LOYALTY_DISCOUNT_THRESHOLD} coins for {CURRENCY.LOYALTY_DISCOUNT_PERCENTAGE}% off.
         </p>
       </div>
     </div>

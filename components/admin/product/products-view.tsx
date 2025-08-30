@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Edit, Package, Tag, Image as ImageIcon, Info, TrendingUp, Calendar, Hash } from "lucide-react"
+import { formatCurrency } from "@/lib/constants/currency"
 
 type Brand = { _id: string; name: string; description?: string; logo?: string }
 type Category = { _id: string; name: string; parent?: { _id: string; name: string } | string | null; description?: string; image?: string }
@@ -135,7 +136,7 @@ export default function ProductsViewAdminUI({ product, onClose, onEdit }: Produc
                 </div>
                 <div className="bg-green-50 dark:bg-green-950/20 p-3 rounded-lg">
                   <div className="text-2xl font-bold text-green-600">
-                    ${product?.price?.toFixed(2)}
+                                         {formatCurrency(product?.price || 0)}
                   </div>
                   <div className="text-sm text-green-600">Base Price</div>
                 </div>
@@ -180,11 +181,11 @@ export default function ProductsViewAdminUI({ product, onClose, onEdit }: Produc
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Base Price</label>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-semibold">${product?.price?.toFixed(2)}</span>
+                                         <span className="text-lg font-semibold">{formatCurrency(product?.price || 0)}</span>
                     {product?.discount > 0 && (
                       <>
                         <span className="text-sm text-muted-foreground line-through">
-                          ${(product?.price + (product?.price * product?.discount / 100)).toFixed(2)}
+                                                     {formatCurrency((product?.price || 0) + ((product?.price || 0) * (product?.discount || 0) / 100))}
                         </span>
                         <Badge variant="secondary" className="bg-red-100 text-red-800">
                           -{product?.discount}%
@@ -194,7 +195,7 @@ export default function ProductsViewAdminUI({ product, onClose, onEdit }: Produc
                   </div>
                   {product?.discount > 0 && (
                     <p className="text-sm text-green-600 font-medium">
-                      Final Price: ${calculateDiscountedPrice(product?.price, product?.discount).toFixed(2)}
+                                             Final Price: {formatCurrency(calculateDiscountedPrice(product?.price || 0, product?.discount || 0))}
                     </p>
                   )}
                 </div>
@@ -316,11 +317,11 @@ export default function ProductsViewAdminUI({ product, onClose, onEdit }: Produc
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Price</label>
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-semibold">${variant?.price?.toFixed(2)}</span>
+                                                 <span className="text-lg font-semibold">{formatCurrency(variant?.price || 0)}</span>
                         {variant?.discount > 0 && (
                           <>
                             <span className="text-sm text-muted-foreground line-through">
-                              ${(variant?.price + (variant?.price * variant?.discount / 100)).toFixed(2)}
+                              {formatCurrency((variant?.price || 0) + ((variant?.price || 0) * (variant?.discount || 0) / 100))}
                             </span>
                             <Badge variant="secondary" className="bg-red-100 text-red-800">
                               -{variant.discount}%
@@ -330,7 +331,7 @@ export default function ProductsViewAdminUI({ product, onClose, onEdit }: Produc
                       </div>
                       {variant.discount > 0 && (
                         <p className="text-sm text-green-600 font-medium">
-                          Final: ${calculateDiscountedPrice(variant?.price, variant?.discount).toFixed(2)}
+                          Final: {formatCurrency(calculateDiscountedPrice(variant?.price || 0, variant?.discount || 0))}
                         </p>
                       )}
                     </div>

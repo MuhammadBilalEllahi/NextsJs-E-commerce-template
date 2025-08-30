@@ -220,7 +220,7 @@ export default function ProductsTable() {
                         </div>
                       </td>
                       <td className="p-4 align-middle">
-                        ${product.price.toFixed(2)}
+                        Rs. {product.price.toFixed(2)}
                       </td>
                       <td className="p-4 align-middle">
                         <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
