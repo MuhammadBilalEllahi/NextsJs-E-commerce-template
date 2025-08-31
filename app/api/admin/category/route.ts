@@ -87,8 +87,8 @@ export async function POST(req: Request) {
       await writeFile(tempFilePath, buffer);
       console.log("File saved to disk:", tempFilePath);
 
-      console.log("tempFilePath",tempFilePath)
-      console.log("")
+      // console.log("tempFilePath",tempFilePath)
+      // console.log("")
 
        imageUrl = await uploadFileToS3({
         filepath: tempFilePath,
@@ -137,8 +137,8 @@ export async function PUT(req: Request) {
     const imageData = formData.get("image");
     let imageUrl: string | undefined;
 
-    console.log("FORM",formData)
-    console.log("FORM.image",imageData)
+    // console.log("FORM",formData)
+    // console.log("FORM.image",imageData)
     
 
     if (imageData && imageData instanceof Blob) {
@@ -166,8 +166,8 @@ export async function PUT(req: Request) {
       await writeFile(tempFilePath, buffer);
       console.log("File saved to disk:", tempFilePath);
 
-      console.log("tempFilePath",tempFilePath)
-      console.log("")
+      // console.log("tempFilePath",tempFilePath)
+      // console.log("")
 
        imageUrl = await uploadFileToS3({
         filepath: tempFilePath,

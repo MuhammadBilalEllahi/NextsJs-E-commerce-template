@@ -57,7 +57,7 @@ export default function ProductsCreateAdminUI() {
   const saveProduct = async () => {
     if (!form.name || !form.price || form.categories.length === 0) return
 
-    console.log(form)
+    // console.log(form)
 
     try {
       // Prepare product data for the service

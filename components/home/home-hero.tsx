@@ -31,7 +31,7 @@ import { fetchGlobalSettings, GlobalSettings } from "@/lib/api/admin/global-sett
           return true
         })
         
-        console.log("Active banners:", activeBanners)
+        // console.log("Active banners:", activeBanners)
         // setBanners(activeBanners)
         // setGlobalSettings(fetchedSettings)
       } catch (error) {

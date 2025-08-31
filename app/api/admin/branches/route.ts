@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     try {
         const body = await req.formData();
 
-        console.log("POST BRANCH",body);
+        // console.log("POST BRANCH",body);
         
         // Validate required fields
         const requiredFields = ['name', 'address', 'phoneNumber', 'email', 'branchNumber', 'location', 'city', 'state', 'postalCode'];

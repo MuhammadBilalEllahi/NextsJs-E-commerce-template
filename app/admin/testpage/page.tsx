@@ -252,7 +252,7 @@ export default function PackagingAdminPage() {
       logo: logoPosition,
       baseImage
     }
-    console.log("Saving packaging configuration:", config)
+    // console.log("Saving packaging configuration:", config)
     // Here you would typically send this to your API
     alert("Configuration saved! Check console for details.")
   }

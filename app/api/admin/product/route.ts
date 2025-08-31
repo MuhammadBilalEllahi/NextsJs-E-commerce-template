@@ -88,7 +88,7 @@ export async function POST(req: Request) {
 
     // Upload product images
     const productImageFiles = formData.getAll("images") as File[];
-    console.log("[POST] productImageFiles:", productImageFiles);
+    // console.log("[POST] productImageFiles:", productImageFiles);
     const uploadedProductImages: string[] = [];
     for (const file of productImageFiles) {
       if (file instanceof Blob) {
@@ -98,7 +98,7 @@ export async function POST(req: Request) {
         try {
           await mkdir(uploadDir, { recursive: true });
         } catch (err) {
-          console.log("Upload directory already exists or couldn't be created");
+          // console.log("Upload directory already exists or couldn't be created");
         }
 
         // Convert File to buffer
@@ -114,10 +114,10 @@ export async function POST(req: Request) {
 
         // Save buffer to disk (uses disk storage, not RAM)
         await writeFile(tempFilePath, buffer);
-        console.log("File saved to disk:", tempFilePath);
+        // console.log("File saved to disk:", tempFilePath);
 
-        console.log("tempFilePath", tempFilePath)
-        console.log("")
+        // console.log("tempFilePath", tempFilePath)
+        // console.log("")
 
 
         const url = await uploadFileToS3(
@@ -130,7 +130,7 @@ export async function POST(req: Request) {
           },
           `products/${newProduct._id}`
         );
-        console.log("[POST] uploadedProductImages:", uploadedProductImages);
+        // console.log("[POST] uploadedProductImages:", uploadedProductImages);
         uploadedProductImages.push(url);
       }
     }
@@ -239,9 +239,9 @@ export async function PUT(req: Request) {
 
   try {
     const formData = await req.formData();
-    console.log("[PUT] formData:", formData);
+    // console.log("[PUT] formData:", formData);
     const productId = formData.get("id")?.toString();
-    console.log("[PUT] productId:", productId);
+    // console.log("[PUT] productId:", productId);
     if (!productId) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
     }
@@ -337,7 +337,7 @@ export async function PUT(req: Request) {
         try {
           await mkdir(uploadDir, { recursive: true });
         } catch (err) {
-          console.log("Upload directory already exists or couldn't be created");
+          // console.log("Upload directory already exists or couldn't be created");
         }
 
         // Convert File to buffer
@@ -353,10 +353,10 @@ export async function PUT(req: Request) {
 
         // Save buffer to disk (uses disk storage, not RAM)
         await writeFile(tempFilePath, buffer);
-        console.log("File saved to disk:", tempFilePath);
+        // console.log("File saved to disk:", tempFilePath);
 
-        console.log("tempFilePath", tempFilePath)
-        console.log("")
+        // console.log("tempFilePath", tempFilePath)
+        // console.log("")
 
 
           const url = await uploadFileToS3(

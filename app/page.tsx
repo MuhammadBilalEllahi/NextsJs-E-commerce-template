@@ -39,8 +39,8 @@ export default async function HomePage() {
   ])
 
 
-  console.log("Fetched banners:", fetchedBanners)
-  console.log("Fetched global settings:", fetchedSettings)
+  // console.log("Fetched banners:", fetchedBanners)
+  // console.log("Fetched global settings:", fetchedSettings)
 
   return (
     <div>

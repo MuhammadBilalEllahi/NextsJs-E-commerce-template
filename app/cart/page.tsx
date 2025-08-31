@@ -11,11 +11,9 @@ import { RootProviders } from "@/lib/providers/rootProvider"
 export default function CartPage() {
   // Important: do NOT call useCart here. Wrap children with providers first.
   return (
-    <RootProviders>
-      <CartProvider>
+    
       <CartContent />
-      </CartProvider>
-    </RootProviders>
+    
   )
 }
 

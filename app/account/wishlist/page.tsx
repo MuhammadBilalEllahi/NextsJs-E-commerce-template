@@ -8,8 +8,8 @@ import Link from "next/link"
 import { products } from "@/mock_data/mock-data"
 
 export default function WishlistPage() {
-  const { ids, remove } = useWishlist()
-  const { add, isAdding } = useCart()
+  const { ids } = useWishlist()
+  const { add, remove, isAdding } = useCart()
 
   // Get wishlisted products from the products array
   const wishlistedProducts = products.filter(product => ids.has(product.id))
@@ -21,7 +21,8 @@ export default function WishlistPage() {
         id: product.id, 
         title: product.title, 
         price: product.price, 
-        image: product.image 
+        image: product.image,
+        productId: product.id
       }, 
       1
     )

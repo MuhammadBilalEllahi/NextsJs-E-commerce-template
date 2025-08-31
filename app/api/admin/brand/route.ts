@@ -16,18 +16,18 @@ export async function POST(req: Request) {
     try {
         const formData = await req.formData();
 
-        console.log("FORMDATA", formData)
+        // console.log("FORMDATA", formData)
 
         const raw = {
             name: formData.get("name")?.toString(),
             description: formData.get("description")?.toString() ?? "",
         };
 
-        console.log("RAW DATA", raw); // Add this to debug
+        // console.log("RAW DATA", raw); // Add this to debug
 
         const parsed = brandZodSchema.safeParse(raw);
         if (!parsed.success) {
-            console.log("ZOD VALIDATION ERRORS:", parsed.error.message); // Add this to debug
+            // console.log("ZOD VALIDATION ERRORS:", parsed.error.message); // Add this to debug
             return NextResponse.json(
                 { error: "Validation failed", details: parsed.error.message },
                 { status: 400 }
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
             try {
                 await mkdir(uploadDir, { recursive: true });
             } catch (err) {
-                console.log("Upload directory already exists or couldn't be created");
+                // console.log("Upload directory already exists or couldn't be created");
             }
 
             // Convert File to buffer
@@ -69,10 +69,10 @@ export async function POST(req: Request) {
 
             // Save buffer to disk (uses disk storage, not RAM)
             await writeFile(tempFilePath, buffer);
-            console.log("File saved to disk:", tempFilePath);
+            // console.log("File saved to disk:", tempFilePath);
 
-            console.log("tempFilePath", tempFilePath)
-            console.log("")
+            // console.log("tempFilePath", tempFilePath)
+            // console.log("")
 
             imageUrl = await uploadFileToS3({
                 filepath: tempFilePath,

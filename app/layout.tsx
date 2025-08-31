@@ -9,6 +9,7 @@ import { Footer } from "@/components/main_comp/footer"
 import { RootProviders } from "@/lib/providers/rootProvider"
 import { AppProviderWrapper } from "@/components/app-provider-wrapper";
 import { HeaderWithCategories } from "@/components/main_comp/header-with-categories";
+import { ChatWidget } from "@/components/chat-widget";
 
 
 export const metadata: Metadata = {
@@ -65,6 +66,7 @@ export default function RootLayout({
       <Navbar />
               
               <main className="flex-1">{children}</main>
+              {/* <ChatWidget/> */}
             </RootProviders>
             <Footer />
           </div>

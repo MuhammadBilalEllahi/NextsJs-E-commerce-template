@@ -44,7 +44,7 @@ export interface UpdateProductData extends Partial<CreateProductData> {
 export const fetchProducts = async (): Promise<Product[]> => {
   try {
     const response = await fetch(API_URL_PRODUCT_ADMIN);
-    console.log("[fetchProducts] response:", response);
+    // console.log("[fetchProducts] response:", response);
     if (!response.ok) {
       throw new Error("Failed to fetch products");
     }
@@ -67,7 +67,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
 // Create a new product
 export const createProduct = async (productData: CreateProductData): Promise<Product> => {
   try {
-    console.log("[createProduct] productData:", productData);
+    // console.log("[createProduct] productData:", productData);
     const formData = new FormData();
     if (productData.name) formData.append("name", productData.name);
     if (productData.description) formData.append("description", productData.description);
@@ -99,7 +99,7 @@ export const createProduct = async (productData: CreateProductData): Promise<Pro
           sku: v.sku, slug: v.slug, label: v.label, price: v.price, stock: v.stock, discount: v.discount
         }))))
       }
-    console.log("[createProduct] formData:", formData);
+    // console.log("[createProduct] formData:", formData);
     
     const response = await fetch(API_URL_PRODUCT_ADMIN, {
       method: "POST",
@@ -115,7 +115,7 @@ export const createProduct = async (productData: CreateProductData): Promise<Pro
     }
     
     const data = await response.json();
-    console.log("[createProduct] data:", data);
+    // console.log("[createProduct] data:", data);
     return data.product;
   } catch (err: any) {
     console.error("Error creating product:", err);
@@ -126,7 +126,7 @@ export const createProduct = async (productData: CreateProductData): Promise<Pro
 // Delete a product
 export const deleteProduct = async (productId: string): Promise<void> => {
   try {
-    console.log("[deleteProduct] productId:", productId);
+    // console.log("[deleteProduct] productId:", productId);
     const response = await fetch(`${API_URL_PRODUCT_ADMIN}?id=${productId}`, {
       method: "DELETE",
     });

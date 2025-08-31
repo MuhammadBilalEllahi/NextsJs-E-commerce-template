@@ -10,7 +10,7 @@ export const fetchCategories = async () => {
 
 // create a new category
 export const createCategory = async (category: { name: string; parent?: string;description?:string, image: File }) => {
-  console.log("[createCategory]", category)
+  // console.log("[createCategory]", category)
 
 
   const formData = new FormData();
@@ -23,7 +23,7 @@ export const createCategory = async (category: { name: string; parent?: string;d
     formData.append("image", category.image);
   }
 
-  console.log("[createCategory]", formData)
+  // console.log("[createCategory]", formData)
   const res = await fetch(`${API_URL_CATEGORY_ADMIN}`, {
     method: "POST",
     body: formData,
@@ -54,7 +54,7 @@ export const updateCategory = async (category: {
     formData.append("image", category.image);
   }
 
-  console.log("[updateCategory]", formData)
+  // console.log("[updateCategory]", formData)
   const res = await fetch(`${API_URL_CATEGORY_ADMIN}`, {
     method: "PUT",
     body: formData,

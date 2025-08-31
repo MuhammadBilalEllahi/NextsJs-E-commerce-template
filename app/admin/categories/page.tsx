@@ -49,7 +49,7 @@ export default function CategoriesAdminPage() {
         data.image = image; // old URL
       }
 
-      console.log("EDITNG", editing)
+      // console.log("EDITNG", editing)
 
       if (editing) {
         const updated = await updateCategory({ id: editing._id, ...data })

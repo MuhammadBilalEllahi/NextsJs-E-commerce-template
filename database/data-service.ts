@@ -92,7 +92,7 @@ export async function getAllTopSellingProducts() {
       .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
       .sort({ createdAt: -1 })
       .lean();
-      console.log("products in getAllTopSellingProducts", JSON.stringify(products, null, 2));
+      // console.log("products in getAllTopSellingProducts", JSON.stringify(products, null, 2));
     return products.map(product => ({
       id: String(product._id),
       slug: product.slug,
@@ -152,7 +152,7 @@ export async function getAllNewArrivalsProducts() {
       .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
       .sort({ createdAt: -1 })
       .lean();
-      console.log("products in getAllNewArrivalsProducts", JSON.stringify(products, null, 2));
+      // console.log("products in getAllNewArrivalsProducts", JSON.stringify(products, null, 2));
     return products.map(product => ({
       id: String(product._id),
       slug: product.slug,
@@ -212,7 +212,7 @@ export async function getAllProducts() {
       .sort({ createdAt: -1 })
       .lean();
 
-    console.log("products in getAllProducts", JSON.stringify(products, null, 2));
+    // console.log("products in getAllProducts", JSON.stringify(products, null, 2));
     
     return products.map(product => ({
       id: String(product._id),

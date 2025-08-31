@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     try {
         const formData = await req.formData();
 
-        console.log(formData);
+        // console.log(formData);
         const raw = {
             title: formData.get("title"),
             description: formData.get("description"),
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
             showDescription: formData.get('showDescription') ==='true' ?true: false,
             timeout: formData.get("timeout") ? Number(formData.get("timeout")) : null
         }
-        console.log(formData.get("expiresAt"), formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null);
+        // console.log(formData.get("expiresAt"), formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null);
         if(formData.get("expiresAt") && formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null && formData.get("expiresAt") !== undefined){
             raw.expiresAt = new Date(formData.get("expiresAt") as string);
         }

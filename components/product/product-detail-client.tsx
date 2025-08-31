@@ -53,9 +53,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     setIsInitialized(true);
   }, [product.variants]);
 
-  // Get current price and images based on selected variant
+  // Get current price, stock, and images based on selected variant or product
   const currentPrice = selectedVariant?.price || product.price;
+  const currentStock = selectedVariant?.stock || product.stock || 0;
   const currentImages = selectedVariant?.images && selectedVariant.images.length > 0 ? selectedVariant.images : product.images;
+  const hasVariants = product.variants && product.variants.length > 0;
 
   // Create mapping between images and variant labels
   const getVariantLabelsForImages = () => {
@@ -97,6 +99,15 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       return;
     }
     setSelectedVariant(variant);
+    // Reset quantity to 1 when changing variants
+    setQuantity(1);
+  };
+
+  // Handle quantity changes with stock validation
+  const handleQuantityChange = (newQuantity: number) => {
+    const maxQuantity = hasVariants ? (selectedVariant?.stock || 0) : (product.stock || 0);
+    const validQuantity = Math.max(1, Math.min(newQuantity, maxQuantity));
+    setQuantity(validQuantity);
   };
 
   // Ensure we have valid data
@@ -111,7 +122,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   }
 
 
-  console.log("product in ProductDetailClient", product);
+  // console.log("product in ProductDetailClient", product);
 
   // Don't render until component is initialized
   if (!isInitialized) {
@@ -130,17 +141,38 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   }
 
   const handleAddToCart = () => {
-    if (isAdding || !selectedVariant) return
-    add(
-      {
-        id: String(product.id),
-        title: `${product.title} - ${selectedVariant.label}`,
-        price: selectedVariant.price,
-        image: currentImages[0] || product.images[0],
-
-      },
-      quantity
-    )
+    if (isAdding) return;
+    
+    // For products with variants, require variant selection
+    if (hasVariants && !selectedVariant) return;
+    
+    // For products with variants, use variant data
+    if (hasVariants && selectedVariant) {
+      add(
+        {
+          id: `${String(product.id)}-${selectedVariant._id}`, // Create unique ID for variant
+          title: `${product.title} - ${selectedVariant.label}`,
+          price: selectedVariant.price,
+          image: currentImages[0] || product.images[0],
+          variantId: selectedVariant._id,
+          variantLabel: selectedVariant.label,
+          productId: String(product.id),
+        },
+        quantity
+      );
+    } else {
+      // For products without variants, use product data
+      add(
+        {
+          id: String(product.id),
+          title: product.title,
+          price: product.price,
+          image: product.images[0],
+          productId: String(product.id),
+        },
+        quantity
+      );
+    }
   }
 
   const handleBuyNow = () => {
@@ -150,6 +182,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   }
 
   const subtotal = currentPrice * quantity
+  const isOutOfStock = currentStock <= 0;
+  const isVariantRequired = hasVariants && !selectedVariant;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -180,19 +214,17 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           </div>
 
           {/* Stock Indicator */}
-          {selectedVariant && (
-            <div className="mt-2 text-sm">
-              {selectedVariant.stock > 0 ? (
-                <span className="text-green-600">
-                  In Stock: {selectedVariant.stock} available
-                </span>
-              ) : (
-                <span className="text-red-600">
-                  Out of Stock
-                </span>
-              )}
-            </div>
-          )}
+          <div className="mt-2 text-sm">
+            {!isOutOfStock ? (
+              <span className="text-green-600">
+                In Stock: {currentStock} available
+              </span>
+            ) : (
+              <span className="text-red-600">
+                Out of Stock
+              </span>
+            )}
+          </div>
 
           {/* Variant Price Info */}
           {selectedVariant && selectedVariant.price !== product.price && (
@@ -238,7 +270,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <div className="flex items-center gap-4">
               <div className="flex items-center border rounded-lg">
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  onClick={() => handleQuantityChange(Math.max(1, quantity - 1))}
                   className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   disabled={quantity <= 1}
                 >
@@ -246,8 +278,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 </button>
                 <span className="px-4 py-2 text-lg font-medium">{quantity}</span>
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
+                  onClick={() => handleQuantityChange(quantity + 1)}
                   className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  disabled={quantity >= currentStock}
                 >
                   <Plus className="h-4 w-4" />
                 </button>
@@ -256,6 +289,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 Subtotal: <span className="font-semibold text-red-600">{formatCurrency(subtotal)}</span>
               </div>
             </div>
+            {currentStock > 0 && (
+              <p className="text-xs text-neutral-500 mt-1">
+                Maximum quantity: {currentStock}
+              </p>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -263,25 +301,23 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <Button
               className="flex-1 bg-neutral-800 hover:bg-neutral-900 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 h-12"
               onClick={handleAddToCart}
-              disabled={isAdding || !selectedVariant || selectedVariant.stock === 0 || !selectedVariant.isActive || selectedVariant.isOutOfStock}
+              disabled={isAdding || isOutOfStock || isVariantRequired}
             >
               {isAdding ? "Adding..." :
-                !selectedVariant ? "Select Variant" :
-                  selectedVariant.stock === 0 ? "Out of Stock" :
-                    !selectedVariant.isActive ? "Variant Unavailable" :
-                      "ADD TO CART"}
+                isVariantRequired ? "Select Variant" :
+                  isOutOfStock ? "Out of Stock" :
+                    "ADD TO CART"}
             </Button>
             <Button
               variant="outline"
               className="flex-1 h-12"
               onClick={handleBuyNow}
-              disabled={isAdding || !selectedVariant || selectedVariant.stock === 0 || !selectedVariant.isActive || selectedVariant.isOutOfStock}
+              disabled={isAdding || isOutOfStock || isVariantRequired}
             >
               {isAdding ? "Processing..." :
-                !selectedVariant ? "Select Variant" :
-                  selectedVariant.stock === 0 ? "Out of Stock" :
-                    !selectedVariant.isActive ? "Variant Unavailable" :
-                      "BUY IT NOW"}
+                isVariantRequired ? "Select Variant" :
+                  isOutOfStock ? "Out of Stock" :
+                    "BUY IT NOW"}
             </Button>
           </div>
 

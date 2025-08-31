@@ -35,9 +35,9 @@ export function FiltersSidebar({
   const autoApplyTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [isAutoApplying, setIsAutoApplying] = useState(false)
 
-  console.log("categories", categories)
-  console.log("availableTypes", availableTypes)
-  console.log("availableBrands", availableBrands)
+  // console.log("categories", categories)
+  // console.log("availableTypes", availableTypes)
+  // console.log("availableBrands", availableBrands)
 
   useEffect(() => {
     setPmin(initial.pmin)

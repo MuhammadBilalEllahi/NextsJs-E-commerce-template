@@ -65,14 +65,14 @@ export function HomeFeaturedProducts({
       <div
         key={activeTab} // forces remount for lazy-load effect
         ref={scroller}
-        className="hide-scrollbar flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2"
+        className="hide-scrollbar flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 "
       >
         {products.map((p) => (
           <div
             key={p.id}
-            className="min-w-[260px] md:min-w-[280px] snap-start animate-fadeIn"
+            className="min-w-[260px] md:min-w-[280px] snap-start animate-fadeIn "
           >
-            <ProductCard product={p} />
+            <ProductCard product={p}  />
           </div>
         ))}
       </div>

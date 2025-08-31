@@ -40,7 +40,7 @@ export async function uploadFileToS3(file: any, folder = "categories") {
       })
     );
 
-    console.log("FILE in aws [letsSEE]", letsSEE)
+    // console.log("FILE in aws [letsSEE]", letsSEE)
 
     return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
   } catch (err: any) {

@@ -12,9 +12,11 @@ import { useState, useRef, useEffect } from "react"
 export function ProductCard({
   product,
   variant = "grid",
+  className,
 }: {
   product: Product
   variant?: "grid" | "list" | "single"
+  className?: string
 }) {
   const { add, isAdding } = useCart()
   const [isExpanded, setIsExpanded] = useState(false)
@@ -43,7 +45,7 @@ export function ProductCard({
 
   const handleAddToCart = () => {
     if (isAdding) return // Prevent duplicate clicks
-    add({ id: product.id, title: product.title, price: product.price, image: getDisplayImage() }, 1)
+    add({ id: product.id, title: product.title, price: product.price, image: getDisplayImage(), productId: product.id }, 1)
   }
 
   // Check if description text overflows 3 lines
@@ -62,7 +64,7 @@ export function ProductCard({
 
   if (variant === "list") {
     return (
-      <div className="rounded-xl border overflow-hidden bg-white dark:bg-neutral-950 flex">
+      <div className={cn("rounded-xl border overflow-hidden bg-white dark:bg-neutral-950 flex", className)}>
         <Link href={`/product/${product.slug}`} className="block">
           <img
             src={getDisplayImage()}
@@ -136,7 +138,7 @@ export function ProductCard({
   }
 
   return (
-    <div className="p-1 mb-auto group rounded-md border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition relative">
+    <div className={cn("p-1 mb-auto group rounded-md border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition relative", className)}>
       {/* Variant labels overlay - shown on hover */}
       {product.variants && product.variants.length > 0 && (
         <div className="absolute top-2 left-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">

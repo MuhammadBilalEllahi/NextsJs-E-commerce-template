@@ -3,11 +3,14 @@ import mongoose from "mongoose";
 import { MODELS } from "@/models/constants";
 
 const CartItemSchema = new mongoose.Schema({
-  variant: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.VARIANT, required: true },
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.PRODUCT, required: true },
+  variantId: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.VARIANT, required: true },
   quantity: { type: Number, required: true, min: 1 },
   // Snapshot for UX: price shown in cart UI (not final)
   priceSnapshot: { type: Number, required: true }, // according to qty
-  label: String // e.g. "1kg"
+  label: String, // e.g. "1kg"
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 }, { _id: false });
 
 const CartSchema = new mongoose.Schema({

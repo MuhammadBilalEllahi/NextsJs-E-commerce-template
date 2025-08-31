@@ -8,6 +8,9 @@ export type CartItem = {
   price: number
   image?: string
   qty: number
+  variantId?: string // Add variant ID to distinguish between variants
+  variantLabel?: string // Add variant label for display
+  productId: string // Keep original product ID for reference
 }
 
 type State = {
@@ -64,10 +67,21 @@ function reducer(state: State, action: Action): State {
       return action.payload
     case actionTypes.ADD: {
       const { item, qty = 1 } = action.payload
-      const existing = state.items.find((i) => i.id === item.id)
+      // Create unique ID: productId + variantId (if exists)
+      const uniqueId = item.variantId ? `${item.productId}-${item.variantId}` : item.productId
+      
+      // Find existing item using the unique ID
+      const existing = state.items.find((i) => {
+        const existingUniqueId = i.variantId ? `${i.productId}-${i.variantId}` : i.productId
+        return existingUniqueId === uniqueId
+      })
+      
       if (existing) {
         return {
-          items: state.items.map((i) => (i.id === item.id ? { ...i, qty: i.qty + qty } : i)),
+          items: state.items.map((i) => {
+            const existingUniqueId = i.variantId ? `${i.productId}-${i.variantId}` : i.productId
+            return existingUniqueId === uniqueId ? { ...i, qty: i.qty + qty } : i
+          }),
         }
       }
       return { items: [...state.items, { ...item, qty }] }
@@ -96,6 +110,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const raw = localStorage.getItem(STORAGE_KEY)
       const parsed = raw ? JSON.parse(raw) : null
       const items = normalizeStored(parsed)
+      console.log("items", items)
       dispatch({ type: actionTypes.HYDRATE, payload: { items } })
       setIsHydrated(true)
     } catch (error) {
