@@ -3,9 +3,9 @@
 import { useMemo, useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { type Product, type Category } from "@/mock_data/mock-data"
-import { FiltersSidebar } from "@/components/filters-sidebar"
-import { MobileFiltersSheet } from "@/components/mobile-filters-sheet"
-import { ViewControls } from "@/components/view-controls"
+import { FiltersSidebar } from "@/components/shop/filters-sidebar"
+import { MobileFiltersSheet } from "@/components/shop/mobile-filters-sheet"
+import { ViewControls } from "@/components/shop/view-controls"
 
 import { Button } from "@/components/ui/button"
 import { Filter } from 'lucide-react'
@@ -41,12 +41,12 @@ export function CategoryClient({
 }: CategoryClientProps) {
   const router = useRouter()
   const sp = useSearchParams()
-  const [view, setView] = useState<"list" | "grid-2" | "grid-3" | "grid-4">((sp.get("view") as "list" | "grid-2" | "grid-3" | "grid-4") || "grid-3")
+  const [view, setView] = useState<"list" | "grid-2" | "grid-3" | "grid-4" | "single">((sp.get("view") as "list" | "grid-2" | "grid-3" | "grid-4" | "single") || "grid-3")
   const [itemsPerPage, setItemsPerPage] = useState<number>(Number(sp.get("itemsPerPage")) || 12)
 
   useEffect(() => {
     const v = sp.get("view")
-    if (v === "list" || v === "grid-2" || v === "grid-3" || v === "grid-4") setView(v)
+    if (v === "list" || v === "grid-2" || v === "grid-3" || v === "grid-4" || v === "single") setView(v)
     
     const items = Number(sp.get("itemsPerPage"))
     if (items && [12, 20, 24, 36, 48].includes(items)) setItemsPerPage(items)
@@ -91,27 +91,8 @@ export function CategoryClient({
           availableTypes={availableTypes}
           availableBrands={availableBrands}
         />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            const ev = new CustomEvent("open-filters")
-            window.dispatchEvent(ev)
-          }}
-        >
-          <Filter className="h-4 w-4 mr-2" />
-          Filters
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            const ev = new CustomEvent("reset-filters")
-            window.dispatchEvent(ev)
-          }}
-        >
-          Reset
-        </Button>
+        
+       
       </div>
 
       <div className="mt-6 grid grid-cols-1 md:grid-cols-[280px_minmax(0,1fr)] gap-6">

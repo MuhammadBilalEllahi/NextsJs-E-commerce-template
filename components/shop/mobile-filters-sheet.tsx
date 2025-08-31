@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import type { Product, Category } from "@/mock_data/mock-data"
-import { FiltersSidebar } from "@/components/filters-sidebar"
+import { FiltersSidebar } from "@/components/shop/filters-sidebar"
 
 export function MobileFiltersSheet({
   slug,
@@ -37,9 +37,9 @@ export function MobileFiltersSheet({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="md:hidden">
+        {/* <Button variant="outline" size="sm" className="md:hidden">
           Open Filters
-        </Button>
+        </Button> */}
       </SheetTrigger>
       <SheetContent side="left" className="w-[90vw] sm:w-[420px] p-0">
         <SheetHeader className="p-4">

@@ -13,15 +13,15 @@ export function Header({ categories }: { categories?: Category[] }) {
   const { ids: wishlistIds } = useWishlist()
 
   return (
-    <header className=" border-b bg-white/85 dark:bg-neutral-950/85 backdrop-blur">
+    <header className="border-b bg-white/85 dark:bg-neutral-950/85 backdrop-blur md:flex hidden">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-6">
         {/* Website Name */}
         <Link href="/" className="font-extrabold text-xl tracking-tight flex-shrink-0">
           <span className="text-red-600">Dehli</span> <span className="text-green-600">Mirch</span>
         </Link>
 
-        {/* Search Bar */}
-        <div className="flex-1 max-w-2xl">
+        {/* Search Bar - Hidden on mobile */}
+        <div className="hidden lg:flex flex-1 max-w-2xl">
           {categories ? (
             <HomeSearchBar categories={categories} />
           ) : (
@@ -31,10 +31,8 @@ export function Header({ categories }: { categories?: Category[] }) {
           )}
         </div>
 
-        {/* Cart and Wishlist Icons */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          
-
+        {/* Cart and Wishlist Icons - Hidden on mobile */}
+        <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
           <CartSheet>
             <button
               className={`relative flex flex-row items-center gap-2 px-3 py-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${isAdding ? 'bg-green-100 dark:bg-green-900' : ''
@@ -54,7 +52,6 @@ export function Header({ categories }: { categories?: Category[] }) {
               </div>
             </button>
           </CartSheet>
-
 
           <Link href="/account/wishlist">
             <button

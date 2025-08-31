@@ -204,9 +204,6 @@ export function FiltersSidebar({
         <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center">
           <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 shadow-lg flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-black" />
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Auto-applying filters in 1 second...
-            </p>
           </div>
         </div>
       )}
@@ -214,12 +211,7 @@ export function FiltersSidebar({
       <div className="bg-white dark:bg-neutral-950 p-4 sticky top-4 h-fit">
         <div className="mb-4">
           <h2 className="text-lg font-semibold">Filters</h2>
-          {isAutoApplying && (
-            <div className="mt-2 text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              Auto-applying in 1 second...
-            </div>
-          )}
+          
         </div>
 
         <Accordion type="multiple" defaultValue={["price", "type", "brand", "category"]} className="w-full">

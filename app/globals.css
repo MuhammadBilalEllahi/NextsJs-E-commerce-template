@@ -122,6 +122,50 @@
 }
 
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Mobile-first responsive utilities */
+@media (max-width: 1023px) {
+  .lg\:hidden {
+    display: block !important;
+  }
+  
+  .lg\:block {
+    display: none !important;
+  }
+  
+  .lg\:flex {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:hidden {
+    display: none !important;
+  }
+  
+  .lg\:block {
+    display: block !important;
+  }
+  
+  .lg\:flex {
+    display: flex !important;
+  }
+}
+
+/* Ensure bottom navigation doesn't overlap content */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: 4rem; /* 64px for bottom nav */
+  }
+}
+
 /* For Chrome, Safari and Edge */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
@@ -137,11 +181,38 @@
   -ms-overflow-style: none; 
 }
 
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Mobile cart badge positioning */
+@media (max-width: 640px) {
+  .cart-badge-mobile {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+  }
 }
-.animate-fadeIn {
-  animation: fadeIn 0.4s ease-in-out;
+
+/* Mobile bottom sheet styles */
+@media (max-width: 767px) {
+  /* Ensure bottom sheet has proper height and positioning */
+  .mobile-bottom-sheet {
+    height: 300px !important;
+    border-radius: 1rem 1rem 0 0 !important;
+  }
+  
+  /* Improve touch targets on mobile */
+  .mobile-sort-option {
+    min-height: 3.5rem;
+    padding: 1rem;
+  }
+  
+  /* Ensure view controls stack properly on mobile */
+  .view-controls-mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  /* Make sort dropdown full width on mobile */
+  .sort-dropdown-mobile {
+    width: 100% !important;
+  }
 }

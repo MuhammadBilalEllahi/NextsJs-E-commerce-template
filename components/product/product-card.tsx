@@ -14,7 +14,7 @@ export function ProductCard({
   variant = "grid",
 }: {
   product: Product
-  variant?: "grid" | "list"
+  variant?: "grid" | "list" | "single"
 }) {
   const { add, isAdding } = useCart()
   const [isExpanded, setIsExpanded] = useState(false)
@@ -67,7 +67,7 @@ export function ProductCard({
           <img
             src={getDisplayImage()}
             alt={product.title}
-            className="h-full w-52 object-cover"
+            className=" w-52 object-cover h-10 lg:h-full"
           />
         </Link>
         <div className="flex-1 p-4">
@@ -76,11 +76,11 @@ export function ProductCard({
             <Link href={`/product/${product.slug}`} className="font-semibold hover:text-red-600">
               {product.title}
             </Link>
-            <div className="flex items-center gap-2 text-[#121212]">
+            <div className="flex items-center gap-2 text-[#121212] dark:text-white">
             {Array.from({length: 5}).map((_, index) => (
-              <Star key={index} className="h-3 w-3 fill-[#121212]" />
+              <Star key={index} className="h-3 w-3 fill-[#121212] dark:fill-white" />
             ))}
-            <span className="text-sm">{product.rating?.toFixed(1) ?? "4.5"}</span>
+            <span className="text-sm text-black dark:text-white">{product.rating?.toFixed(1) ?? "4.5"}</span>
           </div>
             </div>
             <AddToWishlistButton productId={product.id} />
@@ -109,7 +109,8 @@ export function ProductCard({
           <div className="mt-3 flex items-center justify-between">
 
           <a
-            className="w-full rounded-sm px-4 py-2 text-center  font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
+         
+            className="w-full rounded-sm px-2 py-2 md:px-4 md:py-2 text-sm text-center  md:text-sm lg:text-md  font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
             aria-label="View Product"
             title="View Product"
             href={`/product/${product.slug}`}
@@ -168,9 +169,9 @@ export function ProductCard({
         </div>
         <div className="flex items-center gap-2 text-[#121212]">
             {Array.from({length: 5}).map((_, index) => (
-              <Star key={index} className="h-3 w-3 fill-[#121212]" />
+              <Star key={index} className="h-3 w-3 fill-[#121212] dark:fill-white" />
             ))}
-            <span className="text-sm">{product.rating?.toFixed(1) ?? "4.5"}</span>
+            <span className="text-sm dark:text-white text-black">{product.rating?.toFixed(1) ?? "4.5"}</span>
           </div>
         
         <div className="font-mono text-xs text-neutral-600 dark:text-neutral-400">
@@ -201,7 +202,8 @@ export function ProductCard({
 
 
           <a
-            className="w-full rounded-sm px-4 py-2 text-center  font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
+           
+            className="w-full rounded-sm px-2 py-2 md:px-4 md:py-2 text-sm text-center  md:text-sm lg:text-md font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
             aria-label="View Product"
             title="View Product"
             href={`/product/${product.slug}`}

@@ -12,7 +12,7 @@ export function ProductGrid({
   enableInfinite = true,
 }: {
   products?: Product[]
-  view?: "list" | "grid-2" | "grid-3" | "grid-4"
+  view?: "list" | "grid-2" | "grid-3" | "grid-4" | "single"
   pageSize?: number
   enableInfinite?: boolean
 }) {
@@ -54,6 +54,7 @@ export function ProductGrid({
         <div className={`grid gap-4 ${
           view === "grid-2" ? "grid-cols-2" :
           view === "grid-3" ? "grid-cols-2 sm:grid-cols-3" :
+          view === "single" ? "grid-cols-1" :
           "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
         }`}>
           {paged.map((p) => (
