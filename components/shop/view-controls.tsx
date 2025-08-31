@@ -42,7 +42,7 @@ export function ViewControls({
         <Button
             variant={view === "single" ?  "outline": "ghost" }
             size="sm"
-            className={` h-8  w-5 p-0 border-[1.9px] rounded-none transition-all duration-200 ${
+            className={`md:hidden h-8  w-5 p-0 border-[1.9px] rounded-none transition-all duration-200 ${
               view === "single" 
                 ? "border-black" 
                 : "border-gray-300 dark:border-gray-600 opacity-50"
@@ -51,7 +51,7 @@ export function ViewControls({
           >
             <img 
               src="/bars/three-lines-vert.svg" 
-              className={`h-8 w-8 ml-3 object-cover transition-all duration-200 ${
+              className={` h-8 w-8 ml-3 object-cover transition-all duration-200 ${
                 view === "single" 
                   ? "opacity-100" 
                   : "opacity-40 grayscale"

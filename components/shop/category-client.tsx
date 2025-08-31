@@ -10,6 +10,7 @@ import { ViewControls } from "@/components/shop/view-controls"
 import { Button } from "@/components/ui/button"
 import { Filter } from 'lucide-react'
 import { ProductGrid } from "@/components/product/product-grid"
+import { BottomNav } from "../main_comp/bottom-nav"
 
 interface CategoryClientProps {
   slug: string
@@ -137,6 +138,7 @@ export function CategoryClient({
             pageSize={itemsPerPage}
             enableInfinite={true}
           />
+          <BottomNav/>
         </section>
       </div>
     </main>

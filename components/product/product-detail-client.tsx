@@ -56,11 +56,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   // Get current price and images based on selected variant
   const currentPrice = selectedVariant?.price || product.price;
   const currentImages = selectedVariant?.images && selectedVariant.images.length > 0 ? selectedVariant.images : product.images;
-  
+
   // Create mapping between images and variant labels
   const getVariantLabelsForImages = () => {
     const variantLabels: Array<{ imageIndex: number; label: string }> = [];
-    
+
     if (selectedVariant?.images && selectedVariant.images.length > 0) {
       // If showing variant images, all images are from the selected variant
       selectedVariant.images.forEach((_, index) => {
@@ -84,12 +84,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         }
       });
     }
-    
+
     return variantLabels;
   };
-  
+
   const variantLabels = getVariantLabelsForImages();
-  
+
   // Handle variant selection with validation
   const handleVariantSelect = (variant: any) => {
     // Don't allow selection of out-of-stock variants
@@ -98,7 +98,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     }
     setSelectedVariant(variant);
   };
-  
+
   // Ensure we have valid data
   if (!product || !product.id) {
     return (
@@ -112,7 +112,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
 
   console.log("product in ProductDetailClient", product);
-  
+
   // Don't render until component is initialized
   if (!isInitialized) {
     return (
@@ -128,17 +128,17 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       </div>
     );
   }
-  
+
   const handleAddToCart = () => {
     if (isAdding || !selectedVariant) return
     add(
-      { 
-        id: String(product.id), 
-        title: `${product.title} - ${selectedVariant.label}`, 
-        price: selectedVariant.price, 
+      {
+        id: String(product.id),
+        title: `${product.title} - ${selectedVariant.label}`,
+        price: selectedVariant.price,
         image: currentImages[0] || product.images[0],
 
-      }, 
+      },
       quantity
     )
   }
@@ -167,18 +167,18 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <span>{product.rating.toFixed(1)}</span>
               <span className="opacity-70">({product.reviews.length})</span>
             </div>
-            
+
           </div>
 
           <div className="mt-4 text-3xl font-extrabold text-red-600">
-                            {formatCurrency(currentPrice)}
+            {formatCurrency(currentPrice)}
             {selectedVariant && selectedVariant.price !== product.price && (
               <span className="text-lg text-neutral-500 line-through ml-2">
-                                 {formatCurrency(product.price)}
+                {formatCurrency(product.price)}
               </span>
             )}
           </div>
-          
+
           {/* Stock Indicator */}
           {selectedVariant && (
             <div className="mt-2 text-sm">
@@ -193,11 +193,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               )}
             </div>
           )}
-          
+
           {/* Variant Price Info */}
           {selectedVariant && selectedVariant.price !== product.price && (
             <div className="mt-2 text-sm text-neutral-600">
-                              <span className="font-medium">{selectedVariant.label}:</span> {formatCurrency(selectedVariant.price)}
+              <span className="font-medium">{selectedVariant.label}:</span> {formatCurrency(selectedVariant.price)}
             </div>
           )}
 
@@ -209,7 +209,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 {product.variants.map((variant) => {
                   const isSelected = selectedVariant?._id === variant._id;
                   const isAvailable = variant.isActive && !variant.isOutOfStock && variant.stock > 0;
-                  
+
                   return (
                     <Button
                       key={variant._id}
@@ -253,7 +253,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 </button>
               </div>
               <div className="text-sm text-neutral-600 dark:text-neutral-400">
-                                 Subtotal: <span className="font-semibold text-red-600">{formatCurrency(subtotal)}</span>
+                Subtotal: <span className="font-semibold text-red-600">{formatCurrency(subtotal)}</span>
               </div>
             </div>
           </div>
@@ -265,11 +265,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               onClick={handleAddToCart}
               disabled={isAdding || !selectedVariant || selectedVariant.stock === 0 || !selectedVariant.isActive || selectedVariant.isOutOfStock}
             >
-              {isAdding ? "Adding..." : 
-               !selectedVariant ? "Select Variant" :
-               selectedVariant.stock === 0 ? "Out of Stock" :
-               !selectedVariant.isActive ? "Variant Unavailable" :
-               "ADD TO CART"}
+              {isAdding ? "Adding..." :
+                !selectedVariant ? "Select Variant" :
+                  selectedVariant.stock === 0 ? "Out of Stock" :
+                    !selectedVariant.isActive ? "Variant Unavailable" :
+                      "ADD TO CART"}
             </Button>
             <Button
               variant="outline"
@@ -277,11 +277,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               onClick={handleBuyNow}
               disabled={isAdding || !selectedVariant || selectedVariant.stock === 0 || !selectedVariant.isActive || selectedVariant.isOutOfStock}
             >
-              {isAdding ? "Processing..." : 
-               !selectedVariant ? "Select Variant" :
-               selectedVariant.stock === 0 ? "Out of Stock" :
-               !selectedVariant.isActive ? "Variant Unavailable" :
-               "BUY IT NOW"}
+              {isAdding ? "Processing..." :
+                !selectedVariant ? "Select Variant" :
+                  selectedVariant.stock === 0 ? "Out of Stock" :
+                    !selectedVariant.isActive ? "Variant Unavailable" :
+                      "BUY IT NOW"}
             </Button>
           </div>
 
@@ -332,24 +332,24 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 </AccordionContent>
               </AccordionItem>
 
-                             <AccordionItem value="customer-reviews">
-                 <AccordionTrigger className="text-left">
-                   Customer Reviews
-                 </AccordionTrigger>
-                 <AccordionContent>
-                   <ReviewsEnhanced 
-                     productId={String(product.id)} 
-                     initialReviews={product.reviews.map(review => ({
-                       id: String(review.id),
-                       user: review.user,
-                       rating: review.rating,
-                       title: "",
-                       comment: review.comment,
-                       date: review.date
-                     }))} 
-                   />
-                 </AccordionContent>
-               </AccordionItem>
+              <AccordionItem value="customer-reviews">
+                <AccordionTrigger className="text-left">
+                  Customer Reviews
+                </AccordionTrigger>
+                <AccordionContent>
+                  <ReviewsEnhanced
+                    productId={String(product.id)}
+                    initialReviews={product.reviews.map(review => ({
+                      id: String(review.id),
+                      user: review.user,
+                      rating: review.rating,
+                      title: "",
+                      comment: review.comment,
+                      date: review.date
+                    }))}
+                  />
+                </AccordionContent>
+              </AccordionItem>
 
               <AccordionItem value="quality-promise">
                 <AccordionTrigger className="text-left">
@@ -411,8 +411,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <a
               className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
               href={`https://wa.me/?text=${encodeURIComponent(
-                `${product.title} - ${
-                  typeof window !== "undefined" ? window.location.href : ""
+                `${product.title} - ${typeof window !== "undefined" ? window.location.href : ""
                 }`
               )}`}
               target="_blank"

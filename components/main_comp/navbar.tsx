@@ -131,7 +131,7 @@ export function Navbar() {
             </Link> */}
 
             {/* Cart */}
-            {scrolled && (
+            {scrolled  && (
               <CartSheet>
                 <button
                   className={`relative flex flex-row items-center gap-2 px-3 py-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${
