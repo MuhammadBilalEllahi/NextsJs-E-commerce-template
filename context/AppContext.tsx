@@ -87,6 +87,7 @@ export const AppProvider = ({children}:{children: ReactNode} ) => {
         });
 
         const data = await response.json();
+        console.log('Login data:', data);
         
         if (data.success) {
           setUser(data.user);
@@ -96,7 +97,8 @@ export const AppProvider = ({children}:{children: ReactNode} ) => {
           return false;
         }
       } catch (error) {
-        setError('Login failed');
+        console.error('Login error:', error);
+        setError(error instanceof Error ? error.message : 'Login failed');
         return false;
       } finally {
         setIsLoading(false);

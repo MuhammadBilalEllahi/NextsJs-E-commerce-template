@@ -1,15 +1,23 @@
 "use client"
 
+import { AuthProvider } from "@/lib/providers/authProvider"
 import { CartProvider } from "@/lib/providers/cartProvider"
 import { WishlistProvider } from "@/lib/providers/wishlistProvider"
-import { ReactNode, useEffect } from "react"
+import { SessionProvider } from "next-auth/react"
+import { ReactNode } from "react"
 
 export function RootProviders({ children }: { children: ReactNode }) {
-  // prevent hydration issues by ensuring client-only providers after mount if necessary
-  // Here we render immediately; providers are safe for SSR as they are client components.
+  // Provider hierarchy: Session -> Auth -> Cart -> Wishlist
+  // Cart depends on Auth for user identification
   return (
-    <CartProvider>
-      <WishlistProvider>{children}</WishlistProvider>
-    </CartProvider>
+    <SessionProvider>
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
+            {children}
+          </WishlistProvider>
+        </CartProvider>
+      </AuthProvider>
+    </SessionProvider>
   )
 }

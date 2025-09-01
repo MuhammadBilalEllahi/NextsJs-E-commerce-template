@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { cn } from "@/lib/utils/utils"
-import { LayoutDashboard, Package, Tags, ShoppingCart, Users, Megaphone, FileText, MessageCircle, CreditCard, Shield, LogOut, Building2 } from 'lucide-react'
+import { LayoutDashboard, Package, Tags, ShoppingCart, Users, Megaphone, FileText, MessageCircle, CreditCard, Shield, LogOut, Building2, Truck } from 'lucide-react'
 import { useAppContext } from "@/context/AppContext"
 
 const nav = [
@@ -13,6 +13,7 @@ const nav = [
   { href: "/admin/banner", label: "Banners", icon: Megaphone },
   { href: "/admin/branches", label: "Branches", icon: Building2 },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/shipping", label: "Shipping", icon: Truck },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/promotions", label: "Promotions", icon: Megaphone },
   { href: "/admin/content", label: "Content", icon: FileText },

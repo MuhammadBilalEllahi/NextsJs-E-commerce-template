@@ -76,9 +76,9 @@ export default function CheckoutPage() {
               <section className="bg-white dark:bg-neutral-800 rounded-lg border p-6">
                 <h2 className="text-lg font-semibold mb-4">
                   Contact
-                  <span className="ml-2 text-sm font-normal text-neutral-600 dark:text-neutral-400">
+                  {/* <span className="ml-2 text-sm font-normal text-neutral-600 dark:text-neutral-400">
                     (Login to earn loyalty points 🎉🎁🎊)
-                  </span>
+                  </span> */}
                 </h2>
                 <div className="space-y-4">
                   <div>

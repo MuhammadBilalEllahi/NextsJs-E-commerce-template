@@ -157,6 +157,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           variantId: selectedVariant._id,
           variantLabel: selectedVariant.label,
           productId: String(product.id),
+          slug: product.slug,
+          sku: selectedVariant.label, // Use label as SKU
         },
         quantity
       );
@@ -169,6 +171,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           price: product.price,
           image: product.images[0],
           productId: String(product.id),
+          slug: product.slug,
         },
         quantity
       );

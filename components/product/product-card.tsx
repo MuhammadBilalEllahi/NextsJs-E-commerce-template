@@ -45,7 +45,26 @@ export function ProductCard({
 
   const handleAddToCart = () => {
     if (isAdding) return // Prevent duplicate clicks
-    add({ id: product.id, title: product.title, price: product.price, image: getDisplayImage(), productId: product.id }, 1)
+    if(product.variants && product.variants.length > 0) {
+      add({ 
+        id: product.id, 
+        title: product.title, 
+        price: product.variants[0].price as number, 
+        image: getDisplayImage(), 
+        productId: product.id, 
+        variantId: product.variants[0]._id,
+        variantLabel: product.variants[0].label,  
+        slug: product.slug
+      }, 1)
+    }else{
+    add({ 
+      id: product.id, 
+      title: product.title, 
+      price: product.price, 
+      image: getDisplayImage(), 
+      productId: product.id,
+      slug: product.slug
+    }, 1)}
   }
 
   // Check if description text overflows 3 lines

@@ -9,6 +9,7 @@ import { HomeNewsletter } from "@/components/home/home-newsletter"
 import { getAllBanners, getAllNewArrivalsProducts, getAllTopSellingProducts, getGlobalSettings, getAllBranches } from "@/database/data-service"
 import { HeaderWithCategories } from "@/components/main_comp/header-with-categories"
 import { Navbar } from "@/components/main_comp/navbar"
+import StackedCards from "@/components/home/BranchSlidableCard"
 
 
 // interface Banner {
@@ -51,7 +52,12 @@ export default async function HomePage() {
         <HomeFeaturedProducts bestSellings={topSelling} newArrivals={newArrivals} />
       </section>
 
+      <div className="hidden md:block">
       <HomeShopLocations shopLocation={branches}/>
+      </div>
+      <div className="md:hidden">
+        <StackedCards branches={branches}/>
+      </div>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
         <h2 className="text-2xl font-bold mb-6">Shop by Category</h2>
@@ -62,8 +68,9 @@ export default async function HomePage() {
         <HomeBlogPreview blogs={blogs} />
       </section>
 
-      <section className="container mx-auto px-4 py-10 md:py-14">
+      <section className="container mx-auto px-4 py-10 md:py-14 pt-28">
         {/* <HomeTestimonials /> */}
+        
       </section>
 
       <section className="bg-neutral-50 dark:bg-neutral-900/40">

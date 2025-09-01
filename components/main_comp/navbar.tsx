@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { CartSheet } from "../cart/cart-sheet"
 import { useCart } from "@/lib/providers/cartProvider"
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet"
+import { AuthButton } from "@/components/auth/auth-button"
 
 export function Navbar() {
   const pathname = usePathname()
@@ -87,6 +88,11 @@ export function Navbar() {
                       </Link>
                     ))}
                   </nav>
+                  
+                  {/* Mobile Auth Button */}
+                  <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <AuthButton variant="default" size="default" className="w-full" />
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
@@ -158,6 +164,9 @@ export function Navbar() {
                 </button>
               </CartSheet>
             )}
+
+            {/* Auth Button - Show when scrolled */}
+            {scrolled && <AuthButton variant="ghost" size="sm" />}
 
             {/* Theme Toggle */}
             <button

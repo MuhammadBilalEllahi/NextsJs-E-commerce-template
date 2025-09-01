@@ -22,7 +22,8 @@ export default function WishlistPage() {
         title: product.title, 
         price: product.price, 
         image: product.image,
-        productId: product.id
+        productId: product.id,
+        slug: product.slug
       }, 
       1
     )
@@ -89,7 +90,7 @@ export default function WishlistPage() {
                 </button>
               </div>
               <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
-                {product.brand} • Spice {product.spiceLevel}/5
+                {product.type || 'Spice'} • {product.category || 'Product'}
               </div>
               <div className="mt-2 flex items-center justify-between">
                 <div className="font-semibold text-red-600">Rs. {product.price.toFixed(2)}</div>

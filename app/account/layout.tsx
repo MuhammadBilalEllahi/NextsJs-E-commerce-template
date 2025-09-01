@@ -20,13 +20,6 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                 {l.label}
               </Link>
             ))}
-            <hr className="my-2" />
-            <Link href="/account/login" className="block text-sm text-red-600">
-              Login
-            </Link>
-            <Link href="/account/signup" className="block text-sm text-green-600">
-              Signup
-            </Link>
           </nav>
         </aside>
         <div className="lg:col-span-3">{children}</div>

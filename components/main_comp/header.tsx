@@ -6,6 +6,7 @@ import { useCart } from "@/lib/providers/cartProvider"
 import { useWishlist } from "@/lib/providers/wishlistProvider"
 import { CartSheet } from "@/components/cart/cart-sheet"
 import { HomeSearchBar } from "@/components/home/home-search-bar"
+import { AuthButton } from "@/components/auth/auth-button"
 import type { Category } from "@/mock_data/mock-data"
 
 export function Header({ categories }: { categories?: Category[] }) {
@@ -31,8 +32,8 @@ export function Header({ categories }: { categories?: Category[] }) {
           )}
         </div>
 
-        {/* Cart and Wishlist Icons - Hidden on mobile */}
-        <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
+        {/* Cart, Wishlist, and Auth - Hidden on mobile */}
+        <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
           <CartSheet>
             <button
               className={`relative flex flex-row items-center gap-2 px-3 py-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${isAdding ? 'bg-green-100 dark:bg-green-900' : ''
@@ -67,6 +68,9 @@ export function Header({ categories }: { categories?: Category[] }) {
               )}
             </button>
           </Link>
+
+          {/* Auth Button */}
+          <AuthButton variant="outline" size="sm" />
         </div>
       </div>
     </header>

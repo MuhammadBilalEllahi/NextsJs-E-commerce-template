@@ -7,7 +7,7 @@ import { Header } from "@/components/main_comp/header"
 import { Navbar } from "@/components/main_comp/navbar"
 import { Footer } from "@/components/main_comp/footer"
 import { RootProviders } from "@/lib/providers/rootProvider"
-import { AppProviderWrapper } from "@/components/app-provider-wrapper";
+import { AppProviderWrapper } from "@/lib/providers/AppProvider";
 import { HeaderWithCategories } from "@/components/main_comp/header-with-categories";
 import { ChatWidget } from "@/components/chat-widget";
 

@@ -20,11 +20,11 @@ export function CartSheet({ children }: CartSheetProps) {
       <SheetTrigger asChild>
         {children}
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md">
+      <SheetContent className="w-full sm:max-w-md p-2">
         <SheetHeader>
           <SheetTitle className="flex items-center justify-between">
             <span>{items.length} items</span>
-            <X className="h-4 w-4" />
+            {/* <X className="h-4 w-4" /> */}
           </SheetTitle>
         </SheetHeader>
         
@@ -107,8 +107,8 @@ export function CartSheet({ children }: CartSheetProps) {
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <Link href="/checkout" className="w-full">
+                <div className="space-y-6 mb-2">
+                  <Link href="/checkout" className="w-full ">
                     <Button className="w-full bg-green-600 hover:bg-green-700">
                       Checkout
                     </Button>

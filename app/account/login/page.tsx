@@ -6,22 +6,40 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useAppContext } from "@/context/AppContext"
+import { useAuth } from "@/lib/providers/authProvider"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/admin'
-  const { login, isLoading, error } = useAppContext()
+  const redirect = searchParams.get('redirect') || '/'
+  const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
+    setIsLoading(true)
     
-    const success = await login(email, password)
-    if (success) {
-      router.push(redirect)
+    try {
+      const result = await login(email, password)
+      if (result.success) {
+        // Check if user is admin and redirecting to admin area
+        if (redirect.startsWith('/admin') && result.user?.role !== 'admin') {
+          setError("Access denied. Admin privileges required.")
+          setIsLoading(false)
+          return
+        }
+        router.push(redirect)
+      } else {
+        setError(result.error || 'Login failed')
+        setIsLoading(false)
+      }
+    } catch (error) {
+      setError('An unexpected error occurred')
+      setIsLoading(false)
     }
   }
 
