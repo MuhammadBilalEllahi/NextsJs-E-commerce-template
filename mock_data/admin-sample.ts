@@ -18,9 +18,50 @@ export function getSampleCategories() {
 
 export function getSampleOrders() {
   return [
-    { id:"DM123456", customer:"Rahul Singh", total:39.98, status:"Completed", payment:"COD", date:"2025-08-01", items:2, tracking:"TRK123" },
-    { id:"DM123355", customer:"Ayesha Khan", total:19.99, status:"Processing", payment:"JazzCash", date:"2025-07-20", items:1, tracking:"TRK122" },
-    { id:"DM123290", customer:"Bilal Ahmed", total:12.49, status:"Pending", payment:"Easypaisa", date:"2025-07-19", items:1 },
+    { 
+      id:"DM123456", 
+      customer:"Rahul Singh", 
+      total:39.98, 
+      status:"Completed", 
+      payment:"COD", 
+      date:"2025-08-01", 
+      items:2, 
+      tracking:"TRK123",
+      orderId:"DM123456",
+      refId:"REF12345",
+      shippingMethod:"home_delivery",
+      shippingFee:0,
+      tcsFee:0
+    },
+    { 
+      id:"DM123355", 
+      customer:"Ayesha Khan", 
+      total:19.99, 
+      status:"Processing", 
+      payment:"COD", 
+      date:"2025-07-20", 
+      items:1, 
+      tracking:"TRK122",
+      orderId:"DM123355",
+      refId:"REF12346",
+      shippingMethod:"tcs",
+      shippingFee:150,
+      tcsFee:50
+    },
+    { 
+      id:"DM123290", 
+      customer:"Bilal Ahmed", 
+      total:12.49, 
+      status:"Pending", 
+      payment:"COD", 
+      date:"2025-07-19", 
+      items:1,
+      orderId:"DM123290",
+      refId:"REF12347",
+      shippingMethod:"tcs",
+      shippingFee:200,
+      tcsFee:75
+    },
   ]
 }
 

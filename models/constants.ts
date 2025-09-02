@@ -14,17 +14,20 @@ export const MODELS = {
     CATEGORY_PRODUCTS: "CategoryProducts",
     BANNER: "Banner",
     GLOBAL_SETTINGS: "GlobalSettings",
-    BRANCH: "Branch"
+    BRANCH: "Branch",
+    SHIPPING_METHOD: "ShippingMethod"
 }
 
 export const ORDER_TYPE = {
     HOME_DELIVERY: "home_delivery",
+    TCS: "tcs",
     PICKUP: "pickup"
 }
 
+
+
 export const PAYMENT_TYPE = {
-    COD: "cod",
-    FASTIFY_CARD: "FastifyCard"
+    COD: "cod"
 }
 
 export const ORDER_PAYMENT_STATUS = {

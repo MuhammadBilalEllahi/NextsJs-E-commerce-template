@@ -21,15 +21,9 @@ const UserSchema = new mongoose.Schema({
       isDefault: { type: Boolean, default: false }
     }
   ],
-  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: MODELS.PRODUCT }],
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: MODELS.PRODUCT }], // have to make this seperate schema
   cart: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.CART, default: null },
-  // cart: [
-  //   {
-  //     product: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.PRODUCT },
-  //     quantity: { type: Number, default: 1 },
-  //     variant: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.VARIANT} // size/color SKU
-  //   }
-  // ],
+
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
@@ -46,13 +40,6 @@ const AddressSchema = z.object({
   isDefault: z.boolean().default(false),
 });
 
-// Cart schema
-// const CartItemSchema = z.object({
-//   product: z.string().regex(/^[a-f\d]{24}$/i, "Invalid ObjectId"), // Mongo ObjectId
-//   quantity: z.number().int().positive().default(1),
-//   variant: z.string().regex(/^[a-f\d]{24}$/i, "Invalid ObjectId").optional(),
-// });
-
 // Main User schema
 export const UserZodSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -62,7 +49,6 @@ export const UserZodSchema = z.object({
   phone: z.string().optional(),
   addresses: z.array(AddressSchema).optional(),
   wishlist: z.array(z.string().regex(/^[a-f\d]{24}$/i, "Invalid ObjectId")).optional(),
-  // cart: z.array(CartItemSchema).optional(),
   isActive: z.boolean().default(true),
   createdAt: z.date().default(() => new Date()),
 });

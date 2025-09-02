@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { CitySelect } from "@/components/ui/city-select"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Branch, UpdateBranchData } from "@/lib/api/admin/branches/branches"
 import { MapPin, Phone, Mail, Building2, User, Clock, Globe, MessageCircle, X } from "lucide-react"
@@ -256,13 +257,10 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="city">City *</Label>
-                <Input
-                  id="city"
+                <CitySelect
                   value={formData.city}
-                  onChange={(e) => handleInputChange("city", e.target.value)}
-                  placeholder="Enter city"
-                  className={errors.city ? "border-red-500" : ""}
+                  onChange={(value) => handleInputChange("city", value)}
+                  placeholder="Select a city"
                 />
                 {errors.city && <p className="text-sm text-red-500">{errors.city}</p>}
               </div>

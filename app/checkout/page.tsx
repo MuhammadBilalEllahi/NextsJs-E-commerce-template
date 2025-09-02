@@ -1,35 +1,215 @@
 "use client"
 
 import { useCart } from "@/lib/providers/cartProvider"
+import { useAuth } from "@/lib/providers/authProvider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
+import { CitySelect } from "@/components/ui/city-select"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { ArrowLeft, HelpCircle, Lock } from 'lucide-react'
+import { useState, useEffect } from "react"
+import { ArrowLeft, HelpCircle, Lock, MapPin } from 'lucide-react'
 import Link from "next/link"
-import { formatCurrency, calculateShippingCost, calculateTotalWithShipping } from "@/lib/constants/currency"
+import { formatCurrency } from "@/lib/constants/currency"
 
 export default function CheckoutPage() {
   const { items, subtotal, clear } = useCart()
+  const { user, isAuthenticated } = useAuth()
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState("cod")
-  const [shippingMethod, setShippingMethod] = useState("free")
+  const [shippingMethod, setShippingMethod] = useState("home_delivery")
   const [billingAddress, setBillingAddress] = useState("same")
   const [emailNewsletter, setEmailNewsletter] = useState(true)
   const [saveInfo, setSaveInfo] = useState(true)
 
+  console.log("user",user)
+  
+  // Form data
+  const [formData, setFormData] = useState({
+    email: user?.email || "",
+    phone: "",
+    firstName: "",
+    lastName: "",
+    address: "",
+    city: "",
+    postal: "",
+    countryCode: "+92",
+    phoneNumber: ""
+  })
+  
+  // Billing address form data
+  const [billingFormData, setBillingFormData] = useState({
+    firstName: "",
+    lastName: "",
+    address: "",
+    city: "",
+    postal: "",
+    countryCode: "+92",
+    phoneNumber: ""
+  })
+  
+  // Shipping methods and costs
+  const [shippingMethods, setShippingMethods] = useState([])
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState(null)
+  const [shippingFee, setShippingFee] = useState(0)
+  const [tcsFee, setTcsFee] = useState(0)
+  const [orderTotal, setOrderTotal] = useState(subtotal)
+
+  const fetchShippingMethods = async () => {
+    try {
+      const params = new URLSearchParams({
+        city: formData.city,
+        state: "Punjab",
+        country: "Pakistan",
+        subtotal: subtotal.toString()
+      })
+      
+      const response = await fetch(`/api/shipping-methods?${params}`)
+      if (response.ok) {
+        const data = await response.json()
+        setShippingMethods(data.methods)
+        
+        // Auto-select appropriate shipping method
+        const homeDelivery = data.methods.find((m: any) => m.type === "home_delivery")
+        const tcs = data.methods.find((m: any) => m.type === "tcs")
+        
+        if (formData.city.toLowerCase() === "lahore" && homeDelivery) {
+          setSelectedShippingMethod(homeDelivery)
+          setShippingFee(homeDelivery.shippingFee)
+          setTcsFee(homeDelivery.tcsFee)
+          setShippingMethod("home_delivery")
+        } else if (tcs) {
+          setSelectedShippingMethod(tcs)
+          setShippingFee(tcs.shippingFee)
+          setTcsFee(tcs.tcsFee)
+          setShippingMethod("tcs")
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch shipping methods:", error)
+    }
+  }
+
+  // Calculate total with shipping fees
+  useEffect(() => {
+    setOrderTotal(subtotal + shippingFee + tcsFee)
+  }, [subtotal, shippingFee, tcsFee])
+  
+
+  // Fetch shipping methods when city changes
+  useEffect(() => {
+    if (formData.city) {
+      fetchShippingMethods()
+    }
+  }, [formData.city])
+  
+  // Set default city to Lahore if not set
+  useEffect(() => {
+    if (!formData.city) {
+      setFormData(prev => ({ ...prev, city: "Lahore" }))
+    }
+  }, [])
+  
+  // Update email when user data becomes available
+  useEffect(() => {
+    if (user?.email && user.email !== formData.email) {
+      setFormData(prev => ({ ...prev, email: user.email }))
+    }
+  }, [user?.email, formData.email])
+  
+  // Auto-copy shipping address to billing when switching to different billing
+  useEffect(() => {
+    if (billingAddress === "different" && !billingFormData.firstName) {
+      copyShippingToBilling()
+    } else if (billingAddress === "same") {
+      // Reset billing form when switching back to same as shipping
+      setBillingFormData({
+        firstName: "",
+        lastName: "",
+        address: "",
+        city: "",
+        postal: "",
+        countryCode: "+92",
+        phoneNumber: ""
+      })
+    }
+  }, [billingAddress])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate billing address if different billing is selected
+    if (billingAddress === "different") {
+      if (!billingFormData.firstName || !billingFormData.lastName || !billingFormData.address || !billingFormData.city) {
+        alert("Please fill in all required billing address fields")
+        return
+      }
+    }
+    
     setIsSubmitting(true)
-    setTimeout(() => {
-      const orderId = "DM" + Math.floor(Math.random() * 1_000_000).toString()
-      clear()
-      router.push(`/order/success?orderId=${orderId}`)
-    }, 1200)
+    
+    try {
+      const orderData = {
+        contact: {
+          email: formData.email,
+          phone: formData.countryCode + formData.phoneNumber,
+          marketingOptIn: emailNewsletter
+        },
+        shippingMethod: shippingMethod,
+        shippingAddress: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          address: formData.address,
+          city: formData.city,
+          postalCode: formData.postal,
+          phone: formData.countryCode + formData.phoneNumber,
+          country: "PK"
+        },
+        billingAddress: billingAddress === "same" ? null : {
+          firstName: billingFormData.firstName || formData.firstName,
+          lastName: billingFormData.lastName || formData.lastName,
+          address: billingFormData.address || formData.address,
+          city: billingFormData.city || formData.city,
+          postalCode: billingFormData.postal || formData.postal,
+          phone: billingFormData.countryCode + billingFormData.phoneNumber || formData.countryCode + formData.phoneNumber,
+          country: "PK"
+        },
+        items: items.map(item => ({
+          productId: item.productId,
+          variantId: item.variantId,
+          qty: item.qty,
+          price: item.price,
+          variantLabel: item.variantLabel
+        })),
+        subtotal,
+        shippingFee,
+        total: orderTotal,
+        userId: user?.id || null,
+        sessionId: !user ? localStorage.getItem("dm-guest-id") : null
+      }
+      
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData)
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        clear()
+        router.push(`/order/success?orderId=${result.orderId}&refId=${result.refId}`)
+      } else {
+        throw new Error("Checkout failed")
+      }
+    } catch (error) {
+      console.error("Checkout error:", error)
+      alert("Checkout failed. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (items.length === 0) {
@@ -47,9 +227,29 @@ export default function CheckoutPage() {
       </div>
     )
   }
-
-  const shippingCost = calculateShippingCost(subtotal)
-  const total = calculateTotalWithShipping(subtotal)
+  
+ 
+  
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+  
+  const handleBillingInputChange = (field: string, value: string) => {
+    setBillingFormData(prev => ({ ...prev, [field]: value }))
+  }
+  
+  // Copy shipping address to billing address
+  const copyShippingToBilling = () => {
+    setBillingFormData({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      address: formData.address,
+      city: formData.city,
+      postal: formData.postal,
+      countryCode: formData.countryCode,
+      phoneNumber: formData.phoneNumber
+    })
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
@@ -76,14 +276,24 @@ export default function CheckoutPage() {
               <section className="bg-white dark:bg-neutral-800 rounded-lg border p-6">
                 <h2 className="text-lg font-semibold mb-4">
                   Contact
-                  {/* <span className="ml-2 text-sm font-normal text-neutral-600 dark:text-neutral-400">
-                    (Login to earn loyalty points 🎉🎁🎊)
-                  </span> */}
+                  {isAuthenticated && (
+                    <span className="ml-2 text-sm font-normal text-neutral-600 dark:text-neutral-400">
+                      (Logged in as {user?.email})
+                    </span>
+                  )}
                 </h2>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="email">Email or mobile phone number</Label>
-                    <Input id="email" type="email" required placeholder="Enter your email or phone" />
+                    <Label htmlFor="email">Email address</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      required 
+                      placeholder="Enter your email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      disabled={isAuthenticated}
+                    />
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox 
@@ -102,30 +312,69 @@ export default function CheckoutPage() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="firstName">First name</Label>
-                    <Input id="firstName" required />
+                    <Input 
+                      id="firstName" 
+                      required 
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="lastName">Last name</Label>
-                    <Input id="lastName" required />
+                    <Input 
+                      id="lastName" 
+                      required 
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                    />
                   </div>
                   <div className="sm:col-span-2">
                     <Label htmlFor="address">Address</Label>
-                    <Input id="address" required placeholder="Street address" />
+                    <Input 
+                      id="address" 
+                      required 
+                      placeholder="Street address"
+                      value={formData.address}
+                      onChange={(e) => handleInputChange("address", e.target.value)}
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="city">City</Label>
-                    <Input id="city" required />
+                    <CitySelect
+                      value={formData.city}
+                      onChange={(value) => handleInputChange("city", value)}
+                      required
+                    />
                   </div>
                   <div>
                     <Label htmlFor="postal">Postal code (optional)</Label>
-                    <Input id="postal" />
+                    <Input 
+                      id="postal" 
+                      value={formData.postal}
+                      onChange={(e) => handleInputChange("postal", e.target.value)}
+                    />
                   </div>
                   <div className="sm:col-span-2">
                     <Label htmlFor="phone" className="flex items-center gap-1">
                       Phone
                       <HelpCircle className="h-3 w-3" />
                     </Label>
-                    <Input id="phone" required placeholder="+92 3XX XXXXXXX" />
+                    <div className="flex">
+                      <select 
+                        className="rounded-l border border-r-0 px-1 py-2 bg-transparent min-w-[80px] text-sm"
+                        value={formData.countryCode}
+                        onChange={(e) => handleInputChange("countryCode", e.target.value)}
+                      >
+                        <option value="+92">🇵🇰 +92</option>
+                      </select>
+                      <Input 
+                        id="phone" 
+                        required 
+                        placeholder="3XX XXXXXXX" 
+                        value={formData.phoneNumber}
+                        onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                        className="rounded-l-none border-l-0"
+                      />
+                    </div>
                   </div>
                   <div className="sm:col-span-2">
                     <div className="flex items-center space-x-2">
@@ -142,16 +391,55 @@ export default function CheckoutPage() {
 
               {/* Shipping Method Section */}
               <section className="bg-white dark:bg-neutral-800 rounded-lg border p-6">
-                <h2 className="text-lg font-semibold mb-4">Shipping method</h2>
-                <RadioGroup value={shippingMethod} onValueChange={setShippingMethod}>
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="free" id="free" />
-                      <Label htmlFor="free">Free Home Delivery</Label>
-                    </div>
-                    <span className="text-green-600 font-medium">FREE</span>
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Shipping method
+                </h2>
+                {shippingMethods.length > 0 ? (
+                  <RadioGroup value={shippingMethod} onValueChange={setShippingMethod}>
+                    {shippingMethods.map((method: any) => (
+                      <div key={method.id} className="flex items-center justify-between p-3 border rounded-lg mb-2">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem 
+                            value={method.type} 
+                            id={method.type}
+                            onChange={() => {
+                              setSelectedShippingMethod(method)
+                              setShippingFee(method.shippingFee)
+                              setTcsFee(method.tcsFee)
+                            }}
+                          />
+                          <div>
+                            <Label htmlFor={method.type} className="font-medium">
+                              {method.name}
+                            </Label>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                              {method.estimatedDays} day{method.estimatedDays > 1 ? 's' : ''} delivery
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          {method.totalFee === 0 ? (
+                            <span className="text-green-600 font-medium">FREE</span>
+                          ) : (
+                            <div>
+                              <div className="font-medium">{formatCurrency(method.totalFee)}</div>
+                              {method.tcsFee > 0 && (
+                                <div className="text-xs text-neutral-600">
+                                  +{formatCurrency(method.tcsFee)} TCS
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                ) : (
+                  <div className="text-center py-4 text-neutral-600 dark:text-neutral-400">
+                    Enter your city to see shipping options
                   </div>
-                </RadioGroup>
+                )}
               </section>
 
               {/* Payment Section */}
@@ -162,32 +450,28 @@ export default function CheckoutPage() {
                   All transactions are secure and encrypted.
                 </p>
                 <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="jazzcash" id="jazzcash" />
-                        <Label htmlFor="jazzcash">JazzCash</Label>
-                      </div>
+                  <div className="p-3 border rounded-lg bg-neutral-50 dark:bg-neutral-700">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="cod" id="cod" />
+                      <Label htmlFor="cod" className="font-medium">Cash on Delivery (COD)</Label>
                     </div>
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="easypaisa" id="easypaisa" />
-                        <Label htmlFor="easypaisa">Easypaisa</Label>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="cod" id="cod" />
-                        <Label htmlFor="cod">Cash on Delivery (COD)</Label>
-                      </div>
-                    </div>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 ml-6">
+                      Pay with cash when your order is delivered
+                    </p>
                   </div>
                 </RadioGroup>
               </section>
 
               {/* Billing Address Section */}
               <section className="bg-white dark:bg-neutral-800 rounded-lg border p-6">
-                <h2 className="text-lg font-semibold mb-4">Billing address</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Billing address</h2>
+                  {billingAddress === "different" && (
+                    <span className="text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">
+                      Different from shipping
+                    </span>
+                  )}
+                </div>
                 <RadioGroup value={billingAddress} onValueChange={setBillingAddress}>
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
@@ -200,6 +484,91 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 </RadioGroup>
+                
+                {/* Different Billing Address Form */}
+                {billingAddress === "different" && (
+                  <div className="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-md font-medium">Billing Address Details</h3>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={copyShippingToBilling}
+                        className="text-xs"
+                      >
+                        Copy from shipping address
+                      </Button>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="billingFirstName">First name</Label>
+                        <Input 
+                          id="billingFirstName" 
+                          required 
+                          value={billingFormData.firstName}
+                          onChange={(e) => handleBillingInputChange("firstName", e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="billingLastName">Last name</Label>
+                        <Input 
+                          id="billingLastName" 
+                          required 
+                          value={billingFormData.lastName}
+                          onChange={(e) => handleBillingInputChange("lastName", e.target.value)}
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label htmlFor="billingAddress">Address</Label>
+                        <Input 
+                          id="billingAddress" 
+                          required 
+                          placeholder="Street address"
+                          value={billingFormData.address}
+                          onChange={(e) => handleBillingInputChange("address", e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <CitySelect
+                          value={billingFormData.city}
+                          onChange={(value) => handleBillingInputChange("city", value)}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="billingPostal">Postal code (optional)</Label>
+                        <Input 
+                          id="billingPostal" 
+                          value={billingFormData.postal}
+                          onChange={(e) => handleBillingInputChange("postal", e.target.value)}
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label htmlFor="billingPhone" className="flex items-center gap-1">
+                          Phone (optional)
+                          <HelpCircle className="h-3 w-3" />
+                        </Label>
+                        <div className="flex">
+                          <select 
+                            className="rounded-l border border-r-0 px-1 py-2 bg-transparent min-w-[80px] text-sm"
+                            value={billingFormData.countryCode}
+                            onChange={(e) => handleBillingInputChange("countryCode", e.target.value)}
+                          >
+                            <option value="+92">🇵🇰 +92</option>
+                          </select>
+                          <Input 
+                            id="billingPhone" 
+                            placeholder="3XX XXXXXXX" 
+                            value={billingFormData.phoneNumber}
+                            onChange={(e) => handleBillingInputChange("phoneNumber", e.target.value)}
+                            className="rounded-l-none border-l-0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </section>
 
               {/* Complete Order Button */}
@@ -274,11 +643,19 @@ export default function CheckoutPage() {
                     Shipping
                     <HelpCircle className="h-3 w-3" />
                   </span>
-                  <span className="text-green-600 font-medium">FREE</span>
+                  <span className={shippingFee === 0 ? "text-green-600 font-medium" : ""}>
+                    {shippingFee === 0 ? "FREE" : formatCurrency(shippingFee)}
+                  </span>
                 </div>
+                {tcsFee > 0 && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span>TCS Charges</span>
+                    <span>{formatCurrency(tcsFee)}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between text-lg font-bold border-t pt-3">
                   <span>Total</span>
-                  <span>{formatCurrency(total)}</span>
+                  <span>{formatCurrency(orderTotal)}</span>
                 </div>
               </div>
             </div>

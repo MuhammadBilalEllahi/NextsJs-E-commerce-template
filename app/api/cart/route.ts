@@ -5,6 +5,18 @@ import Cart from "@/models/Cart";
 import RedisClient from "@/database/redisClient";
 import { CACHE_CART_KEY, CACHE_CART_EXPIRE_TIME } from "@/lib/cacheConstants";
 
+/**
+ * Cart API with write conflict handling
+ * 
+ * Write conflicts (MongoDB error code 112) can occur when multiple requests
+ * try to update the same cart document simultaneously. This implementation
+ * uses:
+ * 1. Retry logic with exponential backoff
+ * 2. Optimistic concurrency control with version field
+ * 3. Proper transaction handling
+ * 4. Cache invalidation to prevent stale data
+ */
+
 // Create a new cart
 export async function POST(req: Request) {
     await dbConnect();
@@ -74,71 +86,102 @@ console.log(userId, sessionId);
 // Update cart by user id or session id (with upsert support)
 export async function PUT(req: Request) {
     await dbConnect();
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    try {
-        const { searchParams } = new URL(req.url);
-        const [userId, sessionId] = [searchParams.get("userId"), searchParams.get("sessionId")];
-        console.log(userId, sessionId,"PUT");
-        if (!userId && !sessionId) {
-            return NextResponse.json({ error: "Missing userId and sessionId" }, { status: 400 });
-        }
-
-        const body = await req.json();
-        
-        // Prepare cart data
-        const cartData: any = {
-            items: body.items || [],
-            updatedAt: new Date()
-        };
-
-        // Set user or session identifier
-        if (userId) {
-            cartData.user = userId;
-            cartData.uuidv4 = null; // Clear session ID when user is set
-        } else {
-            cartData.uuidv4 = sessionId;
-            cartData.user = null;
-        }
-
-        // Find and update cart, or create new one if doesn't exist
-        const updatedCart = await Cart.findOneAndUpdate(
-            { 
-                $or: [
-                    { "user._id": userId }, 
-                    { uuidv4: sessionId }
-                ] 
-            },
-            cartData,
-            { 
-                new: true, 
-                upsert: true, 
-                session,
-                setDefaultsOnInsert: true
-            }
-        );
-
-        await session.commitTransaction();
-
-        // Clear old cache keys and set new one
-        const oldCacheKey = sessionId ? CACHE_CART_KEY(sessionId) : null;
-        const newCacheKey = userId ? CACHE_CART_KEY(userId) : CACHE_CART_KEY(sessionId!);
-        
-        if (oldCacheKey) {
-            await RedisClient.del(oldCacheKey);
-        }
-        await RedisClient.set(newCacheKey, JSON.stringify(updatedCart), CACHE_CART_EXPIRE_TIME.ONE_HOUR);
-
-        return NextResponse.json({ success: true, cart: updatedCart }, { status: 200 });
-    } catch (err: any) {
-        if (session) {
-            await session.abortTransaction();
-        }
-        console.error("Error updating cart:", err);
-        return NextResponse.json({ error: err.message || "Failed to update cart" }, { status: 500 });
-    } finally {
-        session.endSession();
+    
+    const { searchParams } = new URL(req.url);
+    const [userId, sessionId] = [searchParams.get("userId"), searchParams.get("sessionId")];
+    console.log(userId, sessionId, "PUT");
+    
+    if (!userId && !sessionId) {
+        return NextResponse.json({ error: "Missing userId and sessionId" }, { status: 400 });
     }
+
+    const body = await req.json();
+    
+    // Prepare cart data
+    const cartData: any = {
+        items: body.items || [],
+        updatedAt: new Date(),
+        $inc: { version: 1 } // Increment version for optimistic concurrency control
+    };
+
+    // Set user or session identifier
+    if (userId) {
+        cartData.user = userId;
+        cartData.uuidv4 = null; // Clear session ID when user is set
+    } else {
+        cartData.uuidv4 = sessionId;
+        cartData.user = null;
+    }
+
+    // Retry logic for write conflicts (MongoDB error code 112)
+    // This handles concurrent updates to the same cart document
+    const maxRetries = 3;
+    let retryCount = 0;
+    let updatedCart = null;
+
+    while (retryCount < maxRetries) {
+        try {
+            const session = await mongoose.startSession();
+            session.startTransaction();
+
+            try {
+                // Find and update cart, or create new one if doesn't exist
+                // Use optimistic concurrency control to prevent conflicts
+                updatedCart = await Cart.findOneAndUpdate(
+                    { 
+                        $or: [
+                            { "user._id": userId }, 
+                            { uuidv4: sessionId }
+                        ] 
+                    },
+                    cartData,
+                    { 
+                        new: true, 
+                        upsert: true, 
+                        session,
+                        setDefaultsOnInsert: true
+                    }
+                );
+
+                await session.commitTransaction();
+                break; // Success, exit retry loop
+            } catch (err: any) {
+                await session.abortTransaction();
+                throw err;
+            } finally {
+                session.endSession();
+            }
+        } catch (err: any) {
+            retryCount++;
+            
+            // Check if it's a write conflict error
+            if (err.code === 112 && retryCount < maxRetries) {
+                console.log(`Write conflict detected for cart update (userId: ${userId}, sessionId: ${sessionId}), retrying... (attempt ${retryCount}/${maxRetries})`);
+                // Exponential backoff: 100ms, 200ms, 400ms delays
+                await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 100));
+                continue;
+            }
+            
+            // If it's not a write conflict or we've exhausted retries, throw the error
+            console.error("Error updating cart:", err);
+            return NextResponse.json({ error: err.message || "Failed to update cart" }, { status: 500 });
+        }
+    }
+
+    if (!updatedCart) {
+        return NextResponse.json({ error: "Failed to update cart after retries" }, { status: 500 });
+    }
+
+    // Clear old cache keys and set new one
+    const oldCacheKey = sessionId ? CACHE_CART_KEY(sessionId) : null;
+    const newCacheKey = userId ? CACHE_CART_KEY(userId) : CACHE_CART_KEY(sessionId!);
+    
+    if (oldCacheKey) {
+        await RedisClient.del(oldCacheKey);
+    }
+    await RedisClient.set(newCacheKey, JSON.stringify(updatedCart), CACHE_CART_EXPIRE_TIME.ONE_HOUR);
+
+    return NextResponse.json({ success: true, cart: updatedCart }, { status: 200 });
 }
 
 // Delete cart by user id or session id

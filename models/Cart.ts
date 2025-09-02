@@ -22,7 +22,8 @@ const CartSchema = new mongoose.Schema({
   uuidv4: { type: String, default: null }, // for guests
   items: [CartItemSchema],
   currency: { type: String, default: "PKR" },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
+  version: { type: Number, default: 1 } // For optimistic concurrency control
 });
 
 // Unique either on user or on session

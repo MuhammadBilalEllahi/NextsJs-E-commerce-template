@@ -15,6 +15,7 @@ import '@/models/AbandonCartInfo';
 import '@/models/BrandProducts';
 import '@/models/CategoryProducts';
 import '@/models/Banner';
+import '@/models/Counter';
 
 // Export all models for convenience
 export { default as User } from '@/models/User';
@@ -32,6 +33,7 @@ export { default as AbandonCartInfo } from '@/models/AbandonCartInfo';
 export { default as BrandProducts } from '@/models/BrandProducts';
 export { default as CategoryProducts } from '@/models/CategoryProducts';
 export {default as Banner} from '@/models/Banner';
+export { default as Counter } from '@/models/Counter';
 
 // Export Zod schemas
 export { brandZodSchema } from '@/models/Brand';

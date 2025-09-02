@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { CitySelect } from "@/components/ui/city-select"
 
 export default function AddressesPage() {
   return (
@@ -20,8 +21,10 @@ export default function AddressesPage() {
           <Input id="address" placeholder="Street address" />
         </div>
         <div>
-          <Label htmlFor="city">City</Label>
-          <Input id="city" />
+          <CitySelect
+            value=""
+            onChange={() => {}}
+          />
         </div>
         <div>
           <Label htmlFor="postal">Postal Code</Label>

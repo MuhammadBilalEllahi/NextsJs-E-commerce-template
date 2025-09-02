@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
       if (token.role !== 'admin') {
         // Redirect to home page with access denied message
         const homeUrl = new URL('/', request.url)
-        homeUrl.searchParams.set('error', 'Access denied. Admin privileges required.')
+        homeUrl.searchParams.set('error', 'Access-denied. Admin privileges required.')
         return NextResponse.redirect(homeUrl)
       }
 

@@ -34,20 +34,11 @@ export async function POST(req: Request) {
             );
         }
 
-        // ✅ create base brand (without logo)
-        const newBrand = await Brand.create(
-            [{ name: raw.name, description: raw.description }],
-            { session }
-        ).then(res => res[0]);
-
-
         const logoFile = formData.get("logo") as File | null;
 
         // Upload image if present
         let imageUrl: string | undefined;
-        // const file = imageFile as formidable.File | formidable.File[] | undefined;
         if (logoFile && logoFile instanceof Blob) {
-
             // Create uploads directory if it doesn't exist
             const uploadDir = path.join(process.cwd(), 'uploads', 'temp');
             try {
@@ -69,41 +60,23 @@ export async function POST(req: Request) {
 
             // Save buffer to disk (uses disk storage, not RAM)
             await writeFile(tempFilePath, buffer);
-            // console.log("File saved to disk:", tempFilePath);
-
-            // console.log("tempFilePath", tempFilePath)
-            // console.log("")
 
             imageUrl = await uploadFileToS3({
                 filepath: tempFilePath,
                 originalFilename: originalFilename,
                 mimetype: (logoFile as any).type || "application/octet-stream"
-            }, `brand/${newBrand}/logo`);
-
-            // imageUrl = await uploadFileToS3({ buffer, originalFilename: originalFilename, mimetype: imageData.type }, "categories");
+            }, `brands/temp/logo`);
         }
 
-
-
-
-        // ✅ handle logo upload
-        // const logoFile = formData.get("logo") as File | null;
-        // if (logoFile && logoFile instanceof Blob) {
-        //   const arrayBuffer = await logoFile.arrayBuffer();
-        //   const buffer = Buffer.from(arrayBuffer);
-
-        //   const imageUrl = await uploadFileToS3(
-        //     {
-        //       buffer,
-        //       originalFilename: (logoFile as any).name || `${Date.now()}.jpg`,
-        //       mimetype: logoFile.type,
-        //     },
-        //     `brands/${newBrand._id}/logo`
-        //   );
-
-        //   newBrand.logo = imageUrl;
-        //   await newBrand.save({ session });
-        // }
+        // ✅ create brand with logo if available
+        const newBrand = await Brand.create(
+            [{ 
+                name: raw.name, 
+                description: raw.description,
+                logo: imageUrl
+            }],
+            { session }
+        ).then(res => res[0]);
 
         await session.commitTransaction();
 
@@ -192,6 +165,49 @@ export async function PUT(req: Request) {
         console.error("Error updating brand:", err);
         return NextResponse.json(
             { error: err.message || "Failed to update brand" },
+            { status: 500 }
+        );
+    } finally {
+        session.endSession();
+    }
+}
+
+// ✅ PATCH brand status
+export async function PATCH(req: Request) {
+    await dbConnect();
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const { id, isActive } = await req.json();
+
+        if (!id) {
+            return NextResponse.json(
+                { error: "Brand ID is required" },
+                { status: 400 }
+            );
+        }
+
+        const brand = await Brand.findByIdAndUpdate(
+            id,
+            { isActive },
+            { new: true, session }
+        );
+
+        if (!brand) {
+            return NextResponse.json({ error: "Brand not found" }, { status: 404 });
+        }
+
+        await session.commitTransaction();
+        return NextResponse.json(
+            { message: "Brand status updated successfully", brand },
+            { status: 200 }
+        );
+    } catch (err: any) {
+        await session.abortTransaction();
+        console.error("Error updating brand status:", err);
+        return NextResponse.json(
+            { error: err.message || "Failed to update brand status" },
             { status: 500 }
         );
     } finally {

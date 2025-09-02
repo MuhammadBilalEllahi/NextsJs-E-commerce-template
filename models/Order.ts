@@ -6,13 +6,24 @@ import { MODELS, ORDER_PAYMENT_STATUS, ORDER_STATUS, ORDER_TYPE, PAYMENT_TYPE } 
 
 const OrderItemSchema = new mongoose.Schema({
     product: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.PRODUCT, required: true },
-    variant: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.VARIANT, required: true },
+    variant: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.VARIANT, required: false }, // Optional for products without variants
     quantity: { type: Number, required: true, min: 1 },
     priceAtPurchase: { type: Number, required: true },
     label: { type: String, default: "" }
 }, { _id: false });
 
+const OrderHistorySchema = new mongoose.Schema({
+    status: { type: String, required: true },
+    changedAt: { type: Date, default: Date.now },
+    changedBy: { type: String, required: true }, // "system", "userId", "adminId"
+    reason: { type: String, default: "" } // For cancellation reasons
+}, { _id: false });
+
 const OrderSchema = new mongoose.Schema({
+    orderId: { type: String, unique: true },
+    refId: { type: String, unique: true },
+    tracking: { type: String, default: "" },
+    
     user: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.USER, default: null },
 
     contact: {
@@ -25,12 +36,12 @@ const OrderSchema = new mongoose.Schema({
     billingAddress: { type: AddressSubSchema },
 
     shippingMethod: {
-        type: String, enum: [ORDER_TYPE.HOME_DELIVERY, ORDER_TYPE.PICKUP],
+        type: String, enum: [ORDER_TYPE.HOME_DELIVERY, ORDER_TYPE.TCS],// ORDER_TYPE.PICKUP
         required: true, default: ORDER_TYPE.HOME_DELIVERY
     },
     payment: {
         method: {
-            type: String, enum: [PAYMENT_TYPE.COD, PAYMENT_TYPE.FASTIFY_CARD],
+            type: String, enum: [PAYMENT_TYPE.COD],
             default: PAYMENT_TYPE.COD
         },
         status: {
@@ -49,7 +60,10 @@ const OrderSchema = new mongoose.Schema({
         type: String, enum: [ORDER_STATUS.CANCELLED, ORDER_STATUS.CONFIRMED,
         ORDER_STATUS.DELIVERED, ORDER_STATUS.PENDING, ORDER_STATUS.SHIPPED],
         default: ORDER_STATUS.PENDING
-    }
+    },
+
+    cancellationReason: { type: String, default: "" },
+    history: [OrderHistorySchema]
 }, { timestamps: true });
 
 OrderSchema.index({ "contact.email": 1, createdAt: -1 });
