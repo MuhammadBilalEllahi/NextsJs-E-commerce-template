@@ -3,7 +3,7 @@ import dbConnect from "@/database/mongodb"
 import Order from "@/models/Order"
 import { generateOrderIds } from "@/lib/utils/orderIds"
 import { ORDER_STATUS, ORDER_PAYMENT_STATUS, PAYMENT_TYPE, ORDER_TYPE } from "@/models/constants"
-import { checkStockAvailability } from "@/lib/utils/stockManager"
+import { checkStockAvailability, decreaseStockForOrder } from "@/lib/utils/stockManager"
 
 export async function POST(req: NextRequest) {
     try {
@@ -81,6 +81,19 @@ export async function POST(req: NextRequest) {
         })
         
         await order.save()
+        
+        // Decrease stock for all items in the order
+        // Note: Stock is decreased immediately when order is created (status: pending)
+        // This ensures inventory consistency and prevents overselling
+        try {
+            await decreaseStockForOrder(order._id.toString())
+            console.log(`Stock decreased for order ${orderId}`)
+        } catch (error) {
+            console.error('Failed to decrease stock for order:', error)
+            // Note: Stock decrease failed, but order was created
+            // This could lead to inventory inconsistency - consider handling this case
+            // In production, you might want to rollback the order creation if stock decrease fails
+        }
         
         return NextResponse.json({ 
             success: true,

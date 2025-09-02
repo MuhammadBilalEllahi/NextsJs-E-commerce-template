@@ -24,18 +24,29 @@ export async function restoreStockForCancelledOrder(orderId: string): Promise<vo
         // Process each item in the order
         for (const item of order.items) {
             if (item.variant) {
-                // If item has a variant, restore stock to the variant
-                await Variant.findByIdAndUpdate(
-                    item.variant,
-                    { 
-                        $inc: { stock: item.quantity },
-                        $set: { 
-                            isOutOfStock: false,
-                            updatedAt: new Date()
-                        }
+                try {
+                    // If item has a variant, restore stock to the variant
+                    const result = await Variant.findByIdAndUpdate(
+                        item.variant,
+                        { 
+                            $inc: { stock: item.quantity },
+                            $set: { 
+                                isOutOfStock: false,
+                                updatedAt: new Date()
+                            }
+                        },
+                        { new: true }
+                    )
+                    
+                    if (result) {
+                        console.log(`Restored ${item.quantity} units to variant ${item.variant}. New stock: ${result.stock}`)
+                    } else {
+                        console.error(`Failed to restore stock for variant ${item.variant}`)
                     }
-                )
-                console.log(`Restored ${item.quantity} units to variant ${item.variant}`)
+                } catch (error) {
+                    console.error(`Error restoring stock for variant ${item.variant}:`, error)
+                    throw error
+                }
             } else if (item.product) {
                 // If no variant, we might need to handle product-level stock
                 // For now, we'll just log this case as products don't have stock field
@@ -52,7 +63,7 @@ export async function restoreStockForCancelledOrder(orderId: string): Promise<vo
 }
 
 /**
- * Decrease stock when order is confirmed
+ * Decrease stock when order is created
  * This function decreases the stock by the ordered quantity
  */
 export async function decreaseStockForOrder(orderId: string): Promise<void> {
@@ -72,28 +83,42 @@ export async function decreaseStockForOrder(orderId: string): Promise<void> {
         // Process each item in the order
         for (const item of order.items) {
             if (item.variant) {
-                // Check if there's enough stock
-                const variant = await Variant.findById(item.variant)
-                if (!variant) {
-                    throw new Error(`Variant ${item.variant} not found`)
-                }
-                
-                if (variant.stock < item.quantity) {
-                    throw new Error(`Insufficient stock for variant ${variant.label}. Available: ${variant.stock}, Required: ${item.quantity}`)
-                }
-                
-                // Decrease stock
-                await Variant.findByIdAndUpdate(
-                    item.variant,
-                    { 
-                        $inc: { stock: -item.quantity },
-                        $set: { 
-                            isOutOfStock: variant.stock - item.quantity <= 0,
-                            updatedAt: new Date()
+                try {
+                    // Decrease stock (we already checked availability in checkout)
+                    const result = await Variant.findByIdAndUpdate(
+                        item.variant,
+                        { 
+                            $inc: { stock: -item.quantity },
+                            $set: { 
+                                updatedAt: new Date()
+                            }
+                        },
+                        { new: true }
+                    )
+                    
+                    if (result) {
+                        // Update isOutOfStock flag based on new stock level
+                        if (result.stock <= 0) {
+                            await Variant.findByIdAndUpdate(
+                                item.variant,
+                                { 
+                                    $set: { 
+                                        isOutOfStock: true,
+                                        updatedAt: new Date()
+                                    }
+                                }
+                            )
                         }
+                        console.log(`Decreased ${item.quantity} units from variant ${item.variant}. New stock: ${result.stock}`)
+                    } else {
+                        console.error(`Failed to decrease stock for variant ${item.variant}`)
                     }
-                )
-                console.log(`Decreased ${item.quantity} units from variant ${item.variant}`)
+                } catch (error) {
+                    console.error(`Error decreasing stock for variant ${item.variant}:`, error)
+                    throw error
+                }
+            } else {
+                console.log(`Item has no variant, skipping stock decrease`)
             }
         }
         
