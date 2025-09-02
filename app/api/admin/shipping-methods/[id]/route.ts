@@ -4,14 +4,15 @@ import ShippingMethod from "@/models/ShippingMethod"
 
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect()
+        const { id } = await params
         const body = await req.json()
         
         const method = await ShippingMethod.findByIdAndUpdate(
-            params.id,
+            id,
             body,
             { new: true, runValidators: true }
         )
@@ -40,12 +41,13 @@ export async function PUT(
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect()
+        const { id } = await params
         
-        const method = await ShippingMethod.findByIdAndDelete(params.id)
+        const method = await ShippingMethod.findByIdAndDelete(id)
         
         if (!method) {
             return NextResponse.json(
