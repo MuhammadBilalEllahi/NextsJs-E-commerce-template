@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
         const total = await Order.countDocuments(query)
         
         // Format orders for admin display
-        const formattedOrders = orders.map(order => ({
+        const formattedOrders = orders.map((order: { _id: { toString: () => string }; orderId: any; refId: any; createdAt: string | number | Date; user: { firstName: any; lastName: any; email: any }; shippingAddress: { firstName: any; lastName: any }; contact: { email: any }; total: any; items: { product: { title: any }; variant: { label: any }; quantity: any; priceAtPurchase: any }[]; shippingMethod: any; shippingFee: any; tcsFee: any; status: any; payment: { method: any; status: any }; tracking: any; cancellationReason: any; history: any; billingAddress: any }) => ({
             id: order._id.toString(),
             orderId: order.orderId || order._id.toString().slice(-8).toUpperCase(),
             refId: order.refId || order._id.toString().slice(-8).toUpperCase(),
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
             history: order.history || [],
             address: order.shippingAddress,
             billingAddress: order.billingAddress,
-            items: order.items.map(item => ({
+            items: order.items.map((item: { product: { title: any }; variant: { label: any }; quantity: any; priceAtPurchase: any }) => ({
                 productTitle: item.product?.title || 'Unknown Product',
                 variantLabel: item.variant?.label || '',
                 quantity: item.quantity,

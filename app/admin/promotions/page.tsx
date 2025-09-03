@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { getSampleCoupons } from "@/mock_data/admin-sample"
 
-type Coupon = { code: string; type: "percent"|"fixed"; amount: number; starts?: string; ends?: string; restrict?: string }
+type Coupon = { code: string; type: string; amount: number; starts?: string; ends?: string; restrict?: string }
 
 export default function PromotionsAdminPage() {
   const [coupons, setCoupons] = useState<Coupon[]>(useMemo(()=>getSampleCoupons(),[]))

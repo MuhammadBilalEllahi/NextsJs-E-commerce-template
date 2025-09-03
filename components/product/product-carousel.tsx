@@ -25,7 +25,7 @@ export function ProductCarousel({ products = [] as Product[] }) {
     <div className="relative">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {slide.map((p) => (
-          <ProductCard key={p.id} product={p} />
+          <ProductCard key={String(p.id)} product={{ ...p, id: String(p.id) }} />
         ))}
       </div>
       <button

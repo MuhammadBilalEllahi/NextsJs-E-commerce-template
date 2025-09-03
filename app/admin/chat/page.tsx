@@ -6,14 +6,23 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { getSampleInquiries } from "@/mock_data/admin-sample"
 
-type Inquiry = { id: string; name: string; email?: string; message: string; channel: "Chat"|"WhatsApp"|"Email"; status: "Open"|"Closed"; createdAt: string; thread?: { from: "user"|"admin"; text: string; at: string }[] }
+type Inquiry = { 
+  id: string; 
+  name: string; 
+  email?: string; 
+  message: string; 
+  channel: string; 
+  status: string; 
+  createdAt: string; 
+  thread?: { from: string; text: string; at: string }[] 
+}
 
 export default function ChatInquiriesAdminPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>(useMemo(()=>getSampleInquiries(),[]))
   const [selected, setSelected] = useState<Inquiry | null>(inquiries[0] ?? null)
   const [reply, setReply] = useState("")
 
-  const setStatus = (id:string, status: Inquiry["status"])=> setInquiries(prev=>prev.map(i=>i.id===id?{...i,status}:i))
+  const setStatus = (id:string, status: string)=> setInquiries(prev=>prev.map(i=>i.id===id?{...i,status}:i))
 
   const sendReply = ()=>{
     if(!selected || !reply) return
@@ -50,7 +59,7 @@ export default function ChatInquiriesAdminPage() {
                     <div className="font-semibold">{selected.name}</div>
                     <div className="text-xs text-neutral-500">{selected.email ?? "—"} • {selected.channel}</div>
                   </div>
-                  <select className="rounded border bg-transparent px-2 py-1" value={selected.status} onChange={(e)=>{ setStatus(selected.id, e.target.value as Inquiry["status"]); setSelected(s=> s ? ({...s, status: e.target.value as Inquiry["status"]}) : s) }}>
+                  <select className="rounded border bg-transparent px-2 py-1" value={selected.status} onChange={(e)=>{ setStatus(selected.id, e.target.value); setSelected(s=> s ? ({...s, status: e.target.value}) : s) }}>
                     <option value="Open">Open</option>
                     <option value="Closed">Closed</option>
                   </select>

@@ -15,19 +15,17 @@ export function FiltersSidebar({
   initial,
   onApply,
   categories,
-  availableTypes,
   availableBrands,
 }: {
   slug: string
-  initial: { pmin: number; pmax: number; type: string; brands: string[]; category: string[] }
-  onApply: (entries: Record<string, string | number | undefined | null>) => void
+  initial: { pmin: number; pmax: number;  brands: string[]; category: string[] }
+  onApply: (entries: Record<string, string  | undefined | null>) => void
   categories: Category[]
-  availableTypes: string[]
   availableBrands: string[]
 }) {
   const [pmin, setPmin] = useState(initial.pmin)
   const [pmax, setPmax] = useState(initial.pmax)
-  const [type, setType] = useState(initial.type)
+  
   const [brands, setBrands] = useState<string[]>(initial.brands || [])
   const [category, setCategory] = useState<string[]>(initial.category || [])
 
@@ -35,60 +33,19 @@ export function FiltersSidebar({
   const autoApplyTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [isAutoApplying, setIsAutoApplying] = useState(false)
 
-  // console.log("categories", categories)
-  // console.log("availableTypes", availableTypes)
-  // console.log("availableBrands", availableBrands)
 
   useEffect(() => {
     setPmin(initial.pmin)
     setPmax(initial.pmax)
-    setType(initial.type)
+
     setBrands(initial.brands || [])
     setCategory(initial.category || [])
-  }, [initial.pmin, initial.pmax, initial.type, JSON.stringify(initial.brands), JSON.stringify(initial.category)])
+  }, [initial.pmin, initial.pmax,  JSON.stringify(initial.brands), JSON.stringify(initial.category)])
 
-  // Function to schedule auto-apply
-  // const scheduleAutoApply = () => {
-  //   // Clear existing timer
-  //   if (autoApplyTimerRef.current) {
-  //     clearTimeout(autoApplyTimerRef.current)
-  //   }
 
-  //   // Show auto-applying state
-  //   setIsAutoApplying(true)
-
-  //   // Set new timer for 1 second
-  //   autoApplyTimerRef.current = setTimeout(() => {
-  //     apply()
-  //   }, 1000)
-  // }
-
-  // // Function to apply filters
-  // const apply = () => {
-  //   // Clear any pending auto-apply timer
-  //   if (autoApplyTimerRef.current) {
-  //     clearTimeout(autoApplyTimerRef.current)
-  //     autoApplyTimerRef.current = null
-  //   }
-
-  //   // Hide auto-applying state
-  //   setIsAutoApplying(false)
-
-  //   // Apply filters immediately
-  //   onApply({
-  //     pmin,
-  //     pmax: pmax === 9999 ? undefined : pmax,
-  //     type,
-  //     brands: brands.length ? brands.join(",") : undefined,
-  //     category: category.length ? category.join(",") : undefined,
-  //     page: undefined, // reset pagination
-  //   })
-  // }
-
-  const scheduleAutoApply = (nextFilters: {
+  const scheduleAutoApply = (nextFilters?: {
     pmin?: number
     pmax?: number
-    type?: string
     brands?: string[]
     category?: string[]
   }) => {
@@ -106,7 +63,6 @@ export function FiltersSidebar({
   const apply = (overrides: Partial<{
     pmin: number
     pmax: number
-    type: string
     brands: string[]
     category: string[]
   }> = {}) => {
@@ -117,13 +73,11 @@ export function FiltersSidebar({
 
     setIsAutoApplying(false)
 
-    const filters = {
-      pmin,
-      pmax: pmax === 9999 ? undefined : pmax,
-      type,
-      brands: brands.length ? brands.join(",") : undefined,
-      category: category.length ? category.join(",") : undefined,
-      ...overrides, // override with the latest change
+    const filters: Record<string, string | null | undefined> = {
+      pmin: typeof (overrides.pmin ?? pmin) === "number" ? String(overrides.pmin ?? pmin) : undefined,
+      pmax: typeof (overrides.pmax ?? pmax) === "number" && (overrides.pmax ?? pmax) !== 9999 ? String(overrides.pmax ?? pmax) : undefined,
+      brands: (overrides.brands ?? brands).length ? (overrides.brands ?? brands).join(",") : undefined,
+      category: (overrides.category ?? category).length ? (overrides.category ?? category).join(",") : undefined,
     }
 
     onApply(filters)
@@ -133,7 +87,6 @@ export function FiltersSidebar({
   const reset = () => {
     setPmin(0)
     setPmax(9999)
-    setType("")
     setBrands([])
     setCategory([])
 
@@ -146,29 +99,10 @@ export function FiltersSidebar({
     // Hide auto-applying state
     setIsAutoApplying(false)
 
-    onApply({ pmin: undefined, pmax: undefined, type: undefined, brands: undefined, category: undefined, page: undefined })
+    onApply({ pmin: undefined, pmax: undefined, brands: undefined, category: undefined, page: undefined })
   }
 
 
-  // const toggleBrand = (b: string) => {
-
-  //   const newBrands = brands.includes(b ?? "") 
-  //     ? brands.filter((x) => x !== b) 
-  //     : [...brands, b]
-
-  //   setBrands(newBrands)
-  //   scheduleAutoApply()
-  // }
-
-  // const toggleCategory = (s: string) => {
-
-  //   const newCategories = category.includes(s) 
-  //     ? category.filter((x) => x !== s) 
-  //     : [...category, s]
-
-  //   setCategory(newCategories)
-  //   scheduleAutoApply()
-  // }
 
   const toggleBrand = (b: string) => {
     const newBrands = brands.includes(b)
@@ -214,7 +148,7 @@ export function FiltersSidebar({
           
         </div>
 
-        <Accordion type="multiple" defaultValue={["price", "type", "brand", "category"]} className="w-full">
+        <Accordion type="multiple" defaultValue={["price",  "brand", "category"]} className="w-full">
           <AccordionItem value="category">
             <AccordionTrigger>Category</AccordionTrigger>
             <AccordionContent>
@@ -235,41 +169,7 @@ export function FiltersSidebar({
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="type">
-            <AccordionTrigger>Product Type</AccordionTrigger>
-            <AccordionContent>
-              <div className="grid grid-cols-1 gap-2">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="type"
-                    value=""
-                    checked={type === ""}
-                    onChange={() => {
-                      setType("")
-                      scheduleAutoApply()
-                    }}
-                  />
-                  <span className="text-sm">All</span>
-                </label>
-                {availableTypes.map((t) => (
-                  <label key={t} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="type"
-                      value={t}
-                      checked={type === t}
-                      onChange={() => {
-                        setType(t ?? "")
-                        scheduleAutoApply()
-                      }}
-                    />
-                    <span className="text-sm">{t}</span>
-                  </label>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          
 
           <AccordionItem value="brand">
             <AccordionTrigger>Brand</AccordionTrigger>
@@ -318,7 +218,7 @@ export function FiltersSidebar({
                 ? 'bg-blue-500 hover:bg-blue-600'
                 : 'bg-black hover:bg-gray-800'
               }`}
-            onClick={apply}
+            onClick={()=>apply()}
           >
             {isAutoApplying ? 'Auto-applying...' : 'Apply Filters'}
           </Button>

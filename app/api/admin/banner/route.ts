@@ -29,19 +29,30 @@ export async function POST(req: Request) {
         const formData = await req.formData();
 
         // console.log(formData);
-        const raw = {
+        const raw: {
+            title: FormDataEntryValue | null,
+            description: FormDataEntryValue | null,
+            link: FormDataEntryValue | null,
+            isActive: boolean,
+            showTitle: boolean,
+            showLink: boolean,
+            showDescription: boolean,
+            timeout: number | null,
+            expiresAt: Date | undefined
+        } = {
             title: formData.get("title"),
             description: formData.get("description"),
             // image: formData.get("image"),
             link: formData.get("link"),
             isActive: formData.get("isActive") === 'true' ? true : false,
             showTitle: formData.get('showTitle') === 'true' ? true : false,
-            showLink: formData.get('showLink') === 'true' ?true: false,
-            showDescription: formData.get('showDescription') ==='true' ?true: false,
-            timeout: formData.get("timeout") ? Number(formData.get("timeout")) : null
+            showLink: formData.get('showLink') === 'true' ? true : false,
+            showDescription: formData.get('showDescription') === 'true' ? true : false,
+            timeout: formData.get("timeout") ? Number(formData.get("timeout")) : null,
+            expiresAt: undefined
         }
         // console.log(formData.get("expiresAt"), formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null);
-        if(formData.get("expiresAt") && formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null && formData.get("expiresAt") !== undefined){
+        if (formData.get("expiresAt") && formData.get("expiresAt") !== "" && formData.get("expiresAt") !== null && formData.get("expiresAt") !== undefined) {
             raw.expiresAt = new Date(formData.get("expiresAt") as string);
         }
         const parsed = zodBannerSchema.safeParse(raw);
@@ -70,7 +81,7 @@ export async function POST(req: Request) {
 
         await session.commitTransaction();
 
-        if(await RedisClient.get(CACHE_BANNER_KEY) !== null){
+        if (await RedisClient.get(CACHE_BANNER_KEY) !== null) {
             await RedisClient.del(CACHE_BANNER_KEY);
         }
 
@@ -92,7 +103,7 @@ export async function POST(req: Request) {
 
 
 export async function GET() {
-    
+
     try {
         await dbConnect();
         const value = await RedisClient.get(CACHE_BANNER_KEY);
@@ -121,12 +132,12 @@ export async function GET() {
 export async function PATCH(req: Request) {
     try {
         const { action } = await req.json();
-        
+
         if (action === 'purge') {
             await RedisClient.del(CACHE_BANNER_KEY);
             return NextResponse.json({ message: "Redis cache purged successfully" });
         }
-        
+
         return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     } catch (error) {
         console.error("Error purging Redis:", error);
@@ -145,7 +156,7 @@ export async function PUT(req: Request) {
         const _id = formData.get("_id")?.toString();
         if (!_id) return NextResponse.json({ error: "Missing banner ID" }, { status: 400 });
 
-        const raw = {
+        const raw  = {
             title: formData.get("title"),
             description: formData.get("description"),
             link: formData.get("link"),
@@ -222,7 +233,7 @@ export async function DELETE(req: Request) {
         await session.commitTransaction();
 
         // Invalidate Redis cache
-            await RedisClient.del(CACHE_BANNER_KEY);
+        await RedisClient.del(CACHE_BANNER_KEY);
 
         return NextResponse.json({ message: "Banner deleted", banner: deletedBanner });
     } catch (err: any) {

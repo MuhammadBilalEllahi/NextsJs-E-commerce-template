@@ -3,11 +3,12 @@ import { CategoryClient } from "@/components/shop/category-client"
 import { getAllProducts, getAllCategories } from "@/database/data-service"
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
+import { Category } from "@/mock_data/mock-data"
 
 export const dynamic = "force-dynamic"
 
 // Interface for database category data
-interface DatabaseCategory {
+interface DatabaseCategory extends Category {
   id: string
   name: string
   slug: string
@@ -36,7 +37,7 @@ interface CategoryPageProps {
 // Generate metadata for better SEO
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  
+
   if (slug === "all") {
     return {
       title: "All Products | Dehli Mirch",
@@ -46,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const categories = await getAllCategories()
   const category = categories.find(cat => cat.name.toLowerCase() === slug.toLowerCase())
-  
+
   if (!category) {
     return {
       title: "Category Not Found | Dehli Mirch",
@@ -62,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params
   const searchParamsResolved = await searchParams
-  
+
   // Fetch all data on the server
   const [allProducts, allCategories] = await Promise.all([
     getAllProducts(),
@@ -76,7 +77,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   }
 
   // Get available filter options from ALL products (not filtered) to keep options visible
-  const availableTypes = [...new Set(allProducts.map(p => p.type).filter(Boolean))]
+
   const availableBrands = [...new Set(allProducts.map(p => {
     // Handle both string and nested brand structures
     const brandName = typeof p.brand === 'string' ? p.brand : p.brand?.name
@@ -88,11 +89,10 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
   return (
     <RootProviders>
-      <CategoryClient 
-        slug={slug} 
+      <CategoryClient
+        slug={slug}
         allProducts={filteredProducts}
         categories={allCategories as DatabaseCategory[]}
-        availableTypes={availableTypes}
         availableBrands={availableBrands}
         searchParams={searchParamsResolved}
       />
@@ -102,8 +102,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
 // Server-side filtering function
 function filterProductsOnServer(
-  allProducts: any[], 
-  slug: string, 
+  allProducts: any[],
+  slug: string,
   searchParams: any
 ) {
   let filtered = allProducts.slice()

@@ -16,5 +16,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     return notFound()
   }
 
-  return <ProductDetailClient product={product} />
+  // Convert review id from string to number
+  const fixedProduct = {
+    ...product,
+    reviews: product.reviews?.map((review: any) => ({
+      ...review,
+      id: typeof review.id === "string" ? Number(review.id) : review.id,
+    })) ?? [],
+  };
+
+  return <ProductDetailClient product={fixedProduct} />
 }

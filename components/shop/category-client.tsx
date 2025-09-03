@@ -16,7 +16,7 @@ interface CategoryClientProps {
   slug: string
   allProducts: Product[]
   categories: Category[]
-  availableTypes: string[]
+  
   availableBrands: string[]
   searchParams: {
     q?: string
@@ -36,7 +36,7 @@ export function CategoryClient({
   slug,
   allProducts = [],
   categories,
-  availableTypes,
+
   availableBrands,
   searchParams: initialSearchParams,
 }: CategoryClientProps) {
@@ -48,7 +48,7 @@ export function CategoryClient({
   useEffect(() => {
     const v = sp.get("view")
     if (v === "list" || v === "grid-2" || v === "grid-3" || v === "grid-4" || v === "single") setView(v)
-    
+
     const items = Number(sp.get("itemsPerPage"))
     if (items && [12, 20, 24, 36, 48].includes(items)) setItemsPerPage(items)
   }, [sp])
@@ -84,16 +84,14 @@ export function CategoryClient({
           initial={{
             pmin: Number(sp.get("pmin") ?? 0),
             pmax: Number(sp.get("pmax") ?? 9999),
-            type: sp.get("type") || "",
             brands: (sp.get("brands") || "").split(",").filter(Boolean),
             category: (sp.get("category") || "").split(",").filter(Boolean),
           }}
           categories={categories}
-          availableTypes={availableTypes}
           availableBrands={availableBrands}
         />
-        
-       
+
+
       </div>
 
       <div className="mt-6 grid grid-cols-1 md:grid-cols-[280px_minmax(0,1fr)] gap-6">
@@ -103,13 +101,12 @@ export function CategoryClient({
             initial={{
               pmin: Number(sp.get("pmin") ?? 0),
               pmax: Number(sp.get("pmax") ?? 9999),
-              type: sp.get("type") || "",
+
               brands: (sp.get("brands") || "").split(",").filter(Boolean),
               category: (sp.get("category") || "").split(",").filter(Boolean),
             }}
             onApply={setParams}
             categories={categories}
-            availableTypes={availableTypes}
             availableBrands={availableBrands}
           />
         </aside>
@@ -131,14 +128,14 @@ export function CategoryClient({
               onSortChange={(v) => updateParam("sort", v)}
             />
           </div>
-          
+
           <ProductGrid
             products={filtered}
             view={view}
             pageSize={itemsPerPage}
             enableInfinite={true}
           />
-          <BottomNav/>
+          <BottomNav />
         </section>
       </div>
     </main>

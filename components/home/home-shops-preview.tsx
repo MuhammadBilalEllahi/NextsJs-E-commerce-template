@@ -7,7 +7,7 @@ export function HomeShopLocations({ shopLocation }: { shopLocation: ShopLocation
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mx-10 my-8">
       {shopLocation.map((c) => (
-      <div key={c._id}
+      <div key={c.id}
       className="relative group rounded-2xl border bg-white dark:bg-neutral-900 p-6 hover:shadow-xl transition-all duration-200">
           <img
             src={c.logo || "/placeholder.svg"}

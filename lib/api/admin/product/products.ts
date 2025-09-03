@@ -15,6 +15,10 @@ export interface Product {
   variants: any[];
   isActive: boolean;
   isOutOfStock: boolean;
+  isFeatured: boolean;
+  isTopSelling: boolean;
+  isNewArrival: boolean;
+  isBestSelling: boolean;
   slug: string;
   createdAt: string;
   updatedAt: string;

@@ -12,6 +12,7 @@ import Banner from "@/models/Banner";
 import GlobalSettings from "@/models/GlobalSettings";
 import { CACHE_EXPIRE_TIME,CACHE_BANNER_KEY, CACHE_BRANCH_KEY, CACHE_GLOBAL_SETTINGS_KEY } from "@/lib/cacheConstants";  
 import Branch from "@/models/Branches";
+import {  ProductTypeVariant, Variant as VariantType } from "@/mock_data/data";
 
 
 export async function getAllBranches(){
@@ -264,20 +265,21 @@ export async function getAllProducts() {
 export async function getProductBySlug(slug: string) {
   try {
     await dbConnect();
-    const product = await Product.findOne({ slug, isActive: true })
+    const product  = await Product.findOne({ slug, isActive: true })
       .populate("brand", "name")
       .populate("categories", "name")
       .populate("variants")
-      .lean();
+      .lean<ProductTypeVariant>(); 
+      // .lean();
     
     if (!product) return null;
     
     // Filter and sort variants: available first, then out-of-stock
-    const availableVariants = (product.variants || []).filter((variant: any) => 
+    const availableVariants: VariantType[]  = (product.variants || []).filter((variant: any) => 
       variant.isActive && !variant.isOutOfStock && variant.stock > 0
     );
     
-    const outOfStockVariants = (product.variants || []).filter((variant: any) => 
+    const outOfStockVariants: VariantType[]  = (product.variants || []).filter((variant: any) => 
       variant.isActive && (variant.isOutOfStock || variant.stock <= 0)
     );
     

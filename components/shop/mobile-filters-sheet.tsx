@@ -11,14 +11,12 @@ export function MobileFiltersSheet({
   initial,
   onApply,
   categories,
-  availableTypes,
   availableBrands,
 }: {
   slug: string
-  initial: { pmin: number; pmax: number; type: string; brands: string[]; category: string[] }
+  initial: { pmin: number; pmax: number; brands: string[]; category: string[] }
   onApply: (entries: Record<string, string | number | undefined | null>) => void
   categories: Category[]
-  availableTypes: string[]
   availableBrands: string[]
 }) {
   const [open, setOpen] = useState(false)
@@ -54,7 +52,7 @@ export function MobileFiltersSheet({
               setOpen(false)
             }}
             categories={categories}
-            availableTypes={availableTypes}
+            
             availableBrands={availableBrands}
           />
         </div>

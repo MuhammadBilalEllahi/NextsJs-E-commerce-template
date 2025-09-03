@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
         const shippingMethods = await ShippingMethod.find({ isActive: true }).lean()
         
         // Calculate shipping costs for each method
-        const methodsWithCosts = shippingMethods.map(method => {
+        const methodsWithCosts = shippingMethods.map((method: { defaultShippingFee: any; defaultTcsFee: any; defaultEstimatedDays: any; locations: any[]; freeShippingThreshold: number; _id: any; name: any; type: any; description: any; restrictions: any }) => {
             let shippingFee = method.defaultShippingFee
             let tcsFee = method.defaultTcsFee
             let estimatedDays = method.defaultEstimatedDays
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
             
             // Find specific location pricing
             if (city && method.locations) {
-                const location = method.locations.find(loc => 
+                const location = method.locations.find((loc: { city: string; isAvailable: any }) => 
                     loc.city.toLowerCase() === city.toLowerCase() && 
                     loc.isAvailable
                 )

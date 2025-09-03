@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getSamplePayments } from "@/mock_data/admin-sample"
 import { Button } from "@/components/ui/button"
 
-type Payment = { id: string; method: "COD"|"JazzCash"|"Easypaisa"|"Stripe"; status: "Paid"|"Failed"|"Refunded"; amount: number; date: string; orderId: string }
+type Payment = { id: string; method: string; status: string; amount: number; date: string; orderId: string }
 export default function PaymentsAdminPage() {
   const [logs, setLogs] = useState<Payment[]>(useMemo(()=>getSamplePayments(),[]))
   const approveRefund = (id:string)=> setLogs(prev=>prev.map(p=>p.id===id?{...p,status:"Refunded"}:p))

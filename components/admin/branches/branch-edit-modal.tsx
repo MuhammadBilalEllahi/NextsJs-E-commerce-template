@@ -69,14 +69,14 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
         postalCode: branch.postalCode,
         manager: branch.manager || "",
         openingHours: branch.openingHours || {
-      monday: { open: "09:00", close: "18:00", isOpen: true },
-      tuesday: { open: "09:00", close: "18:00", isOpen: true },
-      wednesday: { open: "09:00", close: "18:00", isOpen: true },
-      thursday: { open: "09:00", close: "18:00", isOpen: true },
-      friday: { open: "09:00", close: "18:00", isOpen: true },
-      saturday: { open: "09:00", close: "18:00", isOpen: true },
-      sunday: { open: "09:00", close: "18:00", isOpen: true }
-    },
+          monday: { open: "09:00", close: "18:00", isOpen: true },
+          tuesday: { open: "09:00", close: "18:00", isOpen: true },
+          wednesday: { open: "09:00", close: "18:00", isOpen: true },
+          thursday: { open: "09:00", close: "18:00", isOpen: true },
+          friday: { open: "09:00", close: "18:00", isOpen: true },
+          saturday: { open: "09:00", close: "18:00", isOpen: true },
+          sunday: { open: "09:00", close: "18:00", isOpen: true }
+        },
         description: branch.description || "",
         website: branch.website || "",
         whatsapp: branch.whatsapp || "",
@@ -100,9 +100,9 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
     setFormData(prev => ({
       ...prev,
       openingHours: {
-        ...prev.openingHours,
+        ...(prev.openingHours ?? {}),
         [day]: {
-          ...prev.openingHours[day],
+          ...(prev.openingHours?.[day] ?? { open: "09:00", close: "18:00", isOpen: true }),
           [field]: value
         }
       }
@@ -153,7 +153,7 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
 
     setIsSubmitting(true)
@@ -183,7 +183,15 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
         country: branch.country,
         postalCode: branch.postalCode,
         manager: branch.manager || "",
-        openingHours: branch.openingHours || "",
+        openingHours: branch.openingHours || {
+          monday: { open: "09:00", close: "18:00", isOpen: true },
+          tuesday: { open: "09:00", close: "18:00", isOpen: true },
+          wednesday: { open: "09:00", close: "18:00", isOpen: true },
+          thursday: { open: "09:00", close: "18:00", isOpen: true },
+          friday: { open: "09:00", close: "18:00", isOpen: true },
+          saturday: { open: "09:00", close: "18:00", isOpen: true },
+          sunday: { open: "09:00", close: "18:00", isOpen: true }
+        },
         description: branch.description || "",
         website: branch.website || "",
         whatsapp: branch.whatsapp || "",
@@ -241,7 +249,7 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
               <MapPin className="h-5 w-5" />
               Address Information
             </h3>
-            
+
             <div className="space-y-2">
               <Label htmlFor="address">Full Address *</Label>
               <Textarea
@@ -258,7 +266,7 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <CitySelect
-                  value={formData.city}
+                  value={formData.city ?? "Lahore"}
                   onChange={(value) => handleInputChange("city", value)}
                   placeholder="Select a city"
                 />
@@ -321,7 +329,7 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
               <Phone className="h-5 w-5" />
               Contact Information
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber">Phone Number *</Label>
@@ -381,7 +389,7 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
               <Building2 className="h-5 w-5" />
               Additional Information
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="manager">Manager</Label>
@@ -396,7 +404,7 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
               <div className="space-y-2">
                 <Label>Opening Hours</Label>
                 <div className="space-y-3">
-                  {Object.entries(formData.openingHours).map(([day, hours]) => (
+                  {Object.entries(formData.openingHours ?? {}).map(([day, hours]) => (
                     <div key={day} className="flex items-center gap-3 p-3 border rounded-lg">
                       <Checkbox
                         id={`${day}_isOpen`}
@@ -444,7 +452,7 @@ export function BranchEditModal({ branch, open, onOpenChange, onSubmit }: Branch
           {/* Logo Upload */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Branch Logo</h3>
-            
+
             <div className="space-y-2">
               <Label htmlFor="logo">Update Logo (Optional)</Label>
               <Input

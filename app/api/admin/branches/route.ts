@@ -10,12 +10,12 @@ export async function GET(req: Request) {
         const limit = parseInt(searchParams.get('limit') || '10');
         const search = searchParams.get('search') || '';
         const isActive = searchParams.get('isActive');
-        
+
         const skip = (page - 1) * limit;
-        
+
         // Build query
         let query: any = {};
-        
+
         if (search) {
             query.$or = [
                 { name: { $regex: search, $options: 'i' } },
@@ -24,11 +24,11 @@ export async function GET(req: Request) {
                 { branchNumber: { $regex: search, $options: 'i' } }
             ];
         }
-        
+
         if (isActive !== null && isActive !== undefined) {
             query.isActive = isActive === 'true';
         }
-        
+
         // Execute query with pagination
         const [branches, total] = await Promise.all([
             Branches.find(query)
@@ -38,7 +38,7 @@ export async function GET(req: Request) {
                 .lean(),
             Branches.countDocuments(query)
         ]);
-        
+
         return NextResponse.json({
             branches,
             pagination: {
@@ -57,12 +57,12 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     const session = await mongoose.startSession();
     session.startTransaction();
-    
+
     try {
         const body = await req.formData();
 
         // console.log("POST BRANCH",body);
-        
+
         // Validate required fields
         const requiredFields = ['name', 'address', 'phoneNumber', 'email', 'branchNumber', 'location', 'city', 'state', 'postalCode'];
         for (const field of requiredFields) {
@@ -71,20 +71,20 @@ export async function POST(req: Request) {
                 return NextResponse.json({ error: `${field} is required` }, { status: 400 });
             }
         }
-        
+
         // Check if branch number already exists
         const existingBranch = await Branches.findOne({ branchNumber: body.get("branchNumber") }).session(session);
         if (existingBranch) {
             await session.abortTransaction();
             return NextResponse.json({ error: "Branch number already exists" }, { status: 400 });
         }
-        
+
         // Check if logo is provided
         if (!body.get("logo")) {
             await session.abortTransaction();
             return NextResponse.json({ error: "Logo is required" }, { status: 400 });
         }
-        
+
         // Create branch data first (without logo)
         const branchData: any = {
             name: body.get("name"),
@@ -99,7 +99,15 @@ export async function POST(req: Request) {
             postalCode: body.get("postalCode"),
             manager: body.get("manager") || "",
             logo: "", // Temporary empty string
-            openingHours: {
+
+            description: body.get("description") || "",
+            website: body.get("website") || "",
+            whatsapp: body.get("whatsapp") || "",
+            isActive: body.get("isActive") === "true"
+        };
+
+        if (branchData.openingHours) {
+            branchData.openingHours = {
                 monday: {
                     open: body.get("monday_open") || "09:00",
                     close: body.get("monday_close") || "18:00",
@@ -135,13 +143,8 @@ export async function POST(req: Request) {
                     close: body.get("sunday_close") || "18:00",
                     isOpen: body.get("sunday_isOpen") === "true"
                 }
-            },
-            description: body.get("description") || "",
-            website: body.get("website") || "",
-            whatsapp: body.get("whatsapp") || "",
-            isActive: body.get("isActive") === "true"
-        };
-        
+            };
+        }
         // Handle coordinates if provided
         const latitude = body.get("latitude");
         const longitude = body.get("longitude");
@@ -151,30 +154,30 @@ export async function POST(req: Request) {
                 longitude: parseFloat(longitude as string)
             };
         }
-        
+
         // Create branch first
         const branch = await Branches.create([branchData], { session }).then(res => res[0]);
-        
+
         if (!branch) {
             await session.abortTransaction();
             return NextResponse.json({ error: "Failed to create branch" }, { status: 500 });
         }
-        
+
         // Upload logo with the actual branch ID
         const logo = body.get("logo") as File;
         const uploadedFiles = await uploaderFiles("branches", logo, branch._id);
-        
+
         // Update branch with logo URL
         branch.logo = uploadedFiles[0].url;
         await branch.save({ session });
-        
+
         await session.commitTransaction();
-        
-        return NextResponse.json({ 
-            message: "Branch created successfully", 
-            branch 
+
+        return NextResponse.json({
+            message: "Branch created successfully",
+            branch
         }, { status: 201 });
-        
+
     } catch (error) {
         await session.abortTransaction();
         console.error("Error creating branch:", error);
@@ -187,37 +190,37 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
     const session = await mongoose.startSession();
     session.startTransaction();
-    
+
     try {
         const body = await req.formData();
         const branchId = body.get("id");
-        
+
         if (!branchId) {
             await session.abortTransaction();
             return NextResponse.json({ error: "Branch ID is required" }, { status: 400 });
         }
-        
+
         // Check if branch exists
         const existingBranch = await Branches.findById(branchId).session(session);
         if (!existingBranch) {
             await session.abortTransaction();
             return NextResponse.json({ error: "Branch not found" }, { status: 404 });
         }
-        
+
         // Check if new branch number conflicts with existing ones
         const newBranchNumber = body.get("branchNumber");
         if (newBranchNumber && newBranchNumber !== existingBranch.branchNumber) {
-            const conflictBranch = await Branches.findOne({ 
-                branchNumber: newBranchNumber, 
-                _id: { $ne: branchId } 
+            const conflictBranch = await Branches.findOne({
+                branchNumber: newBranchNumber,
+                _id: { $ne: branchId }
             }).session(session);
-            
+
             if (conflictBranch) {
                 await session.abortTransaction();
                 return NextResponse.json({ error: "Branch number already exists" }, { status: 400 });
             }
         }
-        
+
         // Update branch data
         const updateData: any = {
             name: body.get("name") || existingBranch.name,
@@ -273,7 +276,7 @@ export async function PUT(req: Request) {
             whatsapp: body.get("whatsapp") || existingBranch.whatsapp,
             isActive: body.get("isActive") !== null ? body.get("isActive") === "true" : existingBranch.isActive
         };
-        
+
         // Handle coordinates
         const latitude = body.get("latitude");
         const longitude = body.get("longitude");
@@ -283,14 +286,14 @@ export async function PUT(req: Request) {
                 longitude: parseFloat(longitude as string)
             };
         }
-        
+
         // Update branch
         const updatedBranch = await Branches.findByIdAndUpdate(
             branchId,
             updateData,
             { new: true, session }
         );
-        
+
         // Handle logo update if provided
         if (body.get("logo")) {
             const logo = body.get("logo");
@@ -300,14 +303,14 @@ export async function PUT(req: Request) {
                 await updatedBranch.save({ session });
             }
         }
-        
+
         await session.commitTransaction();
-        
-        return NextResponse.json({ 
-            message: "Branch updated successfully", 
-            branch: updatedBranch 
+
+        return NextResponse.json({
+            message: "Branch updated successfully",
+            branch: updatedBranch
         });
-        
+
     } catch (error) {
         await session.abortTransaction();
         console.error("Error updating branch:", error);
@@ -320,30 +323,30 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
     const session = await mongoose.startSession();
     session.startTransaction();
-    
+
     try {
         const body = await req.formData();
         const branchId = body.get("id");
-        
+
         if (!branchId) {
             await session.abortTransaction();
             return NextResponse.json({ error: "Branch ID is required" }, { status: 400 });
         }
-        
+
         const branch = await Branches.findByIdAndDelete(branchId, { session });
-        
+
         if (!branch) {
             await session.abortTransaction();
             return NextResponse.json({ error: "Branch not found" }, { status: 404 });
         }
-        
+
         await session.commitTransaction();
-        
-        return NextResponse.json({ 
-            message: "Branch deleted successfully", 
-            branch 
+
+        return NextResponse.json({
+            message: "Branch deleted successfully",
+            branch
         });
-        
+
     } catch (error) {
         await session.abortTransaction();
         console.error("Error deleting branch:", error);

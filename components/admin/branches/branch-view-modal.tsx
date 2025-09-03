@@ -4,14 +4,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Branch } from "@/lib/api/admin/branches/branches"
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Building2, 
-  User, 
-  Clock, 
-  Globe, 
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Building2,
+  User,
+  Clock,
+  Globe,
   MessageCircle,
   Calendar,
   Navigation
@@ -86,36 +86,36 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
               <MapPin className="h-5 w-5 text-blue-600" />
               Address Information
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Full Address</Label>
                   <p className="text-gray-900">{branch.address}</p>
                 </div>
-                
+
                 <div>
                   <Label className="text-sm font-medium text-gray-600">City</Label>
                   <p className="text-gray-900">{branch.city}</p>
                 </div>
-                
+
                 <div>
                   <Label className="text-sm font-medium text-gray-600">State</Label>
                   <p className="text-gray-900">{branch.state}</p>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Country</Label>
                   <p className="text-gray-900">{branch.country}</p>
                 </div>
-                
+
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Postal Code</Label>
                   <p className="text-gray-900">{branch.postalCode}</p>
                 </div>
-                
+
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Location/Area</Label>
                   <p className="text-gray-900">{branch.location}</p>
@@ -150,7 +150,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
               <Phone className="h-5 w-5 text-green-600" />
               Contact Information
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <div>
@@ -160,12 +160,12 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                     {branch.phoneNumber}
                   </p>
                 </div>
-                
+
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Email</Label>
                   <p className="text-gray-900 flex items-center gap-2">
                     <Mail className="h-4 w-4" />
-                    <a 
+                    <a
                       href={`mailto:${branch.email}`}
                       className="text-blue-600 hover:underline"
                     >
@@ -174,7 +174,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                   </p>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 {branch.whatsapp && (
                   <div>
@@ -185,13 +185,13 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                     </p>
                   </div>
                 )}
-                
+
                 {branch.website && (
                   <div>
                     <Label className="text-sm font-medium text-gray-600">Website</Label>
                     <p className="text-gray-900 flex items-center gap-2">
                       <Globe className="h-4 w-4" />
-                      <a 
+                      <a
                         href={branch.website}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -214,7 +214,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
               <Building2 className="h-5 w-5 text-purple-600" />
               Additional Information
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 {branch.manager && (
@@ -226,7 +226,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                     </p>
                   </div>
                 )}
-                
+
                 {branch.openingHours && (
                   <div>
                     <Label className="text-sm font-medium text-gray-600">Opening Hours</Label>
@@ -243,7 +243,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                   </div>
                 )}
               </div>
-              
+
               <div className="space-y-3">
                 {branch.description && (
                   <div>
@@ -263,13 +263,13 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
               <Calendar className="h-5 w-5 text-gray-600" />
               Timestamps
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label className="text-sm font-medium text-gray-600">Created</Label>
                 <p className="text-gray-900">{formatDate(branch.createdAt)}</p>
               </div>
-              
+
               <div>
                 <Label className="text-sm font-medium text-gray-600">Last Updated</Label>
                 <p className="text-gray-900">{formatDate(branch.updatedAt)}</p>
@@ -290,7 +290,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                   Call Branch
                 </a>
               )}
-              
+
               {branch.email && (
                 <a
                   href={`mailto:${branch.email}`}
@@ -300,7 +300,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                   Send Email
                 </a>
               )}
-              
+
               {branch.whatsapp && (
                 <a
                   href={`https://wa.me/${branch.whatsapp.replace(/\D/g, '')}`}
@@ -312,7 +312,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                   WhatsApp
                 </a>
               )}
-              
+
               {branch.coordinates && (
                 <a
                   href={`https://www.google.com/maps?q=${branch.coordinates.latitude},${branch.coordinates.longitude}`}

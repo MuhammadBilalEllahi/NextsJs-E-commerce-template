@@ -12,10 +12,10 @@ export function HomeCategories({ categories }: { categories: Category[] }) {
         >
           <img
             src={c.image || "/placeholder.svg"}
-            alt={c.title}
+            alt={c.name}
             className="mx-auto h-24 w-24 object-cover rounded-xl ring-1 ring-black/5"
           />
-          <div className="mt-3 text-center font-medium group-hover:text-red-600">{c.title}</div>
+          <div className="mt-3 text-center font-medium group-hover:text-red-600">{c.name}</div>
         </Link>
       ))}
     </div>

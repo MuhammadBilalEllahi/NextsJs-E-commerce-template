@@ -63,9 +63,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
     setFormData(prev => ({
       ...prev,
       openingHours: {
-        ...prev.openingHours,
+        ...(prev.openingHours ?? {}),
         [day]: {
-          ...prev.openingHours[day],
+          ...(typeof prev.openingHours?.[day] === "object" && prev.openingHours[day] !== null ? prev.openingHours[day] : { open: "", close: "", isOpen: true }),
           [field]: value
         }
       }
@@ -393,7 +393,7 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
               <div className="space-y-2 w-full">
                 <Label>Opening Hours</Label>
                 <div className="space-y-3">
-                  {Object.entries(formData.openingHours).map(([day, hours]) => (
+                  {Object.entries(formData.openingHours?? {}).map(([day, hours]) => (
                     <div key={day} className="flex items-center gap-3 p-3 border rounded-lg w-full">
                       <Checkbox
                         id={`${day}_isOpen`}

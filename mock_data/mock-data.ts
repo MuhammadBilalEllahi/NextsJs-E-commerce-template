@@ -2,7 +2,7 @@ export type Category = {
   id: string,
   name: string,
   slug: string,
-  parent: string,
+  parent:  { id: string; name: string } | null,
   description: string,
   image: string,
   isActive: boolean,

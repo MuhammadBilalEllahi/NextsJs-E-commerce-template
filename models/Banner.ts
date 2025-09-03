@@ -22,7 +22,7 @@ const BannerSchema = new Schema({
 export const zodBannerSchema = z.object({
     title: z.string().optional(),//.min(1, "Title is required"),
     description: z.string().optional(),//.min(1, "Description is required"),
-    // image: z.string().min(1, "Image is required"),
+    image: z.string().min(1, "Image is required"),
     link: z.string().optional(),
     isActive: z.boolean().default(true),
     expiresAt: z.date().optional(),//.default(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
@@ -30,8 +30,10 @@ export const zodBannerSchema = z.object({
     showDescription: z.boolean().default(false),
     showLink: z.boolean().default(false),
     mimeType: z.string().optional(),
-    timeout: z.number().optional() // Individual banner timeout in milliseconds
+    timeout: z.number().optional(), // Individual banner timeout in milliseconds
 })
+
+
 
 BannerSchema.pre("save", function (next) {
     // if (!this.expiresAt) {

@@ -68,23 +68,59 @@ export type Review = {
 }
 
 export type Product = {
-  id: number
+  id: string | number
   slug: string
   title: string
   description: string
   price: number
   images: string[]
   rating: number
-  spiceLevel: number // 1-5
-  vegetarian: boolean
   ingredients: string
   instructions: string
   category: string
   brand: string
   stock: number
   tags?: string[]
-  reviews: Review[]
+  reviews?: Review[]
 }
+
+export type Variant = {
+  _id: string;
+  label: string;
+  price: number;
+  stock: number;
+  isActive: boolean;
+  isOutOfStock: boolean;
+  images: string[];
+}
+
+export type Categories ={
+  _id: string,
+  name: string
+}
+export type Brand = {
+  _id: string,
+  name: string
+}
+export interface ProductTypeVariant {
+
+  _id: string | number
+  slug: string
+  name: string
+  description: string
+  price: number
+  images: string[]
+  ratingAvg: number
+  ingredients: string
+  instructions: string
+  categories: Categories[]
+  brand: Brand
+  stock: number
+  tags?: string[]
+  reviews: Review[]
+  variants?: Variant[];
+}
+
 
 const products: Product[] = [
   {
@@ -100,8 +136,6 @@ const products: Product[] = [
       "/kashmiri-mirch-alt-2.png",
     ],
     rating: 4.6,
-    spiceLevel: 3,
-    vegetarian: true,
     ingredients: "100% Kashmiri red chili.",
     instructions:
       "Use 1-2 tsp for curries and gravies. Store in an airtight container away from moisture and sunlight.",
@@ -139,8 +173,6 @@ const products: Product[] = [
       "/garam-masala-alt-1.png",
     ],
     rating: 4.7,
-    spiceLevel: 2,
-    vegetarian: true,
     ingredients:
       "Coriander, cumin, cinnamon, cloves, cardamom, black pepper, bay leaf, nutmeg.",
     instructions:
@@ -171,8 +203,6 @@ const products: Product[] = [
       "/cumin-seeds-alt-1.png",
     ],
     rating: 4.5,
-    spiceLevel: 1,
-    vegetarian: true,
     ingredients: "100% cumin seeds.",
     instructions:
       "Toast lightly in oil or ghee until aromatic. Store cool and dry.",
@@ -193,8 +223,6 @@ const products: Product[] = [
       "/chaat-masala-main.png",
     ],
     rating: 4.3,
-    spiceLevel: 2,
-    vegetarian: true,
     ingredients: "Cumin, coriander, black salt, amchur, pepper, chili.",
     instructions: "Sprinkle to taste. Great on raita and chaats.",
     category: "mixes",
@@ -214,8 +242,6 @@ const products: Product[] = [
       "/vibrant-turmeric.png",
     ],
     rating: 4.8,
-    spiceLevel: 1,
-    vegetarian: true,
     ingredients: "100% turmeric.",
     instructions:
       "Use 1/4-1/2 tsp to color curries and rice. Avoid staining surfaces.",
@@ -237,8 +263,6 @@ const products: Product[] = [
       "/mango-pickle-alt.png",
     ],
     rating: 4.4,
-    spiceLevel: 4,
-    vegetarian: true,
     ingredients:
       "Raw mango, mustard oil, chili, fenugreek, fennel, salt, spices.",
     instructions:

@@ -142,10 +142,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   const handleAddToCart = () => {
     if (isAdding) return;
-    
+
     // For products with variants, require variant selection
     if (hasVariants && !selectedVariant) return;
-    
+
     // For products with variants, use variant data
     if (hasVariants && selectedVariant) {
       add(
@@ -198,14 +198,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <AddToWishlistButton productId={String(product.id)} />
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+          {product?.reviews?.length && <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
             <div className="inline-flex items-center gap-1">
               <Star className="h-4 w-4 text-yellow-500" />
               <span>{product.rating.toFixed(1)}</span>
               <span className="opacity-70">({product.reviews.length})</span>
             </div>
 
-          </div>
+          </div>}
 
           <div className="mt-4 text-3xl font-extrabold text-red-600">
             {formatCurrency(currentPrice)}
@@ -375,7 +375,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 <AccordionTrigger className="text-left">
                   Customer Reviews
                 </AccordionTrigger>
-                <AccordionContent>
+                {product?.reviews && <AccordionContent>
                   <ReviewsEnhanced
                     productId={String(product.id)}
                     initialReviews={product.reviews.map(review => ({
@@ -387,7 +387,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                       date: review.date
                     }))}
                   />
-                </AccordionContent>
+                </AccordionContent>}
               </AccordionItem>
 
               <AccordionItem value="quality-promise">

@@ -2,6 +2,33 @@ import { useState } from "react";
 
 const API_URL_BRANCHES = "/api/admin/branches";
 
+type Day =
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday";
+
+interface DayHours {
+  open: string;
+  close: string;
+  isOpen: boolean;
+}
+
+type OpeningHours = Record<Day, DayHours>;
+
+// type OpeningHours = {
+//   monday?: DayHours;
+//   tuesday?: DayHours;
+//   wednesday?: DayHours;
+//   thursday?: DayHours;
+//   friday?: DayHours;
+//   saturday?: DayHours;
+//   sunday?: DayHours;
+// };
+
 export interface Branch {
   _id: string;
   name: string;
@@ -17,15 +44,16 @@ export interface Branch {
   country: string;
   postalCode: string;
   manager?: string;
-  openingHours: {
-    monday: { open: string; close: string; isOpen: boolean };
-    tuesday: { open: string; close: string; isOpen: boolean };
-    wednesday: { open: string; close: string; isOpen: boolean };
-    thursday: { open: string; close: string; isOpen: boolean };
-    friday: { open: string; close: string; isOpen: boolean };
-    saturday: { open: string; close: string; isOpen: boolean };
-    sunday: { open: string; close: string; isOpen: boolean };
-  };
+  openingHours?: OpeningHours;
+  // openingHours: {
+  //   monday: { open: string; close: string; isOpen: boolean };
+  //   tuesday: { open: string; close: string; isOpen: boolean };
+  //   wednesday: { open: string; close: string; isOpen: boolean };
+  //   thursday: { open: string; close: string; isOpen: boolean };
+  //   friday: { open: string; close: string; isOpen: boolean };
+  //   saturday: { open: string; close: string; isOpen: boolean };
+  //   sunday: { open: string; close: string; isOpen: boolean };
+  // };
   description?: string;
   coordinates?: {
     latitude: number;
@@ -49,14 +77,14 @@ export interface CreateBranchData {
   country?: string;
   postalCode: string;
   manager?: string;
-  openingHours: {
-    monday: { open: string; close: string; isOpen: boolean };
-    tuesday: { open: string; close: string; isOpen: boolean };
-    wednesday: { open: string; close: string; isOpen: boolean };
-    thursday: { open: string; close: string; isOpen: boolean };
-    friday: { open: string; close: string; isOpen: boolean };
-    saturday: { open: string; close: string; isOpen: boolean };
-    sunday: { open: string; close: string; isOpen: boolean };
+  openingHours?: {
+    monday?: { open: string; close: string; isOpen: boolean };
+    tuesday?: { open: string; close: string; isOpen: boolean };
+    wednesday?: { open: string; close: string; isOpen: boolean };
+    thursday?: { open: string; close: string; isOpen: boolean };
+    friday?: { open: string; close: string; isOpen: boolean };
+    saturday?: { open: string; close: string; isOpen: boolean };
+    sunday?: { open: string; close: string; isOpen: boolean };
   };
   description?: string;
   coordinates?: {
@@ -134,11 +162,13 @@ export const createBranch = async (branchData: CreateBranchData): Promise<Branch
     if (branchData.country) formData.append("country", branchData.country);
     if (branchData.manager) formData.append("manager", branchData.manager);
     // Handle opening hours - send each day's data separately
-    Object.entries(branchData.openingHours).forEach(([day, hours]) => {
+   if(branchData.openingHours){
+     Object.entries(branchData.openingHours).forEach(([day, hours]) => {
       formData.append(`${day}_open`, hours.open);
       formData.append(`${day}_close`, hours.close);
       formData.append(`${day}_isOpen`, hours.isOpen.toString());
     });
+   }
     if (branchData.description) formData.append("description", branchData.description);
     if (branchData.website) formData.append("website", branchData.website);
     if (branchData.whatsapp) formData.append("whatsapp", branchData.whatsapp);

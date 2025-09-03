@@ -1,13 +1,14 @@
 // lib/RedisClient.ts
 import Redis from 'ioredis';
+import type { Redis as RedisType } from 'ioredis';
 
 class RedisClient {
 
-  private static instance: Redis.Redis;
+  private static instance: RedisType;
 
-  private constructor() {}
+  private constructor() { }
 
-  private static getClient(): Redis.Redis {
+  private static getClient(): RedisType {
     if (!RedisClient.instance) {
       // console.log('Creating new Redis client', process.env.REDIS_URL);
       RedisClient.instance = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
