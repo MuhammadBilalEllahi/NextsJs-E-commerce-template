@@ -157,7 +157,7 @@ export function ProductCard({
   }
 
   return (
-    <div className={cn("p-1 mb-auto group rounded-md border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition relative", className)}>
+    <div className={cn("p-1  mb-auto group rounded-md border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition relative", className)}>
       {/* Variant labels overlay - shown on hover */}
       {product.variants && product.variants.length > 0 && (
         <div className="absolute top-2 left-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -174,11 +174,11 @@ export function ProductCard({
         </div>
       )}
 
-      <Link href={`/product/${product.slug}`} className="block">
+      <Link href={`/product/${product.slug}`} className="block ">
         <img
           src={getDisplayImage()}
           alt={product.title}
-          className="h-44 w-full rounded-sm object-cover group-hover:scale-[1.01] transition-transform"
+          className="h-44 w-full rounded-sm object-contain dark:bg-neutral-900 bg-neutral-100 group-hover:scale-[1.01] transition-transform"
         />
       </Link>
       <div className="p-1">
@@ -215,9 +215,13 @@ export function ProductCard({
           )}
         </div>
         <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
-          Brand: {product.brand}
+          Brand: {product?.brand ? product?.brand : <i>dehli mirch</i>}
         </div>
-        <div className="font-bold text-red-600">Rs.{product.price}</div>
+        {/* {product?.brand && <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+          Brand: {product.brand}
+        </div>} */}
+
+        <div className="font-bold text-red-600 mt-auto">Rs.{product.price}</div>
 
         <div className="mt-2 flex items-center justify-between">
 

@@ -70,9 +70,9 @@ export function HomeFeaturedProducts({
         {products.map((p) => (
           <div
             key={p.id}
-            className="min-w-[260px] md:min-w-[280px] snap-start animate-fadeIn "
+            className=" snap-start animate-fadeIn "
           >
-            <ProductCard product={p}  />
+            <ProductCard product={p} className="w-72 "  />
           </div>
         ))}
       </div>
