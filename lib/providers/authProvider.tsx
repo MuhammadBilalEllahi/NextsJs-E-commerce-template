@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { signIn, signOut, useSession } from "next-auth/react"
+import { getSession, signIn, signOut, useSession } from "next-auth/react"
 import { handleCartMergeOnAuth } from "@/middlewares/cartMerge"
 
 export interface User {
@@ -59,6 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await handleCartMergeOnAuth(user.id)
         return { success: true, user }
       }
+      // Wait for session to update
+    const session = await getSession()
 
       return { success: false, error: "Login fkailed" }
           } catch (error) {
@@ -79,21 +81,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
 
       const data = await response.json()
+if (response.ok) {
+  const loginResult = await signIn("credentials", {
+    email,
+    password,
+    redirect: false,
+  })
 
-      if (response.ok) {
-        // After successful registration, sign in the user
-        const loginResult = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
-        })
+  if (loginResult?.ok) {
+    // Force session refresh
+    const sessionResponse = await fetch("/api/auth/session")
+    const sessionData = await sessionResponse.json()
+    
+    // Wait for session to update
+    const session = await getSession()
 
-        if (loginResult?.ok && user) {
-          // Merge guest cart with user cart if guest cart exists
-          await handleCartMergeOnAuth(user.id)
-          return { success: true, user }
-        }
-      }
+    if (sessionData?.user?.id) {
+      await handleCartMergeOnAuth(sessionData.user.id)
+      return { success: true, user: sessionData.user }
+    }
+  }
+}
+
+      // if (response.ok) {
+      //   // After successful registration, sign in the user
+      //   const loginResult = await signIn("credentials", {
+      //     email,
+      //     password,
+      //     redirect: false,
+      //   })
+
+      //   if (loginResult?.ok && user) {
+      //     // Merge guest cart with user cart if guest cart exists
+      //     await handleCartMergeOnAuth(user.id)
+      //     return { success: true, user }
+      //   }
+      // }
 
       return { success: false, error: data.error || "Registration failed" }
           } catch (error) {
