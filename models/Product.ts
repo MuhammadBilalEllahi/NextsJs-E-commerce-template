@@ -10,6 +10,7 @@ const ProductSchema = new Schema({
   description: String,
   ingredients: String, // New field for ingredients and nutritional info
   price: { type: Number, required: true },
+  stock: { type: Number, default: 0 },
   discount: { type: Number, default: 0 }, // percentage
   categories: [{ type: mongoose.Schema.Types.ObjectId, ref: MODELS.CATEGORY }],
   images: [String],
@@ -53,6 +54,7 @@ export const productZodSchema = z.object({
   description: z.string().optional(),
   ingredients: z.string().optional(), // New field for ingredients
   price: z.number().positive("Price must be greater than 0"),
+  stock: z.number().int().nonnegative(),
   discount: z.number().min(0).max(100).optional(),
   categories: z.array(z.string()).optional(), // ObjectIds as strings
   images: z.array(z.string().url()).optional(),
@@ -62,7 +64,7 @@ export const productZodSchema = z.object({
     slug: z.string().optional(),
     label: z.string().optional(),
     price: z.number(),
-    stock: z.number(),
+    stock: z.number().int().nonnegative(),
     discount: z.number().optional()
   })).optional(), // list of Variant objects
   isActive: z.boolean().optional(),

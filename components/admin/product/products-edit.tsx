@@ -35,6 +35,7 @@ type Product = {
   description: string;
   ingredients?: string;
   price: number;
+  stock: number;
   discount: number;
   brand: { _id: string; name: string };
   categories: { _id: string; name: string }[];
@@ -69,6 +70,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
     description: product.description,
     ingredients: product.ingredients || "",
     price: product.price,
+    stock: product.stock,
     discount: product.discount || 0,
     brand: product.brand?._id || "",
     categories: product.categories?.map(c => c._id) || [],
@@ -85,6 +87,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
     description: string;
     ingredients: string;
     price: number;
+    stock: number;
     discount: number;
     brand: string;
     categories: string[];
@@ -141,6 +144,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
       formData.append("description", form.description);
       formData.append("ingredients", form.ingredients);
       formData.append("price", form.price.toString());
+      formData.append("stock", form.stock.toString());
       formData.append("discount", form.discount.toString());
       formData.append("slug", form.slug);
       formData.append("isActive", form.isActive.toString());
@@ -433,10 +437,25 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
               <Input 
                 id="price"
                 type="number" 
-                step="0.01" 
+                  step="1" 
                 placeholder="Price" 
                 value={form.price || ""} 
                 onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} 
+              />
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="stock">Stock</Label>
+              <Input 
+                id="stock"
+                type="number" 
+                step="1" 
+                min="0" 
+                placeholder="Stock" 
+                value={form.stock || ""} 
+                onChange={e => setForm(f => ({ ...f, stock: Number(e.target.value) }))} 
               />
             </div>
           </div>
@@ -449,7 +468,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
                 type="number" 
                 min="0"
                 max="100"
-                step="0.01" 
+                step="1" 
                 placeholder="0" 
                 value={form.discount || ""} 
                 onChange={e => setForm(f => ({ ...f, discount: Number(e.target.value) }))} 
@@ -899,7 +918,8 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
                   <Input 
                     id="variant-price"
                     type="number" 
-                    step="0.01" 
+                    min="0"
+                    step="1" 
                     placeholder="0.00" 
                     value={editingVariant.price || ""} 
                     onChange={e => setEditingVariant(prev => prev ? { ...prev, price: Number(e.target.value) } : prev)} 
@@ -911,6 +931,8 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
                   <Input 
                     id="variant-stock"
                     type="number" 
+                    min="0"
+                    step="1" 
                     placeholder="0" 
                     value={editingVariant.stock || ""} 
                     onChange={e => setEditingVariant(prev => prev ? { ...prev, stock: Number(e.target.value) } : prev)} 
@@ -924,7 +946,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
                     type="number" 
                     min="0"
                     max="100"
-                    step="0.01" 
+                    step="1" 
                     placeholder="0" 
                     value={editingVariant.discount || ""} 
                     onChange={e => setEditingVariant(prev => prev ? { ...prev, discount: Number(e.target.value) } : prev)} 

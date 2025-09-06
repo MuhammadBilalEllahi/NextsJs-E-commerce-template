@@ -8,6 +8,7 @@ export interface Product {
   description: string;
   ingredients?: string;
   price: number;
+  stock: number;
   discount: number;
   brand: { _id: string; name: string };
   categories: { _id: string; name: string }[];
@@ -29,6 +30,7 @@ export interface CreateProductData {
   description: string;
   ingredients?: string;
   price: number;
+  stock: number;
   discount: number;
   brand: string;
   categories: string[];
@@ -77,6 +79,7 @@ export const createProduct = async (productData: CreateProductData): Promise<Pro
     if (productData.description) formData.append("description", productData.description);
     if (productData.ingredients) formData.append("ingredients", productData.ingredients);
     if (productData.price) formData.append("price", productData.price.toString());
+    if (productData.stock) formData.append("stock", productData.stock.toString());
     if (productData.discount) formData.append("discount", productData.discount.toString());
     if (productData.brand) formData.append("brand", productData.brand);
     if (productData.slug) formData.append("slug", productData.slug);
@@ -100,8 +103,13 @@ export const createProduct = async (productData: CreateProductData): Promise<Pro
           if (productData.variants) {
         // send variants metadata and files
         formData.append("variants", JSON.stringify(productData.variants.map(v => ({
-          sku: v.sku, slug: v.slug, label: v.label, price: v.price, stock: v.stock, discount: v.discount
+          sku: v.sku, slug: v.slug, label: v.label, price: v.price, stock: v.stock || 0, discount: v.discount || 0
         }))))
+        productData.variants.forEach((v, vi) => {
+          v.images?.forEach((file: File, i: number) => {
+            formData.append(`variantsImages[${vi}][images][${i}]`, file);
+          });
+        });
       }
     // console.log("[createProduct] formData:", formData);
     

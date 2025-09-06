@@ -26,6 +26,7 @@ type Product = {
   description: string;
   ingredients?: string;
   price: number;
+  stock: number;
   discount: number;
   brand: { _id: string; name: string };
   categories: { _id: string; name: string }[];
@@ -201,6 +202,11 @@ export default function ProductsViewAdminUI({ product, onClose, onEdit }: Produc
                 </div>
                 
                 <div>
+                  <label className="text-sm font-medium text-muted-foreground">Stock</label>
+                  <p className="text-lg font-semibold">{product.stock}</p>
+                </div>
+                
+                <div>
                   <label className="text-sm font-medium text-muted-foreground">Status</label>
                   <div className="flex items-center gap-2">
                     <Badge variant={product.isActive ? "default" : "secondary"}>
@@ -334,6 +340,11 @@ export default function ProductsViewAdminUI({ product, onClose, onEdit }: Produc
                           Final: {formatCurrency(calculateDiscountedPrice(variant?.price || 0, variant?.discount || 0))}
                         </p>
                       )}
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Stock</label>
+                      <p className="text-lg font-semibold">{variant.stock}</p>
                     </div>
                     
                     <div>

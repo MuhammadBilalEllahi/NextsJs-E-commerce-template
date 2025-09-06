@@ -16,6 +16,7 @@ import { mkdir, writeFile } from "fs/promises";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import path from "path";
+import { uploaderFiles } from "@/lib/utils/imageUploader/awsImageUploader";
 // ============================
 //  CREATE PRODUCT
 // ============================
@@ -27,11 +28,14 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
 
+    console.log("formData", formData);
+
     const raw = {
       name: formData.get("name")?.toString(),
       description: formData.get("description")?.toString() ?? "",
       ingredients: formData.get("ingredients")?.toString() ?? "",
       price: Number(formData.get("price")),
+      stock: Number(formData.get("stock")),
       discount: Number(formData.get("discount") || 0),
       categories: formData.getAll("categories").map(c => c.toString()),
       brand: formData.get("brand")?.toString(),
@@ -44,10 +48,12 @@ export async function POST(req: Request) {
 
     const parsed = productZodSchema.safeParse(raw);
     if (!parsed.success) {
+      console.log(parsed.error);
+      console.log("parsed", parsed);
       return NextResponse.json({ error: parsed.error.message }, { status: 400 });
     }
 
-    let { name, description, ingredients, price, discount, categories, brand, slug, variants, isActive, isOutOfStock } = parsed.data;
+    let { name, description, ingredients, price, stock, discount, categories, brand, slug, variants, isActive, isOutOfStock } = parsed.data;
 
     if (!slug) {
       slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
@@ -63,7 +69,7 @@ export async function POST(req: Request) {
     }
 
     const newProduct = await Product.create(
-      [{ name, description, ingredients, price, discount, slug, categories, isActive, isOutOfStock }],
+      [{ name, description, ingredients, price, stock, discount, slug, categories, isActive, isOutOfStock }],
       { session }
     ).then(res => res[0]);
 
@@ -143,23 +149,42 @@ export async function POST(req: Request) {
     if (variants && variants.length > 0) {
       for (let i = 0; i < variants.length; i++) {
         const v = variants[i];
-        const variantImageFiles = formData.getAll(`variantImages[${i}]`) as File[];
-        const uploadedVariantImages: string[] = [];
-
-        for (const file of variantImageFiles) {
-          if (file instanceof Blob) {
-            const buffer = Buffer.from(await file.arrayBuffer());
-            const url = await uploadFileToS3(
-              {
-                buffer,
-                originalFilename: (file as any).name || `${Date.now()}.jpg`,
-                mimetype: file.type,
-              },
-              `products/${newProduct._id}/variants/${v.sku || i}`
-            );
-            uploadedVariantImages.push(url);
-          }
+        
+        // Get all variant images for this variant index
+        const variantImageFiles: File[] = [];
+        let imageIndex = 0;
+        while (true) {
+          const imageFile = formData.get(`variantsImages[${i}][images][${imageIndex}]`) as File;
+          if (!imageFile) break;
+          variantImageFiles.push(imageFile);
+          imageIndex++;
         }
+
+        console.log("variantImageFiles", variantImageFiles);
+
+        const uploadedVariantImages = await uploaderFiles(`products/${newProduct._id}/variants`, variantImageFiles, newProduct._id as string);
+
+        // for (const file of variantImageFiles) {
+        //   if (file instanceof Blob) {
+        //     const buffer = Buffer.from(await file.arrayBuffer());
+        //     const url = await uploaderFiles(
+        //       {
+        //         buffer,
+        //         originalFilename: (file as any).name || `${Date.now()}.jpg`,
+        //         mimetype: file.type,
+        //       },
+        //       `products/${newProduct._id}/variants/${v.sku || i}`
+        //     );
+        //     uploadedVariantImages.push(url);
+        //   }
+        // }
+
+        console.log("uploadedVariantImages", uploadedVariantImages);
+        let finalUrls: string[] = [];
+
+        uploadedVariantImages.forEach(image => {
+          finalUrls.push(image.url as string);
+        });
 
         // Generate variant slug if not provided
         let variantSlug = v.slug;
@@ -170,7 +195,7 @@ export async function POST(req: Request) {
           variantSlug = `${variantSlug}-${randomSuffix}`;
         }
 
-        await Variant.create(
+     const variant =   await Variant.create(
           [
             {
               product: newProduct._id,
@@ -178,13 +203,15 @@ export async function POST(req: Request) {
               slug: variantSlug,
               label: v.label,
               price: v.price,
-              stock: v.stock,
+              stock: v.stock || 0,
               discount: v.discount || 0,
-              images: uploadedVariantImages,
+               images: finalUrls ,
             },
           ],
           { session }
         );
+      newProduct.variants.push(variant[0]._id);
+      await newProduct.save({ session });
       }
     }
 
@@ -256,6 +283,7 @@ export async function PUT(req: Request) {
     if (formData.get("description")) product.description = formData.get("description")!.toString();
     if (formData.get("ingredients")) product.ingredients = formData.get("ingredients")!.toString();
     if (formData.get("price")) product.price = Number(formData.get("price"));
+    if (formData.get("stock")) product.stock = Number(formData.get("stock"));
     if (formData.get("discount")) product.discount = Number(formData.get("discount"));
     // Handle slug changes with validation
     const newSlug = formData.get("slug")?.toString();

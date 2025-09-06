@@ -27,6 +27,7 @@ export default function ProductsCreateAdminUI() {
     description: "",
     ingredients: "",
     price: 0,
+    stock: 0,
     discount: 0,
     brand: "",
     categories: [] as string[],
@@ -66,6 +67,7 @@ export default function ProductsCreateAdminUI() {
         description: form.description,
         ingredients: form.ingredients,
         price: form.price,
+        stock: form.stock,
         discount: form.discount,
         isActive: form.isActive,
         isOutOfStock: form.isOutOfStock,
@@ -77,8 +79,9 @@ export default function ProductsCreateAdminUI() {
           sku: v.sku, 
           label: v.label, 
           price: v.price, 
-          stock: v.stock, 
-          discount: v.discount
+          stock: v.stock || 0, 
+          discount: v.discount,
+          images: v.images
         }))
       }
 
@@ -87,7 +90,7 @@ export default function ProductsCreateAdminUI() {
       
       alert("Product created ✅")
       // reset
-      setForm({ name: "", description: "", ingredients: "", price: 0, discount: 0, brand: "", categories: [], images: [], slug: "", isActive: false, isOutOfStock: false })
+      setForm({ name: "", description: "", ingredients: "", price: 0, stock: 0, discount: 0, brand: "", categories: [], images: [], slug: "", isActive: false, isOutOfStock: false })
       setVariants([])
     } catch (err: any) {
       alert(err.message || "Failed to create product")
@@ -213,8 +216,9 @@ export default function ProductsCreateAdminUI() {
         <Input placeholder="Product name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
         <Textarea placeholder="Description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
         <Textarea placeholder="Ingredients & Nutritional Info (optional)" value={form.ingredients} onChange={e => setForm(f => ({ ...f, ingredients: e.target.value }))} />
-        <Input type="number" step="0.01" placeholder="Price" value={form.price || "" as any} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} />
-        <Input type="number" step="0.01" min="0" max="100" placeholder="Discount (%)" value={form.discount || "" as any} onChange={e => setForm(f => ({ ...f, discount: Number(e.target.value) }))} />
+        <Input type="number" step="1" min="0" placeholder="Price" value={form.price || "" as any} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} />
+        <Input type="number" step="1" min="0" max="1000000" placeholder="Stock" value={form.stock || "" as any} onChange={e => setForm(f => ({ ...f, stock: Number(e.target.value) }))} />
+        <Input type="number" step="1" min="0" max="100" placeholder="Discount (%)" value={form.discount || "" as any} onChange={e => setForm(f => ({ ...f, discount: Number(e.target.value) }))} />
 
         {/* Slug input */}
         <div className="grid gap-2">
@@ -450,14 +454,16 @@ export default function ProductsCreateAdminUI() {
               <div className="grid sm:grid-cols-3 gap-2">
                 <Input 
                   type="number" 
-                  step="0.01" 
+                  step="1" 
+                  min="0" 
+                  max="1000000" 
                   placeholder="Price" 
                   value={v.price || "" as any} 
                   onChange={e => setVariants(prev => prev.map((x, j) => j === variantIndex ? { ...x, price: Number(e.target.value) } : x))} 
                 />
                 <Input 
                   type="number" 
-                  step="0.01" 
+                  step="1" 
                   min="0" 
                   max="100" 
                   placeholder="Discount (%)" 
@@ -466,6 +472,9 @@ export default function ProductsCreateAdminUI() {
                 />
                 <Input 
                   type="number" 
+                  step="1" 
+                  min="0" 
+                  max="1000000" 
                   placeholder="Stock" 
                   value={v.stock || "" as any} 
                   onChange={e => setVariants(prev => prev.map((x, j) => j === variantIndex ? { ...x, stock: Number(e.target.value) } : x))} 
