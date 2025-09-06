@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: true, user }
       }
       // Wait for session to update
-    const session = await getSession()
+    const session = await getSession() 
 
       return { success: false, error: "Login fkailed" }
           } catch (error) {
