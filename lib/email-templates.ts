@@ -27,6 +27,7 @@ export interface OrderEmailData {
   paymentMethod: string;
   orderDate: string;
   estimatedDelivery?: string;
+  status: string;
 }
 
 export function generateOrderConfirmationEmail(data: OrderEmailData): string {
@@ -75,7 +76,7 @@ export function generateOrderConfirmationEmail(data: OrderEmailData): string {
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <span style="font-size: 14px; color: #6b7280; font-weight: 500;">Status:</span>
-                    <span style="font-size: 14px; color: #1a1a1a; font-weight: 600;">Confirmed</span>
+                    <span style="font-size: 14px; color: #1a1a1a; font-weight: 600;">${data.status}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <span style="font-size: 14px; color: #6b7280; font-weight: 500;">Payment:</span>

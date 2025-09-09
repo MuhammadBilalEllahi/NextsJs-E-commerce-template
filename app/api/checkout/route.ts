@@ -141,8 +141,9 @@ export async function POST(req: NextRequest) {
         }),
         estimatedDelivery:
           shippingMethod === "home_delivery"
-            ? "1-2 business days"
+            ? "Today"
             : "3-5 business days",
+        status: ORDER_STATUS.PENDING,
       },
       runAt: new Date(Date.now()),
       status: "pending",
