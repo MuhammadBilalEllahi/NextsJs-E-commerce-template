@@ -68,7 +68,7 @@ const handler = NextAuth({
   pages: {
     signIn: '/account/login',
   },
-  secret: process.env.NEXTAUTH_SECRET || "fallback-secret",
+  secret: process.env.JWT_SECRET || "fallback-secret",
 })
 
 export { handler as GET, handler as POST }

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { AddToWishlistButton } from "@/components/wishlist/wishlist-button"
-import { useCart } from "@/lib/providers/cartProvider"
+import { useCart } from "@/lib/providers/cartContext"
 import type { Product } from "@/mock_data/mock-data"
 import { ShoppingCart, Star } from 'lucide-react'
 import { cn } from "@/lib/utils/utils"
@@ -37,34 +37,103 @@ export function ProductCard({
     return "/placeholder.svg?height=176&width=320&query=grid product"
   }
 
+  // Get display price - use first variant price if variants exist, otherwise product price
+  const getDisplayPrice = () => {
+    if (product.variants && product.variants.length > 0) {
+      const firstVariant = getFirstVariant()
+      return firstVariant ? firstVariant.price : product.price
+    }
+    return product.price
+  }
+
   // Get variant labels for display
   const getVariantLabels = () => {
     if (!product.variants || product.variants.length === 0) return []
     return product.variants.map(v => v.label).slice(0, 3) // Show max 3 labels
   }
 
+  // Helper function to find first available variant with stock
+  const getFirstAvailableVariant = () => {
+    if (!product.variants || product.variants.length === 0) return null
+    
+    // Find first variant that has stock and is active
+    return product.variants.find(variant => 
+      typeof variant.stock === "number" && 
+      variant.stock > 0 && 
+      !variant.isOutOfStock && 
+      variant.isActive !== false
+    ) || null
+  }
+
+  // Helper function to get first variant (for cart addition, regardless of stock)
+  const getFirstVariant = () => {
+    if (!product.variants || product.variants.length === 0) return null
+    return product.variants[0] // Return first variant
+  }
+
+  // Helper function to check if product is available for purchase
+  const isProductAvailable = () => {
+    if (product.variants && product.variants.length > 0) {
+      // If variants exist, check if any variant has stock
+      return getFirstAvailableVariant() !== null
+    } else {
+      // If no variants, check product stock
+      return product.stock && (product.stock > 0) && !product.isOutOfStock
+    }
+  }
+
   const handleAddToCart = () => {
     if (isAdding) return // Prevent duplicate clicks
-    if(product.variants && product.variants.length > 0) {
+    
+    if (product.variants && product.variants.length > 0) {
+      // Use first variant for cart addition
+      const firstVariant = getFirstVariant()
+      
+      if (!firstVariant) {
+        alert("No variants available for this product")
+        return
+      }
+      
+      // Check if any variant has stock (for availability check)
+      const availableVariant = getFirstAvailableVariant()
+      
+      if (!availableVariant) {
+        alert("This product is currently out of stock")
+        return
+      }
+      console.log("firstVariant", firstVariant);
+      console.log("firstVariant.label", firstVariant.label);
+      console.log("firstVariant.label type:", typeof firstVariant.label);
+      
+      const cartItem = { 
+        id: product.id, 
+        title: product.title, 
+        price: firstVariant.price as number, 
+        image: getDisplayImage(), 
+        productId: product.id, 
+        variantId: firstVariant._id,
+        variantLabel: firstVariant.label,  
+        slug: product.slug
+      };
+      console.log("Adding to cart:", cartItem);
+      console.log("variantLabel being sent:", cartItem.variantLabel);
+      add(cartItem, 1)
+    } else {
+      // No variants, use product stock
+      if ((product.stock && product.stock <= 0) || product.isOutOfStock) {
+        alert("This product is currently out of stock")
+        return
+      }
+      
       add({ 
         id: product.id, 
         title: product.title, 
-        price: product.variants[0].price as number, 
+        price: product.price, 
         image: getDisplayImage(), 
-        productId: product.id, 
-        variantId: product.variants[0]._id,
-        variantLabel: product.variants[0].label,  
+        productId: product.id,
         slug: product.slug
       }, 1)
-    }else{
-    add({ 
-      id: product.id, 
-      title: product.title, 
-      price: product.price, 
-      image: getDisplayImage(), 
-      productId: product.id,
-      slug: product.slug
-    }, 1)}
+    }
   }
 
   // Check if description text overflows 3 lines
@@ -126,7 +195,7 @@ export function ProductCard({
             )}
           </div>
           
-          <div className="font-bold text-red-600">Rs.{product.price}</div>
+          <div className="font-bold text-red-600">Rs.{getDisplayPrice()}</div>
           <div className="mt-3 flex items-center justify-between">
 
           <a
@@ -144,7 +213,7 @@ export function ProductCard({
             className="ml-2 rounded-sm w-10 h-10"
             variant="gradient"
             onClick={handleAddToCart}
-            disabled={isAdding || product.isOutOfStock || product.stock === 0}
+            disabled={isAdding || !isProductAvailable()}
           >
             <ShoppingCart size={16} className="h-4 w-4" />
           </Button>
@@ -221,7 +290,7 @@ export function ProductCard({
           Brand: {product.brand}
         </div>} */}
 
-        <div className="font-bold text-red-600 mt-auto">Rs.{product.price}</div>
+        <div className="font-bold text-red-600 mt-auto">Rs.{getDisplayPrice()}</div>
 
         <div className="mt-2 flex items-center justify-between">
 
@@ -256,7 +325,7 @@ export function ProductCard({
             className="ml-2 rounded-sm w-10 h-10"
             variant="gradient"
             onClick={handleAddToCart}
-            disabled={isAdding || product.isOutOfStock || product.stock === 0}
+            disabled={isAdding || !isProductAvailable()}
           >
             <ShoppingCart size={16} className="h-4 w-4" />
           </Button>

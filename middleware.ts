@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
       // Get the NextAuth token from cookies
       const token = await getToken({ 
         req: request, 
-        secret: process.env.NEXTAUTH_SECRET || 'fallback-secret' 
+        secret: process.env.JWT_SECRET || 'fallback-secret' 
       })
 
       if (!token) {

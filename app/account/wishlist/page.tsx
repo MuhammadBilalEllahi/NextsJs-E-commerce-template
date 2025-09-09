@@ -1,7 +1,7 @@
 "use client"
 
 import { useWishlist } from "@/lib/providers/wishlistProvider"
-import { useCart } from "@/lib/providers/cartProvider"
+import { useCart } from "@/lib/providers/cartContext"
 import { Button } from "@/components/ui/button"
 import { Heart, Trash2 } from 'lucide-react'
 import Link from "next/link"

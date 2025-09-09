@@ -135,6 +135,12 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
       return
     }
 
+    // Validate stock requirement based on variants
+    if (variants.length === 0 && (form.stock === undefined || form.stock < 0)) {
+      alert("Stock is required when no variants are provided")
+      return
+    }
+
     setLoading(true)
     try {
       // Prepare form data for the API
@@ -144,7 +150,7 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
       formData.append("description", form.description);
       formData.append("ingredients", form.ingredients);
       formData.append("price", form.price.toString());
-      formData.append("stock", form.stock.toString());
+      formData.append("stock", (variants.length === 0 ? form.stock : 0).toString());
       formData.append("discount", form.discount.toString());
       formData.append("slug", form.slug);
       formData.append("isActive", form.isActive.toString());
@@ -447,16 +453,24 @@ export default function ProductsEditAdminUI({ product, onClose, onUpdate }: Prod
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="stock">Stock</Label>
+              <Label htmlFor="stock">
+                Stock {variants.length === 0 ? "*" : "(optional - variants handle their own stock)"}
+              </Label>
               <Input 
                 id="stock"
                 type="number" 
                 step="1" 
                 min="0" 
-                placeholder="Stock" 
+                placeholder={variants.length === 0 ? "Stock (required)" : "Stock (optional)"} 
                 value={form.stock || ""} 
                 onChange={e => setForm(f => ({ ...f, stock: Number(e.target.value) }))} 
+                disabled={variants.length > 0}
               />
+              {variants.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Stock is managed by individual variants when variants are present.
+                </p>
+              )}
             </div>
           </div>
 

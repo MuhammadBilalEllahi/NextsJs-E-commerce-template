@@ -54,7 +54,7 @@ export const productZodSchema = z.object({
   description: z.string().optional(),
   ingredients: z.string().optional(), // New field for ingredients
   price: z.number().positive("Price must be greater than 0"),
-  stock: z.number().int().nonnegative(),
+  stock: z.number().int().nonnegative().optional(), // Made optional - will be validated conditionally
   discount: z.number().min(0).max(100).optional(),
   categories: z.array(z.string()).optional(), // ObjectIds as strings
   images: z.array(z.string().url()).optional(),
@@ -73,6 +73,16 @@ export const productZodSchema = z.object({
   isTopSelling: z.boolean().optional(),
   isNewArrival: z.boolean().optional(),
   isBestSelling: z.boolean().optional()
+}).refine((data) => {
+  // If no variants exist, stock is required
+  if (!data.variants || data.variants.length === 0) {
+    return data.stock !== undefined && data.stock >= 0;
+  }
+  // If variants exist, stock is optional (variants handle their own stock)
+  return true;
+}, {
+  message: "Stock is required when no variants are provided",
+  path: ["stock"]
 });
 
 export default mongoose.models[MODELS.PRODUCT] || mongoose.model(MODELS.PRODUCT.toString(), ProductSchema)

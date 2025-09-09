@@ -1,18 +1,26 @@
-"use client"
+// "use client"
 
 import Link from "next/link"
 import { ShoppingCart, Heart, ShoppingBag } from 'lucide-react'
-import { useCart } from "@/lib/providers/cartProvider"
+import { useCart } from "@/lib/providers/cartContext"
 import { useWishlist } from "@/lib/providers/wishlistProvider"
 import { CartSheet } from "@/components/cart/cart-sheet"
 import { HomeSearchBar } from "@/components/home/home-search-bar"
 import { AuthButton } from "@/components/auth/auth-button"
 import type { Category } from "@/mock_data/mock-data"
+import { useAuth } from "@/lib/providers/authProvider"
+// import { useEffect, useState } from "react"
 
 export function Header({ categories }: { categories?: Category[] }) {
-  const { count, isAdding } = useCart()
-  const { ids: wishlistIds } = useWishlist()
+  
 
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth(); // Destructure isLoading as well
+  const { count, isAdding, refreshCart, isHydrated } = useCart();
+  const { ids: wishlistIds } = useWishlist();
+
+  console.log("count cahnges [HEADER]", count)
+
+ 
   return (
     <header className="border-b bg-white/85 dark:bg-neutral-950/85 backdrop-blur md:flex hidden">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-6">
@@ -44,7 +52,7 @@ export function Header({ categories }: { categories?: Category[] }) {
             >
               <ShoppingBag className="h-6 w-6 text-black dark:text-gray-300" />
               <div className="flex flex-col items-start">
-                {count > 0 && (
+                {isHydrated && count > 0 &&(
                   <span className="h-5 min-w-[1.7rem] rounded-full bg-black dark:bg-gray-300 text-white dark:text-gray-900 text-[10px] grid place-items-center px-1">
                     {count}
                   </span>

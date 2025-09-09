@@ -16,6 +16,7 @@ export function getOrCreateGuestId(): string {
   
   if (!guestId) {
     guestId = generateUUID();
+    console.log("GUEST ID", guestId)
     localStorage.setItem(storageKey, guestId);
   }
   

@@ -58,6 +58,12 @@ export default function ProductsCreateAdminUI() {
   const saveProduct = async () => {
     if (!form.name || !form.price || form.categories.length === 0) return
 
+    // Validate stock requirement based on variants
+    if (variants.length === 0 && (form.stock === undefined || form.stock < 0)) {
+      alert("Stock is required when no variants are provided")
+      return
+    }
+
     // console.log(form)
 
     try {
@@ -67,7 +73,7 @@ export default function ProductsCreateAdminUI() {
         description: form.description,
         ingredients: form.ingredients,
         price: form.price,
-        stock: form.stock,
+        stock: variants.length === 0 ? form.stock : 0, // Only set stock if no variants
         discount: form.discount,
         isActive: form.isActive,
         isOutOfStock: form.isOutOfStock,
@@ -217,7 +223,26 @@ export default function ProductsCreateAdminUI() {
         <Textarea placeholder="Description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
         <Textarea placeholder="Ingredients & Nutritional Info (optional)" value={form.ingredients} onChange={e => setForm(f => ({ ...f, ingredients: e.target.value }))} />
         <Input type="number" step="1" min="0" placeholder="Price" value={form.price || "" as any} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} />
-        <Input type="number" step="1" min="0" max="1000000" placeholder="Stock" value={form.stock || "" as any} onChange={e => setForm(f => ({ ...f, stock: Number(e.target.value) }))} />
+        <div className="grid gap-2">
+          <label className="text-sm font-medium">
+            Stock {variants.length === 0 ? "*" : "(optional - variants handle their own stock)"}
+          </label>
+          <Input 
+            type="number" 
+            step="1" 
+            min="0" 
+            max="1000000" 
+            placeholder={variants.length === 0 ? "Stock (required)" : "Stock (optional)"} 
+            value={form.stock || "" as any} 
+            onChange={e => setForm(f => ({ ...f, stock: Number(e.target.value) }))} 
+            disabled={variants.length > 0}
+          />
+          {variants.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Stock is managed by individual variants when variants are present.
+            </p>
+          )}
+        </div>
         <Input type="number" step="1" min="0" max="100" placeholder="Discount (%)" value={form.discount || "" as any} onChange={e => setForm(f => ({ ...f, discount: Number(e.target.value) }))} />
 
         {/* Slug input */}

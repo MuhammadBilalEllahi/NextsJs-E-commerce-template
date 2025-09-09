@@ -12,7 +12,7 @@ import { FAQEnhanced } from "@/components/faq/faq-enhanced"
 import { YouMayAlsoLike } from "@/components/product/you-may-also-like"
 import { RecentlyViewed } from "@/components/product/recently-viewed"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { useCart } from "@/lib/providers/cartProvider"
+import { useCart } from "@/lib/providers/cartContext"
 import type { Product } from "@/mock_data/data"
 import { formatCurrency } from "@/lib/constants/currency"
 

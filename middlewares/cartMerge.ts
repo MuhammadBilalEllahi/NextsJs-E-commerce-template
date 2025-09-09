@@ -1,3 +1,6 @@
+import { useAuth } from "@/lib/providers/authProvider"
+import { useCart } from "@/lib/providers/cartContext"
+
 // Utility function to merge guest cart with user cart
 export async function mergeGuestCartWithUser(userId: string, sessionId: string) {
   try {
@@ -29,6 +32,10 @@ export async function handleCartMergeOnAuth(userId: string) {
 
   const guestId = localStorage.getItem('dm-guest-cart-id')
   if (guestId) {
-    await mergeGuestCartWithUser(userId, guestId)
+    const {user}= useAuth()
+    const {syncAll} = useCart();
+    syncAll().then(async ()=>{
+          await mergeGuestCartWithUser(userId, guestId)
+    })
   }
 }
