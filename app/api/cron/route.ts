@@ -6,6 +6,7 @@ import { generateOrderConfirmationEmail, OrderEmailData } from "@/lib/email-temp
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
+  console.log("Cron job started");
   const resend = new Resend(process.env.RESEND_API_KEY);
   if (
     req.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
@@ -25,28 +26,31 @@ export async function GET(req: Request) {
 
   for (const job of jobs) {
     try {
+      console.log("Processing job", job.type);
       switch (job.type) {
         case SCHEDULE_TYPES.CHECKOUT_COMPLETE:
           const emailData: OrderEmailData = job.payload;
+          console.log("Sending checkout complete email for", emailData.orderId);
           await resend.emails.send({
             from: "Dehli Mirch <orders@socian.app>",
             to: emailData.email,
             subject: `Order Confirmation #${emailData.orderId} - Dehli Mirch`,
             html: generateOrderConfirmationEmail(emailData)
           });
-          console.log("Sending checkout complete email for", emailData.orderId);
+          console.log("Email sent for", emailData.orderId);
           break;
-      
+
         default:
           break;
       }
-     
+
 
       job.status = "done";
       await job.save();
     } catch (err) {
       job.status = "failed";
       await job.save();
+      console.log("Job saved", job.status);
     }
   }
 
