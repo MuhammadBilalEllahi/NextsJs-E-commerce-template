@@ -11,6 +11,8 @@ import { getAllBanners, getAllNewArrivalsProducts, getAllTopSellingProducts, get
 import { HeaderWithCategories } from "@/components/main_comp/header-with-categories"
 import {Navbar}  from "@/components/main_comp/navbar"
 import StackedCards from "@/components/home/BranchSlidableCard"
+import { HomeDeliveryInfo } from "@/components/home/HomeDeliveryInfo"
+
 // import { useEffect, useState } from "react"
 
 
@@ -133,26 +135,26 @@ export default async function HomePage() {
 
        <section className="container mx-auto px-4 py-10 md:py-14">
         <h2 className="text-2xl font-bold mb-6">Our Special</h2>
-        <HomeCategories categories={categories} />
+        
       </section>
 
       
        <section className="container mx-auto px-4 py-10 md:py-14">
         <h2 className="text-2xl font-bold mb-6">Grocery</h2>
-        <HomeCategories categories={categories} />
+        
       </section>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
         <HomeBlogPreview blogs={blogs} />
       </section>
 
-      
+      <HomeDeliveryInfo/>
        <section className="container mx-auto px-4 py-10 md:py-14">
-        <h2 className="text-2xl font-bold mb-6">We Deliver To Your Door Step (Lahore)</h2>
+        {/* <h2 className="text-2xl font-bold mb-6">We Deliver To Your Door Step (Lahore)</h2>
         <div>
           <p> We deliver in all Lahore from all our 4 branches</p>
           <p> For out of Lahore booking we send via TCS</p>
-        </div>
+        </div> */}
       </section>
     
       {/* <section className="container mx-auto px-4 py-10 md:py-14 pt-28">

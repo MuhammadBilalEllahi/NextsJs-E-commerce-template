@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle2, Package, Truck, Clock, XCircle, AlertCircle, MapPin, Phone, Mail, MessageCircle } from 'lucide-react'
 import { formatCurrency } from "@/lib/constants/currency"
+import { useSearchParams } from "next/navigation"
 
 type OrderData = {
   orderId: string
@@ -63,12 +64,13 @@ const statusSteps = [
 ] as const
 
 export default function TrackOrderPage() {
+  const searchParams = useSearchParams()
   const [orderId, setOrderId] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [orderData, setOrderData] = useState<OrderData | null>(null)
 
-  const onTrack = async () => {
+  const onTrack = useCallback(async () => {
     if (!orderId.trim()) {
       setError("Please enter an order ID or reference ID")
       return
@@ -93,7 +95,24 @@ export default function TrackOrderPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [orderId])
+
+  useEffect(() => {
+    const orderIdParam = searchParams.get("orderId")
+    if (orderIdParam) {
+      console.log("orderId", orderIdParam)
+      setOrderId(orderIdParam)
+    } else {
+      // console.log("No orderId found")
+      // setError("Please enter an order ID or reference ID")
+    }
+  }, [searchParams])
+
+  useEffect(() => {
+    if (orderId) {
+      onTrack()
+    }
+  }, [orderId, onTrack])
 
   const getStatusIndex = (status: string) => {
     return statusSteps.findIndex(step => step.key === status)

@@ -33,6 +33,8 @@ export async function POST(req: NextRequest) {
       shippingMethod,
     } = body;
 
+    console.log("items", items);
+
     // Check stock availability before creating order
     const stockCheck = await checkStockAvailability(
       items.map((item: any) => ({
@@ -79,6 +81,7 @@ export async function POST(req: NextRequest) {
         quantity: item.qty,
         priceAtPurchase: item.price,
         label: item.variantLabel || "",
+        image: item.image || "",
       })),
       subtotal,
       shippingFee,
