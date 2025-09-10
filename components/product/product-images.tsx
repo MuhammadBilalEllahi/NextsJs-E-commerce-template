@@ -23,12 +23,12 @@ export function ProductImages({
   }
 
   return (
-    <div>
-      <div className="relative overflow-hidden rounded-lg border">
+    <div className="sticky top-4 h-fit">
+      <div className="relative overflow-hidden rounded-lg border max-h-[35rem]">
         <img
           src={current || "/placeholder.svg"}
           alt={title}
-          className={`w-full object-cover transition-transform duration-300 ${cursor} ${
+          className={`w-full object-fill transition-transform duration-300 ${cursor} ${
             zoom ? "scale-125" : "scale-100"
           }`}
           onClick={() => setZoom((z) => !z)}

@@ -10,7 +10,7 @@ import dbConnect from "@/database/mongodb";
 import RedisClient from "@/database/redisClient";
 import Banner from "@/models/Banner";
 import GlobalSettings from "@/models/GlobalSettings";
-import { CACHE_EXPIRE_TIME,CACHE_BANNER_KEY, CACHE_BRANCH_KEY, CACHE_GLOBAL_SETTINGS_KEY } from "@/lib/cacheConstants";  
+import { CACHE_EXPIRE_TIME,CACHE_BANNER_KEY, CACHE_BRANCH_KEY, CACHE_GLOBAL_SETTINGS_KEY, CACHE_CATEGORIES_KEY, CACHE_PRODUCTS_BY_CATEGORY_KEY } from "@/lib/cacheConstants";  
 import Branch from "@/models/Branches";
 import {  ProductTypeVariant, Variant as VariantType } from "@/mock_data/data";
 
@@ -327,23 +327,38 @@ export async function getProductBySlug(slug: string) {
 export async function getAllCategories() {
   try {
     await dbConnect();
+    
+    // Check Redis cache first
+    const cachedCategories = await RedisClient.get(CACHE_CATEGORIES_KEY);
+    if (cachedCategories) {
+      return JSON.parse(cachedCategories);
+    }
+    
+    // Fetch from database if not in cache
     const categories = await Category.find({ isActive: true })
       .populate("parent", "name")
       .sort({ order: 1, name: 1 })
       .lean();
     
-         return categories.map(category => ({
-       id: String(category._id),
+    const formattedCategories = categories.map(category => ({
+      id: String(category._id),
       name: category.name,
       slug: category.slug,
       description: category.description,
       image: category.image,
-             parent: category.parent ? {
-         id: String(category.parent._id),
-         name: category.parent.name
-       } : null,
+      parent: category.parent ? {
+        id: String(category.parent._id),
+        name: category.parent.name
+      } : null,
       productCount: 0 // Can be populated later if needed
     }));
+    
+    // Cache the results for 10 hours
+    if (formattedCategories.length > 0) {
+      await RedisClient.set(CACHE_CATEGORIES_KEY, JSON.stringify(formattedCategories), CACHE_EXPIRE_TIME);
+    }
+    
+    return formattedCategories;
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];
@@ -412,6 +427,58 @@ export async function getProductReviews(productId: string, limit = 10, page = 1)
   } catch (error) {
     console.error("Error fetching product reviews:", error);
     return { reviews: [], pagination: { page: 1, limit, total: 0, pages: 0 } };
+  }
+}
+
+// Get products by category
+export async function getProductsByCategory(categorySlug: string, limit = 10) {
+  try {
+    await dbConnect();
+    
+    // Create cache key for this specific category and limit
+    const cacheKey = `${CACHE_PRODUCTS_BY_CATEGORY_KEY}:${categorySlug}:${limit}`;
+    
+    // Check Redis cache first
+    const cachedProducts = await RedisClient.get(cacheKey);
+    if (cachedProducts) {
+      return JSON.parse(cachedProducts);
+    }
+    
+    // First find the category
+    const category = await Category.findOne({ slug: categorySlug, isActive: true }).lean();
+    if (!category) return [];
+    
+    // Find products in this category
+    const products = await Product.find({ 
+      isActive: true, 
+      isOutOfStock: false,
+      categories: (category as any)._id 
+    })
+      .populate("brand", "name")
+      .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+    
+    const formattedProducts = products.map(product => ({
+      id: String(product._id),
+      slug: product.slug,
+      title: product.name,
+      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+      images: product.images,
+      image: product.images && product.images.length > 0 ? product.images[0] : undefined,
+      brand: product.brand?.name || "Dehli Mirch",
+    }));
+    
+    // Cache the results for 2 hours (shorter than categories since products change more frequently)
+    if (formattedProducts.length > 0) {
+      await RedisClient.set(cacheKey, JSON.stringify(formattedProducts), 7200); // 2 hours
+    }
+    
+    return formattedProducts;
+  } catch (error) {
+    console.error("Error fetching products by category:", error);
+    return [];
   }
 }
 

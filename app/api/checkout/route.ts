@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/database/mongodb";
 import Order from "@/models/Order";
+import TCSOrder from "@/models/TCSOrder";
 import { generateOrderIds } from "@/lib/utils/orderIds";
 import {
   ORDER_STATUS,
   ORDER_PAYMENT_STATUS,
   PAYMENT_TYPE,
   ORDER_TYPE,
+  TCS_STATUS,
 } from "@/models/constants";
 import {
   checkStockAvailability,
@@ -14,6 +16,7 @@ import {
 } from "@/lib/utils/stockManager";
 import { Resend } from "resend";
 import ScheduledJob, { SCHEDULE_TYPES } from "@/models/ScheduledJob";
+import tcsService from "@/lib/api/tcs/tcsService";
 
 export async function POST(req: NextRequest) {
   try {
@@ -112,6 +115,77 @@ export async function POST(req: NextRequest) {
       // In production, you might want to rollback the order creation if stock decrease fails
     }
 
+    // Check if order should be sent via TCS
+    const shouldUseTCS = shippingMethod === ORDER_TYPE.TCS || 
+      tcsService.isOutsideLahore(shippingAddress.city);
+    
+    let tcsOrder = null;
+    if (shouldUseTCS) {
+      try {
+        // Prepare TCS order data
+        const tcsOrderData = tcsService.mapOrderToTCSFormat({
+          orderId: order.orderId,
+          refId: order.refId,
+          shippingAddress: order.shippingAddress,
+          contact: order.contact,
+          items: items,
+          total: order.total
+        });
+        
+        // Create TCS order via API
+        const tcsResponse = await tcsService.createOrder(tcsOrderData);
+        
+        if (tcsResponse.CN) {
+          // Create TCS order record in database
+          tcsOrder = new TCSOrder({
+            order: order._id,
+            consignmentNumber: tcsResponse.CN,
+            customerReferenceNo: order.refId,
+            userName: process.env.TCS_USERNAME || '',
+            password: process.env.TCS_PASSWORD || '',
+            costCenterCode: process.env.TCS_COST_CENTER_CODE || '',
+            consigneeName: tcsOrderData.consigneeName,
+            consigneeAddress: tcsOrderData.consigneeAddress,
+            consigneeMobNo: tcsOrderData.consigneeMobNo,
+            consigneeEmail: tcsOrderData.consigneeEmail,
+            originCityName: tcsOrderData.originCityName,
+            destinationCityName: tcsOrderData.destinationCityName,
+            weight: tcsOrderData.weight,
+            pieces: tcsOrderData.pieces,
+            codAmount: tcsOrderData.codAmount,
+            productDetails: tcsOrderData.productDetails,
+            fragile: tcsOrderData.fragile,
+            remarks: tcsOrderData.remarks,
+            insuranceValue: tcsOrderData.insuranceValue,
+            services: tcsOrderData.services,
+            status: TCS_STATUS.CREATED,
+            tcsResponse: tcsResponse,
+            estimatedDelivery: new Date(Date.now() + tcsService.getEstimatedDeliveryDays(shippingAddress.city) * 24 * 60 * 60 * 1000)
+          });
+          
+          await tcsOrder.save();
+          
+          // Update main order with TCS tracking
+          order.tracking = tcsResponse.CN;
+          order.status = ORDER_STATUS.CONFIRMED;
+          order.history.push({
+            status: ORDER_STATUS.CONFIRMED,
+            changedAt: new Date(),
+            changedBy: 'system',
+            reason: `TCS order created with CN: ${tcsResponse.CN}`
+          });
+          await order.save();
+          
+          console.log(`TCS order created for order ${orderId} with CN: ${tcsResponse.CN}`);
+        } else {
+          console.error('Failed to create TCS order:', tcsResponse);
+        }
+      } catch (error) {
+        console.error('Failed to create TCS order:', error);
+        // Continue with regular order processing even if TCS fails
+      }
+    }
+
     // Create scheduled job with complete order information
     await ScheduledJob.create({
       type: SCHEDULE_TYPES.CHECKOUT_COMPLETE,
@@ -140,10 +214,17 @@ export async function POST(req: NextRequest) {
           day: "numeric",
         }),
         estimatedDelivery:
-          shippingMethod === "home_delivery"
+          shouldUseTCS && tcsOrder
+            ? `${tcsService.getEstimatedDeliveryDays(shippingAddress.city)} business days`
+            : shippingMethod === "home_delivery"
             ? "Today"
             : "3-5 business days",
-        status: ORDER_STATUS.PENDING,
+        status: shouldUseTCS && tcsOrder ? ORDER_STATUS.CONFIRMED : ORDER_STATUS.PENDING,
+        tcsInfo: tcsOrder ? {
+          consignmentNumber: tcsOrder.consignmentNumber,
+          estimatedDelivery: tcsOrder.estimatedDelivery,
+          isOutsideLahore: tcsService.isOutsideLahore(shippingAddress.city)
+        } : null,
       },
       runAt: new Date(Date.now()),
       status: "pending",

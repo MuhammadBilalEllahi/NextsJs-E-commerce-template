@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet"
 import { AuthButton } from "@/components/auth/auth-button"
 import { useAuth } from "@/lib/providers/authProvider"
 import { useWishlist } from "@/lib/providers/wishlistProvider"
+import { HoverNavigation } from "./hover-navigation"
 
 export function Navbar() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth(); // Destructure isLoading as well
@@ -22,6 +23,8 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isClient, setIsClient] = useState(false)
+  const [isHoverNavOpen, setIsHoverNavOpen] = useState(false)
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     setIsClient(true) // Set to true when component mounts on client
@@ -44,6 +47,15 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout)
+      }
+    }
+  }, [hoverTimeout])
+
   const toggleTheme = () => {
     const next = theme === "light" ? "dark" : "light"
     setTheme(next)
@@ -51,8 +63,24 @@ export function Navbar() {
     if (typeof document !== "undefined") document.documentElement.classList.toggle("dark", next === "dark")
   }
 
+  const handleHoverEnter = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout)
+      setHoverTimeout(null)
+    }
+    setIsHoverNavOpen(true)
+  }
+
+  const handleHoverLeave = () => {
+    const timeout = setTimeout(() => {
+      setIsHoverNavOpen(false)
+    }, 150) // Small delay to allow moving to dropdown
+    setHoverTimeout(timeout)
+  }
+
   const nav = [
     { href: "/", label: "Home" },
+    { href: "/category/all", label: "All Products", hasHover: true },
     { href: "/category/all", label: "Shop" },
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
@@ -89,10 +117,10 @@ export function Navbar() {
                         key={n.href}
                         href={n.href}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className={`font-poppins text-lg font-medium hover:text-red-600 transition-colors py-2 ${
+                        className={`font-poppins text-lg font-medium hover:text-primary transition-colors py-2 ${
                           pathname === n.href || pathname?.startsWith(n.href) 
-                            ? "text-red-600 font-semibold" 
-                            : "text-neutral-700 dark:text-neutral-300"
+                            ? "text-primary font-semibold" 
+                            : "text-foreground"
                         }`}
                       >
                         {n.label}
@@ -124,20 +152,47 @@ export function Navbar() {
           )}
 
           {/* Desktop Navigation Routes */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-6 relative">
             {nav.map((n) => (
-              <Link
-                key={n.href}
-                href={n.href}
-                className={`font-poppins leading-none text-sm font-medium hover:text-red-600 transition-colors ${
-                  pathname === n.href || pathname?.startsWith(n.href) 
-                    ? "text-red-600 font-medium" 
-                    : ""
-                }`}
-              >
-                {n.label}
-              </Link>
+              <div key={n.href} className="relative">
+                {n.hasHover ? (
+                  <div className="relative">
+                    <div
+                      className={`font-poppins leading-none text-sm font-medium hover:text-primary transition-colors cursor-pointer ${
+                        pathname === n.href || pathname?.startsWith(n.href) 
+                          ? "text-primary font-medium" 
+                          : "text-foreground"
+                      }`}
+                      onMouseEnter={handleHoverEnter}
+                      onMouseLeave={handleHoverLeave}
+                    >
+                      {n.label}
+                    </div>
+                         {/* Hover Navigation - positioned relative to the nav container */}
+                <HoverNavigation 
+                isOpen={isHoverNavOpen} 
+                onClose={() => setIsHoverNavOpen(false)}
+                onMouseEnter={handleHoverEnter}
+                onMouseLeave={handleHoverLeave}
+              />
+                </div>
+                ) : (
+                  <Link
+                    href={n.href}
+                    className={`font-poppins leading-none text-sm font-medium hover:text-primary transition-colors ${
+                      pathname === n.href || pathname?.startsWith(n.href) 
+                        ? "text-primary font-medium" 
+                        : "text-foreground"
+                    }`}
+                  >
+                    {n.label}
+                  </Link>
+                )}
+
+              </div>
             ))}
+            
+           
           </div>
 
           {/* Right side actions */}

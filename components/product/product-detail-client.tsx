@@ -190,7 +190,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="relative grid lg:grid-cols-2 gap-8">
         <ProductImages images={currentImages} title={product.title} variantLabels={variantLabels} />
         <div>
           <div className="flex items-start justify-between gap-4">
@@ -209,11 +209,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
           <div className="mt-4 text-3xl font-extrabold text-red-600">
             {formatCurrency(currentPrice)}
-            {selectedVariant && selectedVariant.price !== product.price && (
+            {/* {selectedVariant && selectedVariant.price !== product.price && (
               <span className="text-lg text-neutral-500 line-through ml-2">
                 {formatCurrency(product.price)}
               </span>
-            )}
+            )} */}
           </div>
 
           {/* Stock Indicator */}
@@ -470,7 +470,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </div>
       </div>
 
-      <section className="mt-12">
+      <section className="mt-12" id="you-may-also-like">
         <YouMayAlsoLike currentId={String(product.id)} />
       </section>
 

@@ -28,6 +28,11 @@ export interface OrderEmailData {
   orderDate: string;
   estimatedDelivery?: string;
   status: string;
+  tcsInfo?: {
+    consignmentNumber: string;
+    estimatedDelivery: string;
+    isOutsideLahore: boolean;
+  };
 }
 
 export function generateOrderConfirmationEmail(data: OrderEmailData): string {
@@ -134,6 +139,7 @@ export function generateOrderConfirmationEmail(data: OrderEmailData): string {
                     Phone: ${data.shippingAddress.phone}<br><br>
                     <strong>Shipping Method:</strong> ${data.shippingMethod}<br>
                     ${data.estimatedDelivery ? `<strong>Estimated Delivery:</strong> ${data.estimatedDelivery}` : ''}
+                    ${data.tcsInfo ? `<br><br><strong>TCS Consignment Number:</strong> ${data.tcsInfo.consignmentNumber}<br><strong>TCS Delivery:</strong> ${data.tcsInfo.isOutsideLahore ? 'Outside Lahore' : 'Within Lahore'}` : ''}
                 </div>
             </div>
             

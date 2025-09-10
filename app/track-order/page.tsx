@@ -55,6 +55,42 @@ type OrderData = {
   total: number
 }
 
+type TCSOrderData = {
+  consignmentNumber: string
+  status: string
+  estimatedDelivery: string
+  actualDelivery?: string
+  trackingHistory: Array<{
+    status: string
+    location: string
+    timestamp: string
+    description: string
+    updatedBy: string
+  }>
+  pickupStatus: string
+  paymentStatus: string
+  weight: number
+  pieces: number
+  codAmount: string
+  originCityName: string
+  destinationCityName: string
+  services: string
+  fragile: string
+  remarks: string
+  lastApiCall: string
+}
+
+type TrackingData = {
+  order: OrderData
+  tcsOrder: TCSOrderData | null
+  latestTracking: any
+  deliveryInfo: {
+    isOutsideLahore: boolean
+    estimatedDays: number
+    shippingMethod: string
+  }
+}
+
 const statusSteps = [
   { key: "pending", title: "Order Received", icon: Clock, description: "Your order has been received and is being processed" },
   { key: "confirmed", title: "Order Confirmed", icon: Package, description: "Your order has been confirmed and is being prepared" },
@@ -68,7 +104,7 @@ export default function TrackOrderPage() {
   const [orderId, setOrderId] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [orderData, setOrderData] = useState<OrderData | null>(null)
+  const [orderData, setOrderData] = useState<TrackingData | null>(null)
 
   const onTrack = useCallback(async () => {
     if (!orderId.trim()) {
@@ -81,12 +117,12 @@ export default function TrackOrderPage() {
     setOrderData(null)
     
     try {
-      const response = await fetch(`/api/track-order?orderId=${encodeURIComponent(orderId.trim())}`)
+      const response = await fetch(`/api/tcs-tracking?orderId=${encodeURIComponent(orderId.trim())}`)
       const data = await response.json()
       
       if (response.ok) {
-        console.log('Order data received:', data.order)
-        setOrderData(data.order)
+        console.log('Tracking data received:', data.data)
+        setOrderData(data.data)
       } else {
         setError(data.error || "Order not found")
       }
@@ -178,6 +214,11 @@ export default function TrackOrderPage() {
                   <CardTitle className="flex items-center gap-2">
                     <Package className="h-5 w-5" />
                     Order Status
+                    {orderData.tcsOrder && (
+                      <span className="ml-auto text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        TCS Delivery
+                      </span>
+                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -186,13 +227,13 @@ export default function TrackOrderPage() {
                     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                       <div className="flex items-center gap-3">
                         {(() => {
-                          const currentStep = getStatusStep(orderData.status)
+                          const currentStep = getStatusStep(orderData.order.status)
                           const Icon = currentStep.icon
                           return (
                             <>
                               <div className={`p-2 rounded-full ${
-                                orderData.status === 'cancelled' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
-                                orderData.status === 'delivered' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' :
+                                orderData.order.status === 'cancelled' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
+                                orderData.order.status === 'delivered' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' :
                                 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
                               }`}>
                                 <Icon className="h-5 w-5" />
@@ -204,18 +245,33 @@ export default function TrackOrderPage() {
                                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
                                   {currentStep.description}
                                 </p>
-                                {orderData.tracking && orderData.status === 'shipped' && (
+                                {orderData.order.tracking && orderData.order.status === 'shipped' && (
                                   <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-1">
-                                    Tracking: {orderData.tracking}
+                                    Tracking: {orderData.order.tracking}
                                   </p>
                                 )}
-                                {orderData.cancellationReason && orderData.status === 'cancelled' && (
+                                {orderData.tcsOrder && (
+                                  <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded">
+                                    <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                                      TCS Consignment Number: {orderData.tcsOrder.consignmentNumber}
+                                    </p>
+                                    <p className="text-sm text-green-700 dark:text-green-300">
+                                      Estimated Delivery: {new Date(orderData.tcsOrder.estimatedDelivery).toLocaleDateString()}
+                                    </p>
+                                    {orderData.deliveryInfo.isOutsideLahore && (
+                                      <p className="text-sm text-green-700 dark:text-green-300">
+                                        Delivery Time: {orderData.deliveryInfo.estimatedDays} business days
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                                {orderData.order.cancellationReason && orderData.order.status === 'cancelled' && (
                                   <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
                                     <p className="text-sm font-medium text-red-800 dark:text-red-200">
                                       Cancellation Reason:
                                     </p>
                                     <p className="text-sm text-red-700 dark:text-red-300">
-                                      {orderData.cancellationReason}
+                                      {orderData.order.cancellationReason}
                                     </p>
                                   </div>
                                 )}
@@ -226,13 +282,53 @@ export default function TrackOrderPage() {
                       </div>
                     </div>
 
-                                        {/* Status Timeline */}
+                    {/* TCS Tracking History */}
+                    {orderData.tcsOrder && orderData.tcsOrder.trackingHistory && orderData.tcsOrder.trackingHistory.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-lg text-neutral-900 dark:text-neutral-100">
+                          TCS Tracking History
+                        </h4>
+                        {orderData.tcsOrder.trackingHistory.map((entry, idx) => (
+                          <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                            <div className="p-1.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                              <Truck className="h-3 w-3" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-medium text-sm text-neutral-900 dark:text-neutral-100 capitalize">
+                                  {entry.status.replace('_', ' ')}
+                                </span>
+                                <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                                  {new Date(entry.timestamp).toLocaleString()}
+                                </span>
+                              </div>
+                              {entry.location && (
+                                <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                                  Location: {entry.location}
+                                </p>
+                              )}
+                              <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                                {entry.description}
+                              </p>
+                              <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-1">
+                                Updated by: {entry.updatedBy}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Status Timeline */}
                     <div className="space-y-3">
-                      {getRelevantStatusSteps(orderData.status).map((step, idx) => {
+                      <h4 className="font-semibold text-lg text-neutral-900 dark:text-neutral-100">
+                        Order Progress
+                      </h4>
+                      {getRelevantStatusSteps(orderData.order.status).map((step, idx) => {
                         const Icon = step.icon
-                        const isActive = step.key === orderData.status
-                        const isCompleted = orderData.status !== 'cancelled' && getStatusIndex(orderData.status) > getStatusIndex(step.key)
-                        const isCancelled = orderData.status === 'cancelled' && step.key !== 'cancelled'
+                        const isActive = step.key === orderData.order.status
+                        const isCompleted = orderData.order.status !== 'cancelled' && getStatusIndex(orderData.order.status) > getStatusIndex(step.key)
+                        const isCancelled = orderData.order.status === 'cancelled' && step.key !== 'cancelled'
                         
                         return (
                           <div key={step.key} className={`flex items-center gap-3 p-3 rounded-lg ${
@@ -278,14 +374,14 @@ export default function TrackOrderPage() {
               </Card>
 
               {/* Order History */}
-              {orderData.history && orderData.history.length > 0 && (
+              {orderData.order.history && orderData.order.history.length > 0 && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Order History</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {orderData.history
+                      {orderData.order.history
                         .sort((a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime())
                         .map((entry, idx) => (
                         <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
@@ -328,24 +424,55 @@ export default function TrackOrderPage() {
                 <CardContent className="space-y-3">
                   <div>
                     <span className="text-sm text-neutral-600 dark:text-neutral-400">Order ID:</span>
-                    <p className="font-mono font-medium text-neutral-900 dark:text-neutral-100">{orderData.orderId}</p>
+                    <p className="font-mono font-medium text-neutral-900 dark:text-neutral-100">{orderData.order.orderId}</p>
                   </div>
                   <div>
                     <span className="text-sm text-neutral-600 dark:text-neutral-400">Reference ID:</span>
-                    <p className="font-mono font-medium text-neutral-900 dark:text-neutral-100">{orderData.refId}</p>
+                    <p className="font-mono font-medium text-neutral-900 dark:text-neutral-100">{orderData.order.refId}</p>
                   </div>
                   <div>
                     <span className="text-sm text-neutral-600 dark:text-neutral-400">Order Date:</span>
-                    <p className="text-neutral-900 dark:text-neutral-100">{new Date(orderData.createdAt).toLocaleDateString()}</p>
+                    <p className="text-neutral-900 dark:text-neutral-100">{new Date(orderData.order.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div>
                     <span className="text-sm text-neutral-600 dark:text-neutral-400">Payment Method:</span>
-                    <p className="uppercase text-neutral-900 dark:text-neutral-100">{orderData.payment.method}</p>
+                    <p className="uppercase text-neutral-900 dark:text-neutral-100">{orderData.order.payment.method}</p>
                   </div>
                   <div>
                     <span className="text-sm text-neutral-600 dark:text-neutral-400">Total Amount:</span>
-                    <p className="font-semibold text-lg text-neutral-900 dark:text-neutral-100">{formatCurrency(orderData.total)}</p>
+                    <p className="font-semibold text-lg text-neutral-900 dark:text-neutral-100">{formatCurrency(orderData.order.total)}</p>
                   </div>
+                  {orderData.tcsOrder && (
+                    <div className="border-t pt-3">
+                      <h4 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100 mb-2">TCS Information</h4>
+                      <div className="space-y-2">
+                        <div>
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">Consignment Number:</span>
+                          <p className="font-mono text-sm font-medium text-neutral-900 dark:text-neutral-100">{orderData.tcsOrder.consignmentNumber}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">Weight:</span>
+                          <p className="text-sm text-neutral-900 dark:text-neutral-100">{orderData.tcsOrder.weight} kg</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">Pieces:</span>
+                          <p className="text-sm text-neutral-900 dark:text-neutral-100">{orderData.tcsOrder.pieces}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">Service:</span>
+                          <p className="text-sm text-neutral-900 dark:text-neutral-100">{orderData.tcsOrder.services === 'O' ? 'Overnight' : orderData.tcsOrder.services}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">Pickup Status:</span>
+                          <p className="text-sm text-neutral-900 dark:text-neutral-100 capitalize">{orderData.tcsOrder.pickupStatus}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">Payment Status:</span>
+                          <p className="text-sm text-neutral-900 dark:text-neutral-100 capitalize">{orderData.tcsOrder.paymentStatus}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -360,17 +487,27 @@ export default function TrackOrderPage() {
                 <CardContent>
                   <div className="space-y-1">
                     <p className="font-medium text-neutral-900 dark:text-neutral-100">
-                      {orderData.shippingAddress.firstName} {orderData.shippingAddress.lastName}
+                      {orderData.order.shippingAddress.firstName} {orderData.order.shippingAddress.lastName}
                     </p>
-                    <p className="text-neutral-700 dark:text-neutral-300">{orderData.shippingAddress.address}</p>
-                    <p className="text-neutral-700 dark:text-neutral-300">{orderData.shippingAddress.city}</p>
-                    {orderData.shippingAddress.postalCode && (
-                      <p className="text-neutral-700 dark:text-neutral-300">{orderData.shippingAddress.postalCode}</p>
+                    <p className="text-neutral-700 dark:text-neutral-300">{orderData.order.shippingAddress.address}</p>
+                    <p className="text-neutral-700 dark:text-neutral-300">{orderData.order.shippingAddress.city}</p>
+                    {orderData.order.shippingAddress.postalCode && (
+                      <p className="text-neutral-700 dark:text-neutral-300">{orderData.order.shippingAddress.postalCode}</p>
                     )}
                     <p className="flex items-center gap-1 mt-2 text-neutral-700 dark:text-neutral-300">
                       <Phone className="h-3 w-3" />
-                      {orderData.shippingAddress.phone}
+                      {orderData.order.shippingAddress.phone}
                     </p>
+                    {orderData.deliveryInfo.isOutsideLahore && (
+                      <div className="mt-2 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded">
+                        <p className="text-xs text-orange-800 dark:text-orange-200">
+                          📍 Outside Lahore - TCS Delivery
+                        </p>
+                        <p className="text-xs text-orange-700 dark:text-orange-300">
+                          Estimated: {orderData.deliveryInfo.estimatedDays} business days
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -386,11 +523,11 @@ export default function TrackOrderPage() {
                 <CardContent className="space-y-2">
                   <p className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
                     <Mail className="h-4 w-4" />
-                    {orderData.contact.email}
+                    {orderData.order.contact.email}
                   </p>
                   <p className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
                     <Phone className="h-4 w-4" />
-                    {orderData.contact.phone}
+                    {orderData.order.contact.phone}
                   </p>
                 </CardContent>
               </Card>
@@ -402,7 +539,7 @@ export default function TrackOrderPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {orderData.items.map((item, idx) => (
+                    {orderData.order.items.map((item, idx) => (
                       <div key={idx} className="flex items-center gap-3">
                         <img
                           src={item.image || '/placeholder.svg'}
@@ -439,17 +576,17 @@ export default function TrackOrderPage() {
                   <div className="border-t border-neutral-200 dark:border-neutral-700 pt-3 mt-3 space-y-1">
                     <div className="flex justify-between text-sm">
                       <span className="text-neutral-600 dark:text-neutral-400">Subtotal:</span>
-                      <span className="text-neutral-900 dark:text-neutral-100">{formatCurrency(orderData.subtotal)}</span>
+                      <span className="text-neutral-900 dark:text-neutral-100">{formatCurrency(orderData.order.subtotal)}</span>
                     </div>
-                    {orderData.shippingFee > 0 && (
+                    {orderData.order.shippingFee > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-neutral-600 dark:text-neutral-400">Shipping:</span>
-                        <span className="text-neutral-900 dark:text-neutral-100">{formatCurrency(orderData.shippingFee)}</span>
+                        <span className="text-neutral-900 dark:text-neutral-100">{formatCurrency(orderData.order.shippingFee)}</span>
                       </div>
                     )}
                     <div className="flex justify-between font-semibold">
                       <span className="text-neutral-900 dark:text-neutral-100">Total:</span>
-                      <span className="text-neutral-900 dark:text-neutral-100">{formatCurrency(orderData.total)}</span>
+                      <span className="text-neutral-900 dark:text-neutral-100">{formatCurrency(orderData.order.total)}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -468,7 +605,7 @@ export default function TrackOrderPage() {
                     Having trouble with your order? Our support team is here to help.
                   </p>
                   <a
-                    href={`https://wa.me/923001234567?text=${encodeURIComponent(`Hello Dehli Mirch, I need help with my order ${orderData.orderId}.`)}`}
+                    href={`https://wa.me/923001234567?text=${encodeURIComponent(`Hello Dehli Mirch, I need help with my order ${orderData.order.orderId}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
@@ -507,3 +644,4 @@ export default function TrackOrderPage() {
     </div>
   )
 }
+

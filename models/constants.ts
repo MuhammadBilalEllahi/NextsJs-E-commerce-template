@@ -16,7 +16,8 @@ export const MODELS = {
     GLOBAL_SETTINGS: "GlobalSettings",
     BRANCH: "Branch",
     SHIPPING_METHOD: "ShippingMethod",
-    SCHEDULED_JOBS: "ScheduledJob"
+    SCHEDULED_JOBS: "ScheduledJob",
+    TCS_ORDER: "TCSOrder"
 }
 
 export const ORDER_TYPE = {
@@ -52,5 +53,30 @@ export const RESERVATION_STATUS = {
 export const UserTypes = {
     CUSTOMER: "customer",
     ADMIN: "admin"
+}
+
+export const TCS_STATUS = {
+    PENDING: "pending",
+    CREATED: "created",
+    PICKED_UP: "picked_up",
+    IN_TRANSIT: "in_transit",
+    OUT_FOR_DELIVERY: "out_for_delivery",
+    DELIVERED: "delivered",
+    FAILED: "failed",
+    CANCELLED: "cancelled"
+}
+
+export const TCS_PAYMENT_STATUS = {
+    PENDING: "pending",
+    COLLECTED: "collected",
+    FAILED: "failed",
+    REFUNDED: "refunded"
+}
+
+export const TCS_PICKUP_STATUS = {
+    PENDING: "pending",
+    SCHEDULED: "scheduled",
+    PICKED_UP: "picked_up",
+    FAILED: "failed"
 }
 
