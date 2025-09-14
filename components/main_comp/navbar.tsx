@@ -1,82 +1,89 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Sun, Moon, ShoppingBag, Menu, Search } from 'lucide-react'
-import { useEffect, useState } from "react"
-import { CartSheet } from "../cart/cart-sheet"
-import { useCart } from "@/lib/providers/cartContext"
-import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet"
-import { AuthButton } from "@/components/auth/auth-button"
-import { useAuth } from "@/lib/providers/authProvider"
-import { useWishlist } from "@/lib/providers/wishlistProvider"
-import { HoverNavigation } from "./hover-navigation"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Sun, Moon, ShoppingBag, Menu, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CartSheet } from "../cart/cart-sheet";
+import { useCart } from "@/lib/providers/cartContext";
+import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
+import { AuthButton } from "@/components/auth/auth-button";
+import { useAuth } from "@/lib/providers/authProvider";
+import { useWishlist } from "@/lib/providers/wishlistProvider";
+import { HoverNavigation } from "./hover-navigation";
 
 export function Navbar() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth(); // Destructure isLoading as well
   const { count, isAdding, refreshCart, isHydrated } = useCart();
   const { ids: wishlistIds } = useWishlist();
-  console.log("count cahnges [NAV]", count)
-  
-  const pathname = usePathname()
-  const [theme, setTheme] = useState<"light" | "dark">("light")
-  const [scrolled, setScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isClient, setIsClient] = useState(false)
-  const [isHoverNavOpen, setIsHoverNavOpen] = useState(false)
-  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null)
+  console.log("count cahnges [NAV]", count);
+
+  const pathname = usePathname();
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [scrolled, setScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [isHoverNavOpen, setIsHoverNavOpen] = useState(false);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    setIsClient(true) // Set to true when component mounts on client
-  }, [])
+    setIsClient(true); // Set to true when component mounts on client
+  }, []);
 
   useEffect(() => {
-    const stored = (typeof window !== "undefined" && localStorage.getItem("dm-theme")) as "light" | "dark" | null
+    const stored = (typeof window !== "undefined" &&
+      localStorage.getItem("dm-theme")) as "light" | "dark" | null;
     const initial =
-      stored ?? (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-    setTheme(initial)
-    if (typeof document !== "undefined") document.documentElement.classList.toggle("dark", initial === "dark")
-  }, [])
+      stored ??
+      (typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light");
+    setTheme(initial);
+    if (typeof document !== "undefined")
+      document.documentElement.classList.toggle("dark", initial === "dark");
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
-      const val = 60
-      setScrolled(window.scrollY > val ? true : window.scrollY < val && false)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+      const val = 60;
+      setScrolled(window.scrollY > val ? true : window.scrollY < val && false);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (hoverTimeout) {
-        clearTimeout(hoverTimeout)
+        clearTimeout(hoverTimeout);
       }
-    }
-  }, [hoverTimeout])
+    };
+  }, [hoverTimeout]);
 
   const toggleTheme = () => {
-    const next = theme === "light" ? "dark" : "light"
-    setTheme(next)
-    if (typeof window !== "undefined") localStorage.setItem("dm-theme", next)
-    if (typeof document !== "undefined") document.documentElement.classList.toggle("dark", next === "dark")
-  }
+    const next = theme === "light" ? "dark" : "light";
+    setTheme(next);
+    if (typeof window !== "undefined") localStorage.setItem("dm-theme", next);
+    if (typeof document !== "undefined")
+      document.documentElement.classList.toggle("dark", next === "dark");
+  };
 
   const handleHoverEnter = () => {
     if (hoverTimeout) {
-      clearTimeout(hoverTimeout)
-      setHoverTimeout(null)
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
     }
-    setIsHoverNavOpen(true)
-  }
+    setIsHoverNavOpen(true);
+  };
 
   const handleHoverLeave = () => {
     const timeout = setTimeout(() => {
-      setIsHoverNavOpen(false)
-    }, 150) // Small delay to allow moving to dropdown
-    setHoverTimeout(timeout)
-  }
+      setIsHoverNavOpen(false);
+    }, 150); // Small delay to allow moving to dropdown
+    setHoverTimeout(timeout);
+  };
 
   const nav = [
     { href: "/", label: "Home" },
@@ -85,11 +92,11 @@ export function Navbar() {
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
-  ]
+  ];
 
   return (
     <>
-      <nav className="sticky top-0 z-50 border-b bg-white/95 dark:bg-neutral-950/95 backdrop-blur">
+      <nav className="sticky top-0 z-40 border-b bg-white/95 dark:bg-neutral-950/95 backdrop-blur">
         <div className="container mx-auto px-4 h-12 flex items-center justify-between">
           {/* Mobile Hamburger Menu */}
           <div className="flex items-center gap-3 lg:hidden">
@@ -106,7 +113,8 @@ export function Navbar() {
                 <SheetHeader>
                   <div className="flex items-center gap-2">
                     <span className="font-extrabold text-xl tracking-tight">
-                      <span className="text-red-600">Dehli</span> <span className="text-green-600">Mirch</span>
+                      <span className="text-red-600">Dehli</span>{" "}
+                      <span className="text-green-600">Mirch</span>
                     </span>
                   </div>
                 </SheetHeader>
@@ -118,8 +126,8 @@ export function Navbar() {
                         href={n.href}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={`font-poppins text-lg font-medium hover:text-primary transition-colors py-2 ${
-                          pathname === n.href || pathname?.startsWith(n.href) 
-                            ? "text-primary font-semibold" 
+                          pathname === n.href || pathname?.startsWith(n.href)
+                            ? "text-primary font-semibold"
                             : "text-foreground"
                         }`}
                       >
@@ -127,10 +135,14 @@ export function Navbar() {
                       </Link>
                     ))}
                   </nav>
-                  
+
                   {/* Mobile Auth Button */}
                   <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <AuthButton variant="default" size="default" className="w-full" />
+                    <AuthButton
+                      variant="default"
+                      size="default"
+                      className="w-full"
+                    />
                   </div>
                 </div>
               </SheetContent>
@@ -139,15 +151,23 @@ export function Navbar() {
 
           {/* Logo - Show on mobile when not scrolled */}
           {!scrolled && (
-            <Link href="/" className="font-extrabold text-xl tracking-tight flex-shrink-0 lg:hidden">
-              <span className="text-red-600">Dehli</span> <span className="text-green-600">Mirch</span>
+            <Link
+              href="/"
+              className="font-extrabold text-xl tracking-tight flex-shrink-0 lg:hidden"
+            >
+              <span className="text-red-600">Dehli</span>{" "}
+              <span className="text-green-600">Mirch</span>
             </Link>
           )}
 
           {/* Desktop Logo - Show when scrolled */}
           {scrolled && (
-            <Link href="/" className="font-extrabold text-xl tracking-tight flex-shrink-0 hidden lg:block">
-              <span className="text-red-600">Dehli</span> <span className="text-green-600">Mirch</span>
+            <Link
+              href="/"
+              className="font-extrabold text-xl tracking-tight flex-shrink-0 hidden lg:block"
+            >
+              <span className="text-red-600">Dehli</span>{" "}
+              <span className="text-green-600">Mirch</span>
             </Link>
           )}
 
@@ -159,8 +179,8 @@ export function Navbar() {
                   <div className="relative">
                     <div
                       className={`font-poppins leading-none text-sm font-medium hover:text-primary transition-colors cursor-pointer ${
-                        pathname === n.href || pathname?.startsWith(n.href) 
-                          ? "text-primary font-medium" 
+                        pathname === n.href || pathname?.startsWith(n.href)
+                          ? "text-primary font-medium"
                           : "text-foreground"
                       }`}
                       onMouseEnter={handleHoverEnter}
@@ -168,31 +188,28 @@ export function Navbar() {
                     >
                       {n.label}
                     </div>
-                         {/* Hover Navigation - positioned relative to the nav container */}
-                <HoverNavigation 
-                isOpen={isHoverNavOpen} 
-                onClose={() => setIsHoverNavOpen(false)}
-                onMouseEnter={handleHoverEnter}
-                onMouseLeave={handleHoverLeave}
-              />
-                </div>
+                    {/* Hover Navigation - positioned relative to the nav container */}
+                    <HoverNavigation
+                      isOpen={isHoverNavOpen}
+                      onClose={() => setIsHoverNavOpen(false)}
+                      onMouseEnter={handleHoverEnter}
+                      onMouseLeave={handleHoverLeave}
+                    />
+                  </div>
                 ) : (
                   <Link
                     href={n.href}
                     className={`font-poppins leading-none text-sm font-medium hover:text-primary transition-colors ${
-                      pathname === n.href || pathname?.startsWith(n.href) 
-                        ? "text-primary font-medium" 
+                      pathname === n.href || pathname?.startsWith(n.href)
+                        ? "text-primary font-medium"
                         : "text-foreground"
                     }`}
                   >
                     {n.label}
                   </Link>
                 )}
-
               </div>
             ))}
-            
-           
           </div>
 
           {/* Right side actions */}
@@ -203,30 +220,31 @@ export function Navbar() {
             </Link> */}
 
             {/* Cart */}
-            {scrolled  && (
+            {scrolled && (
               <CartSheet>
                 <button
                   className={`relative flex flex-row items-center gap-2 px-3 py-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${
-                    isAdding ? 'bg-green-100 dark:bg-green-900' : ''
+                    isAdding ? "bg-green-100 dark:bg-green-900" : ""
                   }`}
                   aria-label="Cart"
                   title="View Cart"
                   disabled={isAdding}
                 >
-                  
                   <ShoppingBag className="h-6 w-6 text-black dark:text-gray-300" />
                   {/* Cart count badge - positioned on top for mobile */}
                   <div className="md:flex md:flex-col md:items-start">
-                  {isHydrated && count > 0 && (
-                    // <span className={window.innerWidth > 768 ? "h-5 min-w-[1.7rem] rounded-full bg-black dark:bg-gray-300 text-white dark:text-gray-900 text-[10px] grid place-items-center px-1" :"absolute -top-0 -right-0 h-5 min-w-[1.25rem] rounded-full bg-red-600 text-white text-xs font-medium grid place-items-center px-1"}>
-                    <span  className="absolute -top-0 -right-0 h-5 min-w-[1.25rem] rounded-full bg-red-600 text-white text-xs font-medium grid place-items-center px-1 md:static md:h-5 md:min-w-[1.7rem] md:rounded-full md:bg-black md:dark:bg-gray-300 md:text-white md:dark:text-gray-900 md:text-[10px] md:grid md:place-items-center md:px-1">  
-                    {count}
-                    </span>
-                  )}
-                  {/* Desktop cart text */}
-                  <div className="hidden sm:flex flex-col items-start">
-                    <p className="text-sm font-medium text-black dark:text-gray-300 tracking-wide">Cart</p>
-                  </div>
+                    {isHydrated && count > 0 && (
+                      // <span className={window.innerWidth > 768 ? "h-5 min-w-[1.7rem] rounded-full bg-black dark:bg-gray-300 text-white dark:text-gray-900 text-[10px] grid place-items-center px-1" :"absolute -top-0 -right-0 h-5 min-w-[1.25rem] rounded-full bg-red-600 text-white text-xs font-medium grid place-items-center px-1"}>
+                      <span className="absolute -top-0 -right-0 h-5 min-w-[1.25rem] rounded-full bg-red-600 text-white text-xs font-medium grid place-items-center px-1 md:static md:h-5 md:min-w-[1.7rem] md:rounded-full md:bg-black md:dark:bg-gray-300 md:text-white md:dark:text-gray-900 md:text-[10px] md:grid md:place-items-center md:px-1">
+                        {count}
+                      </span>
+                    )}
+                    {/* Desktop cart text */}
+                    <div className="hidden sm:flex flex-col items-start">
+                      <p className="text-sm font-medium text-black dark:text-gray-300 tracking-wide">
+                        Cart
+                      </p>
+                    </div>
                   </div>
                 </button>
               </CartSheet>
@@ -241,15 +259,18 @@ export function Navbar() {
               aria-label="Toggle theme"
               className="h-8 w-8 inline-flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
             </button>
           </div>
         </div>
       </nav>
     </>
-  )
+  );
 }
-
 
 // "use client"
 
@@ -275,12 +296,12 @@ export function Navbar() {
 //   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 //   const { count, isAdding, refreshCart, isHydrated, items } = useCart(); // Add items to dependencies
 //   const { ids: wishlistIds } = useWishlist();
-  
+
 //   // Use useMemo to prevent unnecessary re-renders while ensuring updates
 //   const cartCount = useMemo(() => count, [count, items.length]); // Add items.length as dependency
-  
+
 //   console.log("count cahnges [NAV]", cartCount, "items:", items.length)
-  
+
 //   const pathname = usePathname()
 //   const [theme, setTheme] = useState<"light" | "dark">("light")
 //   const [scrolled, setScrolled] = useState(false)
@@ -349,8 +370,8 @@ export function Navbar() {
 //                         href={n.href}
 //                         onClick={() => setIsMobileMenuOpen(false)}
 //                         className={`font-poppins text-lg font-medium hover:text-red-600 transition-colors py-2 ${
-//                           pathname === n.href || pathname?.startsWith(n.href) 
-//                             ? "text-red-600 font-semibold" 
+//                           pathname === n.href || pathname?.startsWith(n.href)
+//                             ? "text-red-600 font-semibold"
 //                             : "text-neutral-700 dark:text-neutral-300"
 //                         }`}
 //                       >
@@ -358,7 +379,7 @@ export function Navbar() {
 //                       </Link>
 //                     ))}
 //                   </nav>
-                  
+
 //                   {/* Mobile Auth Button */}
 //                   <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
 //                     <AuthButton variant="default" size="default" className="w-full" />
@@ -389,8 +410,8 @@ export function Navbar() {
 //                 key={n.href}
 //                 href={n.href}
 //                 className={`font-poppins leading-none text-sm font-medium hover:text-red-600 transition-colors ${
-//                   pathname === n.href || pathname?.startsWith(n.href) 
-//                     ? "text-red-600 font-medium" 
+//                   pathname === n.href || pathname?.startsWith(n.href)
+//                     ? "text-red-600 font-medium"
 //                     : ""
 //                 }`}
 //               >
@@ -412,7 +433,7 @@ export function Navbar() {
 //                   title="View Cart"
 //                   disabled={isAdding}
 //                 >
-                  
+
 //                   <ShoppingBag className="h-6 w-6 text-black dark:text-gray-300" />
 //                   {/* Cart count badge */}
 //                   <div className="md:flex md:flex-col md:items-start">

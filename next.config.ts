@@ -1,15 +1,20 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /* config options here */
-//   webpack: (config, { isServer }) => {
-//     if (!isServer) {
-//       config.resolve.fallback.fs = false
-//       config.resolve.fallback.dns = false
-//       config.resolve.fallback.net = false
-//  }
-    // return config;
-// }
+// next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: ["images-dehlimirchmasalajaat-com.s3.ap-south-1.amazonaws.com"],
+    // or use remotePatterns for more control:
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images-dehlimirchmasalajaat-com.s3.ap-south-1.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

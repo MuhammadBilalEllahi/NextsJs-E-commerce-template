@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { downloadCSV } from "@/lib/csv"
+import { OrderDetailsSidebar } from "@/components/admin/orders/order-details-sidebar"
 
 type Order = {
   id: string
@@ -62,6 +63,10 @@ export default function OrdersAdminPage() {
   const [status, setStatus] = useState<string>("")
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  
+  // Order details sidebar state
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   
   const filtered = useMemo(()=>orders.filter(o=>{
     return (!q || o.orderId.includes(q) || o.refId.includes(q) || o.customer.toLowerCase().includes(q.toLowerCase()) || o.email.toLowerCase().includes(q.toLowerCase())) &&
@@ -234,6 +239,17 @@ export default function OrdersAdminPage() {
 
   const exportPDF = ()=> window.print()
 
+  // Handle opening order details sidebar
+  const handleViewOrderDetails = (orderId: string) => {
+    setSelectedOrderId(orderId)
+    setIsSidebarOpen(true)
+  }
+
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false)
+    setSelectedOrderId(null)
+  }
+
   return (
     <div className="grid gap-6">
       <Card>
@@ -265,12 +281,13 @@ export default function OrdersAdminPage() {
                   <th className="p-3 text-left">Shipping</th>
                   <th className="p-3 text-left">Payment</th>
                   <th className="p-3 text-left">Status & Tracking</th>
+                  <th className="p-3 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={9} className="p-4 text-center text-neutral-500">
+                    <td colSpan={10} className="p-4 text-center text-neutral-500">
                       Loading orders...
                     </td>
                   </tr>
@@ -362,12 +379,22 @@ export default function OrdersAdminPage() {
                           )}
                         </div>
                       </td>
+                      <td className="p-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewOrderDetails(o.id)}
+                          className="text-xs"
+                        >
+                          View Details
+                        </Button>
+                      </td>
                     </tr>
                   ))
                 )}
                 {!loading && !filtered.length && (
                   <tr>
-                    <td colSpan={9} className="p-4 text-center text-neutral-500">
+                    <td colSpan={10} className="p-4 text-center text-neutral-500">
                       No orders found
                     </td>
                   </tr>
@@ -406,6 +433,13 @@ export default function OrdersAdminPage() {
           <p className="text-xs text-neutral-500">Delivery tracking and notifications can be integrated with your courier APIs.</p>
         </CardContent>
       </Card>
+      
+      {/* Order Details Sidebar */}
+      <OrderDetailsSidebar
+        orderId={selectedOrderId}
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+      />
     </div>
   )
 }

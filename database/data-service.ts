@@ -1,4 +1,4 @@
-"use server"
+"use server";
 // Import specific models for use
 import Product from "@/models/Product";
 import Category from "@/models/Category";
@@ -10,21 +10,31 @@ import dbConnect from "@/database/mongodb";
 import RedisClient from "@/database/redisClient";
 import Banner from "@/models/Banner";
 import GlobalSettings from "@/models/GlobalSettings";
-import { CACHE_EXPIRE_TIME,CACHE_BANNER_KEY, CACHE_BRANCH_KEY, CACHE_GLOBAL_SETTINGS_KEY, CACHE_CATEGORIES_KEY, CACHE_PRODUCTS_BY_CATEGORY_KEY } from "@/lib/cacheConstants";  
+import {
+  CACHE_EXPIRE_TIME,
+  CACHE_BANNER_KEY,
+  CACHE_BRANCH_KEY,
+  CACHE_GLOBAL_SETTINGS_KEY,
+  CACHE_CATEGORIES_KEY,
+  CACHE_PRODUCTS_BY_CATEGORY_KEY,
+} from "@/lib/cacheConstants";
 import Branch from "@/models/Branches";
-import {  ProductTypeVariant, Variant as VariantType } from "@/mock_data/data";
+import { ProductTypeVariant, Variant as VariantType } from "@/mock_data/data";
 
-
-export async function getAllBranches(){
+export async function getAllBranches() {
   try {
     await dbConnect();
     const cachedBranches = await RedisClient.get(CACHE_BRANCH_KEY);
-    if(cachedBranches){
+    if (cachedBranches) {
       return JSON.parse(cachedBranches);
     }
     const branches = await Branch.find({ isActive: true }).lean();
-    if(branches.length > 0){
-      await RedisClient.set(CACHE_BRANCH_KEY, JSON.stringify(branches), CACHE_EXPIRE_TIME);
+    if (branches.length > 0) {
+      await RedisClient.set(
+        CACHE_BRANCH_KEY,
+        JSON.stringify(branches),
+        CACHE_EXPIRE_TIME
+      );
     }
     return branches;
   } catch (error) {
@@ -33,35 +43,41 @@ export async function getAllBranches(){
   }
 }
 
-export async function getGlobalSettings(){
+export async function getGlobalSettings() {
   try {
     await dbConnect();
     const cachedSettings = await RedisClient.get(CACHE_GLOBAL_SETTINGS_KEY);
-    if(cachedSettings){
+    if (cachedSettings) {
       return JSON.parse(cachedSettings);
     }
     const globalSettings = await GlobalSettings.findOne({}).lean();
-    if(globalSettings){
-      await RedisClient.set(CACHE_GLOBAL_SETTINGS_KEY, JSON.stringify(globalSettings), CACHE_EXPIRE_TIME);
+    if (globalSettings) {
+      await RedisClient.set(
+        CACHE_GLOBAL_SETTINGS_KEY,
+        JSON.stringify(globalSettings),
+        CACHE_EXPIRE_TIME
+      );
     }
     return globalSettings;
   } catch (error) {
     console.error("Error fetching global settings:", error);
     return null;
-  } 
+  }
 }
 
-export async function getAllBanners(){
+export async function getAllBanners() {
   try {
     await dbConnect();
     const cachedBanners = await RedisClient.get(CACHE_BANNER_KEY);
-    if(cachedBanners){
+    if (cachedBanners) {
       return JSON.parse(cachedBanners);
     }
-    const banners = await Banner.find({ isActive: true }).sort({ createdAt: -1 }).lean();
-    
+    const banners = await Banner.find({ isActive: true })
+      .sort({ createdAt: -1 })
+      .lean();
+
     // Filter out expired banners
-    const activeBanners = banners.filter(banner => {
+    const activeBanners = banners.filter((banner) => {
       if (banner.expiresAt) {
         const expiryDate = new Date(banner.expiresAt);
         const now = new Date();
@@ -69,12 +85,16 @@ export async function getAllBanners(){
       }
       return true;
     });
-    
-    if(activeBanners.length > 0){
-      if(await RedisClient.get(CACHE_BANNER_KEY) !== null){
+
+    if (activeBanners.length > 0) {
+      if ((await RedisClient.get(CACHE_BANNER_KEY)) !== null) {
         await RedisClient.del(CACHE_BANNER_KEY);
       }
-      await RedisClient.set(CACHE_BANNER_KEY, JSON.stringify(activeBanners), CACHE_EXPIRE_TIME);
+      await RedisClient.set(
+        CACHE_BANNER_KEY,
+        JSON.stringify(activeBanners),
+        CACHE_EXPIRE_TIME
+      );
     }
     return activeBanners;
   } catch (error) {
@@ -90,18 +110,27 @@ export async function getAllTopSellingProducts() {
     const products = await Product.find({ isActive: true, isTopSelling: true })
       // .populate("brand", "name")
       // .populate("categories", "name")
-      .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
+      .populate({
+        path: "variants",
+        match: { isActive: true, isOutOfStock: false },
+      })
       .sort({ createdAt: -1 })
       .lean();
-      console.log("products in getAllTopSellingProducts", JSON.stringify(products, null, 2));
-    return products.map(product => ({
+    console.log(
+      "products in getAllTopSellingProducts",
+      JSON.stringify(products, null, 2)
+    );
+    return products.map((product) => ({
       id: String(product._id),
       slug: product.slug,
       title: product.name,
       description: product.description,
-      price: product?.variants?.[0]?.price ?? product?.price  ?? 0,
+      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
       images: product.images,
-      image: product.images && product.images.length > 0 ? product.images[0] : undefined,
+      image:
+        product.images && product.images.length > 0
+          ? product.images[0]
+          : undefined,
       rating: product.ratingAvg,
       isTopSelling: product.isTopSelling,
       // ingredients: product.ingredients,
@@ -127,7 +156,7 @@ export async function getAllTopSellingProducts() {
           stock: variant.stock,
           isActive: variant.isActive,
           isOutOfStock: variant.isOutOfStock,
-          images: variant.images || []
+          images: variant.images || [],
         })),
       // reviews: product.reviews?.map(review => ({
       //   id: String(review._id),
@@ -143,25 +172,30 @@ export async function getAllTopSellingProducts() {
   }
 }
 
-
 export async function getAllNewArrivalsProducts() {
   try {
     await dbConnect();
     const products = await Product.find({ isActive: true, isNewArrival: true })
       // .populate("brand", "name")
       // .populate("categories", "name")
-      .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
+      .populate({
+        path: "variants",
+        match: { isActive: true, isOutOfStock: false },
+      })
       .sort({ createdAt: -1 })
       .lean();
-      // console.log("products in getAllNewArrivalsProducts", JSON.stringify(products, null, 2));
-    return products.map(product => ({
+    // console.log("products in getAllNewArrivalsProducts", JSON.stringify(products, null, 2));
+    return products.map((product) => ({
       id: String(product._id),
       slug: product.slug,
       title: product.name,
       description: product.description,
-      price: product?.variants?.[0]?.price ?? product?.price  ?? 0,
+      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
       images: product.images,
-      image: product.images && product.images.length > 0 ? product.images[0] : undefined,
+      image:
+        product.images && product.images.length > 0
+          ? product.images[0]
+          : undefined,
       rating: product.ratingAvg,
       isNewArrival: product.isNewArrival,
       // ingredients: product.ingredients,
@@ -187,7 +221,7 @@ export async function getAllNewArrivalsProducts() {
           stock: variant.stock,
           isActive: variant.isActive,
           isOutOfStock: variant.isOutOfStock,
-          images: variant.images || []
+          images: variant.images || [],
         })),
       // reviews: product.reviews?.map(review => ({
       //   id: String(review._id),
@@ -209,13 +243,16 @@ export async function getAllProducts() {
     const products = await Product.find({ isActive: true, isOutOfStock: false })
       .populate("brand", "name")
       .populate("categories", "name")
-      .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
+      .populate({
+        path: "variants",
+        match: { isActive: true, isOutOfStock: false },
+      })
       .sort({ createdAt: -1 })
       .lean();
 
     // console.log("products in getAllProducts", JSON.stringify(products, null, 2));
-    
-    return products.map(product => ({
+
+    return products.map((product) => ({
       id: String(product._id),
       slug: product.slug,
       title: product.name,
@@ -227,7 +264,11 @@ export async function getAllProducts() {
       instructions: "", // Can be added to product model later
       category: product.categories?.[0]?.name || "spices",
       brand: product.brand?.name || "Dehli Mirch",
-      stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+      stock:
+        product.variants?.reduce(
+          (sum: number, v: any) => sum + (v.stock || 0),
+          0
+        ) || 0,
       tags: [], // Can be added to product model later
       variants: (product.variants || [])
         .filter((variant: any) => variant.isActive) // Only show active variants
@@ -246,15 +287,16 @@ export async function getAllProducts() {
           stock: variant.stock,
           isActive: variant.isActive,
           isOutOfStock: variant.isOutOfStock,
-          images: variant.images
+          images: variant.images,
         })),
-      reviews: product.reviews?.map((review: any) => ({
-        id: String(review._id),
-        user: review.user?.name || "Anonymous",
-        rating: review.rating,
-        comment: review.comment,
-        date: review.createdAt
-      })) || []
+      reviews:
+        product.reviews?.map((review: any) => ({
+          id: String(review._id),
+          user: review.user?.name || "Anonymous",
+          rating: review.rating,
+          comment: review.comment,
+          date: review.createdAt,
+        })) || [],
     }));
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -265,27 +307,29 @@ export async function getAllProducts() {
 export async function getProductBySlug(slug: string) {
   try {
     await dbConnect();
-    const product  = await Product.findOne({ slug, isActive: true })
+    const product = await Product.findOne({ slug, isActive: true })
       .populate("brand", "name")
       .populate("categories", "name")
       .populate("variants")
-      .lean<ProductTypeVariant>(); 
-      // .lean();
-    
+      .lean<ProductTypeVariant>();
+    // .lean();
+
     if (!product) return null;
-    
+
     // Filter and sort variants: available first, then out-of-stock
-    const availableVariants: VariantType[]  = (product.variants || []).filter((variant: any) => 
-      variant.isActive && !variant.isOutOfStock && variant.stock > 0
+    const availableVariants: VariantType[] = (product.variants || []).filter(
+      (variant: any) =>
+        variant.isActive && !variant.isOutOfStock && variant.stock > 0
     );
-    
-    const outOfStockVariants: VariantType[]  = (product.variants || []).filter((variant: any) => 
-      variant.isActive && (variant.isOutOfStock || variant.stock <= 0)
+
+    const outOfStockVariants: VariantType[] = (product.variants || []).filter(
+      (variant: any) =>
+        variant.isActive && (variant.isOutOfStock || variant.stock <= 0)
     );
-    
+
     // Combine: available first, then out-of-stock
     const sortedVariants = [...availableVariants, ...outOfStockVariants];
-    
+
     return {
       id: String(product._id),
       slug: product.slug,
@@ -298,7 +342,10 @@ export async function getProductBySlug(slug: string) {
       instructions: "", // Can be added later
       category: product.categories?.[0]?.name || "spices",
       brand: product.brand?.name || "Dehli Mirch",
-      stock: availableVariants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0),
+      stock: availableVariants.reduce(
+        (sum: number, v: any) => sum + (v.stock || 0),
+        0
+      ),
       tags: [], // Can be added later
       variants: sortedVariants.map((variant: any) => ({
         _id: String(variant._id),
@@ -307,15 +354,16 @@ export async function getProductBySlug(slug: string) {
         stock: variant.stock,
         isActive: variant.isActive,
         isOutOfStock: variant.isOutOfStock,
-        images: variant.images
+        images: variant.images,
       })),
-      reviews: product.reviews?.map((review: any) => ({
-        id: String(review._id),
-        user: review.user?.name || "Anonymous",
-        rating: review.rating,
-        comment: review.comment,
-        date: review.createdAt
-      })) || []
+      reviews:
+        product.reviews?.map((review: any) => ({
+          id: String(review._id),
+          user: review.user?.name || "Anonymous",
+          rating: review.rating,
+          comment: review.comment,
+          date: review.createdAt,
+        })) || [],
     };
   } catch (error) {
     console.error("Error fetching product by slug:", error);
@@ -327,37 +375,43 @@ export async function getProductBySlug(slug: string) {
 export async function getAllCategories() {
   try {
     await dbConnect();
-    
+
     // Check Redis cache first
     const cachedCategories = await RedisClient.get(CACHE_CATEGORIES_KEY);
     if (cachedCategories) {
       return JSON.parse(cachedCategories);
     }
-    
+
     // Fetch from database if not in cache
     const categories = await Category.find({ isActive: true })
       .populate("parent", "name")
       .sort({ order: 1, name: 1 })
       .lean();
-    
-    const formattedCategories = categories.map(category => ({
+
+    const formattedCategories = categories.map((category) => ({
       id: String(category._id),
       name: category.name,
       slug: category.slug,
       description: category.description,
       image: category.image,
-      parent: category.parent ? {
-        id: String(category.parent._id),
-        name: category.parent.name
-      } : null,
-      productCount: 0 // Can be populated later if needed
+      parent: category.parent
+        ? {
+            id: String(category.parent._id),
+            name: category.parent.name,
+          }
+        : null,
+      productCount: 0, // Can be populated later if needed
     }));
-    
+
     // Cache the results for 10 hours
     if (formattedCategories.length > 0) {
-      await RedisClient.set(CACHE_CATEGORIES_KEY, JSON.stringify(formattedCategories), CACHE_EXPIRE_TIME);
+      await RedisClient.set(
+        CACHE_CATEGORIES_KEY,
+        JSON.stringify(formattedCategories),
+        CACHE_EXPIRE_TIME
+      );
     }
-    
+
     return formattedCategories;
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -372,12 +426,12 @@ export async function getAllBrands() {
     const brands = await Brand.find({ isActive: true })
       .sort({ name: 1 })
       .lean();
-    
-         return brands.map(brand => ({
-       id: String(brand._id),
+
+    return brands.map((brand) => ({
+      id: String(brand._id),
       name: brand.name,
       description: brand.description,
-      logo: brand.logo
+      logo: brand.logo,
     }));
   } catch (error) {
     console.error("Error fetching brands:", error);
@@ -386,43 +440,47 @@ export async function getAllBrands() {
 }
 
 // Review data functions
-export async function getProductReviews(productId: string, limit = 10, page = 1) {
+export async function getProductReviews(
+  productId: string,
+  limit = 10,
+  page = 1
+) {
   try {
     await dbConnect();
     const skip = (page - 1) * limit;
-    
-    const reviews = await Review.find({ 
-      product: productId, 
-      isActive: true 
+
+    const reviews = await Review.find({
+      product: productId,
+      isActive: true,
     })
       .populate("user", "name")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean();
-    
-    const total = await Review.countDocuments({ 
-      product: productId, 
-      isActive: true 
+
+    const total = await Review.countDocuments({
+      product: productId,
+      isActive: true,
     });
-    
-           return {
-         reviews: reviews.map(review => ({
-           id: String(review._id),
+
+    return {
+      reviews: reviews.map((review) => ({
+        id: String(review._id),
         user: review.user?.name || "Anonymous",
         rating: review.rating,
         title: review.title,
         comment: review.comment,
         date: review.createdAt,
         isVerified: review.isVerified,
-        helpfulCount: review.helpfulCount
+        helpfulCount: review.helpfulCount,
       })),
       pagination: {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     console.error("Error fetching product reviews:", error);
@@ -434,50 +492,127 @@ export async function getProductReviews(productId: string, limit = 10, page = 1)
 export async function getProductsByCategory(categorySlug: string, limit = 10) {
   try {
     await dbConnect();
-    
+
     // Create cache key for this specific category and limit
     const cacheKey = `${CACHE_PRODUCTS_BY_CATEGORY_KEY}:${categorySlug}:${limit}`;
-    
+
     // Check Redis cache first
     const cachedProducts = await RedisClient.get(cacheKey);
     if (cachedProducts) {
       return JSON.parse(cachedProducts);
     }
-    
+
     // First find the category
-    const category = await Category.findOne({ slug: categorySlug, isActive: true }).lean();
+    const category = await Category.findOne({
+      slug: categorySlug,
+      isActive: true,
+    }).lean();
     if (!category) return [];
-    
+
     // Find products in this category
-    const products = await Product.find({ 
-      isActive: true, 
+    const products = await Product.find({
+      isActive: true,
       isOutOfStock: false,
-      categories: (category as any)._id 
+      categories: (category as any)._id,
     })
       .populate("brand", "name")
-      .populate({path:"variants", match: {isActive: true, isOutOfStock: false}})
+      .populate({
+        path: "variants",
+        match: { isActive: true, isOutOfStock: false },
+      })
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
-    
-    const formattedProducts = products.map(product => ({
+
+    const formattedProducts = products.map((product) => ({
       id: String(product._id),
       slug: product.slug,
       title: product.name,
       price: product?.variants?.[0]?.price ?? product?.price ?? 0,
       images: product.images,
-      image: product.images && product.images.length > 0 ? product.images[0] : undefined,
+      image:
+        product.images && product.images.length > 0
+          ? product.images[0]
+          : undefined,
       brand: product.brand?.name || "Dehli Mirch",
     }));
-    
+
     // Cache the results for 2 hours (shorter than categories since products change more frequently)
     if (formattedProducts.length > 0) {
       await RedisClient.set(cacheKey, JSON.stringify(formattedProducts), 7200); // 2 hours
     }
-    
+
     return formattedProducts;
   } catch (error) {
     console.error("Error fetching products by category:", error);
+    return [];
+  }
+}
+
+// Get trending products (top selling + new arrivals)
+export async function getTrendingProducts(limit = 6) {
+  try {
+    await dbConnect();
+
+    // Get top selling products first
+    const topSelling = await Product.find({
+      isActive: true,
+      isTopSelling: true,
+      isOutOfStock: false,
+    })
+      .populate("brand", "name")
+      .populate("categories", "name")
+      .populate({
+        path: "variants",
+        match: { isActive: true, isOutOfStock: false },
+      })
+      .sort({ createdAt: -1 })
+      .limit(Math.ceil(limit / 2))
+      .lean();
+
+    // Get new arrivals to fill remaining slots
+    const remainingLimit = limit - topSelling.length;
+    const newArrivals =
+      remainingLimit > 0
+        ? await Product.find({
+            isActive: true,
+            isNewArrival: true,
+            isOutOfStock: false,
+            _id: { $nin: topSelling.map((p) => p._id) }, // Exclude already selected products
+          })
+            .populate("brand", "name")
+            .populate("categories", "name")
+            .populate({
+              path: "variants",
+              match: { isActive: true, isOutOfStock: false },
+            })
+            .sort({ createdAt: -1 })
+            .limit(remainingLimit)
+            .lean()
+        : [];
+
+    // Combine and format products
+    const allProducts = [...topSelling, ...newArrivals];
+
+    return allProducts.map((product) => ({
+      id: String(product._id),
+      slug: product.slug,
+      title: product.name,
+      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+      images: product.images,
+      image:
+        product.images && product.images.length > 0
+          ? product.images[0]
+          : undefined,
+      brand: product.brand?.name || "Dehli Mirch",
+      rating: product.ratingAvg || 0,
+      reviewCount: product.reviewCount || 0,
+      category: product.categories?.[0]?.name || "spices",
+      isTopSelling: product.isTopSelling,
+      isNewArrival: product.isNewArrival,
+    }));
+  } catch (error) {
+    console.error("Error fetching trending products:", error);
     return [];
   }
 }
@@ -486,28 +621,26 @@ export async function getProductsByCategory(categorySlug: string, limit = 10) {
 export async function getFAQs(category = "all", search = "") {
   try {
     await dbConnect();
-    
+
     let query: any = { isActive: true };
-    
+
     if (category && category !== "all") {
       query.category = category;
     }
-    
+
     if (search) {
       query.$text = { $search: search };
     }
-    
-    const faqs = await FAQ.find(query)
-      .sort({ order: 1, createdAt: -1 })
-      .lean();
-    
-    return faqs.map(faq => ({
+
+    const faqs = await FAQ.find(query).sort({ order: 1, createdAt: -1 }).lean();
+
+    return faqs.map((faq) => ({
       id: faq._id,
       question: faq.question,
       answer: faq.answer,
       category: faq.category,
       tags: faq.tags,
-      helpfulCount: faq.helpfulCount
+      helpfulCount: faq.helpfulCount,
     }));
   } catch (error) {
     console.error("Error fetching FAQs:", error);
@@ -523,4 +656,3 @@ export async function getFAQs(category = "all", search = "") {
 //     { author: "Fatima Z.", quote: "Fast delivery and great packaging." },
 //   ];
 // }
-
