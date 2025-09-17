@@ -87,8 +87,8 @@ export function Navbar() {
 
   const nav = [
     { href: "/", label: "Home" },
-    { href: "/category/all", label: "All Products", hasHover: true },
-    { href: "/category/all", label: "Shop" },
+    { href: "/shop/all", label: "All Products", hasHover: true },
+    { href: "/shop/all", label: "Shop" },
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
@@ -333,7 +333,7 @@ export function Navbar() {
 
 //   const nav = [
 //     { href: "/", label: "Home" },
-//     { href: "/category/all", label: "Shop" },
+//     { href: "/shop/all", label: "Shop" },
 //     { href: "/blog", label: "Blog" },
 //     { href: "/about", label: "About" },
 //     { href: "/contact", label: "Contact" },

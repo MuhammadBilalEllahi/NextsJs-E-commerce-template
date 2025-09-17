@@ -1,35 +1,139 @@
-"use client"
+"use client";
 
-import { useWishlist } from "@/lib/providers/wishlistProvider"
-import { useCart } from "@/lib/providers/cartContext"
-import { Button } from "@/components/ui/button"
-import { Heart, Trash2 } from 'lucide-react'
-import Link from "next/link"
-import { products } from "@/mock_data/mock-data"
+import { useWishlist } from "@/lib/providers/wishlistProvider";
+import { useCart } from "@/lib/providers/cartContext";
+import { useAuth } from "@/lib/providers/authProvider";
+import { Button } from "@/components/ui/button";
+import { Heart, Trash2, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { products } from "@/mock_data/mock-data";
+import { ProductCard } from "@/components/product/product-card";
+import { YouMayAlsoLike } from "@/components/product/you-may-also-like";
+import { RecentlyViewed } from "@/components/product/recently-viewed";
+
+type WishlistItem = {
+  id: string;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  productImage: string;
+  productPrice: number;
+  variantId?: string;
+  variantLabel?: string;
+  isOutOfStock: boolean;
+  availableStock: number;
+  addedAt: string;
+};
 
 export default function WishlistPage() {
-  const { ids } = useWishlist()
-  const { add, remove, isAdding } = useCart()
+  const { ids, items, clear, isLoading } = useWishlist();
+  const { add, remove, isAdding } = useCart();
+  const { isAuthenticated } = useAuth();
+  const [wishlistData, setWishlistData] = useState<WishlistItem[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
-  // Get wishlisted products from the products array
-  const wishlistedProducts = products.filter(product => ids.has(product.id))
+  // Fetch wishlist data from database for authenticated users
+  useEffect(() => {
+    const fetchWishlistData = async () => {
+      setIsLoadingData(true);
+      try {
+        if (isAuthenticated) {
+          // Authenticated user - fetch from database
+          const response = await fetch("/api/wishlist");
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+              setWishlistData(data.wishlist);
+            }
+          }
+        } else {
+          // Guest user - fetch from database using session ID
+          const guestSessionId = localStorage.getItem("dm-guest-cart-id");
+          if (guestSessionId) {
+            const response = await fetch(
+              `/api/wishlist?sessionId=${guestSessionId}`
+            );
+            if (response.ok) {
+              const data = await response.json();
+              if (data.success) {
+                setWishlistData(data.wishlist);
+              }
+            }
+          } else {
+            // Fallback to mock data for guests without session
+            const wishlistedProducts = products.filter((product) =>
+              ids.has(product.id)
+            );
+            const mockWishlistData: WishlistItem[] = wishlistedProducts.map(
+              (product) => ({
+                id: product.id,
+                productId: product.id,
+                productSlug: product.slug,
+                productName: product.title,
+                productImage: product.image || "/placeholder.svg",
+                productPrice: product.price,
+                variantId: undefined,
+                variantLabel: undefined,
+                isOutOfStock: false, // Mock data doesn't have stock info
+                availableStock: 10, // Mock stock
+                addedAt: new Date().toISOString(),
+              })
+            );
+            setWishlistData(mockWishlistData);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching wishlist data:", error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
 
-  const handleAddToCart = (product: any) => {
-    if (isAdding) return
+    fetchWishlistData();
+  }, [isAuthenticated, ids]);
+
+  const handleAddToCart = (item: WishlistItem) => {
+    if (isAdding) return;
     add(
-      { 
-        id: product.id, 
-        title: product.title, 
-        price: product.price, 
-        image: product.image,
-        productId: product.id,
-        slug: product.slug
-      }, 
+      {
+        id: item.productId,
+        title: item.productName,
+        price: item.productPrice,
+        image: item.productImage,
+        productId: item.productId,
+        slug: item.productSlug,
+        variantId: item.variantId,
+      },
       1
-    )
+    );
+  };
+
+  const handleRemoveFromWishlist = async (productId: string) => {
+    // This will be handled by the wishlist provider
+    // The UI will update automatically through the provider
+  };
+
+  const handleClearAll = async () => {
+    await clear();
+    setWishlistData([]);
+  };
+
+  if (isLoadingData) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="text-6xl mb-4">⏳</div>
+          <h1 className="text-2xl font-bold mb-4">Loading Wishlist...</h1>
+          <p className="text-neutral-600 dark:text-neutral-400">
+            Please wait while we fetch your wishlist items.
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  if (wishlistedProducts.length === 0) {
+  if (wishlistData.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto text-center">
@@ -38,14 +142,14 @@ export default function WishlistPage() {
           <p className="text-neutral-600 dark:text-neutral-400 mb-6">
             Start adding products to your wishlist to save them for later!
           </p>
-          <Link href="/category/all">
+          <Link href="/shop/all">
             <Button className="bg-green-600 hover:bg-green-700">
               Start Shopping
             </Button>
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -54,12 +158,14 @@ export default function WishlistPage() {
         <div>
           <h1 className="text-2xl font-bold">My Wishlist</h1>
           <p className="text-neutral-600 dark:text-neutral-400">
-            {wishlistedProducts.length} {wishlistedProducts.length === 1 ? 'item' : 'items'} saved
+            {wishlistData.length} {wishlistData.length === 1 ? "item" : "items"}{" "}
+            saved
           </p>
         </div>
-        <Button 
-          variant="outline" 
-          onClick={() => wishlistedProducts.forEach(product => remove(product.id))}
+        <Button
+          variant="outline"
+          onClick={handleClearAll}
+          disabled={isLoading}
           className="flex items-center gap-2"
         >
           <Trash2 className="h-4 w-4" />
@@ -68,45 +174,44 @@ export default function WishlistPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {wishlistedProducts.map((product) => (
-          <div key={product.id} className="group rounded-2xl border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition">
-            <Link href={`/product/${product.slug}`} className="block">
-              <img
-                src={product.image || "/placeholder.svg"}
-                alt={product.title}
-                className="h-44 w-full object-cover group-hover:scale-[1.01] transition-transform"
-              />
-            </Link>
-            <div className="p-3">
-              <div className="flex items-start justify-between gap-2">
-                <Link href={`/product/${product.slug}`} className="font-medium line-clamp-1 hover:text-red-600">
-                  {product.title}
-                </Link>
-                <button 
-                  onClick={() => remove(product.id)}
-                  className="text-red-600 hover:text-red-700 p-1"
-                >
-                  <Heart className="h-4 w-4 fill-red-600" />
-                </button>
-              </div>
-              <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
-                {product.type || 'Spice'} • {product.category || 'Product'}
-              </div>
-              <div className="mt-2 flex items-center justify-between">
-                <div className="font-semibold text-red-600">Rs. {product.price.toFixed(2)}</div>
-                <Button
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={() => handleAddToCart(product)}
-                  disabled={isAdding}
-                >
-                  {isAdding ? "Adding..." : "Add to Cart"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
+        {wishlistData.map((item) => {
+          // Convert WishlistItem to Product format for ProductCard
+          const productForCard = {
+            id: item.productId,
+            slug: item.productSlug,
+            title: item.productName,
+            description: "", // WishlistItem doesn't have description
+            price: item.productPrice,
+            image: item.productImage,
+            images: [item.productImage],
+            variants: item.variantId
+              ? [
+                  {
+                    _id: item.variantId,
+                    label: item.variantLabel || "",
+                    price: item.productPrice,
+                    stock: item.availableStock,
+                    isActive: true,
+                    isOutOfStock: item.isOutOfStock,
+                    images: [item.productImage],
+                  },
+                ]
+              : [],
+            isOutOfStock: item.isOutOfStock,
+            stock: item.availableStock,
+            rating: 4.5, // Default rating
+            brand: "Dehli Mirch",
+          };
+
+          return <ProductCard key={item.id} product={productForCard} />;
+        })}
       </div>
+
+      <section className="mt-12" id="you-may-also-like">
+        <YouMayAlsoLike currentId={String(wishlistData[0].id)} />
+      </section>
+
+      <RecentlyViewed currentId={String(wishlistData[0].id)} />
     </div>
-  )
+  );
 }

@@ -10,9 +10,6 @@ import fs from "fs";
 import path from "path";
 import { mkdir, writeFile } from "fs/promises";
 
-
-
-
 // GET all categories
 export async function GET() {
   await dbConnect();
@@ -20,7 +17,10 @@ export async function GET() {
     const categories = await Category.find().populate("parent").lean();
     return NextResponse.json({ success: true, categories });
   } catch (err: any) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    );
   }
 }
 
@@ -32,16 +32,16 @@ export async function POST(req: Request) {
   const session = await mongoose.startSession();
 
   try {
-   
-      // Convert NextRequest to Node-like request for formidable
+    // Convert NextRequest to Node-like request for formidable
     const formData = await req.formData();
-    
+
     // Since we can't easily use formidable with App Router, let's process manually
-    const name = formData.get('name')?.toString();
-    const slug = formData.get('slug')?.toString();
-    const parent = formData.get('parent')?.toString() || null;
-    const description = formData.get('description')?.toString();
-    const imageData = formData.get('image') as File | null;
+    const name = formData.get("name")?.toString();
+    const slug = formData.get("slug")?.toString();
+    const parent = formData.get("parent")?.toString() || null;
+    const description = formData.get("description")?.toString();
+    const isActive = formData.get("isActive")?.toString() === "true";
+    const imageData = formData.get("image") as File | null;
 
     // Validate fields
     const validated = categorySchema.parse({
@@ -49,6 +49,7 @@ export async function POST(req: Request) {
       slug: slug,
       parent: parent || null,
       description: description,
+      isActive: isActive,
     });
 
     // Auto-generate slug if not provided
@@ -62,12 +63,11 @@ export async function POST(req: Request) {
     // Upload image if present
     let imageUrl: string | undefined;
     // const file = imageFile as formidable.File | formidable.File[] | undefined;
-  if (imageData && imageData instanceof Blob) {
-      
+    if (imageData && imageData instanceof Blob) {
       // Create uploads directory if it doesn't exist
-      const uploadDir = path.join(process.cwd(), 'uploads', 'temp');
+      const uploadDir = path.join(process.cwd(), "uploads", "temp");
       try {
-        await mkdir(uploadDir, {recursive: true});
+        await mkdir(uploadDir, { recursive: true });
       } catch (err) {
         console.log("Upload directory already exists or couldn't be created");
       }
@@ -75,11 +75,12 @@ export async function POST(req: Request) {
       // Convert File to buffer
       const arrayBuffer = await imageData.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      
+
       // Generate unique filename
-      const originalFilename = (imageData as any).name || `file-${Date.now()}.jpg`;
-      const fileExt = path.extname(originalFilename) || '.jpg';
-      const safeFilename = originalFilename.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const originalFilename =
+        (imageData as any).name || `file-${Date.now()}.jpg`;
+      const fileExt = path.extname(originalFilename) || ".jpg";
+      const safeFilename = originalFilename.replace(/[^a-zA-Z0-9.-]/g, "_");
       const tempFileName = `temp-${Date.now()}-${safeFilename}`;
       const tempFilePath = path.join(uploadDir, tempFileName);
 
@@ -90,11 +91,14 @@ export async function POST(req: Request) {
       // console.log("tempFilePath",tempFilePath)
       // console.log("")
 
-       imageUrl = await uploadFileToS3({
-        filepath: tempFilePath,
-        originalFilename: originalFilename,
-        mimetype: (imageData as any).type || "application/octet-stream"
-      }, "categories");
+      imageUrl = await uploadFileToS3(
+        {
+          filepath: tempFilePath,
+          originalFilename: originalFilename,
+          mimetype: (imageData as any).type || "application/octet-stream",
+        },
+        "categories"
+      );
 
       // imageUrl = await uploadFileToS3({ buffer, originalFilename: originalFilename, mimetype: imageData.type }, "categories");
     }
@@ -110,15 +114,20 @@ export async function POST(req: Request) {
   } catch (err: any) {
     // await session.abortTransaction();
     session.endSession();
-    console.error("ERR", err)
+    console.error("ERR", err);
 
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ success: false, errors: err.message }, { status: 400 });
+      return NextResponse.json(
+        { success: false, errors: err.message },
+        { status: 400 }
+      );
     }
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    );
   }
 }
-
 
 export async function PUT(req: Request) {
   await dbConnect();
@@ -132,21 +141,19 @@ export async function PUT(req: Request) {
     const name = formData.get("name")?.toString();
     const parent = formData.get("parent")?.toString() || null;
     const description = formData.get("description")?.toString();
+    const isActive = formData.get("isActive")?.toString() === "true";
 
-    
     const imageData = formData.get("image");
     let imageUrl: string | undefined;
 
     // console.log("FORM",formData)
     // console.log("FORM.image",imageData)
-    
 
     if (imageData && imageData instanceof Blob) {
-      
       // Create uploads directory if it doesn't exist
-      const uploadDir = path.join(process.cwd(), 'uploads', 'temp');
+      const uploadDir = path.join(process.cwd(), "uploads", "temp");
       try {
-        await mkdir(uploadDir, {recursive: true});
+        await mkdir(uploadDir, { recursive: true });
       } catch (err) {
         console.log("Upload directory already exists or couldn't be created");
       }
@@ -154,11 +161,12 @@ export async function PUT(req: Request) {
       // Convert File to buffer
       const arrayBuffer = await imageData.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      
+
       // Generate unique filename
-      const originalFilename = (imageData as any).name || `file-${Date.now()}.jpg`;
-      const fileExt = path.extname(originalFilename) || '.jpg';
-      const safeFilename = originalFilename.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const originalFilename =
+        (imageData as any).name || `file-${Date.now()}.jpg`;
+      const fileExt = path.extname(originalFilename) || ".jpg";
+      const safeFilename = originalFilename.replace(/[^a-zA-Z0-9.-]/g, "_");
       const tempFileName = `temp-${Date.now()}-${safeFilename}`;
       const tempFilePath = path.join(uploadDir, tempFileName);
 
@@ -169,26 +177,47 @@ export async function PUT(req: Request) {
       // console.log("tempFilePath",tempFilePath)
       // console.log("")
 
-       imageUrl = await uploadFileToS3({
-        filepath: tempFilePath,
-        originalFilename: originalFilename,
-        mimetype: (imageData as any).type || "application/octet-stream"
-      }, "categories");
+      imageUrl = await uploadFileToS3(
+        {
+          filepath: tempFilePath,
+          originalFilename: originalFilename,
+          mimetype: (imageData as any).type || "application/octet-stream",
+        },
+        "categories"
+      );
 
       // imageUrl = await uploadFileToS3({ buffer, originalFilename: originalFilename, mimetype: imageData.type }, "categories");
     }
 
-    console.log("IMAGE url", imageUrl)
+    console.log("IMAGE url", imageUrl);
     // Validate partial fields
-    const validated = categorySchema.partial().parse({ name, parent, description, image: imageUrl });
+    const validated = categorySchema
+      .partial()
+      .parse({ name, parent, description, isActive, image: imageUrl });
 
     if (validated.name && !validated.slug) {
-      validated.slug = validated.name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+      validated.slug = validated.name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]/g, "");
     }
 
     let updatedCategory: any = null;
     await session.withTransaction(async () => {
-      updatedCategory = await Category.findByIdAndUpdate(id, validated, { new: true, session });
+      updatedCategory = await Category.findByIdAndUpdate(id, validated, {
+        new: true,
+        session,
+      });
+
+      // If category is being deactivated, deactivate all products under this category
+      if (validated.isActive === false) {
+        const Product = mongoose.model("Product");
+        await Product.updateMany(
+          { categories: id },
+          { isActive: false },
+          { session }
+        );
+      }
     });
 
     session.endSession();
@@ -196,12 +225,13 @@ export async function PUT(req: Request) {
   } catch (err: any) {
     // await session.abortTransaction();
     session.endSession();
-    console.error("ERR", err)
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    console.error("ERR", err);
+    return NextResponse.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    );
   }
 }
-
-
 
 // DELETE category
 export async function DELETE(req: Request) {
@@ -211,7 +241,11 @@ export async function DELETE(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    if (!id) return NextResponse.json({ success: false, error: "Category ID required" }, { status: 400 });
+    if (!id)
+      return NextResponse.json(
+        { success: false, error: "Category ID required" },
+        { status: 400 }
+      );
 
     await session.withTransaction(async () => {
       await Category.findByIdAndDelete(id, { session });
@@ -225,6 +259,9 @@ export async function DELETE(req: Request) {
   } catch (err: any) {
     await session.abortTransaction();
     session.endSession();
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    );
   }
 }

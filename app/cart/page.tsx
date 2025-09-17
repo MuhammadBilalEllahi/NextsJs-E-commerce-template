@@ -1,26 +1,27 @@
-'use client'
+"use client";
 
-import { CartProvider, useCart } from "@/lib/providers/cartContext"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Input } from "@/components/ui/input"
-import { Minus, Plus, Trash2 } from 'lucide-react'
-import { formatCurrency, CURRENCY, calculateShippingCost, calculateTotalWithShipping } from "@/lib/constants/currency"
-import { RootProviders } from "@/lib/providers/rootProvider"
+import { CartProvider, useCart } from "@/lib/providers/cartContext";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Minus, Plus, Trash2 } from "lucide-react";
+import {
+  formatCurrency,
+  CURRENCY,
+  calculateShippingCost,
+  calculateTotalWithShipping,
+} from "@/lib/constants/currency";
+import { RootProviders } from "@/lib/providers/rootProvider";
 
 export default function CartPage() {
   // Important: do NOT call useCart here. Wrap children with providers first.
-  return (
-    
-      <CartContent />
-    
-  )
+  return <CartContent />;
 }
 
 function CartContent() {
-  const { items, remove, updateQty, subtotal,  clear } = useCart()
-  console.log("CartContent - items:", items)
-  console.log("CartContent - items length:", items.length)
+  const { items, remove, updateQty, subtotal, clear } = useCart();
+  console.log("CartContent - items:", items);
+  console.log("CartContent - items length:", items.length);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -28,7 +29,7 @@ function CartContent() {
       {items.length === 0 ? (
         <div className="rounded-lg border p-8 text-center">
           <p className="mb-4">Your cart is empty.</p>
-          <Link href="/category/all" className="text-red-600 underline">
+          <Link href="/shop/all" className="text-red-600 underline">
             Continue shopping
           </Link>
         </div>
@@ -36,7 +37,10 @@ function CartContent() {
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
             {items.map((it) => (
-              <div key={it.id} className="flex items-center gap-4 rounded-lg border p-4">
+              <div
+                key={it.id}
+                className="flex items-center gap-4 rounded-lg border p-4"
+              >
                 <img
                   src={it.image || "/placeholder.svg"}
                   alt={it.title}
@@ -53,11 +57,15 @@ function CartContent() {
                       <Trash2 className="h-4 w-4" /> Remove
                     </button>
                   </div>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">Quantity: {it.qty}</p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Quantity: {it.qty}
+                  </p>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="inline-flex items-center gap-2">
                       <button
-                        onClick={() => updateQty(it.id, Math.max(1, it.qty - 1))}
+                        onClick={() =>
+                          updateQty(it.id, Math.max(1, it.qty - 1))
+                        }
                         className="h-8 w-8 inline-flex items-center justify-center rounded border"
                         aria-label="Decrease quantity"
                       >
@@ -72,7 +80,9 @@ function CartContent() {
                         <Plus className="h-4 w-4" />
                       </button>
                     </div>
-                    <div className="font-semibold">{formatCurrency(it.price * it.qty)}</div>
+                    <div className="font-semibold">
+                      {formatCurrency(it.price * it.qty)}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -117,16 +127,21 @@ function CartContent() {
               </span>
             </div> */}
             <Link href="/checkout">
-              <Button className="mt-4 w-full bg-green-600 hover:bg-green-700">Checkout</Button>
+              <Button className="mt-4 w-full bg-green-600 hover:bg-green-700">
+                Checkout
+              </Button>
             </Link>
-            <button onClick={clear} className="mt-2 w-full text-sm text-neutral-600 hover:underline">
+            <button
+              onClick={clear}
+              className="mt-2 w-full text-sm text-neutral-600 hover:underline"
+            >
               Clear cart
             </button>
           </aside>
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // "use client"
@@ -146,7 +161,7 @@ function CartContent() {
 //       {items.length === 0 ? (
 //         <div className="rounded-lg border p-8 text-center">
 //           <p className="mb-4">Your cart is empty.</p>
-//           <Link href="/category/all" className="text-red-600 underline">
+//           <Link href="/shop/all" className="text-red-600 underline">
 //             Continue shopping
 //           </Link>
 //         </div>

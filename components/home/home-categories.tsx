@@ -1,23 +1,28 @@
-import Link from "next/link"
-import { Category } from "@/mock_data/mock-data"
+import Link from "next/link";
+import { Category } from "@/mock_data/mock-data";
 
 export function HomeCategories({ categories }: { categories: Category[] }) {
+  console.log("categories in HomeCategories", categories);
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+    <div className="flex flex-wrap gap-3 justify-center">
       {categories.map((c) => (
         <Link
           key={c.slug}
           href={`/category/${c.slug}`}
-          className="group rounded-2xl border bg-white dark:bg-neutral-900 p-4 hover:shadow-md transition-shadow"
+          className="group inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-white dark:bg-neutral-900 hover:shadow-md transition-all duration-200 hover:scale-105"
         >
-          <img
-            src={c.image || "/placeholder.svg"}
-            alt={c.name}
-            className="mx-auto h-24 w-24 object-cover rounded-xl ring-1 ring-black/5"
-          />
-          <div className="mt-3 text-center font-medium group-hover:text-red-600">{c.name}</div>
+          {c.image && (
+            <img
+              src={c.image}
+              alt={c.name}
+              className="h-6 w-6 object-cover rounded-full ring-1 ring-black/5"
+            />
+          )}
+          <span className="font-medium text-sm group-hover:text-red-600 transition-colors">
+            {c.name}
+          </span>
         </Link>
       ))}
     </div>
-  )
+  );
 }

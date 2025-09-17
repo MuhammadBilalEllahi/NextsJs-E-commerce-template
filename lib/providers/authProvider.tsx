@@ -20,7 +20,7 @@ interface AuthContextType {
   login: (
     email: string,
     password: string
-  ) => Promise<{ success: boolean; error?: string; user?: User }>;
+  ) => Promise<{ success: boolean; error?: string; user?: User | null }>;
   register: (
     name: string,
     email: string,
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Wait for session to update
       const session = await getSession();
 
-      return { success: false, error: "Login fkailed" };
+      return { success: true, user };
     } catch (error) {
       console.error("Login error:", error);
       return { success: false, error: "Network error" };

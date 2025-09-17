@@ -1,24 +1,36 @@
-"use client"
+"use client";
 
-import { useCart } from "@/lib/providers/cartContext"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Minus, Plus, Trash2 } from 'lucide-react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import { formatCurrency, calculateShippingCost, calculateTotalWithShipping } from "@/lib/constants/currency"
+import { useCart } from "@/lib/providers/cartContext";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Minus, Plus, Trash2 } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  formatCurrency,
+  calculateShippingCost,
+  calculateTotalWithShipping,
+} from "@/lib/constants/currency";
 
 interface CartSheetUnTriggerableProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTriggerableProps) {
-  const { items, remove, updateQty, subtotal, clear } = useCart()
+export function CartSheetUnTriggerable({
+  open,
+  onOpenChange,
+}: CartSheetUnTriggerableProps) {
+  const { items, remove, updateQty, subtotal, clear } = useCart();
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-     <SheetContent
-     forceMount
+      <SheetContent
+        forceMount
         className="
       w-full sm:max-w-md p-2
       data-[state=open]:animate-in data-[state=open]:slide-in-from-right
@@ -30,7 +42,7 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
             <span>{items.length} items</span>
           </SheetTitle>
         </SheetHeader>
-        
+
         <div className="flex flex-col h-full">
           {items.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center py-8">
@@ -39,7 +51,7 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
                 Add some delicious spices to get started!
               </p>
-              <Link href="/category/all">
+              <Link href="/shop/all">
                 <Button className="bg-green-600 hover:bg-green-700">
                   Start Shopping
                 </Button>
@@ -49,7 +61,10 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
             <>
               <div className="flex-1 overflow-y-auto py-4 space-y-4">
                 {items.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3 rounded-lg border p-3">
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 rounded-lg border p-3"
+                  >
                     <img
                       src={item.image || "/placeholder.svg"}
                       alt={item.title}
@@ -58,8 +73,12 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-medium text-sm truncate">{item.title}</h3>
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400">Quantity: {item.qty}</p>
+                          <h3 className="font-medium text-sm truncate">
+                            {item.title}
+                          </h3>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                            Quantity: {item.qty}
+                          </p>
                         </div>
                         <button
                           aria-label={`Remove ${item.title}`}
@@ -72,13 +91,17 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
                       <div className="mt-2 flex items-center justify-between">
                         <div className="inline-flex items-center gap-1">
                           <button
-                            onClick={() => updateQty(item.id, Math.max(1, item.qty - 1))}
+                            onClick={() =>
+                              updateQty(item.id, Math.max(1, item.qty - 1))
+                            }
                             className="h-6 w-6 inline-flex items-center justify-center rounded border text-xs"
                             aria-label="Decrease quantity"
                           >
                             <Minus className="h-3 w-3" />
                           </button>
-                          <span className="w-8 text-center text-sm">{item.qty}</span>
+                          <span className="w-8 text-center text-sm">
+                            {item.qty}
+                          </span>
                           <button
                             onClick={() => updateQty(item.id, item.qty + 1)}
                             className="h-6 w-6 inline-flex items-center justify-center rounded border text-xs"
@@ -87,13 +110,15 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
                             <Plus className="h-3 w-3" />
                           </button>
                         </div>
-                        <div className="font-semibold text-sm">{formatCurrency(item.price * item.qty)}</div>
+                        <div className="font-semibold text-sm">
+                          {formatCurrency(item.price * item.qty)}
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-              
+
               <div className="border-t pt-4 space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
@@ -102,14 +127,18 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span>Shipping</span>
-                    <span>{formatCurrency(calculateShippingCost(subtotal))}</span>
+                    <span>
+                      {formatCurrency(calculateShippingCost(subtotal))}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between font-semibold">
                     <span>Total</span>
-                    <span>{formatCurrency(calculateTotalWithShipping(subtotal))}</span>
+                    <span>
+                      {formatCurrency(calculateTotalWithShipping(subtotal))}
+                    </span>
                   </div>
                 </div>
-                
+
                 <div className="space-y-6 mb-2">
                   <Link href="/checkout" className="w-full ">
                     <Button className="w-full bg-green-600 hover:bg-green-700">
@@ -121,8 +150,8 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
                       View Full Cart
                     </Button>
                   </Link>
-                  <button 
-                    onClick={clear} 
+                  <button
+                    onClick={clear}
                     className="w-full text-sm text-neutral-600 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 py-2"
                   >
                     Clear cart
@@ -134,7 +163,7 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
 
 // "use client"
@@ -162,7 +191,7 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
 //             <span>{items.length} items</span>
 //           </SheetTitle>
 //         </SheetHeader>
-        
+
 //         <div className="flex flex-col h-full">
 //           {items.length === 0 ? (
 //             <div className="flex-1 flex flex-col items-center justify-center text-center py-8">
@@ -171,7 +200,7 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
 //               <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
 //                 Add some delicious spices to get started!
 //               </p>
-//               <Link href="/category/all">
+//               <Link href="/shop/all">
 //                 <Button className="bg-green-600 hover:bg-green-700">
 //                   Start Shopping
 //                 </Button>
@@ -225,7 +254,7 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
 //                   </div>
 //                 ))}
 //               </div>
-              
+
 //               <div className="border-t pt-4 space-y-4">
 //                 <div className="space-y-2">
 //                   <div className="flex items-center justify-between text-sm">
@@ -241,7 +270,7 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
 //                     <span>{formatCurrency(calculateTotalWithShipping(subtotal))}</span>
 //                   </div>
 //                 </div>
-                
+
 //                 <div className="space-y-6 mb-2">
 //                   <Link href="/checkout" className="w-full ">
 //                     <Button className="w-full bg-green-600 hover:bg-green-700">
@@ -253,8 +282,8 @@ export function CartSheetUnTriggerable({ open, onOpenChange }: CartSheetUnTrigge
 //                       View Full Cart
 //                     </Button>
 //                   </Link>
-//                   <button 
-//                     onClick={clear} 
+//                   <button
+//                     onClick={clear}
 //                     className="w-full text-sm text-neutral-600 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 py-2"
 //                   >
 //                     Clear cart

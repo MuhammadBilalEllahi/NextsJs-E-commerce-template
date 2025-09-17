@@ -1,60 +1,233 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useAuth } from "./authProvider";
+import { getOrCreateGuestId } from "@/lib/utils/uuid";
 
-const STORAGE_KEY = "dm-wishlist"
+const STORAGE_KEY = "dm-wishlist";
+
+type WishlistItem = {
+  productId: string;
+  variantId?: string;
+  addedAt: string;
+};
 
 type WishlistCtx = {
-  ids: Set<string>
-  has: (id: string) => boolean
-  toggle: (id: string) => void
-  clear: () => void
-}
+  ids: Set<string>;
+  items: WishlistItem[];
+  has: (id: string) => boolean;
+  toggle: (id: string, variantId?: string) => Promise<void>;
+  clear: () => Promise<void>;
+  isLoading: boolean;
+  syncWithDatabase: () => Promise<void>;
+};
 
-const Ctx = createContext<WishlistCtx | null>(null)
+const Ctx = createContext<WishlistCtx | null>(null);
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
-  const [ids, setIds] = useState<Set<string>>(new Set())
+  const [ids, setIds] = useState<Set<string>>(new Set());
+  const [items, setItems] = useState<WishlistItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
+  // Load wishlist from localStorage on mount
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      const arr = raw ? (JSON.parse(raw) as string[]) : []
-      setIds(new Set(Array.isArray(arr) ? arr : []))
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const storedItems = raw ? (JSON.parse(raw) as WishlistItem[]) : [];
+      setItems(storedItems);
+      setIds(new Set(storedItems.map((item) => item.productId)));
     } catch {
-      setIds(new Set())
+      setItems([]);
+      setIds(new Set());
     }
-  }, [])
+  }, []);
 
+  // Sync with database when user authenticates
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      syncWithDatabase();
+    }
+  }, [isAuthenticated, user?.id]);
+
+  // Save to localStorage whenever items change
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(ids)))
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch {
       // ignore
     }
-  }, [ids])
+  }, [items]);
+
+  const syncWithDatabase = async () => {
+    if (!isAuthenticated || !user?.id) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/wishlist");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const dbItems: WishlistItem[] = data.wishlist.map((item: any) => ({
+            productId: item.productId,
+            variantId: item.variantId,
+            addedAt: item.addedAt,
+          }));
+
+          setItems(dbItems);
+          setIds(new Set(dbItems.map((item) => item.productId)));
+        }
+      }
+    } catch (error) {
+      console.error("Error syncing wishlist with database:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggle = async (productId: string, variantId?: string) => {
+    setIsLoading(true);
+    try {
+      if (isAuthenticated && user?.id) {
+        // For authenticated users, sync with database
+        if (ids.has(productId)) {
+          // Remove from wishlist
+          const response = await fetch(`/api/wishlist?productId=${productId}`, {
+            method: "DELETE",
+          });
+
+          if (response.ok) {
+            setItems((prev) =>
+              prev.filter((item) => item.productId !== productId)
+            );
+            setIds((prev) => {
+              const newSet = new Set(prev);
+              newSet.delete(productId);
+              return newSet;
+            });
+          }
+        } else {
+          // Add to wishlist
+          const response = await fetch("/api/wishlist", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId, variantId }),
+          });
+
+          if (response.ok) {
+            const newItem: WishlistItem = {
+              productId,
+              variantId,
+              addedAt: new Date().toISOString(),
+            };
+            setItems((prev) => [...prev, newItem]);
+            setIds((prev) => new Set([...prev, productId]));
+          }
+        }
+      } else {
+        // For guest users, sync with database using session ID
+        const guestSessionId = getOrCreateGuestId();
+
+        if (ids.has(productId)) {
+          // Remove from wishlist
+          const response = await fetch(
+            `/api/wishlist?productId=${productId}&sessionId=${guestSessionId}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (response.ok) {
+            setItems((prev) =>
+              prev.filter((item) => item.productId !== productId)
+            );
+            setIds((prev) => {
+              const newSet = new Set(prev);
+              newSet.delete(productId);
+              return newSet;
+            });
+          }
+        } else {
+          // Add to wishlist
+          const response = await fetch("/api/wishlist", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              productId,
+              variantId,
+              sessionId: guestSessionId,
+            }),
+          });
+
+          if (response.ok) {
+            const newItem: WishlistItem = {
+              productId,
+              variantId,
+              addedAt: new Date().toISOString(),
+            };
+            setItems((prev) => [...prev, newItem]);
+            setIds((prev) => new Set([...prev, productId]));
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clear = async () => {
+    setIsLoading(true);
+    try {
+      if (isAuthenticated && user?.id) {
+        // For authenticated users, clear from database
+        for (const item of items) {
+          await fetch(`/api/wishlist?productId=${item.productId}`, {
+            method: "DELETE",
+          });
+        }
+        setItems([]);
+        setIds(new Set());
+      } else {
+        // For guest users, clear from database using session ID
+        const guestSessionId = getOrCreateGuestId();
+        for (const item of items) {
+          await fetch(
+            `/api/wishlist?productId=${item.productId}&sessionId=${guestSessionId}`,
+            {
+              method: "DELETE",
+            }
+          );
+        }
+        setItems([]);
+        setIds(new Set());
+      }
+    } catch (error) {
+      console.error("Error clearing wishlist:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const value = useMemo<WishlistCtx>(
     () => ({
       ids,
+      items,
       has: (id: string) => ids.has(id),
-      toggle: (id: string) =>
-        setIds((prev) => {
-          const n = new Set(prev)
-          if (n.has(id)) n.delete(id)
-          else n.add(id)
-          return n
-        }),
-      clear: () => setIds(new Set()),
+      toggle,
+      clear,
+      isLoading,
+      syncWithDatabase,
     }),
-    [ids],
-  )
+    [ids, items, isLoading, isAuthenticated, user?.id]
+  );
 
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
 export function useWishlist() {
-  const ctx = useContext(Ctx)
-  if (!ctx) throw new Error("useWishlist must be used within WishlistProvider")
-  return ctx
+  const ctx = useContext(Ctx);
+  if (!ctx) throw new Error("useWishlist must be used within WishlistProvider");
+  return ctx;
 }

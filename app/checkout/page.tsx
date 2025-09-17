@@ -8,14 +8,30 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CitySelect } from "@/components/ui/city-select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ArrowLeft, HelpCircle, Lock, MapPin } from "lucide-react";
+import {
+  ArrowLeft,
+  HelpCircle,
+  Lock,
+  MapPin,
+  Home,
+  Building,
+  CreditCard,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants/currency";
 
 export default function CheckoutPage() {
-  
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +40,13 @@ export default function CheckoutPage() {
   const [billingAddress, setBillingAddress] = useState("same");
   const [emailNewsletter, setEmailNewsletter] = useState(true);
   const [saveInfo, setSaveInfo] = useState(true);
-const { items, subtotal, clear, syncAll } = useCart();
+  const { items, subtotal, clear, syncAll } = useCart();
+
+  // Address management states
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [addressMode, setAddressMode] = useState("manual"); // "saved" or "manual"
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
   console.log("user", user);
 
   // Form data
@@ -62,9 +84,52 @@ const { items, subtotal, clear, syncAll } = useCart();
     console.log("CALLED");
     await syncAll();
   };
+
+  // Fetch saved addresses for authenticated users
+  const fetchSavedAddresses = async () => {
+    if (!isAuthenticated) return;
+
+    try {
+      setIsLoadingAddresses(true);
+      const response = await fetch("/api/addresses");
+      if (response.ok) {
+        const data = await response.json();
+        setSavedAddresses(data.addresses || []);
+
+        // Auto-select default address if available
+        const defaultAddress = data.addresses?.find(
+          (addr: any) => addr.isDefault
+        );
+        if (defaultAddress) {
+          setSelectedAddressId(defaultAddress._id);
+          setAddressMode("saved");
+          populateFormFromAddress(defaultAddress);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch saved addresses:", error);
+    } finally {
+      setIsLoadingAddresses(false);
+    }
+  };
+
+  // Populate form data from selected address
+  const populateFormFromAddress = (address: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      firstName: address.firstName,
+      lastName: address.lastName,
+      address: address.address,
+      city: address.city,
+      postal: address.postalCode || "",
+      phoneNumber: address.phone.replace("+92", ""),
+    }));
+  };
+
   useEffect(() => {
     syncCartBackend();
-  }, []);
+    fetchSavedAddresses();
+  }, [isAuthenticated]);
 
   const fetchShippingMethods = async () => {
     try {
@@ -165,6 +230,11 @@ const { items, subtotal, clear, syncAll } = useCart();
 
     setIsSubmitting(true);
 
+    // Save address if user is authenticated and wants to save info
+    if (isAuthenticated && saveInfo && addressMode === "manual") {
+      await saveNewAddress();
+    }
+
     try {
       const orderData = {
         contact: {
@@ -241,7 +311,7 @@ const { items, subtotal, clear, syncAll } = useCart();
           <p className="text-neutral-600 dark:text-neutral-400 mb-6">
             Your cart is empty.
           </p>
-          <Link href="/category/all">
+          <Link href="/shop/all">
             <Button className="bg-green-600 hover:bg-green-700">
               Continue Shopping
             </Button>
@@ -270,6 +340,53 @@ const { items, subtotal, clear, syncAll } = useCart();
       countryCode: formData.countryCode,
       phoneNumber: formData.phoneNumber,
     });
+  };
+
+  // Handle address selection from saved addresses
+  const handleAddressSelection = (addressId: string) => {
+    setSelectedAddressId(addressId);
+    const selectedAddress = savedAddresses.find(
+      (addr: any) => addr._id === addressId
+    );
+    if (selectedAddress) {
+      populateFormFromAddress(selectedAddress);
+    }
+  };
+
+  // Save new address during checkout
+  const saveNewAddress = async () => {
+    if (!isAuthenticated || !saveInfo) return;
+
+    try {
+      const addressData = {
+        label: "Home", // Default label
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        address: formData.address,
+        city: formData.city,
+        state: "Punjab", // Default state
+        country: "Pakistan",
+        postalCode: formData.postal,
+        phone: formData.countryCode + formData.phoneNumber,
+        countryCode: formData.countryCode,
+        isDefault: savedAddresses.length === 0, // Set as default if it's the first address
+        isShipping: true,
+        isBilling: true,
+      };
+
+      const response = await fetch("/api/addresses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(addressData),
+      });
+
+      if (response.ok) {
+        // Refresh saved addresses
+        await fetchSavedAddresses();
+      }
+    } catch (error) {
+      console.error("Failed to save address:", error);
+    }
   };
 
   return (
@@ -341,100 +458,223 @@ const { items, subtotal, clear, syncAll } = useCart();
               {/* Delivery Section */}
               <section className="bg-white dark:bg-neutral-800 rounded-lg border p-6">
                 <h2 className="text-lg font-semibold mb-4">Delivery</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">First name</Label>
-                    <Input
-                      id="firstName"
-                      required
-                      value={formData.firstName}
-                      onChange={(e) =>
-                        handleInputChange("firstName", e.target.value)
-                      }
-                    />
+
+                {/* Address Selection for Authenticated Users */}
+                {isAuthenticated && savedAddresses.length > 0 && (
+                  <div className="mb-6 p-4 bg-neutral-50 dark:bg-neutral-700 rounded-lg">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-medium text-sm">Choose Address</h3>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant={
+                            addressMode === "saved" ? "default" : "outline"
+                          }
+                          size="sm"
+                          onClick={() => setAddressMode("saved")}
+                          className="text-xs"
+                        >
+                          Saved Addresses
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={
+                            addressMode === "manual" ? "default" : "outline"
+                          }
+                          size="sm"
+                          onClick={() => setAddressMode("manual")}
+                          className="text-xs"
+                        >
+                          Manual Entry
+                        </Button>
+                        <Link href="/account/addresses">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Manage
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+
+                    {addressMode === "saved" && (
+                      <div className="space-y-2">
+                        {isLoadingAddresses ? (
+                          <div className="text-center py-4 text-sm text-neutral-600">
+                            Loading addresses...
+                          </div>
+                        ) : (
+                          <Select
+                            value={selectedAddressId}
+                            onValueChange={handleAddressSelection}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a saved address" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {savedAddresses.map((address: any) => (
+                                <SelectItem
+                                  key={address._id}
+                                  value={address._id}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {address.isDefault && (
+                                      <span className="text-xs bg-green-100 text-green-800 px-1 rounded">
+                                        Default
+                                      </span>
+                                    )}
+                                    <span>{address.label}</span>
+                                    <span className="text-neutral-500">
+                                      - {address.address}, {address.city}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <Label htmlFor="lastName">Last name</Label>
-                    <Input
-                      id="lastName"
-                      required
-                      value={formData.lastName}
-                      onChange={(e) =>
-                        handleInputChange("lastName", e.target.value)
-                      }
-                    />
+                )}
+
+                {/* No Saved Addresses Message */}
+                {isAuthenticated && savedAddresses.length === 0 && (
+                  <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center gap-2 mb-2">
+                      <MapPin className="h-4 w-4 text-blue-600" />
+                      <h3 className="font-medium text-sm text-blue-800 dark:text-blue-200">
+                        No saved addresses yet
+                      </h3>
+                    </div>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                      You can save this address for future orders or manage your
+                      addresses.
+                    </p>
+                    <div className="flex gap-2">
+                      <Link href="/account/addresses">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="text-xs"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Manage Addresses
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="sm:col-span-2">
-                    <Label htmlFor="address">Address</Label>
-                    <Input
-                      id="address"
-                      required
-                      placeholder="Street address"
-                      value={formData.address}
-                      onChange={(e) =>
-                        handleInputChange("address", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div>
-                    <CitySelect
-                      value={formData.city}
-                      onChange={(value) => handleInputChange("city", value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="postal">Postal code (optional)</Label>
-                    <Input
-                      id="postal"
-                      value={formData.postal}
-                      onChange={(e) =>
-                        handleInputChange("postal", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <Label htmlFor="phone" className="flex items-center gap-1">
-                      Phone
-                      <HelpCircle className="h-3 w-3" />
-                    </Label>
-                    <div className="flex">
-                      <select
-                        className="rounded-l border border-r-0 px-1 py-2 bg-transparent min-w-[80px] text-sm"
-                        value={formData.countryCode}
-                        onChange={(e) =>
-                          handleInputChange("countryCode", e.target.value)
-                        }
-                      >
-                        <option value="+92">🇵🇰 +92</option>
-                      </select>
+                )}
+
+                {/* Manual Address Entry */}
+                {(addressMode === "manual" ||
+                  !isAuthenticated ||
+                  savedAddresses.length === 0) && (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="firstName">First name</Label>
                       <Input
-                        id="phone"
+                        id="firstName"
                         required
-                        placeholder="3XX XXXXXXX"
-                        value={formData.phoneNumber}
+                        value={formData.firstName}
                         onChange={(e) =>
-                          handleInputChange("phoneNumber", e.target.value)
+                          handleInputChange("firstName", e.target.value)
                         }
-                        className="rounded-l-none border-l-0"
                       />
                     </div>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="saveInfo"
-                        checked={saveInfo}
-                        onCheckedChange={(checked) =>
-                          setSaveInfo(checked as boolean)
+                    <div>
+                      <Label htmlFor="lastName">Last name</Label>
+                      <Input
+                        id="lastName"
+                        required
+                        value={formData.lastName}
+                        onChange={(e) =>
+                          handleInputChange("lastName", e.target.value)
                         }
                       />
-                      <Label htmlFor="saveInfo" className="text-sm">
-                        Save this information for next time
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Label htmlFor="address">Address</Label>
+                      <Input
+                        id="address"
+                        required
+                        placeholder="Street address"
+                        value={formData.address}
+                        onChange={(e) =>
+                          handleInputChange("address", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div>
+                      <CitySelect
+                        value={formData.city}
+                        onChange={(value) => handleInputChange("city", value)}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="postal">Postal code (optional)</Label>
+                      <Input
+                        id="postal"
+                        value={formData.postal}
+                        onChange={(e) =>
+                          handleInputChange("postal", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Label
+                        htmlFor="phone"
+                        className="flex items-center gap-1"
+                      >
+                        Phone
+                        <HelpCircle className="h-3 w-3" />
                       </Label>
+                      <div className="flex">
+                        <select
+                          className="rounded-l border border-r-0 px-1 py-2 bg-transparent min-w-[80px] text-sm"
+                          value={formData.countryCode}
+                          onChange={(e) =>
+                            handleInputChange("countryCode", e.target.value)
+                          }
+                        >
+                          <option value="+92">🇵🇰 +92</option>
+                        </select>
+                        <Input
+                          id="phone"
+                          required
+                          placeholder="3XX XXXXXXX"
+                          value={formData.phoneNumber}
+                          onChange={(e) =>
+                            handleInputChange("phoneNumber", e.target.value)
+                          }
+                          className="rounded-l-none border-l-0"
+                        />
+                      </div>
+                    </div>
+                    <div className="sm:col-span-2">
+                      {isAuthenticated && addressMode === "manual" && (
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="saveInfo"
+                            checked={saveInfo}
+                            onCheckedChange={(checked) =>
+                              setSaveInfo(checked as boolean)
+                            }
+                          />
+                          <Label htmlFor="saveInfo" className="text-sm">
+                            Save this information for next time
+                          </Label>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
               </section>
 
               {/* Shipping Method Section */}

@@ -1,41 +1,46 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { fetchBanners, Banner } from "@/lib/api/banner/banner"
-import { fetchGlobalSettings, GlobalSettings } from "@/lib/api/admin/global-settings/global-settings"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { fetchBanners, Banner } from "@/lib/api/banner/banner";
+import {
+  fetchGlobalSettings,
+  GlobalSettings,
+} from "@/lib/api/admin/global-settings/global-settings";
 
-
-
-  export function HomeHero({banners, globalSettings}: {banners: Banner[], globalSettings: GlobalSettings}) {
+export function HomeHero({
+  banners,
+  globalSettings,
+}: {
+  banners: Banner[];
+  globalSettings: GlobalSettings;
+}) {
   // const [banners, setBanners] = useState<Banner[]>([])
-  const [index, setIndex] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [index, setIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
   // const [globalSettings, setGlobalSettings] = useState<GlobalSettings | null>(null)
 
   // Fetch banners and global settings on component mount
   useEffect(() => {
     const loadData = async () => {
       try {
-        
-        
         // Filter only active banners and those that haven't expired
         const activeBanners = banners.filter((banner: Banner) => {
-          if (!banner.isActive) return false
+          if (!banner.isActive) return false;
           if (banner.expiresAt) {
-            const expiryDate = new Date(banner.expiresAt)
-            const now = new Date()
-            return expiryDate > now
+            const expiryDate = new Date(banner.expiresAt);
+            const now = new Date();
+            return expiryDate > now;
           }
-          return true
-        })
-        
+          return true;
+        });
+
         // console.log("Active banners:", activeBanners)
         // setBanners(activeBanners)
         // setGlobalSettings(fetchedSettings)
       } catch (error) {
-        console.error("Error loading data:", error)
+        console.error("Error loading data:", error);
         // Fallback to default banners if API fails
         // setBanners([
         //   {
@@ -43,7 +48,7 @@ import { fetchGlobalSettings, GlobalSettings } from "@/lib/api/admin/global-sett
         //     title: "Summer Heat Sale",
         //     description: "Up to 30% off select spices & masalas",
         //     image: "/spice-banner-red.png",
-        //     link: "/category/all",
+        //     link: "/shop/all",
         //     isActive: true,
         //     expiresAt: "",
         //     showTitle: true,
@@ -78,26 +83,26 @@ import { fetchGlobalSettings, GlobalSettings } from "@/lib/api/admin/global-sett
         //   updatedAt: new Date().toISOString()
         // })
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
   // Auto-advance slides with individual banner timeouts
   useEffect(() => {
-    if (banners.length <= 1 || !globalSettings) return
-    
-    const currentBanner = banners[index]
-    const timeout = currentBanner.timeout || globalSettings.bannerScrollTime
-    
+    if (banners.length <= 1 || !globalSettings) return;
+
+    const currentBanner = banners[index];
+    const timeout = currentBanner.timeout || globalSettings.bannerScrollTime;
+
     const t = setInterval(() => {
-      setIndex((i) => (i + 1) % banners.length)
-    }, timeout)
-    
-    return () => clearInterval(t)
-  }, [banners, index, globalSettings])
+      setIndex((i) => (i + 1) % banners.length);
+    }, timeout);
+
+    return () => clearInterval(t);
+  }, [banners, index, globalSettings]);
 
   // Don't render if no banners or still loading
   if (loading) {
@@ -109,14 +114,14 @@ import { fetchGlobalSettings, GlobalSettings } from "@/lib/api/admin/global-sett
           </div>
         </div>
       </section>
-    )
+    );
   }
 
   if (banners.length === 0) {
-    return null
+    return null;
   }
 
-  const current = banners[index]
+  const current = banners[index];
 
   return (
     <section className="relative">
@@ -154,7 +159,9 @@ import { fetchGlobalSettings, GlobalSettings } from "@/lib/api/admin/global-sett
           <>
             <button
               aria-label="Previous slide"
-              onClick={() => setIndex((i) => (i - 1 + banners.length) % banners.length)}
+              onClick={() =>
+                setIndex((i) => (i - 1 + banners.length) % banners.length)
+              }
               className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full border bg-white/90 p-2 hover:bg-white transition-colors"
             >
               <ChevronLeft className="h-5 w-5 dark:text-black" />
@@ -174,7 +181,9 @@ import { fetchGlobalSettings, GlobalSettings } from "@/lib/api/admin/global-sett
                   aria-label={`Go to slide ${i + 1}`}
                   onClick={() => setIndex(i)}
                   className={`h-2 w-2 rounded-full transition-all ${
-                    i === index ? "bg-red-600 w-6" : "bg-white/70 hover:bg-white"
+                    i === index
+                      ? "bg-red-600 w-6"
+                      : "bg-white/70 hover:bg-white"
                   }`}
                 />
               ))}
@@ -183,5 +192,5 @@ import { fetchGlobalSettings, GlobalSettings } from "@/lib/api/admin/global-sett
         )}
       </div>
     </section>
-  )
+  );
 }

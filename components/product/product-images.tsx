@@ -1,29 +1,32 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
+import { useMemo, useState } from "react";
 
 interface VariantLabel {
   imageIndex: number;
   label: string;
 }
 
-export function ProductImages({ 
-  images = [] as string[], 
+export function ProductImages({
+  images = [] as string[],
   title = "Product",
-  variantLabels = [] as VariantLabel[]
+  variantLabels = [] as VariantLabel[],
 }) {
-  const [index, setIndex] = useState(0)
-  const [zoom, setZoom] = useState(false)
-  const current = images[index] ?? "/modern-tech-product.png"
-  const cursor = useMemo(() => (zoom ? "cursor-zoom-out" : "cursor-zoom-in"), [zoom])
+  const [index, setIndex] = useState(0);
+  const [zoom, setZoom] = useState(false);
+  const current = images[index] ?? "/modern-tech-product.png";
+  const cursor = useMemo(
+    () => (zoom ? "cursor-zoom-out" : "cursor-zoom-in"),
+    [zoom]
+  );
 
   // Helper function to get variant label for a specific image
   const getVariantLabel = (imageIndex: number) => {
-    return variantLabels.find(vl => vl.imageIndex === imageIndex)?.label;
-  }
+    return variantLabels.find((vl) => vl.imageIndex === imageIndex)?.label;
+  };
 
   return (
-    <div className="sticky top-4 h-fit">
+    <div className="lg:sticky top-4 h-fit">
       <div className="relative overflow-hidden rounded-lg border max-h-[35rem]">
         <img
           src={current || "/placeholder.svg"}
@@ -45,10 +48,12 @@ export function ProductImages({
           <button
             key={i}
             onClick={() => {
-              setIndex(i)
-              setZoom(false)
+              setIndex(i);
+              setZoom(false);
             }}
-            className={`relative rounded border overflow-hidden ${i === index ? "ring-2 ring-red-600" : ""}`}
+            className={`relative rounded border overflow-hidden ${
+              i === index ? "ring-2 ring-red-600" : ""
+            }`}
           >
             <img
               src={src || "/placeholder.svg?height=64&width=64&query=thumb"}
@@ -66,5 +71,5 @@ export function ProductImages({
       </div>
       {/* Sticky add-to-cart bar is in AddToCartSection */}
     </div>
-  )
+  );
 }

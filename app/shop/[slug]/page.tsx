@@ -113,15 +113,13 @@ export default async function CategoryPage({
   );
 
   return (
-    <RootProviders>
-      <CategoryClient
-        slug={slug}
-        allProducts={filteredProducts}
-        categories={allCategories as DatabaseCategory[]}
-        availableBrands={availableBrands}
-        searchParams={searchParamsResolved}
-      />
-    </RootProviders>
+    <CategoryClient
+      slug={slug}
+      allProducts={filteredProducts}
+      categories={allCategories as DatabaseCategory[]}
+      availableBrands={availableBrands}
+      searchParams={searchParamsResolved}
+    />
   );
 }
 

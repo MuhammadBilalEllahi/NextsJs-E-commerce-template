@@ -16,6 +16,7 @@ import {
   LogOut,
   Building2,
   Truck,
+  Heart,
 } from "lucide-react";
 import { RootProviders } from "@/lib/providers/rootProvider";
 import LogOutButton from "./components/buttons/LogOutButton";
@@ -28,8 +29,10 @@ const nav = [
   { href: "/admin/banner", label: "Banners", icon: Megaphone },
   { href: "/admin/branches", label: "Branches", icon: Building2 },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/admin/cart", label: "Carts", icon: ShoppingCart },
   { href: "/admin/shipping", label: "Shipping", icon: Truck },
   { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/wishlist", label: "Wishlist", icon: Heart },
   { href: "/admin/promotions", label: "Promotions", icon: Megaphone },
   { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/chat", label: "Chat & Inquiries", icon: MessageCircle },

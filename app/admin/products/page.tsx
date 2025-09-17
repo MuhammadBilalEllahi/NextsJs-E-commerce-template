@@ -1,68 +1,76 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Edit, Trash2, Eye, Plus } from "lucide-react"
-import ProductsCreateAdminUI from "@/components/admin/product/products-create"
-import ProductsEditAdminUI from "@/components/admin/product/products-edit"
-import ProductsViewAdminUI from "@/components/admin/product/products-view"
-import { useProducts, Product } from "@/lib/api/admin/product/products"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Edit, Trash2, Eye, Plus } from "lucide-react";
+import ProductsCreateAdminUI from "@/components/admin/product/products-create";
+import ProductsEditAdminUI from "@/components/admin/product/products-edit";
+import ProductsViewAdminUI from "@/components/admin/product/products-view";
+import { useProducts, Product } from "@/lib/api/admin/product/products";
 
 export default function ProductsTable() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [showCreateForm, setShowCreateForm] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [viewingProduct, setViewingProduct] = useState<Product | null>(null)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
 
   // Use the products service hook
-  const { products, loading, error, loadProducts, removeProduct } = useProducts()
+  const { products, loading, error, loadProducts, removeProduct } =
+    useProducts();
 
   useEffect(() => {
-    loadProducts()
-  }, [])
+    loadProducts();
+  }, []);
 
   // Delete product
   const handleDeleteProduct = async (productId: string) => {
     // console.log("[handleDeleteProduct] productId:", productId);
-    if (!confirm("Are you sure you want to delete this product?")) return
-    
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
     try {
-      await removeProduct(productId)
-      alert("Product deleted successfully")
+      await removeProduct(productId);
+      alert("Product deleted successfully");
     } catch (err: any) {
-      alert("Error deleting product: " + err.message)
+      alert("Error deleting product: " + err.message);
     }
-  }
+  };
 
   // View product details
   const viewProduct = (product: Product) => {
-    setViewingProduct(product)
-    setEditingProduct(null)
-    setShowCreateForm(false)
-  }
+    setViewingProduct(product);
+    setEditingProduct(null);
+    setShowCreateForm(false);
+  };
 
   // Edit product
   const editProduct = (product: Product) => {
-    setEditingProduct(product)
-    setViewingProduct(null)
-    setShowCreateForm(false)
-  }
+    setEditingProduct(product);
+    setViewingProduct(null);
+    setShowCreateForm(false);
+  };
 
   // Close all forms
   const closeAllForms = () => {
-    setShowCreateForm(false)
-    setEditingProduct(null)
-    setViewingProduct(null)
-  }
+    setShowCreateForm(false);
+    setEditingProduct(null);
+    setViewingProduct(null);
+  };
 
   // Filter products based on search term
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.brand.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.brand.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return (
@@ -77,7 +85,7 @@ export default function ProductsTable() {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (error) {
@@ -88,22 +96,22 @@ export default function ProductsTable() {
           <CardDescription>Error loading products</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-red-500 p-4 bg-red-50 rounded-md">
-            {error}
-          </div>
+          <div className="text-red-500 p-4 bg-red-50 rounded-md">{error}</div>
           <Button onClick={loadProducts} className="mt-4">
             Try Again
           </Button>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Products Management</CardTitle>
-        <CardDescription>View and manage all products in your store</CardDescription>
+        <CardDescription>
+          View and manage all products in your store
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {/* Search and Controls */}
@@ -114,7 +122,7 @@ export default function ProductsTable() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1"
           />
-         <Button 
+          <Button
             className="bg-green-600 hover:bg-green-700"
             onClick={() => setShowCreateForm(!showCreateForm)}
           >
@@ -123,10 +131,8 @@ export default function ProductsTable() {
           </Button>
         </div>
 
-         {/* Product Creation Form */}
-        {showCreateForm && (
-          <ProductsCreateAdminUI/>
-        )}
+        {/* Product Creation Form */}
+        {showCreateForm && <ProductsCreateAdminUI />}
 
         {/* Product Edit Form */}
         {editingProduct && (
@@ -134,8 +140,8 @@ export default function ProductsTable() {
             product={editingProduct}
             onClose={closeAllForms}
             onUpdate={() => {
-              loadProducts()
-              closeAllForms()
+              loadProducts();
+              closeAllForms();
             }}
           />
         )}
@@ -154,26 +160,53 @@ export default function ProductsTable() {
             <table className="w-full caption-bottom text-sm">
               <thead className="border-b">
                 <tr className="bg-muted/50">
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Product</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Brand</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Categories</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Price</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Variants</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Created</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Product
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Brand
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Categories
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Price
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Status
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Special
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Variants
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Created
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {filteredProducts.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="p-8 text-center text-muted-foreground">
-                      {searchTerm ? "No products found matching your search" : "No products found"}
+                    <td
+                      colSpan={9}
+                      className="p-8 text-center text-muted-foreground"
+                    >
+                      {searchTerm
+                        ? "No products found matching your search"
+                        : "No products found"}
                     </td>
                   </tr>
                 ) : (
                   filteredProducts.map((product) => (
-                    <tr key={product._id} className="border-b hover:bg-muted/50">
+                    <tr
+                      key={product._id}
+                      className="border-b hover:bg-muted/50"
+                    >
                       <td className="p-4 align-middle">
                         <div className="flex items-center gap-3">
                           {product.images && product.images.length > 0 ? (
@@ -184,7 +217,9 @@ export default function ProductsTable() {
                             />
                           ) : (
                             <div className="h-10 w-10 rounded-md bg-gray-200 flex items-center justify-center">
-                              <span className="text-xs text-gray-500">No image</span>
+                              <span className="text-xs text-gray-500">
+                                No image
+                              </span>
                             </div>
                           )}
                           <div>
@@ -200,7 +235,8 @@ export default function ProductsTable() {
                       </td>
                       <td className="p-4 align-middle">
                         <div className="flex flex-wrap gap-1">
-                          {product.categories && product.categories.length > 0 ? (
+                          {product.categories &&
+                          product.categories.length > 0 ? (
                             product.categories.slice(0, 2).map((category) => (
                               <span
                                 key={category._id}
@@ -210,30 +246,42 @@ export default function ProductsTable() {
                               </span>
                             ))
                           ) : (
-                            <span className="text-muted-foreground text-xs">No categories</span>
-                          )}
-                          {product.categories && product.categories.length > 2 && (
-                            <span className="text-xs text-muted-foreground">
-                              +{product.categories.length - 2} more
+                            <span className="text-muted-foreground text-xs">
+                              No categories
                             </span>
                           )}
+                          {product.categories &&
+                            product.categories.length > 2 && (
+                              <span className="text-xs text-muted-foreground">
+                                +{product.categories.length - 2} more
+                              </span>
+                            )}
                         </div>
                       </td>
                       <td className="p-4 align-middle">
                         Rs. {product.price.toFixed(2)}
                       </td>
                       <td className="p-4 align-middle">
-                        <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                          product.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                        }`}>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                            product.isActive
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
                           {product.isActive ? "Active" : "Inactive"}
                         </span>
-                        <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ml-2 ${
-                          product.isOutOfStock ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"
-                        }`}>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ml-2 ${
+                            product.isOutOfStock
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
                           {product.isOutOfStock ? "Out of Stock" : "In Stock"}
                         </span>
                       </td>
+
                       <td className="p-4 align-middle">
                         {product.variants?.length || 0} variants
                       </td>
@@ -294,20 +342,5 @@ export default function ProductsTable() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

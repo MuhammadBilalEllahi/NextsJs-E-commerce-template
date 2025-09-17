@@ -1,20 +1,36 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { Star, Truck, ShieldCheck, Share2, SendHorizontal, Facebook, Twitter, ChevronDown, Minus, Plus } from 'lucide-react'
-import Link from "next/link"
-import { ProductImages } from "@/components/product/product-images"
-import { AddToWishlistButton } from "@/components/wishlist/wishlist-button"
-import { ReviewsEnhanced } from "@/components/reviews/reviews-enhanced2"
-import { FAQEnhanced } from "@/components/faq/faq-enhanced"
-import { YouMayAlsoLike } from "@/components/product/you-may-also-like"
-import { RecentlyViewed } from "@/components/product/recently-viewed"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { useCart } from "@/lib/providers/cartContext"
-import type { Product } from "@/mock_data/data"
-import { formatCurrency } from "@/lib/constants/currency"
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  Star,
+  Truck,
+  ShieldCheck,
+  Share2,
+  SendHorizontal,
+  Facebook,
+  Twitter,
+  ChevronDown,
+  Minus,
+  Plus,
+} from "lucide-react";
+import Link from "next/link";
+import { ProductImages } from "@/components/product/product-images";
+import { AddToWishlistButton } from "@/components/wishlist/wishlist-button";
+import { ReviewsEnhanced } from "@/components/reviews/reviews-enhanced";
+import { FAQEnhanced } from "@/components/faq/faq-enhanced";
+import { YouMayAlsoLike } from "@/components/product/you-may-also-like";
+import { RecentlyViewed } from "@/components/product/recently-viewed";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useCart } from "@/lib/providers/cartContext";
+import type { Product } from "@/mock_data/data";
+import { formatCurrency } from "@/lib/constants/currency";
 
 interface ProductDetailClientProps {
   product: Product & {
@@ -27,7 +43,7 @@ interface ProductDetailClientProps {
       isOutOfStock: boolean;
       images: string[];
     }>;
-  }
+  };
 }
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
@@ -39,15 +55,17 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     isActive: boolean;
     isOutOfStock: boolean;
     images: string[];
-  } | null>(null)
-  const [quantity, setQuantity] = useState(1)
-  const [isInitialized, setIsInitialized] = useState(false)
-  const { add, isAdding } = useCart()
+  } | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const { add, isAdding } = useCart();
 
   // Set default variant if available
   React.useEffect(() => {
     if (product.variants && product.variants.length > 0) {
-      const defaultVariant = product.variants.find(v => v.isActive && !v.isOutOfStock) || product.variants[0];
+      const defaultVariant =
+        product.variants.find((v) => v.isActive && !v.isOutOfStock) ||
+        product.variants[0];
       setSelectedVariant(defaultVariant);
     }
     setIsInitialized(true);
@@ -56,7 +74,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   // Get current price, stock, and images based on selected variant or product
   const currentPrice = selectedVariant?.price || product.price;
   const currentStock = selectedVariant?.stock || product.stock || 0;
-  const currentImages = selectedVariant?.images && selectedVariant.images.length > 0 ? selectedVariant.images : product.images;
+  const currentImages =
+    selectedVariant?.images && selectedVariant.images.length > 0
+      ? selectedVariant.images
+      : product.images;
   const hasVariants = product.variants && product.variants.length > 0;
 
   // Create mapping between images and variant labels
@@ -68,18 +89,18 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       selectedVariant.images.forEach((_, index) => {
         variantLabels.push({
           imageIndex: index,
-          label: selectedVariant.label
+          label: selectedVariant.label,
         });
       });
     } else if (product.variants && product.variants.length > 0) {
       // If showing product images, check which images belong to which variants
       let imageIndex = 0;
-      product.variants.forEach(variant => {
+      product.variants.forEach((variant) => {
         if (variant.images && variant.images.length > 0) {
           variant.images.forEach(() => {
             variantLabels.push({
               imageIndex: imageIndex,
-              label: variant.label
+              label: variant.label,
             });
             imageIndex++;
           });
@@ -105,7 +126,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   // Handle quantity changes with stock validation
   const handleQuantityChange = (newQuantity: number) => {
-    const maxQuantity = hasVariants ? (selectedVariant?.stock || 0) : (product.stock || 0);
+    const maxQuantity = hasVariants
+      ? selectedVariant?.stock || 0
+      : product.stock || 0;
     const validQuantity = Math.max(1, Math.min(newQuantity, maxQuantity));
     setQuantity(validQuantity);
   };
@@ -120,7 +143,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       </div>
     );
   }
-
 
   // console.log("product in ProductDetailClient", product);
 
@@ -139,6 +161,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       </div>
     );
   }
+
+  console.log("product.reviews", product.reviews);
 
   const handleAddToCart = () => {
     if (isAdding) return;
@@ -176,36 +200,44 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         quantity
       );
     }
-  }
+  };
 
   const handleBuyNow = () => {
-    handleAddToCart()
+    handleAddToCart();
     // Redirect to checkout
-    window.location.href = "/checkout"
-  }
+    window.location.href = "/checkout";
+  };
 
-  const subtotal = currentPrice * quantity
+  const subtotal = currentPrice * quantity;
   const isOutOfStock = currentStock <= 0;
   const isVariantRequired = hasVariants && !selectedVariant;
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="relative grid lg:grid-cols-2 gap-8">
-        <ProductImages images={currentImages} title={product.title} variantLabels={variantLabels} />
+        <ProductImages
+          images={currentImages}
+          title={product.title}
+          variantLabels={variantLabels}
+        />
         <div>
           <div className="flex items-start justify-between gap-4">
             <h1 className="text-2xl md:text-3xl font-bold">{product.title}</h1>
-            <AddToWishlistButton productId={String(product.id)} />
+            <AddToWishlistButton
+              productId={String(product.id)}
+              variantId={selectedVariant?._id}
+            />
           </div>
 
-          {product?.reviews?.length && <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
-            <div className="inline-flex items-center gap-1">
-              <Star className="h-4 w-4 text-yellow-500" />
-              <span>{product.rating.toFixed(1)}</span>
-              <span className="opacity-70">({product.reviews.length})</span>
+          {product?.reviews?.length && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+              <div className="inline-flex items-center gap-1">
+                <Star className="h-4 w-4 text-yellow-500" />
+                <span>{product.rating.toFixed(1)}</span>
+                <span className="opacity-70">({product.reviews.length})</span>
+              </div>
             </div>
-
-          </div>}
+          )}
 
           <div className="mt-4 text-3xl font-extrabold text-red-600">
             {formatCurrency(currentPrice)}
@@ -223,27 +255,31 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 In Stock: {currentStock} available
               </span>
             ) : (
-              <span className="text-red-600">
-                Out of Stock
-              </span>
+              <span className="text-red-600">Out of Stock</span>
             )}
           </div>
 
           {/* Variant Price Info */}
           {selectedVariant && selectedVariant.price !== product.price && (
             <div className="mt-2 text-sm text-neutral-600">
-              <span className="font-medium">{selectedVariant.label}:</span> {formatCurrency(selectedVariant.price)}
+              <span className="font-medium">{selectedVariant.label}:</span>{" "}
+              {formatCurrency(selectedVariant.price)}
             </div>
           )}
 
           {/* Variant Selection */}
           {product.variants && product.variants.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Variants</h3>
+              <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+                Variants
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {product.variants.map((variant) => {
                   const isSelected = selectedVariant?._id === variant._id;
-                  const isAvailable = variant.isActive && !variant.isOutOfStock && variant.stock > 0;
+                  const isAvailable =
+                    variant.isActive &&
+                    !variant.isOutOfStock &&
+                    variant.stock > 0;
 
                   return (
                     <Button
@@ -252,7 +288,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                       size="sm"
                       onClick={() => handleVariantSelect(variant)}
                       disabled={!isAvailable}
-                      className={`relative ${!isAvailable ? 'opacity-50' : ''}`}
+                      className={`relative ${!isAvailable ? "opacity-50" : ""}`}
                     >
                       {variant.label}
                       {!isAvailable && (
@@ -269,17 +305,23 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
           {/* Quantity Selector */}
           <div className="mt-6">
-            <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Quantity</h3>
+            <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
+              Quantity
+            </h3>
             <div className="flex items-center gap-4">
               <div className="flex items-center border rounded-lg">
                 <button
-                  onClick={() => handleQuantityChange(Math.max(1, quantity - 1))}
+                  onClick={() =>
+                    handleQuantityChange(Math.max(1, quantity - 1))
+                  }
                   className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   disabled={quantity <= 1}
                 >
                   <Minus className="h-4 w-4" />
                 </button>
-                <span className="px-4 py-2 text-lg font-medium">{quantity}</span>
+                <span className="px-4 py-2 text-lg font-medium">
+                  {quantity}
+                </span>
                 <button
                   onClick={() => handleQuantityChange(quantity + 1)}
                   className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800"
@@ -289,7 +331,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 </button>
               </div>
               <div className="text-sm text-neutral-600 dark:text-neutral-400">
-                Subtotal: <span className="font-semibold text-red-600">{formatCurrency(subtotal)}</span>
+                Subtotal:{" "}
+                <span className="font-semibold text-red-600">
+                  {formatCurrency(subtotal)}
+                </span>
               </div>
             </div>
             {currentStock > 0 && (
@@ -306,10 +351,13 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               onClick={handleAddToCart}
               disabled={isAdding || isOutOfStock || isVariantRequired}
             >
-              {isAdding ? "Adding..." :
-                isVariantRequired ? "Select Variant" :
-                  isOutOfStock ? "Out of Stock" :
-                    "ADD TO CART"}
+              {isAdding
+                ? "Adding..."
+                : isVariantRequired
+                ? "Select Variant"
+                : isOutOfStock
+                ? "Out of Stock"
+                : "ADD TO CART"}
             </Button>
             <Button
               variant="outline"
@@ -317,10 +365,13 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               onClick={handleBuyNow}
               disabled={isAdding || isOutOfStock || isVariantRequired}
             >
-              {isAdding ? "Processing..." :
-                isVariantRequired ? "Select Variant" :
-                  isOutOfStock ? "Out of Stock" :
-                    "BUY IT NOW"}
+              {isAdding
+                ? "Processing..."
+                : isVariantRequired
+                ? "Select Variant"
+                : isOutOfStock
+                ? "Out of Stock"
+                : "BUY IT NOW"}
             </Button>
           </div>
 
@@ -331,7 +382,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <Truck className="h-4 w-4 text-green-600" /> Fast Delivery
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <ShieldCheck className="h-4 w-4 text-orange-500" /> Secure Checkout
+              <ShieldCheck className="h-4 w-4 text-orange-500" /> Secure
+              Checkout
             </div>
           </div>
 
@@ -361,9 +413,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               </AccordionItem>
 
               <AccordionItem value="faqs">
-                <AccordionTrigger className="text-left">
-                  FAQs
-                </AccordionTrigger>
+                <AccordionTrigger className="text-left">FAQs</AccordionTrigger>
                 <AccordionContent>
                   <div className="max-h-96 overflow-y-auto">
                     <FAQEnhanced category="products" />
@@ -375,19 +425,30 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 <AccordionTrigger className="text-left">
                   Customer Reviews
                 </AccordionTrigger>
-                {product?.reviews && <AccordionContent>
-                  <ReviewsEnhanced
-                    productId={String(product.id)}
-                    initialReviews={product.reviews.map(review => ({
-                      id: String(review.id),
-                      user: review.user,
-                      rating: review.rating,
-                      title: "",
-                      comment: review.comment,
-                      date: review.date
-                    }))}
-                  />
-                </AccordionContent>}
+
+                {product?.reviews && (
+                  <AccordionContent>
+                    <ReviewsEnhanced
+                      productId={String(product.id)}
+                      initialReviews={product.reviews.map((review) => ({
+                        id: String(review.id),
+                        user: "",
+                        // user:
+                        //   typeof review.user === "object"
+                        //     ? review.user?.name
+                        //       ? review.user?.name
+                        //       : review.user?.id
+                        //       ? review.user.id
+                        //       : review.user
+                        //     : review.user,
+                        rating: review.rating,
+                        title: "",
+                        comment: review.comment,
+                        date: review.date,
+                      }))}
+                    />
+                  </AccordionContent>
+                )}
               </AccordionItem>
 
               <AccordionItem value="quality-promise">
@@ -398,7 +459,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   <div className="space-y-3 text-sm">
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                      <span>Premium quality ingredients sourced from trusted farms</span>
+                      <span>
+                        Premium quality ingredients sourced from trusted farms
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 bg-green-500 rounded-full"></div>
@@ -406,7 +469,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                      <span>Traditional recipes passed down through generations</span>
+                      <span>
+                        Traditional recipes passed down through generations
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 bg-green-500 rounded-full"></div>
@@ -419,10 +484,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              className="gap-2"
-            >
+            <Button variant="outline" className="gap-2">
               <Share2 className="h-4 w-4" /> Share
             </Button>
             <a
@@ -450,7 +512,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <a
               className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
               href={`https://wa.me/?text=${encodeURIComponent(
-                `${product.title} - ${typeof window !== "undefined" ? window.location.href : ""
+                `${product.title} - ${
+                  typeof window !== "undefined" ? window.location.href : ""
                 }`
               )}`}
               target="_blank"
@@ -461,8 +524,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           </div>
 
           <div className="mt-6 text-sm text-neutral-600 dark:text-neutral-400">
-            <span className="font-semibold">Refund policy:</span>{" "}
-            Items can be returned within 7 days if unopened.{" "}
+            <span className="font-semibold">Refund policy:</span> Items can be
+            returned within 7 days if unopened.{" "}
             <Link href="/returns" className="text-green-700 underline">
               Read full policy
             </Link>
@@ -476,5 +539,5 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
       <RecentlyViewed currentId={String(product.id)} />
     </div>
-  )
+  );
 }
