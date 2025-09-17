@@ -104,9 +104,11 @@ export async function getAllBanners() {
 }
 
 // getAllTopSellingProducts
-export async function getAllTopSellingProducts() {
+export async function getAllTopSellingProducts(limit = 10, page = 1) {
   try {
     await dbConnect();
+    const skip = (page - 1) * limit;
+
     const products = await Product.find({ isActive: true, isTopSelling: true })
       // .populate("brand", "name")
       // .populate("categories", "name")
@@ -115,66 +117,83 @@ export async function getAllTopSellingProducts() {
         match: { isActive: true, isOutOfStock: false },
       })
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
+
+    const total = await Product.countDocuments({
+      isActive: true,
+      isTopSelling: true,
+    });
     console.log(
       "products in getAllTopSellingProducts",
       JSON.stringify(products, null, 2)
     );
-    return products.map((product) => ({
-      id: String(product._id),
-      slug: product.slug,
-      title: product.name,
-      description: product.description,
-      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-      images: product.images,
-      image:
-        product.images && product.images.length > 0
-          ? product.images[0]
-          : undefined,
-      rating: product.ratingAvg,
-      isTopSelling: product.isTopSelling,
-      // ingredients: product.ingredients,
-      instructions: "", // Can be added to product model later
-      // category: product.categories?.[0]?.name || "spices",
-      // brand: product.brand?.name || "Dehli Mirch",
-      // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-      tags: [], // Can be added to product model later
-      variants: (product?.variants || [])
-        .filter((variant: any) => variant.isActive) // Only show active variants
-        .sort((a: any, b: any) => {
-          // Sort: available first, then out-of-stock
-          const aAvailable = !a.isOutOfStock && a.stock > 0;
-          const bAvailable = !b.isOutOfStock && b.stock > 0;
-          if (aAvailable && !bAvailable) return -1;
-          if (!aAvailable && bAvailable) return 1;
-          return 0;
-        })
-        .map((variant: any) => ({
-          _id: String(variant._id),
-          label: variant.label,
-          price: variant.price,
-          stock: variant.stock,
-          isActive: variant.isActive,
-          isOutOfStock: variant.isOutOfStock,
-          images: variant.images || [],
-        })),
-      // reviews: product.reviews?.map(review => ({
-      //   id: String(review._id),
-      //   user: review.user?.name || "Anonymous",
-      //   rating: review.rating,
-      //   comment: review.comment,
-      //   date: review.createdAt
-      // })) || []
-    }));
+    return {
+      products: products.map((product) => ({
+        id: String(product._id),
+        slug: product.slug,
+        title: product.name,
+        description: product.description,
+        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+        images: product.images,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : undefined,
+        rating: product.ratingAvg,
+        isTopSelling: product.isTopSelling,
+        // ingredients: product.ingredients,
+        instructions: "", // Can be added to product model later
+        // category: product.categories?.[0]?.name || "spices",
+        // brand: product.brand?.name || "Dehli Mirch",
+        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+        tags: [], // Can be added to product model later
+        variants: (product?.variants || [])
+          .filter((variant: any) => variant.isActive) // Only show active variants
+          .sort((a: any, b: any) => {
+            // Sort: available first, then out-of-stock
+            const aAvailable = !a.isOutOfStock && a.stock > 0;
+            const bAvailable = !b.isOutOfStock && b.stock > 0;
+            if (aAvailable && !bAvailable) return -1;
+            if (!aAvailable && bAvailable) return 1;
+            return 0;
+          })
+          .map((variant: any) => ({
+            _id: String(variant._id),
+            label: variant.label,
+            price: variant.price,
+            stock: variant.stock,
+            isActive: variant.isActive,
+            isOutOfStock: variant.isOutOfStock,
+            images: variant.images || [],
+          })),
+        // reviews: product.reviews?.map(review => ({
+        //   id: String(review._id),
+        //   user: review.user?.name || "Anonymous",
+        //   rating: review.rating,
+        //   comment: review.comment,
+        //   date: review.createdAt
+        // })) || []
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
   } catch (error) {
     console.error("Error fetching top selling products:", error);
-    return [];
+    return { products: [], pagination: { page: 1, limit, total: 0, pages: 0 } };
   }
 }
 // getAllFeaturedProducts
-export async function getAllFeaturedProducts() {
+export async function getAllFeaturedProducts(limit = 10, page = 1) {
   try {
     await dbConnect();
+    const skip = (page - 1) * limit;
+
     const products = await Product.find({ isActive: true, isFeatured: true })
       // .populate("brand", "name")
       // .populate("categories", "name")
@@ -183,66 +202,83 @@ export async function getAllFeaturedProducts() {
         match: { isActive: true, isOutOfStock: false },
       })
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
+
+    const total = await Product.countDocuments({
+      isActive: true,
+      isFeatured: true,
+    });
     console.log(
       "products in getAllFeaturedProducts",
       JSON.stringify(products, null, 2)
     );
-    return products.map((product) => ({
-      id: String(product._id),
-      slug: product.slug,
-      title: product.name,
-      description: product.description,
-      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-      images: product.images,
-      image:
-        product.images && product.images.length > 0
-          ? product.images[0]
-          : undefined,
-      rating: product.ratingAvg,
-      isFeatured: product.isFeatured,
-      // ingredients: product.ingredients,
-      instructions: "", // Can be added to product model later
-      // category: product.categories?.[0]?.name || "spices",
-      // brand: product.brand?.name || "Dehli Mirch",
-      // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-      tags: [], // Can be added to product model later
-      variants: (product?.variants || [])
-        .filter((variant: any) => variant.isActive) // Only show active variants
-        .sort((a: any, b: any) => {
-          // Sort: available first, then out-of-stock
-          const aAvailable = !a.isOutOfStock && a.stock > 0;
-          const bAvailable = !b.isOutOfStock && b.stock > 0;
-          if (aAvailable && !bAvailable) return -1;
-          if (!aAvailable && bAvailable) return 1;
-          return 0;
-        })
-        .map((variant: any) => ({
-          _id: String(variant._id),
-          label: variant.label,
-          price: variant.price,
-          stock: variant.stock,
-          isActive: variant.isActive,
-          isOutOfStock: variant.isOutOfStock,
-          images: variant.images || [],
-        })),
-      // reviews: product.reviews?.map(review => ({
-      //   id: String(review._id),
-      //   user: review.user?.name || "Anonymous",
-      //   rating: review.rating,
-      //   comment: review.comment,
-      //   date: review.createdAt
-      // })) || []
-    }));
+    return {
+      products: products.map((product) => ({
+        id: String(product._id),
+        slug: product.slug,
+        title: product.name,
+        description: product.description,
+        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+        images: product.images,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : undefined,
+        rating: product.ratingAvg,
+        isFeatured: product.isFeatured,
+        // ingredients: product.ingredients,
+        instructions: "", // Can be added to product model later
+        // category: product.categories?.[0]?.name || "spices",
+        // brand: product.brand?.name || "Dehli Mirch",
+        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+        tags: [], // Can be added to product model later
+        variants: (product?.variants || [])
+          .filter((variant: any) => variant.isActive) // Only show active variants
+          .sort((a: any, b: any) => {
+            // Sort: available first, then out-of-stock
+            const aAvailable = !a.isOutOfStock && a.stock > 0;
+            const bAvailable = !b.isOutOfStock && b.stock > 0;
+            if (aAvailable && !bAvailable) return -1;
+            if (!aAvailable && bAvailable) return 1;
+            return 0;
+          })
+          .map((variant: any) => ({
+            _id: String(variant._id),
+            label: variant.label,
+            price: variant.price,
+            stock: variant.stock,
+            isActive: variant.isActive,
+            isOutOfStock: variant.isOutOfStock,
+            images: variant.images || [],
+          })),
+        // reviews: product.reviews?.map(review => ({
+        //   id: String(review._id),
+        //   user: review.user?.name || "Anonymous",
+        //   rating: review.rating,
+        //   comment: review.comment,
+        //   date: review.createdAt
+        // })) || []
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
   } catch (error) {
     console.error("Error fetching featured products:", error);
-    return [];
+    return { products: [], pagination: { page: 1, limit, total: 0, pages: 0 } };
   }
 }
 
-export async function getAllNewArrivalsProducts() {
+export async function getAllNewArrivalsProducts(limit = 10, page = 1) {
   try {
     await dbConnect();
+    const skip = (page - 1) * limit;
+
     const products = await Product.find({ isActive: true, isNewArrival: true })
       // .populate("brand", "name")
       // .populate("categories", "name")
@@ -251,57 +287,72 @@ export async function getAllNewArrivalsProducts() {
         match: { isActive: true, isOutOfStock: false },
       })
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
+
+    const total = await Product.countDocuments({
+      isActive: true,
+      isNewArrival: true,
+    });
     // console.log("products in getAllNewArrivalsProducts", JSON.stringify(products, null, 2));
-    return products.map((product) => ({
-      id: String(product._id),
-      slug: product.slug,
-      title: product.name,
-      description: product.description,
-      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-      images: product.images,
-      image:
-        product.images && product.images.length > 0
-          ? product.images[0]
-          : undefined,
-      rating: product.ratingAvg,
-      isNewArrival: product.isNewArrival,
-      // ingredients: product.ingredients,
-      instructions: "", // Can be added to product model later
-      // category: product.categories?.[0]?.name || "spices",
-      // brand: product.brand?.name || "Dehli Mirch",
-      // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-      tags: [], // Can be added to product model later
-      variants: (product?.variants || [])
-        .filter((variant: any) => variant.isActive) // Only show active variants
-        .sort((a: any, b: any) => {
-          // Sort: available first, then out-of-stock
-          const aAvailable = !a.isOutOfStock && a.stock > 0;
-          const bAvailable = !b.isOutOfStock && b.stock > 0;
-          if (aAvailable && !bAvailable) return -1;
-          if (!aAvailable && bAvailable) return 1;
-          return 0;
-        })
-        .map((variant: any) => ({
-          _id: String(variant._id),
-          label: variant.label,
-          price: variant.price,
-          stock: variant.stock,
-          isActive: variant.isActive,
-          isOutOfStock: variant.isOutOfStock,
-          images: variant.images || [],
-        })),
-      // reviews: product.reviews?.map(review => ({
-      //   id: String(review._id),
-      //   user: review.user?.name || "Anonymous",
-      //   rating: review.rating,
-      //   comment: review.comment,
-      //   date: review.createdAt
-      // })) || []
-    }));
+    return {
+      products: products.map((product) => ({
+        id: String(product._id),
+        slug: product.slug,
+        title: product.name,
+        description: product.description,
+        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+        images: product.images,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : undefined,
+        rating: product.ratingAvg,
+        isNewArrival: product.isNewArrival,
+        // ingredients: product.ingredients,
+        instructions: "", // Can be added to product model later
+        // category: product.categories?.[0]?.name || "spices",
+        // brand: product.brand?.name || "Dehli Mirch",
+        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+        tags: [], // Can be added to product model later
+        variants: (product?.variants || [])
+          .filter((variant: any) => variant.isActive) // Only show active variants
+          .sort((a: any, b: any) => {
+            // Sort: available first, then out-of-stock
+            const aAvailable = !a.isOutOfStock && a.stock > 0;
+            const bAvailable = !b.isOutOfStock && b.stock > 0;
+            if (aAvailable && !bAvailable) return -1;
+            if (!aAvailable && bAvailable) return 1;
+            return 0;
+          })
+          .map((variant: any) => ({
+            _id: String(variant._id),
+            label: variant.label,
+            price: variant.price,
+            stock: variant.stock,
+            isActive: variant.isActive,
+            isOutOfStock: variant.isOutOfStock,
+            images: variant.images || [],
+          })),
+        // reviews: product.reviews?.map(review => ({
+        //   id: String(review._id),
+        //   user: review.user?.name || "Anonymous",
+        //   rating: review.rating,
+        //   comment: review.comment,
+        //   date: review.createdAt
+        // })) || []
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
   } catch (error) {
-    console.error("Error fetching top selling products:", error);
-    return [];
+    console.error("Error fetching new arrivals products:", error);
+    return { products: [], pagination: { page: 1, limit, total: 0, pages: 0 } };
   }
 }
 // Product data functions
@@ -373,83 +424,117 @@ export async function getAllProducts() {
 }
 
 // getAllSpecialProducts
-export async function getAllSpecialProducts() {
+export async function getAllSpecialProducts(limit = 10, page = 1) {
   try {
     await dbConnect();
+    const skip = (page - 1) * limit;
+
     const products = await Product.find({ isActive: true, isSpecial: true })
       .populate({
         path: "variants",
         match: { isActive: true, isOutOfStock: false },
       })
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
+
+    const total = await Product.countDocuments({
+      isActive: true,
+      isSpecial: true,
+    });
     console.log(
       "products in getAllSpecialProducts",
       JSON.stringify(products, null, 2)
     );
-    return products.map((product) => ({
-      id: String(product._id),
-      slug: product.slug,
-      title: product.name,
-      description: product.description,
-      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-      images: product.images,
-      image:
-        product.images && product.images.length > 0
-          ? product.images[0]
-          : undefined,
-      rating: product.ratingAvg,
-      isSpecial: product.isSpecial,
-      // ingredients: product.ingredients,
-      instructions: "", // Can be added to product model later
-      // category: product.categories?.[0]?.name || "spices",
-      // brand: product.brand?.name || "Dehli Mirch",
-      // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-      tags: [], // Can be added to product model later
-      variants: (product?.variants || [])
-        .filter((variant: any) => variant.isActive) // Only show active variants
-        .sort((a: any, b: any) => {
-          // Sort: available first, then out-of-stock
-          const aAvailable = !a.isOutOfStock && a.stock > 0;
-          const bAvailable = !b.isOutOfStock && b.stock > 0;
-          if (aAvailable && !bAvailable) return -1;
-          if (!aAvailable && bAvailable) return 1;
-          return 0;
-        })
-        .map((variant: any) => ({
-          _id: String(variant._id),
-          label: variant.label,
-          price: variant.price,
-          stock: variant.stock,
-          isActive: variant.isActive,
-          isOutOfStock: variant.isOutOfStock,
-          images: variant.images,
-        })),
-    }));
+    return {
+      products: products.map((product) => ({
+        id: String(product._id),
+        slug: product.slug,
+        title: product.name,
+        description: product.description,
+        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+        images: product.images,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : undefined,
+        rating: product.ratingAvg,
+        isSpecial: product.isSpecial,
+        // ingredients: product.ingredients,
+        instructions: "", // Can be added to product model later
+        // category: product.categories?.[0]?.name || "spices",
+        // brand: product.brand?.name || "Dehli Mirch",
+        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+        tags: [], // Can be added to product model later
+        variants: (product?.variants || [])
+          .filter((variant: any) => variant.isActive) // Only show active variants
+          .sort((a: any, b: any) => {
+            // Sort: available first, then out-of-stock
+            const aAvailable = !a.isOutOfStock && a.stock > 0;
+            const bAvailable = !b.isOutOfStock && b.stock > 0;
+            if (aAvailable && !bAvailable) return -1;
+            if (!aAvailable && bAvailable) return 1;
+            return 0;
+          })
+          .map((variant: any) => ({
+            _id: String(variant._id),
+            label: variant.label,
+            price: variant.price,
+            stock: variant.stock,
+            isActive: variant.isActive,
+            isOutOfStock: variant.isOutOfStock,
+            images: variant.images,
+          })),
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
   } catch (error) {
     console.error("Error fetching special products:", error);
-    return [];
+    return { products: [], pagination: { page: 1, limit, total: 0, pages: 0 } };
   }
 }
 
-// getAllActiveBrands
+// getAllActiveBrands - sorted by product count (highest to lowest)
 export async function getAllActiveBrands() {
   try {
     await dbConnect();
-    const brands = await Brand.find({ isActive: true })
-      .sort({ createdAt: -1 })
-      .lean();
-    console.log(
-      "brands in getAllActiveBrands",
-      JSON.stringify(brands, null, 2)
+
+    // Get all active brands
+    const brands = await Brand.find({ isActive: true }).lean();
+
+    // Get product count for each brand and sort by product count
+    const brandsWithProductCount = await Promise.all(
+      brands.map(async (brand) => {
+        const productCount = await Product.countDocuments({
+          brand: brand._id,
+          isActive: true,
+          isOutOfStock: false,
+        });
+
+        return {
+          id: String(brand._id),
+          name: brand.name,
+          description: brand.description,
+          logo: brand.logo,
+          isActive: brand.isActive,
+          productCount,
+        };
+      })
     );
-    return brands.map((brand) => ({
-      id: String(brand._id),
-      name: brand.name,
-      description: brand.description,
-      logo: brand.logo,
-      isActive: brand.isActive,
-    }));
+
+    // Sort by product count in descending order (highest to lowest)
+    const sortedBrands = brandsWithProductCount.sort(
+      (a, b) => b.productCount - a.productCount
+    );
+
+    // Return only the brand data without productCount (as requested)
+    return sortedBrands.map(({ productCount, ...brand }) => brand);
   } catch (error) {
     console.error("Error fetching active brands:", error);
     return [];
@@ -637,6 +722,66 @@ export async function getProductReviews(
   } catch (error) {
     console.error("Error fetching product reviews:", error);
     return { reviews: [], pagination: { page: 1, limit, total: 0, pages: 0 } };
+  }
+}
+
+// Get products by brand
+export async function getProductsByBrand(brandName: string, limit = 10) {
+  try {
+    await dbConnect();
+
+    // First find the brand
+    const brand = await Brand.findOne({
+      name: brandName,
+      isActive: true,
+    }).lean();
+    if (!brand) return [];
+
+    // Find products for this brand
+    const products = await Product.find({
+      isActive: true,
+      isOutOfStock: false,
+      brand: (brand as any)._id,
+    })
+      .populate("brand", "name")
+      .populate({
+        path: "variants",
+        match: { isActive: true, isOutOfStock: false },
+      })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    const formattedProducts = products.map((product) => ({
+      id: String(product._id),
+      slug: product.slug,
+      title: product.name,
+      description: product.description,
+      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+      images: product.images,
+      image:
+        product.images && product.images.length > 0
+          ? product.images[0]
+          : undefined,
+      rating: product.ratingAvg,
+      brand: product.brand?.name || "Dehli Mirch",
+      variants: (product.variants || [])
+        .filter((variant: any) => variant.isActive)
+        .map((variant: any) => ({
+          _id: String(variant._id),
+          label: variant.label,
+          price: variant.price,
+          stock: variant.stock,
+          isActive: variant.isActive,
+          isOutOfStock: variant.isOutOfStock,
+          images: variant.images,
+        })),
+    }));
+
+    return formattedProducts;
+  } catch (error) {
+    console.error("Error fetching products by brand:", error);
+    return [];
   }
 }
 

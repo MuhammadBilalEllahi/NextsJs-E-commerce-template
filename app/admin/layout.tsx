@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { RootProviders } from "@/lib/providers/rootProvider";
 import LogOutButton from "./components/buttons/LogOutButton";
+// import { Metadata } from "next";
 
 const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -40,6 +41,21 @@ const nav = [
   { href: "/admin/access", label: "Access Control", icon: Shield },
   { href: "/admin/testpage", label: "Test", icon: Package },
 ];
+// export const metadata: Metadata = {
+//   title: "Admin - Dehli Mirch ",
+//   description: "Admin - Dehli Mirch ",
+//   openGraph: {
+//     title: "Admin - Dehli Mirch ",
+//     description: "Admin - Dehli Mirch ",
+//     images: ["/dehli-mirch-og-banner.png"],
+//   },
+//   twitter: {
+//     card: "summary_large_image",
+//     title: "Admin - Dehli Mirch ",
+//     description: "Admin - Dehli Mirch ",
+//     images: ["/dehli-mirch-og-banner.png"],
+//   },
+// };
 
 export default function AdminLayout({
   children,

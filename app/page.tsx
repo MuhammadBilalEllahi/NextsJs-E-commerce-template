@@ -4,7 +4,7 @@ import { HomeFeaturedProducts } from "@/components/home/home-featured-products";
 import { HomeBestSellingAndNewArrivalProducts } from "@/components/home/home-best-selling-new-arrival-products";
 import { HomeSpecialProducts } from "@/components/home/home-special-products";
 import { HomeCategories } from "@/components/home/home-categories";
-import { HomeBrands } from "@/components/home/home-brands";
+import { HomeBrandShowcase } from "@/components/home/home-brand-showcase";
 import { HomeBlogPreview } from "@/components/home/home-blog-preview";
 // import { HomeTestimonials } from "@/components/home/home-testimonials"
 import { getFeaturedBlogs } from "@/mock_data/mock-data";
@@ -46,26 +46,32 @@ export default async function HomePage() {
   const [
     fetchedBanners,
     fetchedSettings,
-    newArrivals,
-    topSelling,
-    specialProducts,
+    newArrivalsData,
+    topSellingData,
+    specialProductsData,
     activeBrands,
     blogs,
     categories,
     branches,
-    featuredProducts,
+    featuredProductsData,
   ] = await Promise.all([
     getAllBanners(),
     getGlobalSettings(),
-    getAllNewArrivalsProducts(),
-    getAllTopSellingProducts(),
-    getAllSpecialProducts(),
+    getAllNewArrivalsProducts(6, 1), // Limit to 6 products for home page
+    getAllTopSellingProducts(6, 1), // Limit to 6 products for home page
+    getAllSpecialProducts(6, 1), // Limit to 6 products for home page
     getAllActiveBrands(),
     getFeaturedBlogs(),
     getAllCategories(),
     getAllBranches(),
-    getAllFeaturedProducts(),
+    getAllFeaturedProducts(6, 1), // Limit to 6 products for home page
   ]);
+
+  // Extract products from paginated data
+  const newArrivals = newArrivalsData.products || [];
+  const topSelling = topSellingData.products || [];
+  const specialProducts = specialProductsData.products || [];
+  const featuredProducts = featuredProductsData.products || [];
   return (
     <div>
       <HomeHero
@@ -100,8 +106,7 @@ export default async function HomePage() {
       </section>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
-        <h2 className="text-2xl font-bold mb-6">Our Brands</h2>
-        <HomeBrands brands={activeBrands} />
+        <HomeBrandShowcase brands={activeBrands} />
       </section>
 
       <section className="container mx-auto px-4 py-10 md:py-14">

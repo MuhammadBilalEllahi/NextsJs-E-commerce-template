@@ -10,15 +10,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Edit, Trash2, Eye, Plus } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Eye,
+  Plus,
+  Upload,
+  History,
+  ImageIcon,
+} from "lucide-react";
 import ProductsCreateAdminUI from "@/components/admin/product/products-create";
 import ProductsEditAdminUI from "@/components/admin/product/products-edit";
 import ProductsViewAdminUI from "@/components/admin/product/products-view";
+import CSVImportComponent from "@/components/admin/product/csv-import";
+import ImportHistoryComponent from "@/components/admin/product/import-history";
+import BulkImageManager from "@/components/admin/product/bulk-image-manager";
 import { useProducts, Product } from "@/lib/api/admin/product/products";
 
 export default function ProductsTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showImportForm, setShowImportForm] = useState(false);
+  const [showHistoryForm, setShowHistoryForm] = useState(false);
+  const [showBulkImageForm, setShowBulkImageForm] = useState(false);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedVariants, setSelectedVariants] = useState<string[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
 
@@ -60,8 +76,13 @@ export default function ProductsTable() {
   // Close all forms
   const closeAllForms = () => {
     setShowCreateForm(false);
+    setShowImportForm(false);
+    setShowHistoryForm(false);
+    setShowBulkImageForm(false);
     setEditingProduct(null);
     setViewingProduct(null);
+    setSelectedProducts([]);
+    setSelectedVariants([]);
   };
 
   // Filter products based on search term
@@ -122,17 +143,75 @@ export default function ProductsTable() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1"
           />
-          <Button
-            className="bg-green-600 hover:bg-green-700"
-            onClick={() => setShowCreateForm(!showCreateForm)}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {showCreateForm ? "Cancel" : "Add Product"}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowBulkImageForm(!showBulkImageForm)}
+              disabled={
+                selectedProducts.length === 0 && selectedVariants.length === 0
+              }
+            >
+              <ImageIcon className="h-4 w-4 mr-2" />
+              {showBulkImageForm ? "Hide Images" : "Bulk Images"}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowHistoryForm(!showHistoryForm)}
+            >
+              <History className="h-4 w-4 mr-2" />
+              {showHistoryForm ? "Hide History" : "Import History"}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowImportForm(!showImportForm)}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              {showImportForm ? "Cancel Import" : "Import CSV"}
+            </Button>
+            <Button
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => setShowCreateForm(!showCreateForm)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {showCreateForm ? "Cancel" : "Add Product"}
+            </Button>
+          </div>
         </div>
 
         {/* Product Creation Form */}
         {showCreateForm && <ProductsCreateAdminUI />}
+
+        {/* CSV Import Form */}
+        {showImportForm && (
+          <CSVImportComponent
+            onImportComplete={() => {
+              loadProducts();
+              setShowImportForm(false);
+            }}
+          />
+        )}
+
+        {/* Import History */}
+        {showHistoryForm && (
+          <ImportHistoryComponent
+            onUndoComplete={() => {
+              loadProducts(); // Refresh products after undo
+            }}
+          />
+        )}
+
+        {/* Bulk Image Manager */}
+        {showBulkImageForm && (
+          <BulkImageManager
+            selectedProducts={selectedProducts}
+            selectedVariants={selectedVariants}
+            onComplete={() => {
+              loadProducts(); // Refresh products after image update
+              setSelectedProducts([]);
+              setSelectedVariants([]);
+            }}
+          />
+        )}
 
         {/* Product Edit Form */}
         {editingProduct && (
@@ -154,12 +233,68 @@ export default function ProductsTable() {
             onEdit={() => editProduct(viewingProduct)}
           />
         )}
+
+        {/* Selection Summary */}
+        {(selectedProducts.length > 0 || selectedVariants.length > 0) && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-blue-800">
+                <strong>
+                  {selectedProducts.length + selectedVariants.length}
+                </strong>{" "}
+                items selected
+                {selectedProducts.length > 0 && (
+                  <span className="ml-2">
+                    ({selectedProducts.length} products
+                  </span>
+                )}
+                {selectedVariants.length > 0 && (
+                  <span className="ml-1">
+                    {selectedVariants.length} variants)
+                  </span>
+                )}
+                {selectedProducts.length > 0 &&
+                  selectedVariants.length === 0 && <span>)</span>}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedProducts([]);
+                  setSelectedVariants([]);
+                }}
+              >
+                Clear Selection
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Products Table */}
         <div className="rounded-md border">
           <div className="relative w-full overflow-auto">
             <table className="w-full caption-bottom text-sm">
               <thead className="border-b">
                 <tr className="bg-muted/50">
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={
+                        selectedProducts.length === filteredProducts.length &&
+                        filteredProducts.length > 0
+                      }
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedProducts(
+                            filteredProducts.map((p) => p._id)
+                          );
+                        } else {
+                          setSelectedProducts([]);
+                        }
+                      }}
+                      className="rounded"
+                    />
+                  </th>
                   <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                     Product
                   </th>
@@ -193,7 +328,7 @@ export default function ProductsTable() {
                 {filteredProducts.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={9}
+                      colSpan={10}
                       className="p-8 text-center text-muted-foreground"
                     >
                       {searchTerm
@@ -207,6 +342,25 @@ export default function ProductsTable() {
                       key={product._id}
                       className="border-b hover:bg-muted/50"
                     >
+                      <td className="p-4 align-middle">
+                        <input
+                          type="checkbox"
+                          checked={selectedProducts.includes(product._id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedProducts((prev) => [
+                                ...prev,
+                                product._id,
+                              ]);
+                            } else {
+                              setSelectedProducts((prev) =>
+                                prev.filter((id) => id !== product._id)
+                              );
+                            }
+                          }}
+                          className="rounded"
+                        />
+                      </td>
                       <td className="p-4 align-middle">
                         <div className="flex items-center gap-3">
                           {product.images && product.images.length > 0 ? (
@@ -283,7 +437,48 @@ export default function ProductsTable() {
                       </td>
 
                       <td className="p-4 align-middle">
-                        {product.variants?.length || 0} variants
+                        <div className="space-y-1">
+                          {product.variants && product.variants.length > 0 ? (
+                            product.variants.slice(0, 3).map((variant: any) => (
+                              <div
+                                key={variant._id}
+                                className="flex items-center gap-2"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedVariants.includes(
+                                    variant._id
+                                  )}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setSelectedVariants((prev) => [
+                                        ...prev,
+                                        variant._id,
+                                      ]);
+                                    } else {
+                                      setSelectedVariants((prev) =>
+                                        prev.filter((id) => id !== variant._id)
+                                      );
+                                    }
+                                  }}
+                                  className="rounded h-3 w-3"
+                                />
+                                <span className="text-xs">
+                                  {variant.label} - Rs. {variant.price}
+                                </span>
+                              </div>
+                            ))
+                          ) : (
+                            <span className="text-xs text-muted-foreground">
+                              No variants
+                            </span>
+                          )}
+                          {product.variants && product.variants.length > 3 && (
+                            <span className="text-xs text-muted-foreground">
+                              +{product.variants.length - 3} more
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="p-4 align-middle">
                         {new Date(product.createdAt).toLocaleDateString()}

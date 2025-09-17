@@ -1,177 +1,131 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState, useEffect } from "react"
-import { ChevronRight } from "lucide-react"
-import { getAllCategories, getProductsByCategory } from "@/database/data-service"
-import { CURRENCY } from "@/lib/constants"
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { ChevronRight } from "lucide-react";
+import { getProductsByCategory } from "@/database/data-service";
+import { usePreloadedData } from "@/lib/hooks/use-preloaded-data";
+import { CURRENCY } from "@/lib/constants";
 
 interface Category {
-  id: string
-  name: string
-  slug: string
-  parent: { id: string; name: string } | null
-  description: string
-  image: string
+  id: string;
+  name: string;
+  slug: string;
+  parent: { id: string; name: string } | null;
+  description: string;
+  image: string;
 }
 
 interface Product {
-  id: string
-  slug: string
-  title: string
-  price: number
-  image?: string
-  brand: string
+  id: string;
+  slug: string;
+  title: string;
+  price: number;
+  image?: string;
+  brand: string;
 }
 
 interface HoverNavigationProps {
-  isOpen: boolean
-  onClose: () => void
-  onMouseEnter?: () => void
-  onMouseLeave?: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
-export function HoverNavigation({ isOpen, onClose, onMouseEnter, onMouseLeave }: HoverNavigationProps) {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [hoveredCategory, setHoveredCategory] = useState<Category | null>(null)
-  const [categoryProducts, setCategoryProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(false)
-  const [showProducts, setShowProducts] = useState(false)
+export function HoverNavigation({
+  isOpen,
+  onClose,
+  onMouseEnter,
+  onMouseLeave,
+}: HoverNavigationProps) {
+  const { categories, isLoaded } = usePreloadedData();
+  const [hoveredCategory, setHoveredCategory] = useState<Category | null>(null);
+  const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showProducts, setShowProducts] = useState(false);
 
-  // Cache keys and expiry times
-  const CATEGORIES_CACHE_KEY = 'dehli_mirch_categories'
-  const PRODUCTS_CACHE_KEY_PREFIX = 'dehli_mirch_products_'
-  const CACHE_EXPIRY_TIME = 30 * 60 * 1000 // 30 minutes in milliseconds
+  // Cache keys and expiry times for products
+  const PRODUCTS_CACHE_KEY_PREFIX = "dehli_mirch_products_";
+  const CACHE_EXPIRY_TIME = 30 * 60 * 1000; // 30 minutes in milliseconds
 
   // Helper function to check if cache is expired
   const isCacheExpired = (timestamp: number) => {
-    return Date.now() - timestamp > CACHE_EXPIRY_TIME
-  }
+    return Date.now() - timestamp > CACHE_EXPIRY_TIME;
+  };
 
   // Helper function to get cached data
   const getCachedData = (key: string) => {
     try {
-      const cached = localStorage.getItem(key)
+      const cached = localStorage.getItem(key);
       if (cached) {
-        const { data, timestamp } = JSON.parse(cached)
+        const { data, timestamp } = JSON.parse(cached);
         if (!isCacheExpired(timestamp)) {
-          return data
+          return data;
         } else {
           // Remove expired cache
-          localStorage.removeItem(key)
+          localStorage.removeItem(key);
         }
       }
     } catch (error) {
-      console.error('Error reading from cache:', error)
+      console.error("Error reading from cache:", error);
     }
-    return null
-  }
+    return null;
+  };
 
   // Helper function to set cached data
   const setCachedData = (key: string, data: any) => {
     try {
       const cacheData = {
         data,
-        timestamp: Date.now()
-      }
-      localStorage.setItem(key, JSON.stringify(cacheData))
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(key, JSON.stringify(cacheData));
     } catch (error) {
-      console.error('Error writing to cache:', error)
+      console.error("Error writing to cache:", error);
     }
-  }
-
-  // Clear expired cache on component mount
-  useEffect(() => {
-    const clearExpiredCache = () => {
-      try {
-        const keys = Object.keys(localStorage)
-        keys.forEach(key => {
-          if (key.startsWith('dehli_mirch_')) {
-            const cached = localStorage.getItem(key)
-            if (cached) {
-              const { timestamp } = JSON.parse(cached)
-              if (isCacheExpired(timestamp)) {
-                localStorage.removeItem(key)
-              }
-            }
-          }
-        })
-      } catch (error) {
-        console.error('Error clearing expired cache:', error)
-      }
-    }
-    
-    clearExpiredCache()
-  }, [])
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchCategories()
-    }
-  }, [isOpen])
+  };
 
   useEffect(() => {
     if (hoveredCategory) {
-      setShowProducts(true)
-      fetchCategoryProducts(hoveredCategory.slug)
+      setShowProducts(true);
+      fetchCategoryProducts(hoveredCategory.slug);
     } else {
-      setShowProducts(false)
-      setCategoryProducts([])
+      setShowProducts(false);
+      setCategoryProducts([]);
     }
-  }, [hoveredCategory])
-
-  const fetchCategories = async () => {
-    try {
-      // Check localStorage cache first
-      const cachedCategories = getCachedData(CATEGORIES_CACHE_KEY)
-      if (cachedCategories) {
-        setCategories(cachedCategories)
-        return
-      }
-
-      // Fetch from server if not in cache
-      const data = await getAllCategories()
-      setCategories(data as Category[])
-      
-      // Cache the results
-      setCachedData(CATEGORIES_CACHE_KEY, data)
-    } catch (error) {
-      console.error("Error fetching categories:", error)
-    }
-  }
+  }, [hoveredCategory]);
 
   const fetchCategoryProducts = async (categorySlug: string) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const cacheKey = `${PRODUCTS_CACHE_KEY_PREFIX}${categorySlug}`
-      
+      const cacheKey = `${PRODUCTS_CACHE_KEY_PREFIX}${categorySlug}`;
+
       // Check localStorage cache first
-      const cachedProducts = getCachedData(cacheKey)
+      const cachedProducts = getCachedData(cacheKey);
       if (cachedProducts) {
-        setCategoryProducts(cachedProducts)
-        setLoading(false)
-        return
+        setCategoryProducts(cachedProducts);
+        setLoading(false);
+        return;
       }
 
       // Fetch from server if not in cache
-      const products = await getProductsByCategory(categorySlug, 6)
-      setCategoryProducts(products)
-      
+      const products = await getProductsByCategory(categorySlug, 6);
+      setCategoryProducts(products);
+
       // Cache the results
-      setCachedData(cacheKey, products)
+      setCachedData(cacheKey, products);
     } catch (error) {
-      console.error("Error fetching category products:", error)
-      setCategoryProducts([])
+      console.error("Error fetching category products:", error);
+      setCategoryProducts([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="absolute top-8 left-0 z-50"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -185,8 +139,8 @@ export function HoverNavigation({ isOpen, onClose, onMouseEnter, onMouseLeave }:
                 <div
                   className="flex items-center justify-between py-2 px-4 hover:underline cursor-pointer group transition-all"
                   onMouseEnter={() => {
-                    setHoveredCategory(category)
-                    setShowProducts(true)
+                    setHoveredCategory(category);
+                    setShowProducts(true);
                   }}
                 >
                   <span className="text-xs font-medium w-28">
@@ -229,7 +183,7 @@ export function HoverNavigation({ isOpen, onClose, onMouseEnter, onMouseLeave }:
                       )}
                     </div>
                   ))}
-                  
+
                   {/* More link */}
                   {categoryProducts.length > 0 && (
                     <div>
@@ -239,9 +193,7 @@ export function HoverNavigation({ isOpen, onClose, onMouseEnter, onMouseLeave }:
                         className="flex items-center justify-between py-2 px-4 hover:underline cursor-pointer group transition-all"
                         onClick={onClose}
                       >
-                        <span className="text-xs font-medium">
-                          More
-                        </span>
+                        <span className="text-xs font-medium">More</span>
                         <ChevronRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
                       </Link>
                     </div>
@@ -250,7 +202,9 @@ export function HoverNavigation({ isOpen, onClose, onMouseEnter, onMouseLeave }:
               )}
               {categoryProducts.length === 0 && !loading && (
                 <div className="text-center py-8">
-                  <p className="text-xs text-muted-foreground">No products found</p>
+                  <p className="text-xs text-muted-foreground">
+                    No products found
+                  </p>
                 </div>
               )}
             </div>
@@ -258,5 +212,5 @@ export function HoverNavigation({ isOpen, onClose, onMouseEnter, onMouseLeave }:
         )}
       </div>
     </div>
-  )
+  );
 }

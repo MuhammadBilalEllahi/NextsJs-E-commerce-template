@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
 import { AuthButton } from "@/components/auth/auth-button";
 import { useAuth } from "@/lib/providers/authProvider";
 import { useWishlist } from "@/lib/providers/wishlistProvider";
+import { HoverDataPreloader } from "@/lib/hooks/use-preloaded-data";
 import { HoverNavigation } from "./hover-navigation";
 
 export function Navbar() {
@@ -96,6 +97,7 @@ export function Navbar() {
 
   return (
     <>
+      <HoverDataPreloader />
       <nav className="sticky top-0 z-40 border-b bg-white/95 dark:bg-neutral-950/95 backdrop-blur">
         <div className="container mx-auto px-4 h-12 flex items-center justify-between">
           {/* Mobile Hamburger Menu */}
