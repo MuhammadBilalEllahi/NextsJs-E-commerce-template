@@ -92,7 +92,12 @@ export async function POST(request: NextRequest) {
     if (productId) {
       // Undo specific product
       const product = importHistory.products.find(
-        (p) => p.productId.toString() === productId
+        (p: {
+          productId: any;
+          productName: string;
+          productSlug: string;
+          variants: any[];
+        }) => p.productId.toString() === productId
       );
 
       if (!product) {
@@ -121,7 +126,12 @@ export async function POST(request: NextRequest) {
 
         // Update import history
         importHistory.products = importHistory.products.filter(
-          (p) => p.productId.toString() !== productId
+          (p: {
+            productId: any;
+            productName: string;
+            productSlug: string;
+            variants: any[];
+          }) => p.productId.toString() !== productId
         );
 
         // If no products left, mark entire import as undone
@@ -152,7 +162,8 @@ export async function POST(request: NextRequest) {
 
       for (const product of importHistory.products) {
         const variant = product.variants.find(
-          (v) => v.variantId.toString() === variantId
+          (v: { variantId: any; variantSku: string; variantLabel: string }) =>
+            v.variantId.toString() === variantId
         );
         if (variant) {
           foundProduct = product;
@@ -180,13 +191,19 @@ export async function POST(request: NextRequest) {
 
         // Update import history
         foundProduct.variants = foundProduct.variants.filter(
-          (v) => v.variantId.toString() !== variantId
+          (v: { variantId: any; variantSku: string; variantLabel: string }) =>
+            v.variantId.toString() !== variantId
         );
 
         // If no variants left for this product, remove the product from history
         if (foundProduct.variants.length === 0) {
           importHistory.products = importHistory.products.filter(
-            (p) => p.productId.toString() !== foundProduct.productId.toString()
+            (p: {
+              productId: any;
+              productName: string;
+              productSlug: string;
+              variants: any[];
+            }) => p.productId.toString() !== foundProduct.productId.toString()
           );
         }
 
