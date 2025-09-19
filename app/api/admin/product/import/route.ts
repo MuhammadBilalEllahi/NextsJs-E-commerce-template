@@ -10,7 +10,7 @@ import BrandProducts from "@/models/BrandProducts";
 import CategoryProducts from "@/models/CategoryProducts";
 import ImportHistory from "@/models/ImportHistory";
 import { MODELS } from "@/models/constants";
-const { v4: uuidv4 } = require("uuid");
+import { v4 as uuidv4 } from "uuid";
 
 interface CSVRow {
   "Product Name": string;
