@@ -76,6 +76,7 @@ export default function ProductsCreateAdminUI() {
     isNewArrival: false,
     isBestSelling: false,
     isSpecial: false,
+    isGrocery: false,
   });
 
   // modal state
@@ -123,6 +124,7 @@ export default function ProductsCreateAdminUI() {
         isNewArrival: form.isNewArrival,
         isBestSelling: form.isBestSelling,
         isSpecial: form.isSpecial,
+        isGrocery: form.isGrocery,
         brand: form.brand,
         categories: form.categories,
         images: form.images,
@@ -160,6 +162,7 @@ export default function ProductsCreateAdminUI() {
         isNewArrival: false,
         isBestSelling: false,
         isSpecial: false,
+        isGrocery: false, // Added missing property to fix type error
       });
       setVariants([]);
     } catch (err: any) {
@@ -501,6 +504,20 @@ export default function ProductsCreateAdminUI() {
               />
               <label htmlFor="isSpecial" className="text-sm font-medium">
                 Product is special
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isGrocery"
+                checked={form.isGrocery}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, isGrocery: e.target.checked }))
+                }
+                className="rounded"
+              />
+              <label htmlFor="isGrocery" className="text-sm font-medium">
+                Product is grocery
               </label>
             </div>
           </div>

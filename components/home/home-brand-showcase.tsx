@@ -160,7 +160,7 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
                       key={product.id}
                       className="snap-start min-w-[200px] md:min-w-[220px]"
                     >
-                      <ProductCard product={product} className="w-full" />
+                      <ProductCard product={product} className="w-72" />
                     </div>
                   ))}
                 </div>

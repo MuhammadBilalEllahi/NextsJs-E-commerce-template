@@ -6,8 +6,8 @@ import { Product } from "@/mock_data/mock-data";
 import { ProductCard } from "@/components/product/product-card";
 
 export function HomeBestSellingAndNewArrivalProducts({
-  bestSellings,
-  newArrivals,
+  bestSellings: initialBestSellings,
+  newArrivals: initialNewArrivals,
 }: {
   bestSellings: Product[];
   newArrivals: Product[];
@@ -15,10 +15,82 @@ export function HomeBestSellingAndNewArrivalProducts({
   const [activeTab, setActiveTab] = useState<"best" | "new">("best");
   const scroller = useRef<HTMLDivElement>(null);
 
+  // State for both tabs
+  const [bestSellings, setBestSellings] =
+    useState<Product[]>(initialBestSellings);
+  const [newArrivals, setNewArrivals] = useState<Product[]>(initialNewArrivals);
+  const [bestSellingsPage, setBestSellingsPage] = useState(1);
+  const [newArrivalsPage, setNewArrivalsPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMoreBestSellings, setHasMoreBestSellings] = useState(true);
+  const [hasMoreNewArrivals, setHasMoreNewArrivals] = useState(true);
+
+  const loadMoreProducts = async (type: "best" | "new") => {
+    if (loading) return;
+
+    const isBestSelling = type === "best";
+    const currentPage = isBestSelling ? bestSellingsPage : newArrivalsPage;
+    const hasMore = isBestSelling ? hasMoreBestSellings : hasMoreNewArrivals;
+
+    if (!hasMore) return;
+
+    setLoading(true);
+    try {
+      const endpoint = isBestSelling ? "top-selling" : "new-arrivals";
+      const response = await fetch(
+        `/api/products/${endpoint}?page=${currentPage + 1}&limit=6`
+      );
+      const data = await response.json();
+
+      if (data.products && data.products.length > 0) {
+        if (isBestSelling) {
+          setBestSellings((prev) => [...prev, ...data.products]);
+          setBestSellingsPage((prev) => prev + 1);
+          setHasMoreBestSellings(data.products.length === 6);
+        } else {
+          setNewArrivals((prev) => [...prev, ...data.products]);
+          setNewArrivalsPage((prev) => prev + 1);
+          setHasMoreNewArrivals(data.products.length === 6);
+        }
+      } else {
+        if (isBestSelling) {
+          setHasMoreBestSellings(false);
+        } else {
+          setHasMoreNewArrivals(false);
+        }
+      }
+    } catch (error) {
+      console.error(`Error loading more ${type} products:`, error);
+      if (isBestSelling) {
+        setHasMoreBestSellings(false);
+      } else {
+        setHasMoreNewArrivals(false);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const scrollBy = (dir: "left" | "right") => {
     const el = scroller.current;
     if (!el) return;
+
     const amount = el.clientWidth * 0.9;
+    const currentScroll = el.scrollLeft;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+
+    // If scrolling right and near the end, load more products
+    const hasMore =
+      activeTab === "best" ? hasMoreBestSellings : hasMoreNewArrivals;
+    if (
+      dir === "right" &&
+      currentScroll + amount >= maxScroll - 100 &&
+      hasMore &&
+      !loading
+    ) {
+      loadMoreProducts(activeTab);
+    }
+
     el.scrollBy({
       left: dir === "left" ? -amount : amount,
       behavior: "smooth",
@@ -68,13 +140,18 @@ export function HomeBestSellingAndNewArrivalProducts({
       <div
         key={activeTab} // forces remount for lazy-load effect
         ref={scroller}
-        className="hide-scrollbar flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 "
+        className="hide-scrollbar flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2"
       >
         {products.map((p) => (
-          <div key={p.id} className=" snap-start animate-fadeIn ">
-            <ProductCard product={p} className="w-72 " />
+          <div key={p.id} className="snap-start animate-fadeIn">
+            <ProductCard product={p} className="w-72" />
           </div>
         ))}
+        {loading && (
+          <div className="flex items-center justify-center w-72">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        )}
       </div>
 
       {/* Scroll Controls */}

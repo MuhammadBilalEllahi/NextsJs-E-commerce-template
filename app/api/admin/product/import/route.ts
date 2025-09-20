@@ -26,6 +26,7 @@ interface CSVRow {
   "New Arrival": string;
   "Best Selling": string;
   Special: string;
+  Grocery: string;
   Brand: string;
   Categories: string;
   Images: string;
@@ -82,6 +83,7 @@ function parseCSV(csvText: string): CSVRow[] {
             "New Arrival",
             "Best Selling",
             "Special",
+            "Grocery",
             "Variant Active",
             "Variant Out of Stock",
           ].includes(header)
@@ -302,6 +304,7 @@ export async function POST(request: NextRequest) {
           product.isNewArrival = firstRow["New Arrival"] === "true";
           product.isBestSelling = firstRow["Best Selling"] === "true";
           product.isSpecial = firstRow.Special === "true";
+          product.isGrocery = firstRow.Grocery === "true";
           product.brand = brand._id;
           product.categories = categories.map((c) => c._id);
           product.images = productImages;
@@ -324,6 +327,7 @@ export async function POST(request: NextRequest) {
             isNewArrival: firstRow["New Arrival"] === "true",
             isBestSelling: firstRow["Best Selling"] === "true",
             isSpecial: firstRow.Special === "true",
+            isGrocery: firstRow.Grocery === "true",
             brand: brand._id,
             categories: categories.map((c) => c._id),
             images: productImages,

@@ -500,6 +500,82 @@ export async function getAllSpecialProducts(limit = 10, page = 1) {
   }
 }
 
+export async function getAllGroceryProducts(limit = 10, page = 1) {
+  try {
+    await dbConnect();
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find({ isActive: true, isGrocery: true })
+      .populate({
+        path: "variants",
+        match: { isActive: true, isOutOfStock: false },
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const total = await Product.countDocuments({
+      isActive: true,
+      isGrocery: true,
+    });
+    console.log(
+      "products in getAllGroceryProducts",
+      JSON.stringify(products, null, 2)
+    );
+    return {
+      products: products.map((product) => ({
+        id: String(product._id),
+        slug: product.slug,
+        title: product.name,
+        description: product.description,
+        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+        images: product.images,
+        image:
+          product.images && product.images.length > 0
+            ? product.images[0]
+            : undefined,
+        rating: product.ratingAvg,
+        isGrocery: product.isGrocery,
+        // ingredients: product.ingredients,
+        instructions: "", // Can be added to product model later
+        // category: product.categories?.[0]?.name || "spices",
+        // brand: product.brand?.name || "Dehli Mirch",
+        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
+        tags: [], // Can be added to product model later
+        variants: (product?.variants || [])
+          .filter((variant: any) => variant.isActive) // Only show active variants
+          .sort((a: any, b: any) => {
+            // Sort: available first, then out-of-stock
+            const aAvailable = !a.isOutOfStock && a.stock > 0;
+            const bAvailable = !b.isOutOfStock && b.stock > 0;
+            if (aAvailable && !bAvailable) return -1;
+            if (!aAvailable && bAvailable) return 1;
+            return 0;
+          })
+          .map((variant: any) => ({
+            _id: String(variant._id),
+            label: variant.label,
+            price: variant.price,
+            stock: variant.stock,
+            isActive: variant.isActive,
+            isOutOfStock: variant.isOutOfStock,
+            images: variant.images,
+          })),
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching grocery products:", error);
+    return { products: [], pagination: { page: 1, limit, total: 0, pages: 0 } };
+  }
+}
+
 // getAllActiveBrands - sorted by product count (highest to lowest)
 export async function getAllActiveBrands() {
   try {

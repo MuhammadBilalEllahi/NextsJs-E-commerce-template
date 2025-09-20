@@ -15,7 +15,7 @@ export function ProductCard({
   className,
 }: {
   product: Product;
-  variant?: "grid" | "list" | "single";
+  variant?: "grid" | "list" | "single" | "mini";
   className?: string;
 }) {
   const { add, isAdding } = useCart();
@@ -160,6 +160,62 @@ export function ProductCard({
   const toggleReadMore = () => {
     setIsExpanded(!isExpanded);
   };
+
+  if (variant === "mini") {
+    return (
+      <div
+        className={cn(
+          "p-2 mb-auto group rounded-md border overflow-hidden bg-white dark:bg-neutral-950 hover:shadow-md transition relative",
+          className
+        )}
+      >
+        <Link href={`/product/${product.slug}`} className="block">
+          <img
+            src={getDisplayImage()}
+            alt={product.title}
+            className="h-24 w-full rounded-sm object-contain dark:bg-neutral-900 bg-neutral-100 group-hover:scale-[1.02] transition-transform"
+          />
+        </Link>
+        <div className="p-1">
+          <Link
+            href={`/product/${product.slug}`}
+            className="font-semibold text-sm line-clamp-2 hover:text-black dark:hover:text-white hover:underline hover:underline-offset-2 hover:decoration-red-600"
+          >
+            {product.title}
+          </Link>
+
+          <div className="flex items-center gap-1 text-[#121212] mt-1">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <Star
+                key={index}
+                className="h-2 w-2 fill-[#121212] dark:fill-white"
+              />
+            ))}
+            <span className="text-xs dark:text-white text-black">
+              {product.rating?.toFixed(1) ?? "4.5"}
+            </span>
+          </div>
+
+          <div className="font-bold text-red-600 text-sm mt-1">
+            Rs.{getDisplayPrice()}
+          </div>
+
+          <div className="mt-2 flex items-center justify-between">
+            <Button
+              size="sm"
+              className="flex-1 rounded-sm h-8 text-xs"
+              variant="gradient"
+              onClick={handleAddToCart}
+              disabled={isAdding || !isProductAvailable()}
+            >
+              <ShoppingCart size={12} className="h-3 w-3 mr-1" />
+              Add
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (variant === "list") {
     return (

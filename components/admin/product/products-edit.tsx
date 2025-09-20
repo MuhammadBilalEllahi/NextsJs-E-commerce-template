@@ -58,6 +58,8 @@ type Variant = {
   newImages?: File[];
 };
 type Product = {
+  isGrocery: boolean;
+  isSpecial: boolean;
   _id: string;
   name: string;
   description: string;
@@ -113,6 +115,8 @@ export default function ProductsEditAdminUI({
     isTopSelling: product.isTopSelling || false,
     isNewArrival: product.isNewArrival || false,
     isBestSelling: product.isBestSelling || false,
+    isSpecial: product.isSpecial || false,
+    isGrocery: product.isGrocery || false,
 
     slug: product.slug,
   } as {
@@ -131,6 +135,8 @@ export default function ProductsEditAdminUI({
     isTopSelling: boolean;
     isNewArrival: boolean;
     isBestSelling: boolean;
+    isSpecial: boolean;
+    isGrocery: boolean;
 
     slug: string;
   });
@@ -198,6 +204,8 @@ export default function ProductsEditAdminUI({
       formData.append("isTopSelling", form.isTopSelling.toString());
       formData.append("isNewArrival", form.isNewArrival.toString());
       formData.append("isBestSelling", form.isBestSelling.toString());
+      formData.append("isSpecial", form.isSpecial.toString());
+      formData.append("isGrocery", form.isGrocery.toString());
       if (form.brand) formData.append("brand", form.brand);
 
       // Append each category individually
@@ -701,6 +709,26 @@ export default function ProductsEditAdminUI({
               }
             />
             <Label htmlFor="isBestSelling">Product is best selling</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="isSpecial"
+              checked={form.isSpecial}
+              onCheckedChange={(checked) =>
+                setForm((f) => ({ ...f, isSpecial: checked as boolean }))
+              }
+            />
+            <Label htmlFor="isSpecial">Product is special</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="isGrocery"
+              checked={form.isGrocery}
+              onCheckedChange={(checked) =>
+                setForm((f) => ({ ...f, isGrocery: checked as boolean }))
+              }
+            />
+            <Label htmlFor="isGrocery">Product is grocery</Label>
           </div>
         </div>
 

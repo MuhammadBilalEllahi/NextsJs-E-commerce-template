@@ -314,6 +314,9 @@ export default function ProductsTable() {
                     Special
                   </th>
                   <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    Grocery
+                  </th>
+                  <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                     Variants
                   </th>
                   <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
@@ -433,6 +436,29 @@ export default function ProductsTable() {
                           }`}
                         >
                           {product.isOutOfStock ? "Out of Stock" : "In Stock"}
+                        </span>
+                      </td>
+                      <td className="p-4 align-middle">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                            product.isSpecial
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {product.isSpecial ? "Yes" : "No"}
+                        </span>
+                      </td>
+
+                      <td className="p-4 align-middle">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                            product.isGrocery
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {product.isGrocery ? "Yes" : "No"}
                         </span>
                       </td>
 

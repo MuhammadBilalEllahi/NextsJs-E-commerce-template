@@ -41,6 +41,7 @@ export async function POST(req: Request) {
       isActive: formData.get("isActive")?.toString() === "true",
       isOutOfStock: formData.get("isOutOfStock")?.toString() === "true",
       isSpecial: formData.get("isSpecial")?.toString() === "true",
+      isGrocery: formData.get("isGrocery")?.toString() === "true",
     };
 
     const parsed = productZodSchema.safeParse(raw);
@@ -67,6 +68,7 @@ export async function POST(req: Request) {
       isActive,
       isOutOfStock,
       isSpecial,
+      isGrocery,
     } = parsed.data;
 
     if (!slug) {
@@ -102,6 +104,7 @@ export async function POST(req: Request) {
           isActive,
           isOutOfStock,
           isSpecial,
+          isGrocery,
         },
       ],
       { session }
@@ -383,6 +386,8 @@ export async function PUT(req: Request) {
         formData.get("isBestSelling")!.toString() === "true";
     if (formData.get("isSpecial") !== null)
       product.isSpecial = formData.get("isSpecial")!.toString() === "true";
+    if (formData.get("isGrocery") !== null)
+      product.isGrocery = formData.get("isGrocery")!.toString() === "true";
 
     // Handle brand changes
     const newBrand = formData.get("brand")?.toString();

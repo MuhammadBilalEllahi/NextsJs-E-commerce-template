@@ -20,6 +20,7 @@ const ProductSchema = new Schema({
   isNewArrival: { type: Boolean, default: false },
   isBestSelling: { type: Boolean, default: false },
   isSpecial: { type: Boolean, default: false },
+  isGrocery: { type: Boolean, default: false },
 
   brand: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.BRAND },
 
@@ -76,6 +77,7 @@ export const productZodSchema = z
     isNewArrival: z.boolean().optional(),
     isBestSelling: z.boolean().optional(),
     isSpecial: z.boolean().optional(),
+    isGrocery: z.boolean().optional(),
   })
   .refine(
     (data) => {

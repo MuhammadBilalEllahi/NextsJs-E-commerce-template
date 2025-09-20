@@ -3,6 +3,7 @@ import { HomeHero } from "@/components/home/home-hero";
 import { HomeFeaturedProducts } from "@/components/home/home-featured-products";
 import { HomeBestSellingAndNewArrivalProducts } from "@/components/home/home-best-selling-new-arrival-products";
 import { HomeSpecialProducts } from "@/components/home/home-special-products";
+import { HomeGroceryProducts } from "@/components/home/home-grocery-products";
 import { HomeCategories } from "@/components/home/home-categories";
 import { HomeBrandShowcase } from "@/components/home/home-brand-showcase";
 import { HomeBlogPreview } from "@/components/home/home-blog-preview";
@@ -15,6 +16,7 @@ import {
   getAllNewArrivalsProducts,
   getAllTopSellingProducts,
   getAllSpecialProducts,
+  getAllGroceryProducts,
   getAllActiveBrands,
   getGlobalSettings,
   getAllBranches,
@@ -49,6 +51,7 @@ export default async function HomePage() {
     newArrivalsData,
     topSellingData,
     specialProductsData,
+    groceryProductsData,
     activeBrands,
     blogs,
     categories,
@@ -60,6 +63,7 @@ export default async function HomePage() {
     getAllNewArrivalsProducts(6, 1), // Limit to 6 products for home page
     getAllTopSellingProducts(6, 1), // Limit to 6 products for home page
     getAllSpecialProducts(6, 1), // Limit to 6 products for home page
+    getAllGroceryProducts(6, 1), // Limit to 6 products for home page
     getAllActiveBrands(),
     getFeaturedBlogs(),
     getAllCategories(),
@@ -71,6 +75,7 @@ export default async function HomePage() {
   const newArrivals = newArrivalsData.products || [];
   const topSelling = topSellingData.products || [];
   const specialProducts = specialProductsData.products || [];
+  const groceryProducts = groceryProductsData.products || [];
   const featuredProducts = featuredProductsData.products || [];
   return (
     <div>
@@ -114,7 +119,7 @@ export default async function HomePage() {
       </section>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
-        <h2 className="text-2xl font-bold mb-6">Grocery</h2>
+        <HomeGroceryProducts groceryProducts={groceryProducts} />
       </section>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
