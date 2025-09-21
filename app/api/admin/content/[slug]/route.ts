@@ -7,13 +7,14 @@ import ContentPage from "@/models/ContentPage";
 // GET - Fetch single content page
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     await dbConnect();
+    const { slug } = await params;
 
     const contentPage = await ContentPage.findOne({
-      slug: params.slug,
+      slug: slug,
       isActive: true,
     }).lean();
 
@@ -37,10 +38,11 @@ export async function GET(
 // PUT - Update content page
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    console.log("PUT request received for slug:", params.slug);
+    const { slug } = await params;
+    console.log("PUT request received for slug:", slug);
 
     const session = await getServerSession(authOptions);
     console.log("Session:", session);
@@ -70,7 +72,7 @@ export async function PUT(
     console.log("Database connected");
 
     const contentPage = await ContentPage.findOneAndUpdate(
-      { slug: params.slug },
+      { slug: slug },
       {
         title,
         content,
@@ -84,7 +86,7 @@ export async function PUT(
     console.log("Updated content page:", contentPage);
 
     if (!contentPage) {
-      console.log("Content page not found for slug:", params.slug);
+      console.log("Content page not found for slug:", slug);
       return NextResponse.json(
         { error: "Content page not found" },
         { status: 404 }
@@ -108,7 +110,7 @@ export async function PUT(
 // DELETE - Delete content page
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -117,9 +119,10 @@ export async function DELETE(
     }
 
     await dbConnect();
+    const { slug } = await params;
 
     const contentPage = await ContentPage.findOneAndDelete({
-      slug: params.slug,
+      slug: slug,
     });
 
     if (!contentPage) {

@@ -8,7 +8,7 @@ export function HomeCategories({ categories }: { categories: Category[] }) {
       {categories.map((c) => (
         <Link
           key={c.slug}
-          href={`/category/${c.slug}`}
+          href={`/shop/all?category=${encodeURIComponent(c.slug)}`}
           className="group inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-white dark:bg-neutral-900 hover:shadow-md transition-all duration-200 hover:scale-105"
         >
           {c.image && (

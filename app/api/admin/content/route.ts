@@ -37,7 +37,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { slug, title, content, metaTitle, metaDescription, isActive } = body;
+    const {
+      slug,
+      title,
+      content,
+      metaTitle,
+      metaDescription,
+      isActive,
+      parentSlug,
+      sortOrder,
+      showInFooter,
+      showInHeader,
+    } = body;
 
     if (!slug || !title || !content) {
       return NextResponse.json(
@@ -64,6 +75,10 @@ export async function POST(request: NextRequest) {
       metaTitle,
       metaDescription,
       isActive: isActive !== undefined ? isActive : true,
+      parentSlug: parentSlug || null,
+      sortOrder: sortOrder || 0,
+      showInFooter: showInFooter || false,
+      showInHeader: showInHeader || false,
     });
 
     return NextResponse.json({

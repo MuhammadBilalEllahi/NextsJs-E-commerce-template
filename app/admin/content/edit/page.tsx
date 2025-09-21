@@ -41,6 +41,10 @@ export default function EditContentPage() {
     metaTitle: "",
     metaDescription: "",
     isActive: true,
+    parentSlug: "",
+    sortOrder: 0,
+    showInFooter: false,
+    showInHeader: false,
   });
 
   useEffect(() => {
@@ -66,6 +70,10 @@ export default function EditContentPage() {
           metaTitle: data.metaTitle || "",
           metaDescription: data.metaDescription || "",
           isActive: data.isActive,
+          parentSlug: data.parentSlug || "",
+          sortOrder: data.sortOrder || 0,
+          showInFooter: data.showInFooter || false,
+          showInHeader: data.showInHeader || false,
         });
       } else {
         alert("Content page not found");
@@ -291,17 +299,81 @@ export default function EditContentPage() {
                   </p>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="isActive"
-                    checked={formData.isActive}
-                    onChange={(e) =>
-                      handleFormChange("isActive", e.target.checked)
-                    }
-                    className="rounded"
-                  />
-                  <Label htmlFor="isActive">Active (visible to users)</Label>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="parentSlug">Parent Page</Label>
+                    <Input
+                      id="parentSlug"
+                      value={formData.parentSlug}
+                      onChange={(e) =>
+                        handleFormChange("parentSlug", e.target.value)
+                      }
+                      placeholder="company, legal, support (optional)"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Leave empty for top-level pages
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="sortOrder">Sort Order</Label>
+                    <Input
+                      id="sortOrder"
+                      type="number"
+                      value={formData.sortOrder}
+                      onChange={(e) =>
+                        handleFormChange(
+                          "sortOrder",
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Lower numbers appear first
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="isActive"
+                      checked={formData.isActive}
+                      onChange={(e) =>
+                        handleFormChange("isActive", e.target.checked)
+                      }
+                      className="rounded"
+                    />
+                    <Label htmlFor="isActive">Active</Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="showInFooter"
+                      checked={formData.showInFooter}
+                      onChange={(e) =>
+                        handleFormChange("showInFooter", e.target.checked)
+                      }
+                      className="rounded"
+                    />
+                    <Label htmlFor="showInFooter">Show in Footer</Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="showInHeader"
+                      checked={formData.showInHeader}
+                      onChange={(e) =>
+                        handleFormChange("showInHeader", e.target.checked)
+                      }
+                      className="rounded"
+                    />
+                    <Label htmlFor="showInHeader">Show in Header</Label>
+                  </div>
                 </div>
 
                 <div className="flex gap-2">

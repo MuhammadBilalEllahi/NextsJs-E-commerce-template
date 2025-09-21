@@ -71,7 +71,7 @@ export function HomeSpecialProducts({
   }
 
   return (
-    <div className="relative my-12">
+    <div className="relative ">
       {/* Section heading */}
       <div className="flex items-center justify-center gap-4 mb-6">
         <div className="h-[1px] flex-1 bg-gray-300" />

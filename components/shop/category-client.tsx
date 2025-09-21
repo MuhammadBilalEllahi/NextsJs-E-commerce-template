@@ -159,7 +159,7 @@ export function CategoryClient({
             pageSize={itemsPerPage}
             enableInfinite={true}
           />
-          <BottomNav />
+          {/* <BottomNav /> */}
         </section>
       </div>
     </main>

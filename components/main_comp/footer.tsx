@@ -23,22 +23,34 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/category/spices" className="hover:underline">
+              <Link
+                href="/shop/all?category=spices"
+                className="hover:underline"
+              >
                 Spices
               </Link>
             </li>
             <li>
-              <Link href="/category/masalas" className="hover:underline">
+              <Link
+                href="/shop/all?category=masalas"
+                className="hover:underline"
+              >
                 Masalas
               </Link>
             </li>
             <li>
-              <Link href="/category/pickles" className="hover:underline">
+              <Link
+                href="/shop/all?category=pickles"
+                className="hover:underline"
+              >
                 Pickles
               </Link>
             </li>
             <li>
-              <Link href="/category/snacks" className="hover:underline">
+              <Link
+                href="/shop/all?category=snacks"
+                className="hover:underline"
+              >
                 Snacks
               </Link>
             </li>

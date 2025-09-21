@@ -8,6 +8,7 @@ import { Footer } from "@/components/main_comp/footer";
 import { RootProviders } from "@/lib/providers/rootProvider";
 import { HeaderWithCategories } from "@/components/main_comp/header-with-categories";
 import CartSheetWrapper from "@/components/cart/CartSheetWrapper";
+import { BottomNav } from "@/components/main_comp/bottom-nav";
 
 export const metadata: Metadata = {
   title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
@@ -62,6 +63,7 @@ export default function RootLayout({
             {/* <ChatWidget/> */}
             <CartSheetWrapper />
             <Footer />
+            <BottomNav />
           </RootProviders>
         </div>
         {/* </AppProviderWrapper> */}

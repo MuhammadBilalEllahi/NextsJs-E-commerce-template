@@ -5,13 +5,14 @@ import ContentPage from "@/models/ContentPage";
 // GET - Fetch single content page (public)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     await dbConnect();
+    const { slug } = await params;
 
     const contentPage = await ContentPage.findOne({
-      slug: params.slug,
+      slug: slug,
       isActive: true,
     }).lean();
 

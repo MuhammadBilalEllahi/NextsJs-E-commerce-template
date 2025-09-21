@@ -19,7 +19,7 @@ export function HomeBrands({ brands }: { brands: Brand[] }) {
       {brands.map((brand) => (
         <Link
           key={brand.id}
-          href={`/brand/${brand.name.toLowerCase().replace(/\s+/g, "-")}`}
+          href={`/shop/all?brands=${encodeURIComponent(brand.name)}`}
           className="group rounded-2xl border bg-white dark:bg-neutral-900 p-4 hover:shadow-md transition-shadow"
         >
           {brand.logo ? (
@@ -43,4 +43,3 @@ export function HomeBrands({ brands }: { brands: Brand[] }) {
     </div>
   );
 }
-

@@ -7,6 +7,16 @@ export interface PasswordResetTokenDocument extends Document {
   expiresAt: Date;
   used: boolean;
   createdAt: Date;
+  isValid(): boolean;
+  markAsUsed(): Promise<void>;
+}
+
+export interface PasswordResetTokenModel
+  extends mongoose.Model<PasswordResetTokenDocument> {
+  generateToken(): string;
+  createForUser(
+    userId: mongoose.Types.ObjectId
+  ): Promise<PasswordResetTokenDocument>;
 }
 
 const PasswordResetTokenSchema = new Schema<PasswordResetTokenDocument>({
@@ -52,7 +62,7 @@ PasswordResetTokenSchema.statics.createForUser = async function (
   // Remove any existing unused tokens for this user
   await this.deleteMany({ userId, used: false });
 
-  const token = this.generateToken();
+  const token = crypto.randomBytes(32).toString("hex");
   const resetToken = new this({
     userId,
     token,
@@ -75,7 +85,7 @@ PasswordResetTokenSchema.methods.markAsUsed = async function () {
 };
 
 export default mongoose.models.PasswordResetToken ||
-  mongoose.model<PasswordResetTokenDocument>(
+  mongoose.model<PasswordResetTokenDocument, PasswordResetTokenModel>(
     "PasswordResetToken",
     PasswordResetTokenSchema
   );

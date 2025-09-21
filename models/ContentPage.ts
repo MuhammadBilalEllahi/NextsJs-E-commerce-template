@@ -8,6 +8,10 @@ export interface IContentPage extends Document {
   metaTitle?: string;
   metaDescription?: string;
   isActive: boolean;
+  parentSlug?: string; // For hierarchical navigation
+  sortOrder: number; // For ordering within parent
+  showInFooter: boolean; // Whether to show in footer navigation
+  showInHeader: boolean; // Whether to show in header navigation
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,6 +41,22 @@ const ContentPageSchema: Schema = new Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    parentSlug: {
+      type: String,
+      default: null,
+    },
+    sortOrder: {
+      type: Number,
+      default: 0,
+    },
+    showInFooter: {
+      type: Boolean,
+      default: false,
+    },
+    showInHeader: {
+      type: Boolean,
+      default: false,
     },
   },
   {

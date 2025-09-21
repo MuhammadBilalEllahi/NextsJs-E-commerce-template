@@ -3,12 +3,18 @@ import { getContentPage } from "@/database/data-service";
 import { notFound } from "next/navigation";
 import { ContentPage } from "@/types/types";
 
-export default async function PrivacyPolicyPage() {
-  const contentPage = (await getContentPage(
-    "privacy-policy"
-  )) as ContentPage | null;
+interface DynamicContentPageProps {
+  params: Promise<{ slug: string }>;
+}
 
-  if (!contentPage) {
+export default async function DynamicContentPage({
+  params,
+}: DynamicContentPageProps) {
+  const { slug } = await params;
+
+  const contentPage = (await getContentPage(slug)) as ContentPage | null;
+
+  if (!contentPage || !contentPage.isActive) {
     notFound();
   }
 
@@ -28,7 +34,7 @@ export default async function PrivacyPolicyPage() {
         </div>
 
         {/* Dynamic Content */}
-        <div className="bg-white dark:bg-neutral-900 rounded-xl p-8 ">
+        <div className="bg-white dark:bg-neutral-900 rounded-xl p-8 border shadow-sm">
           <div
             className="content-prose prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto max-w-none"
             dangerouslySetInnerHTML={{ __html: contentPage.content }}
@@ -45,3 +51,11 @@ export default async function PrivacyPolicyPage() {
     </div>
   );
 }
+
+// Generate static params for known content pages
+export async function generateStaticParams() {
+  // This will be populated with actual content page slugs
+  // For now, return empty array to allow dynamic generation
+  return [];
+}
+

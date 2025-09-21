@@ -120,69 +120,11 @@ export function RichTextEditor({
 
   return (
     <div className="border rounded-lg">
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-          .ProseMirror h1 {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 1rem 0 0.5rem 0;
-            line-height: 1.2;
-          }
-          .ProseMirror h2 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 0.875rem 0 0.5rem 0;
-            line-height: 1.3;
-          }
-          .ProseMirror h3 {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin: 0.75rem 0 0.5rem 0;
-            line-height: 1.4;
-          }
-          .ProseMirror h4 {
-            font-size: 1.125rem;
-            font-weight: bold;
-            margin: 0.625rem 0 0.5rem 0;
-            line-height: 1.4;
-          }
-          .ProseMirror h5 {
-            font-size: 1rem;
-            font-weight: bold;
-            margin: 0.5rem 0 0.5rem 0;
-            line-height: 1.5;
-          }
-          .ProseMirror h6 {
-            font-size: 0.875rem;
-            font-weight: bold;
-            margin: 0.5rem 0 0.5rem 0;
-            line-height: 1.5;
-          }
-          .ProseMirror ul {
-            list-style-type: disc;
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-          }
-          .ProseMirror ol {
-            list-style-type: decimal;
-            padding-left: 1.5rem;
-            margin: 0.5rem 0;
-          }
-          .ProseMirror li {
-            margin: 0.25rem 0;
-            display: list-item;
-          }
-          .ProseMirror p {
-            margin: 0.5rem 0;
-          }
-        `,
-        }}
-      />
       {/* Toolbar */}
       <div className="border-b p-2 flex flex-wrap gap-1">
         {/* Text Formatting */}
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -192,6 +134,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -201,6 +144,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
@@ -210,6 +154,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().toggleStrike().run()}
@@ -222,6 +167,7 @@ export function RichTextEditor({
 
         {/* Headings */}
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() =>
@@ -235,6 +181,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() =>
@@ -248,6 +195,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() =>
@@ -261,6 +209,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() =>
@@ -274,6 +223,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() =>
@@ -287,6 +237,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() =>
@@ -303,6 +254,7 @@ export function RichTextEditor({
 
         {/* Lists */}
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -312,6 +264,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
@@ -324,6 +277,7 @@ export function RichTextEditor({
 
         {/* Alignment */}
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
@@ -335,6 +289,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
@@ -346,6 +301,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
@@ -357,6 +313,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().setTextAlign("justify").run()}
@@ -371,6 +328,7 @@ export function RichTextEditor({
 
         {/* Links and Images */}
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => setShowLinkDialog(true)}
@@ -379,7 +337,7 @@ export function RichTextEditor({
           <LinkIcon className="h-4 w-4" />
         </Button>
 
-        <Button variant="outline" size="sm" onClick={addImage}>
+        <Button type="button" variant="outline" size="sm" onClick={addImage}>
           <ImageIcon className="h-4 w-4" />
         </Button>
 
@@ -387,6 +345,7 @@ export function RichTextEditor({
 
         {/* Colors */}
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().setColor("#ef4444").run()}
@@ -400,6 +359,7 @@ export function RichTextEditor({
         </Button>
 
         <Button
+          type="button"
           variant="outline"
           size="sm"
           onClick={() => editor.chain().focus().toggleHighlight().run()}
@@ -428,10 +388,11 @@ export function RichTextEditor({
               onKeyPress={(e) => e.key === "Enter" && addLink()}
             />
             <div className="flex gap-2">
-              <Button onClick={addLink} size="sm">
+              <Button type="button" onClick={addLink} size="sm">
                 Add Link
               </Button>
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => {

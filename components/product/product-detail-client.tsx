@@ -432,17 +432,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                       productId={String(product.id)}
                       initialReviews={product.reviews.map((review) => ({
                         id: String(review.id),
-                        user: "",
-                        // user:
-                        //   typeof review.user === "object"
-                        //     ? review.user?.name
-                        //       ? review.user?.name
-                        //       : review.user?.id
-                        //       ? review.user.id
-                        //       : review.user
-                        //     : review.user,
+                        user:
+                          typeof review.user === "object"
+                            ? review.user?.name ||
+                              review.user?.id ||
+                              "Anonymous"
+                            : review.user || "Anonymous",
                         rating: review.rating,
-                        title: "",
+                        title: review.title || "",
                         comment: review.comment,
                         date: review.date,
                       }))}

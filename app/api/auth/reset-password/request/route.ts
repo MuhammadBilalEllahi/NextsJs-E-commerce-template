@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/database/mongodb";
 import User from "@/models/User";
-import PasswordResetToken from "@/models/PasswordResetToken";
+import PasswordResetToken, {
+  PasswordResetTokenModel,
+} from "@/models/PasswordResetToken";
 import { Resend } from "resend";
 import { generatePasswordResetEmail } from "@/lib/email-templates";
 
@@ -32,7 +34,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Create password reset token
-    const resetToken = await PasswordResetToken.createForUser(user._id);
+    const resetToken = await (
+      PasswordResetToken as PasswordResetTokenModel
+    ).createForUser(user._id);
 
     // Generate reset URL
     const baseUrl = process.env.WEBSITE_URL || "http://localhost:3000";

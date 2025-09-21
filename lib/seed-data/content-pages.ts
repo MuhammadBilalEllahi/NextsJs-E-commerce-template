@@ -1,10 +1,79 @@
 export const contentPagesSeedData = [
+  // Parent pages for navigation
+  {
+    title: "Company",
+    slug: "company",
+    metaDescription: "Learn more about Dehli Mirch and our company information",
+    isActive: true,
+    parentSlug: null,
+    sortOrder: 1,
+    showInFooter: true,
+    showInHeader: false,
+    content: `
+      <h2>About Dehli Mirch</h2>
+      <p>Dehli Mirch is a premium Pakistani brand specializing in authentic spices, pickles, snacks, and grocery items. We bring you the finest quality products with traditional flavors and modern convenience.</p>
+      
+      <h3>Our Mission</h3>
+      <p>To provide authentic Pakistani flavors and high-quality products to customers worldwide, preserving traditional recipes while embracing modern convenience.</p>
+      
+      <h3>Our Vision</h3>
+      <p>To be the leading brand for authentic Pakistani spices and food products, recognized for quality, authenticity, and customer satisfaction.</p>
+      
+      <h3>Why Choose Dehli Mirch?</h3>
+      <ul>
+        <li>Authentic Pakistani flavors and recipes</li>
+        <li>Premium quality ingredients</li>
+        <li>Traditional preparation methods</li>
+        <li>Fresh and hygienic products</li>
+        <li>Competitive pricing</li>
+        <li>Fast and reliable delivery</li>
+      </ul>
+    `,
+  },
+  {
+    title: "Legal",
+    slug: "legal",
+    metaDescription: "Legal information and policies",
+    isActive: true,
+    parentSlug: null,
+    sortOrder: 2,
+    showInFooter: true,
+    showInHeader: false,
+    content: `
+      <h2>Legal Information</h2>
+      <p>This section contains important legal information about our services, policies, and terms of use.</p>
+      
+      <h3>Important Documents</h3>
+      <p>Please review our legal documents to understand your rights and responsibilities when using our services.</p>
+    `,
+  },
+  {
+    title: "Support",
+    slug: "support",
+    metaDescription: "Customer support and help information",
+    isActive: true,
+    parentSlug: null,
+    sortOrder: 3,
+    showInFooter: true,
+    showInHeader: false,
+    content: `
+      <h2>Customer Support</h2>
+      <p>We're here to help you with any questions or concerns about our products and services.</p>
+      
+      <h3>How We Can Help</h3>
+      <p>Our support team is available to assist you with orders, shipping, returns, and any other questions you may have.</p>
+    `,
+  },
   {
     title: "Frequently Asked Questions",
     slug: "faqs",
     metaDescription:
       "Find answers to common questions about our products and services",
     isActive: true,
+    parentSlug: "company",
+    sortOrder: 1,
+    showInFooter: true,
+    showInHeader: false,
     content: `
       <h2>General Questions</h2>
       <h3>What is Dehli Mirch?</h3>
@@ -61,6 +130,10 @@ export const contentPagesSeedData = [
     metaDescription:
       "Please read these terms carefully before using our services",
     isActive: true,
+    parentSlug: "legal",
+    sortOrder: 1,
+    showInFooter: true,
+    showInHeader: false,
     content: `
       <h2>Introduction</h2>
       <p>Welcome to Dehli Mirch ("we," "our," or "us"). These Terms of Service ("Terms") govern your use of our website, mobile application, and services (collectively, the "Service") operated by Dehli Mirch.</p>
@@ -136,6 +209,10 @@ export const contentPagesSeedData = [
     metaDescription:
       "Learn how we collect, use, and protect your personal information",
     isActive: true,
+    parentSlug: "legal",
+    sortOrder: 2,
+    showInFooter: true,
+    showInHeader: false,
     content: `
       <h2>Information We Collect</h2>
       <h3>Personal Information</h3>
@@ -214,6 +291,10 @@ export const contentPagesSeedData = [
     metaDescription:
       "Learn about our shipping methods, delivery times, and shipping costs",
     isActive: true,
+    parentSlug: "support",
+    sortOrder: 1,
+    showInFooter: true,
+    showInHeader: false,
     content: `
       <h2>Delivery Areas</h2>
       <p>We currently deliver within Lahore city limits. We're working on expanding our delivery network to other major cities in Pakistan.</p>
@@ -292,6 +373,10 @@ export const contentPagesSeedData = [
     slug: "return-refund",
     metaDescription: "Learn about our return and refund policies",
     isActive: true,
+    parentSlug: "support",
+    sortOrder: 2,
+    showInFooter: true,
+    showInHeader: false,
     content: `
       <h2>Return Policy</h2>
       <p>We offer a 7-day return policy for most products. Returns must be initiated within 7 days of delivery.</p>
@@ -383,6 +468,10 @@ export const contentPagesSeedData = [
     slug: "disclaimers",
     metaDescription: "Important information about our products and services",
     isActive: true,
+    parentSlug: "legal",
+    sortOrder: 3,
+    showInFooter: true,
+    showInHeader: false,
     content: `
       <h2>Product Information Disclaimer</h2>
       <p>While we strive to provide accurate and up-to-date information about our products, we cannot guarantee that all product descriptions, nutritional information, or other content on our website is completely accurate, complete, or current.</p>

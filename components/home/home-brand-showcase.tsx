@@ -71,7 +71,7 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
   }
 
   return (
-    <div className="relative my-12">
+    <div className="relative ">
       {/* Section Header */}
       <div className="flex items-center justify-center gap-4 mb-8">
         <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
@@ -128,9 +128,7 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
           {/* Brand Header */}
           <div className="flex items-center justify-between mb-6">
             <Link
-              href={`/brand/${activeBrand.name
-                .toLowerCase()
-                .replace(/\s+/g, "-")}`}
+              href={`/shop/all?brands=${encodeURIComponent(activeBrand.name)}`}
               className="group flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-300 hover:scale-105"
             >
               <span className="font-medium text-sm flex-end">View All</span>
@@ -203,7 +201,7 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
         {brands.slice(6).map((brand) => (
           <Link
             key={brand.id}
-            href={`/brand/${brand.name.toLowerCase().replace(/\s+/g, "-")}`}
+            href={`/shop/all?brands=${encodeURIComponent(brand.name)}`}
             className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200"
           >
             {brand.name}

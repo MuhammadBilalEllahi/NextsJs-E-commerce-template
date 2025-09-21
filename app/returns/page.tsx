@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { getContentPage } from "@/database/data-service";
 import { notFound } from "next/navigation";
+import { ContentPage } from "@/types/types";
 
 export default async function ReturnsPage() {
-  const contentPage = await getContentPage("returns");
+  const contentPage = (await getContentPage("returns")) as ContentPage | null;
 
   if (!contentPage) {
     notFound();
@@ -11,7 +12,7 @@ export default async function ReturnsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200 mb-4">
@@ -25,7 +26,7 @@ export default async function ReturnsPage() {
         </div>
 
         {/* Dynamic Content */}
-        <div className="bg-white dark:bg-neutral-900 rounded-xl p-8 border shadow-sm">
+        <div className=" ">
           <div
             className="prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto max-w-none"
             dangerouslySetInnerHTML={{ __html: contentPage.content }}

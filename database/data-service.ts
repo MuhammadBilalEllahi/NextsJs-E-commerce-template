@@ -1038,6 +1038,44 @@ export async function getContentPage(slug: string) {
   }
 }
 
+export async function getFooterNavigation() {
+  try {
+    await dbConnect();
+
+    // Get all parent pages that should show in footer
+    const parentPages = await ContentPage.find({
+      isActive: true,
+      showInFooter: true,
+      parentSlug: null,
+    })
+      .sort({ sortOrder: 1, title: 1 })
+      .lean();
+
+    // Get all child pages for each parent
+    const navigationData = await Promise.all(
+      parentPages.map(async (parent) => {
+        const children = await ContentPage.find({
+          isActive: true,
+          showInFooter: true,
+          parentSlug: parent.slug,
+        })
+          .sort({ sortOrder: 1, title: 1 })
+          .lean();
+
+        return {
+          ...parent,
+          children,
+        };
+      })
+    );
+
+    return navigationData;
+  } catch (error) {
+    console.error("Error fetching footer navigation:", error);
+    return [];
+  }
+}
+
 export async function getAllContentPages() {
   try {
     await dbConnect();

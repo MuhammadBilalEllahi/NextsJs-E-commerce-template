@@ -62,24 +62,19 @@ export function ViewControls({
     return (
       <div className="flex items-center justify-between gap-4 p-4 bg-white dark:bg-neutral-800 rounded-lg border">
         <div className="flex items-center gap-2">
-          <SortDropdown value={sortValue} onChange={onSortChange} />
+          <div
+            className="flex items-center gap-2"
+            onClick={() => {
+              const ev = new CustomEvent("open-filters");
+              window.dispatchEvent(ev);
+            }}
+          >
+            <Filter className="h-5 w-5" />
+            <p className="text-sm">filters</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <Select
-            value={String(itemsPerPage)}
-            onValueChange={(value) => onItemsPerPageChange(Number(value))}
-          >
-            <SelectTrigger className="w-20">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="12">12</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="24">24</SelectItem>
-              <SelectItem value="36">36</SelectItem>
-              <SelectItem value="48">48</SelectItem>
-            </SelectContent>
-          </Select>
+          <SortDropdown value={sortValue} onChange={onSortChange} />
         </div>
       </div>
     );
@@ -196,7 +191,12 @@ export function ViewControls({
         </div>
       </div>
 
-      {/* ITEMS PER PAGE */}
+      {/* SORT BY - moved to items per page position on small screens */}
+      <div className="flex items-center gap-3 w-full sm:w-auto justify-end md:hidden">
+        <SortDropdown value={sortValue} onChange={onSortChange} />
+      </div>
+
+      {/* ITEMS PER PAGE - hidden on small screens */}
       <div className="hidden md:flex items-center gap-3">
         <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
           ITEMS PER PAGE
@@ -218,9 +218,9 @@ export function ViewControls({
         </Select>
       </div>
 
-      {/* SORT BY */}
-      <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-        <span className="hidden md:block text-xs md:text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+      {/* SORT BY - desktop version */}
+      <div className="hidden md:flex items-center gap-3">
+        <span className="text-xs md:text-sm font-semibold text-neutral-700 dark:text-neutral-300">
           SORT BY
         </span>
         <SortDropdown value={sortValue} onChange={onSortChange} />
