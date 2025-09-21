@@ -19,6 +19,7 @@ import "@/models/Counter";
 import "@/models/Wishlist";
 import "@/models/Notification";
 import "@/models/Refund";
+import "@/models/ContentPage";
 
 // Export all models for convenience
 export { default as User } from "@/models/User";
@@ -41,6 +42,7 @@ export { default as Wishlist } from "@/models/Wishlist";
 export { default as Notification } from "@/models/Notification";
 export { default as Refund } from "@/models/Refund";
 export { default as Address } from "@/models/Address";
+export { default as ContentPage } from "@/models/ContentPage";
 
 // Export Zod schemas
 export { brandZodSchema } from "@/models/Brand";

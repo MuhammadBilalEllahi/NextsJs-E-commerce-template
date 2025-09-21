@@ -22,6 +22,7 @@ export const MODELS = {
   NOTIFICATION: "Notification",
   ADDRESS: "Address",
   REFUND: "Refund",
+  CONTENT_PAGE: "ContentPage",
 };
 
 export const ORDER_TYPE = {

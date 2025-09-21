@@ -2,8 +2,22 @@ import Link from "next/link";
 import { getContentPage } from "@/database/data-service";
 import { notFound } from "next/navigation";
 
-export default async function PrivacyPage() {
-  const contentPage = await getContentPage("privacy");
+interface ContentPage {
+  _id: string;
+  slug: string;
+  title: string;
+  content: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export default async function PrivacyPolicyPage() {
+  const contentPage = (await getContentPage(
+    "privacy-policy"
+  )) as ContentPage | null;
 
   if (!contentPage) {
     notFound();
@@ -11,7 +25,7 @@ export default async function PrivacyPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-neutral-800 dark:text-neutral-200 mb-4">
@@ -25,9 +39,16 @@ export default async function PrivacyPage() {
         </div>
 
         {/* Dynamic Content */}
-        <div className="bg-white dark:bg-neutral-900 rounded-xl p-8 border shadow-sm">
+        <div className="bg-white dark:bg-neutral-900 rounded-xl p-8 ">
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+              
+            `,
+            }}
+          />
           <div
-            className="prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto max-w-none"
+            className="content-prose prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto max-w-none"
             dangerouslySetInnerHTML={{ __html: contentPage.content }}
           />
         </div>

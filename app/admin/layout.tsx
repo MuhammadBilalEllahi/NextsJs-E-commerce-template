@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/utils";
 import {
   LayoutDashboard,
@@ -62,6 +63,11 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isContentEditPage =
+    pathname.includes("/admin/content/edit") ||
+    pathname.includes("/admin/content/create");
+
   return (
     <div className="min-h-svh bg-white dark:bg-background">
       <div className="border-b bg-gradient-to-r from-red-600 via-orange-500 to-green-600 text-white">
@@ -79,19 +85,31 @@ export default function AdminLayout({
           <LogOutButton />
         </div>
       </div>
-      <div className="container mx-auto grid gap-6 px-4 py-6 lg:grid-cols-[240px_1fr]">
-        <aside className="h-fit rounded-lg border p-3">
+      <div
+        className={`container mx-auto grid gap-6 px-4 py-6 ${
+          isContentEditPage
+            ? "lg:grid-cols-[60px_1fr]"
+            : "lg:grid-cols-[240px_1fr]"
+        }`}
+      >
+        <aside
+          className={`h-fit rounded-lg border ${
+            isContentEditPage ? "p-1" : "p-3"
+          }`}
+        >
           <ul className="grid gap-1">
             {nav.map((n) => (
               <li key={n.href}>
                 <Link
                   href={n.href}
                   className={cn(
-                    "flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                    "flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900",
+                    isContentEditPage && "justify-center"
                   )}
+                  title={isContentEditPage ? n.label : undefined}
                 >
                   <n.icon className="size-4 text-red-600" />
-                  <span>{n.label}</span>
+                  {!isContentEditPage && <span>{n.label}</span>}
                 </Link>
               </li>
             ))}

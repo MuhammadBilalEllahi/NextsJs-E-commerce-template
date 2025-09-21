@@ -19,6 +19,7 @@ import {
   CACHE_PRODUCTS_BY_CATEGORY_KEY,
 } from "@/lib/cacheConstants";
 import Branch from "@/models/Branches";
+import ContentPage from "@/models/ContentPage";
 import { ProductTypeVariant, Variant as VariantType } from "@/mock_data/data";
 
 export async function getAllBranches() {
@@ -1017,6 +1018,36 @@ export async function getFAQs(category = "all", search = "") {
     }));
   } catch (error) {
     console.error("Error fetching FAQs:", error);
+    return [];
+  }
+}
+
+// Content Page functions
+export async function getContentPage(slug: string) {
+  try {
+    await dbConnect();
+    const contentPage = await ContentPage.findOne({
+      slug,
+      isActive: true,
+    }).lean();
+
+    return contentPage;
+  } catch (error) {
+    console.error("Error fetching content page:", error);
+    return null;
+  }
+}
+
+export async function getAllContentPages() {
+  try {
+    await dbConnect();
+    const contentPages = await ContentPage.find({ isActive: true })
+      .sort({ updatedAt: -1 })
+      .lean();
+
+    return contentPages;
+  } catch (error) {
+    console.error("Error fetching content pages:", error);
     return [];
   }
 }

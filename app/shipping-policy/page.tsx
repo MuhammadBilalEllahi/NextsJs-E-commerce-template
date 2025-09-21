@@ -14,8 +14,10 @@ interface ContentPage {
   updatedAt: string;
 }
 
-export default async function FAQsPage() {
-  const contentPage = (await getContentPage("faqs")) as ContentPage | null;
+export default async function ShippingPolicyPage() {
+  const contentPage = (await getContentPage(
+    "shipping-policy"
+  )) as ContentPage | null;
 
   if (!contentPage) {
     notFound();
