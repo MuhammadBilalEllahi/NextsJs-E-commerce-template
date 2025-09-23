@@ -92,7 +92,13 @@ export default async function HomePage() {
       </section>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
-        <h2 className="text-2xl font-bold mb-6">About Us</h2>
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <div className="h-[1px] flex-1 bg-gray-300" />
+          <h2 className="text-lg md:text-xl font-bold tracking-wide uppercase">
+            About Us
+          </h2>
+          <div className="h-[1px] flex-1 bg-gray-300" />
+        </div>{" "}
         <div className="hidden md:block">
           <HomeShopLocations shopLocation={branches} />
         </div>
@@ -102,7 +108,13 @@ export default async function HomePage() {
       </section>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
-        <h2 className="text-2xl font-bold mb-6">Shop by Category</h2>
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <div className="h-[1px] flex-1 bg-gray-300" />
+          <h2 className="text-lg md:text-xl font-bold tracking-wide uppercase">
+            Shop By Category
+          </h2>
+          <div className="h-[1px] flex-1 bg-gray-300" />
+        </div>
         <HomeCategories categories={categories} />
       </section>
 

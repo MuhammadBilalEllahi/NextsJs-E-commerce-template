@@ -17,6 +17,7 @@ import {
 import { Resend } from "resend";
 import ScheduledJob, { SCHEDULE_TYPES } from "@/models/ScheduledJob";
 import tcsService from "@/lib/api/tcs/tcsService";
+import whatsappService from "@/lib/api/whatsapp/whatsappService";
 
 export async function POST(req: NextRequest) {
   try {
@@ -197,6 +198,27 @@ export async function POST(req: NextRequest) {
     }
 
     // Create scheduled job with complete order information
+    // Send WhatsApp notification for order confirmation
+    try {
+      const orderDataForWhatsApp = {
+        orderId: order.orderId,
+        refId: order.refId,
+        contact: order.contact,
+        shippingAddress: order.shippingAddress,
+        items: order.items,
+        subtotal: order.subtotal,
+        shippingFee: order.shippingFee,
+        total: order.total,
+        shippingMethod: order.shippingMethod,
+      };
+
+      await whatsappService.sendOrderConfirmation(orderDataForWhatsApp);
+      console.log(`WhatsApp notification sent for order ${orderId}`);
+    } catch (whatsappError) {
+      console.error("Failed to send WhatsApp notification:", whatsappError);
+      // Don't fail the checkout if WhatsApp fails
+    }
+
     await ScheduledJob.create({
       type: SCHEDULE_TYPES.CHECKOUT_COMPLETE,
       payload: {

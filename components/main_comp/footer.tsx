@@ -18,7 +18,7 @@ export function Footer() {
           <h4 className="font-semibold mb-3">Shop</h4>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link href="/shop" className="hover:underline">
+              <Link href="/shop/all" className="hover:underline">
                 All Products
               </Link>
             </li>

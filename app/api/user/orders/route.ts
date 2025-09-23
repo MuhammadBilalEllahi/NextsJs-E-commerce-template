@@ -55,6 +55,8 @@ export async function GET(req: NextRequest) {
       tracking: order.tracking || "",
       cancellationReason: order.cancellationReason || "",
       items: order.items.map((item: any) => ({
+        productId: item.product?._id?.toString() || "",
+        variantId: item.variant?._id?.toString() || "",
         productTitle: item.product?.name || "Unknown Product",
         variantLabel: item.variant?.label || "",
         quantity: item.quantity,

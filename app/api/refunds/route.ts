@@ -6,6 +6,7 @@ import { RefundZodSchema } from "@/models/Refund";
 import Order from "@/models/Order";
 import Product from "@/models/Product";
 import GlobalSettings from "@/models/GlobalSettings";
+import AnalyticsLog from "@/models/AnalyticsLog";
 import { authOptions } from "@/lib/auth";
 
 // GET - Get user refunds
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
       user: session.user.id,
     };
 
+    console.log("body", body);
     // Validate the refund request
     const parsed = RefundZodSchema.safeParse(refundData);
     if (!parsed.success) {
@@ -144,6 +146,27 @@ export async function POST(req: NextRequest) {
     }
 
     const refund = await Refund.create(parsed.data);
+
+    // Log analytics for refund request
+    try {
+      await AnalyticsLog.create({
+        type: "refund",
+        action: "requested",
+        entity: "Refund",
+        entityId: String(refund._id),
+        actor: session.user.id,
+        amount: refund.amount,
+        meta: {
+          order: String(refund.order),
+          product: String(refund.product),
+          variant: refund.variant ? String(refund.variant) : null,
+          quantity: refund.quantity,
+          reason: refund.reason,
+        },
+      });
+    } catch (e) {
+      console.error("Failed to log analytics for refund request:", e);
+    }
 
     return NextResponse.json({
       success: true,

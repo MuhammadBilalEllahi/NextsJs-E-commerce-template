@@ -77,6 +77,18 @@ export default function AdminRefundsPage() {
   const [selectedRefund, setSelectedRefund] = useState<Refund | null>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    order: "",
+    user: "",
+    product: "",
+    variant: "",
+    quantity: 1,
+    amount: 0,
+    reason: "",
+    refundMethod: "original_payment",
+    status: "pending",
+  });
   const [filters, setFilters] = useState({
     status: "all",
     search: "",
@@ -155,6 +167,30 @@ export default function AdminRefundsPage() {
     setShowUpdateModal(true);
   };
 
+  const quickUpdateStatus = async (refundId: string, status: string) => {
+    const note = prompt(`Please provide a reason to mark as ${status}:`);
+    if (!note || !note.trim()) {
+      alert("Reason is required.");
+      return;
+    }
+    try {
+      const response = await fetch("/api/admin/refunds", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: refundId, status, adminNotes: note.trim() }),
+      });
+      if (response.ok) {
+        fetchRefunds();
+      } else {
+        const e = await response.json().catch(() => ({}));
+        alert(e.error || "Failed to update status");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Failed to update status");
+    }
+  };
+
   const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRefund) return;
@@ -209,6 +245,11 @@ export default function AdminRefundsPage() {
         <p className="text-neutral-600 dark:text-neutral-400">
           Manage customer refund requests and process refunds
         </p>
+        <div className="mt-3">
+          <Button onClick={() => setShowCreateModal(true)}>
+            Create Refund
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -411,6 +452,24 @@ export default function AdminRefundsPage() {
                     <Eye className="h-4 w-4" />
                     Update Status
                   </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => quickUpdateStatus(refund._id, "approved")}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => quickUpdateStatus(refund._id, "rejected")}
+                  >
+                    Reject
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => quickUpdateStatus(refund._id, "completed")}
+                  >
+                    Complete
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -540,6 +599,210 @@ export default function AdminRefundsPage() {
                     variant="outline"
                     onClick={() => setShowUpdateModal(false)}
                     disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Create Refund Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-lg">
+            <CardHeader>
+              <CardTitle>Create Refund</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form
+                className="grid gap-3"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    const payload: any = { ...createForm };
+                    if (!payload.variant) delete payload.variant;
+                    payload.quantity = Number(payload.quantity) || 1;
+                    payload.amount = Number(payload.amount) || 0;
+                    const res = await fetch("/api/admin/refunds", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(payload),
+                    });
+                    if (res.ok) {
+                      setShowCreateModal(false);
+                      setCreateForm({
+                        order: "",
+                        user: "",
+                        product: "",
+                        variant: "",
+                        quantity: 1,
+                        amount: 0,
+                        reason: "",
+                        refundMethod: "original_payment",
+                        status: "pending",
+                      });
+                      fetchRefunds();
+                    } else {
+                      const j = await res.json().catch(() => ({}));
+                      alert(j.error || "Failed to create refund");
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    alert("Failed to create refund");
+                  }
+                }}
+              >
+                <div>
+                  <Label>Order ID</Label>
+                  <Input
+                    value={createForm.order}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        order: e.target.value,
+                      }))
+                    }
+                    placeholder="Order _id"
+                  />
+                </div>
+                <div>
+                  <Label>User ID</Label>
+                  <Input
+                    value={createForm.user}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        user: e.target.value,
+                      }))
+                    }
+                    placeholder="User _id"
+                  />
+                </div>
+                <div>
+                  <Label>Product ID</Label>
+                  <Input
+                    value={createForm.product}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        product: e.target.value,
+                      }))
+                    }
+                    placeholder="Product _id"
+                  />
+                </div>
+                <div>
+                  <Label>Variant ID (optional)</Label>
+                  <Input
+                    value={createForm.variant}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        variant: e.target.value,
+                      }))
+                    }
+                    placeholder="Variant _id (optional)"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Quantity</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={createForm.quantity}
+                      onChange={(e) =>
+                        setCreateForm((prev) => ({
+                          ...prev,
+                          quantity: Number(e.target.value),
+                        }))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label>Amount</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={createForm.amount}
+                      onChange={(e) =>
+                        setCreateForm((prev) => ({
+                          ...prev,
+                          amount: Number(e.target.value),
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Reason</Label>
+                  <Input
+                    value={createForm.reason}
+                    onChange={(e) =>
+                      setCreateForm((prev) => ({
+                        ...prev,
+                        reason: e.target.value,
+                      }))
+                    }
+                    placeholder="Reason"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Refund Method</Label>
+                    <Select
+                      value={createForm.refundMethod}
+                      onValueChange={(v) =>
+                        setCreateForm((prev) => ({ ...prev, refundMethod: v }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="original_payment">
+                          Original Payment
+                        </SelectItem>
+                        <SelectItem value="store_credit">
+                          Store Credit
+                        </SelectItem>
+                        <SelectItem value="bank_transfer">
+                          Bank Transfer
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Status</Label>
+                    <Select
+                      value={createForm.status}
+                      onValueChange={(v) =>
+                        setCreateForm((prev) => ({ ...prev, status: v }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="approved">Approved</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                        <SelectItem value="processing">Processing</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <Button type="submit">Create</Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowCreateModal(false)}
                   >
                     Cancel
                   </Button>

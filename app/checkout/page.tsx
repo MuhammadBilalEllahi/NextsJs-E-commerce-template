@@ -27,6 +27,7 @@ import {
   Building,
   CreditCard,
   Plus,
+  Edit,
 } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants/currency";
@@ -462,31 +463,9 @@ export default function CheckoutPage() {
                 {/* Address Selection for Authenticated Users */}
                 {isAuthenticated && savedAddresses.length > 0 && (
                   <div className="mb-6 p-4 bg-neutral-50 dark:bg-neutral-700 rounded-lg">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className=" flex items-center justify-between mb-3">
                       <h3 className="font-medium text-sm">Choose Address</h3>
                       <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant={
-                            addressMode === "saved" ? "default" : "outline"
-                          }
-                          size="sm"
-                          onClick={() => setAddressMode("saved")}
-                          className="text-xs"
-                        >
-                          Saved Addresses
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={
-                            addressMode === "manual" ? "default" : "outline"
-                          }
-                          size="sm"
-                          onClick={() => setAddressMode("manual")}
-                          className="text-xs"
-                        >
-                          Manual Entry
-                        </Button>
                         <Link href="/account/addresses">
                           <Button
                             type="button"
@@ -495,7 +474,7 @@ export default function CheckoutPage() {
                             className="text-xs"
                           >
                             <Plus className="h-3 w-3 mr-1" />
-                            Manage
+                            <p className="hidden sm:block">Manage</p>
                           </Button>
                         </Link>
                       </div>
@@ -572,9 +551,7 @@ export default function CheckoutPage() {
                 )}
 
                 {/* Manual Address Entry */}
-                {(addressMode === "manual" ||
-                  !isAuthenticated ||
-                  savedAddresses.length === 0) && (
+                {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First name</Label>
@@ -674,7 +651,7 @@ export default function CheckoutPage() {
                       )}
                     </div>
                   </div>
-                )}
+                }
               </section>
 
               {/* Shipping Method Section */}

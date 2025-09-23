@@ -11,7 +11,7 @@ import {
   Phone,
   CheckCircle,
   Car,
-  Package
+  Package,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -42,9 +42,10 @@ export function HomeDeliveryInfo() {
         "Direct communication with delivery team",
         "Same-day delivery available",
         "Cash on delivery accepted",
-        "Package protection guaranteed"
+        "Package protection guaranteed",
       ],
-      color: "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700"
+      color:
+        "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700",
     },
     {
       type: "tcs",
@@ -52,17 +53,18 @@ export function HomeDeliveryInfo() {
       description: "Nationwide delivery through TCS",
       icon: <Truck className="h-8 w-8 text-green-600" />,
       coverage: "All Pakistan",
-      timeFrame: "3-5 Business Days",
-      cost: "Rs. 200-500 (based on weight)",
+      timeFrame: "1-5 Business Days",
+      cost: "Rs. 80-300 (based on weight)",
       features: [
         "Nationwide coverage",
         "Secure packaging",
         "Tracking available",
         "Insurance included",
-        "Professional handling"
+        "Professional handling",
       ],
-      color: "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700"
-    }
+      color:
+        "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700",
+    },
   ];
 
   return (
@@ -72,81 +74,10 @@ export function HomeDeliveryInfo() {
           We Deliver To Your Doorstep
         </h2>
         <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto">
-          Choose from our flexible delivery options designed to bring authentic South Asian flavors
-          right to your home, whether you're in Lahore or anywhere in Pakistan.
+          Choose from our flexible delivery options designed to bring authentic
+          South Asian flavors right to your home, whether you're in Lahore or
+          anywhere in Pakistan.
         </p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8">
-        {deliveryOptions.map((option) => (
-          <Card key={option.type} className={`${option.color} hover:shadow-xl transition-all duration-300`}>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-full bg-white dark:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-700">
-                  {option.icon}
-                </div>
-                <div>
-                  <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">{option.title}</CardTitle>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{option.description}</p>
-                </div>
-              </div>
-            </CardHeader>
-
-            <CardContent className="space-y-4">
-              {/* Coverage & Time */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  <div>
-                    <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Coverage</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{option.coverage}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  <div>
-                    <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Delivery Time</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{option.timeFrame}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Cost */}
-              <div className="flex items-center gap-2">
-                <Package className="h-4 w-4" />
-                <div>
-                  <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">Cost</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{option.cost}</p>
-                </div>
-              </div>
-
-              {/* Features */}
-              <div>
-                <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 mb-2">What's Included:</p>
-                <ul className="space-y-1">
-                  {option.features.map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <CheckCircle className="h-3 w-3 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* CTA Button */}
-              <div className="pt-4">
-                <Link href="/shipping">
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-sm border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
-                  >
-                    Learn More
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
       </div>
 
       {/* Additional Info */}

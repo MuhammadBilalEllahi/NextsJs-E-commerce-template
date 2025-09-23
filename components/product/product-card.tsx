@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { AddToWishlistButton } from "@/components/wishlist/wishlist-button";
 import { useCart } from "@/lib/providers/cartContext";
 import type { Product } from "@/mock_data/mock-data";
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart, Star, Eye } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import { useState, useRef, useEffect } from "react";
+import { QuickLookModal } from "@/components/product/quick-look-modal";
 
 export function ProductCard({
   product,
@@ -21,6 +22,7 @@ export function ProductCard({
   const { add, isAdding } = useCart();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
+  const [isQuickLookOpen, setIsQuickLookOpen] = useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
 
   // Get the first available image: variant image -> product images -> product image -> placeholder
@@ -200,7 +202,7 @@ export function ProductCard({
             Rs.{getDisplayPrice()}
           </div>
 
-          <div className="mt-2 flex items-center justify-between">
+          <div className="mt-2 flex items-center justify-between gap-1">
             <Button
               size="sm"
               className="flex-1 rounded-sm h-8 text-xs"
@@ -210,6 +212,15 @@ export function ProductCard({
             >
               <ShoppingCart size={12} className="h-3 w-3 mr-1" />
               Add
+            </Button>
+            <Button
+              size="sm"
+              className="rounded-sm h-8 w-8 p-0"
+              variant="outline"
+              onClick={() => setIsQuickLookOpen(true)}
+              title="Quick Look"
+            >
+              <Eye size={12} className="h-3 w-3" />
             </Button>
           </div>
         </div>
@@ -276,9 +287,9 @@ export function ProductCard({
           </div>
 
           <div className="font-bold text-red-600">Rs.{getDisplayPrice()}</div>
-          <div className="mt-3 flex items-center justify-between">
+          <div className="mt-3 flex items-center justify-between gap-2">
             <a
-              className="w-full rounded-sm px-2 py-2 md:px-4 md:py-2 text-sm text-center  md:text-sm lg:text-md  font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
+              className="flex-1 rounded-sm px-2 py-2 md:px-4 md:py-2 text-sm text-center  md:text-sm lg:text-md  font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
               aria-label="View Product"
               title="View Product"
               href={`/product/${product.slug}`}
@@ -288,7 +299,17 @@ export function ProductCard({
 
             <Button
               size="sm"
-              className="ml-2 rounded-sm w-10 h-10"
+              className="rounded-sm w-10 h-10"
+              variant="outline"
+              onClick={() => setIsQuickLookOpen(true)}
+              title="Quick Look"
+            >
+              <Eye size={16} className="h-4 w-4" />
+            </Button>
+
+            <Button
+              size="sm"
+              className="rounded-sm w-10 h-10"
               variant="gradient"
               onClick={handleAddToCart}
               disabled={isAdding || !isProductAvailable()}
@@ -383,33 +404,29 @@ export function ProductCard({
           Rs.{getDisplayPrice()}
         </div>
 
-        <div className="mt-2 flex items-center justify-between">
+        <div className="mt-2 flex items-center justify-between gap-2">
           <a
-            className="w-full rounded-sm px-2 py-2 md:px-4 md:py-2 text-sm text-center  md:text-sm lg:text-md font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
+            className="flex-1 rounded-sm px-2 py-2 md:px-4 md:py-2 text-sm text-center  md:text-sm lg:text-md font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
             aria-label="View Product"
             title="View Product"
             href={`/product/${product.slug}`}
           >
             View Product
           </a>
-          {/* <a
-  className={cn(
-    "w-full rounded-md px-4 py-2 text-center font-semibold border transition-colors duration-300",
-    // Light mode
-    "bg-gradient-to-r from-[#2b2b2b] to-[#1a1a1a] text-white border-black/30 hover:from-[#3b3b3b] hover:to-[#2a2a2a]",
-    // Dark mode
-    "dark:bg-gradient-to-r dark:from-[#f5f5f5] dark:to-[#d9d9d9] dark:text-black dark:border-gray-400 dark:hover:from-[#e8e8e8] dark:hover:to-[#cfcfcf]"
-  )} 
-  aria-label="View Product"
-  title="View Product"
-  href={`/product/${product.slug}`}
->
-  {isAdding ? "Adding..." : "View Product"}
-</a> */}
 
           <Button
             size="sm"
-            className="ml-2 rounded-sm w-10 h-10"
+            className="rounded-sm w-10 h-10"
+            variant="outline"
+            onClick={() => setIsQuickLookOpen(true)}
+            title="Quick Look"
+          >
+            <Eye size={16} className="h-4 w-4" />
+          </Button>
+
+          <Button
+            size="sm"
+            className="rounded-sm w-10 h-10"
             variant="gradient"
             onClick={handleAddToCart}
             disabled={isAdding || !isProductAvailable()}
@@ -418,6 +435,24 @@ export function ProductCard({
           </Button>
         </div>
       </div>
+
+      {/* Quick Look Modal */}
+      <QuickLookModal
+        product={{
+          ...product,
+          variants: product.variants?.map((v) => ({
+            _id: v._id,
+            label: v.label,
+            price: v.price ?? 0,
+            stock: v.stock ?? 0,
+            isActive: v.isActive ?? true,
+            isOutOfStock: v.isOutOfStock ?? false,
+            images: v.images ?? [],
+          })),
+        }}
+        isOpen={isQuickLookOpen}
+        onClose={() => setIsQuickLookOpen(false)}
+      />
     </div>
   );
 }

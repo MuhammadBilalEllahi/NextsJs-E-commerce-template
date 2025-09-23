@@ -18,6 +18,7 @@ import {
   Building2,
   Truck,
   Heart,
+  RotateCcw,
 } from "lucide-react";
 import { RootProviders } from "@/lib/providers/rootProvider";
 import LogOutButton from "./components/buttons/LogOutButton";
@@ -39,6 +40,7 @@ const nav = [
   { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/chat", label: "Chat & Inquiries", icon: MessageCircle },
   { href: "/admin/payments", label: "Payments & Refunds", icon: CreditCard },
+  { href: "/admin/refunds", label: "Refunds", icon: RotateCcw },
   { href: "/admin/access", label: "Access Control", icon: Shield },
   { href: "/admin/testpage", label: "Test", icon: Package },
 ];
@@ -76,7 +78,7 @@ export default function AdminLayout({
             Dehli Mirch Admin
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            {nav.slice(0, 6).map((n) => (
+            {nav.slice(0, 7).map((n) => (
               <Link key={n.href} href={n.href} className="hover:underline">
                 {n.label}
               </Link>
