@@ -35,7 +35,7 @@ export function HomeDeliveryInfo() {
       description: "We deliver personally with our own vehicles",
       icon: <Car className="h-8 w-8 text-red-600" />,
       coverage: "All Lahore Areas",
-      timeFrame: "Within 1 Day",
+      timeFrame: "Within Hours or Even Minutes",
       cost: "FREE on orders above Rs. 2000",
       features: [
         "Personal touch and care",
@@ -47,24 +47,24 @@ export function HomeDeliveryInfo() {
       color:
         "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700",
     },
-    {
-      type: "tcs",
-      title: "TCS Courier Service",
-      description: "Nationwide delivery through TCS",
-      icon: <Truck className="h-8 w-8 text-green-600" />,
-      coverage: "All Pakistan",
-      timeFrame: "1-5 Business Days",
-      cost: "Rs. 80-300 (based on weight)",
-      features: [
-        "Nationwide coverage",
-        "Secure packaging",
-        "Tracking available",
-        "Insurance included",
-        "Professional handling",
-      ],
-      color:
-        "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700",
-    },
+    // {
+    //   type: "tcs",
+    //   title: "TCS Courier Service",
+    //   description: "Nationwide delivery through TCS",
+    //   icon: <Truck className="h-8 w-8 text-green-600" />,
+    //   coverage: "All Pakistan",
+    //   timeFrame: "1-5 Business Days",
+    //   cost: "Rs. 80-300 (based on weight)",
+    //   features: [
+    //     "Nationwide coverage",
+    //     "Secure packaging",
+    //     "Tracking available",
+    //     "Insurance included",
+    //     "Professional handling",
+    //   ],
+    //   color:
+    //     "bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700",
+    // },
   ];
 
   return (

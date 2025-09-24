@@ -122,9 +122,9 @@ export function Navbar() {
                 </SheetHeader>
                 <div className="mt-6">
                   <nav className="flex flex-col space-y-4">
-                    {nav.map((n) => (
+                    {nav.map((n, i) => (
                       <Link
-                        key={n.href}
+                        key={`${n.href}-${i}`}
                         href={n.href}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={`font-poppins text-lg font-medium hover:text-primary transition-colors py-2 ${
@@ -175,8 +175,8 @@ export function Navbar() {
 
           {/* Desktop Navigation Routes */}
           <div className="hidden lg:flex items-center gap-6 relative">
-            {nav.map((n) => (
-              <div key={n.href} className="relative">
+            {nav.map((n, i) => (
+              <div key={`${n.href}-${i}`} className="relative">
                 {n.hasHover ? (
                   <div className="relative">
                     <div

@@ -507,9 +507,9 @@ export default function CheckoutPage() {
                                       </span>
                                     )}
                                     <span>{address.label}</span>
-                                    <span className="text-neutral-500">
+                                    {/* <span className="text-neutral-500">
                                       - {address.address}, {address.city}
-                                    </span>
+                                    </span> */}
                                   </div>
                                 </SelectItem>
                               ))}

@@ -215,7 +215,7 @@ export function ProductCard({
             </Button>
             <Button
               size="sm"
-              className="rounded-sm h-8 w-8 p-0"
+              className="rounded-sm h-8 w-8 p-0 md:hidden"
               variant="outline"
               onClick={() => setIsQuickLookOpen(true)}
               title="Quick Look"
@@ -299,7 +299,7 @@ export function ProductCard({
 
             <Button
               size="sm"
-              className="rounded-sm w-10 h-10"
+              className="rounded-sm w-10 h-10 md:hidden"
               variant="outline"
               onClick={() => setIsQuickLookOpen(true)}
               title="Quick Look"
@@ -416,7 +416,7 @@ export function ProductCard({
 
           <Button
             size="sm"
-            className="rounded-sm w-10 h-10"
+            className="rounded-sm w-10 h-10 md:hidden"
             variant="outline"
             onClick={() => setIsQuickLookOpen(true)}
             title="Quick Look"

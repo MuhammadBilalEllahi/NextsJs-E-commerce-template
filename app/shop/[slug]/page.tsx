@@ -40,7 +40,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug = "all" } = await params;
 
   if (slug === "all") {
     return {
@@ -73,7 +73,7 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: CategoryPageProps) {
-  const { slug } = await params;
+  const { slug = "all" } = await params;
   const searchParamsResolved = await searchParams;
 
   // Fetch all data on the server
