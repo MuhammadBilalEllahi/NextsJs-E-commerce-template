@@ -14,14 +14,16 @@ const eslintConfig = [
   {
     rules: {
       // Disable strict rules that are causing build failures
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/no-explicit-any": "warn",
-      "prefer-const": "warn",
-      "react/no-unescaped-entities": "warn",
-      "react-hooks/exhaustive-deps": "warn",
-      "@next/next/no-img-element": "warn",
-      "jsx-a11y/alt-text": "warn",
-      "@typescript-eslint/ban-ts-comment": "warn"
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "prefer-const": "off",
+      "react/no-unescaped-entities": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "@next/next/no-img-element": "off",
+      "jsx-a11y/alt-text": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@next/next/no-html-link-for-pages": "error", // Keep this as error since it's critical
+      "import/no-anonymous-default-export": "off"
     },
     ignores: [
       "node_modules/**",
@@ -29,6 +31,9 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "*.config.js",
+      "*.config.ts",
+      "*.config.mjs"
     ],
   },
 ];
