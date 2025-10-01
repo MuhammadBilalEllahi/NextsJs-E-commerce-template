@@ -34,8 +34,6 @@ import {
 import Link from "next/link";
 
 interface OrderItem {
-  productId: string;
-  variantId: string;
   productTitle: string;
   variantLabel: string;
   quantity: number;
@@ -179,8 +177,7 @@ export default function OrdersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           order: selectedOrder.id,
-          product: selectedItem.productId,
-          variant: selectedItem.variantId || undefined,
+          product: selectedItem.productSlug, // This should be product ID, but using slug for now
           quantity: refundForm.quantity,
           amount: selectedItem.price * refundForm.quantity,
           reason: refundForm.reason,

@@ -7,7 +7,6 @@ import Product from "@/models/Product";
 import User from "@/models/User";
 import { ORDER_STATUS } from "@/models/constants";
 import Refund from "@/models/Refund";
-import AnalyticsLog from "@/models/AnalyticsLog";
 
 export async function GET(request: NextRequest) {
   try {
