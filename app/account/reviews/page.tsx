@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Star,
-  Edit,
-  Trash2,
-  Image as ImageIcon,
-  CheckCircle,
-  Loader2,
-} from "lucide-react";
+import { Star, Edit, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -160,7 +153,7 @@ export default function UserReviewsPage() {
         <Card>
           <CardContent className="text-center py-8">
             <p className="text-muted-foreground mb-4">
-              You haven't written any reviews yet.
+              You haven&apos;t written any reviews yet.
             </p>
             <Link href="/shop/all">
               <Button>Browse Products</Button>

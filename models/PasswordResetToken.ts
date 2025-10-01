@@ -28,7 +28,6 @@ const PasswordResetTokenSchema = new Schema<PasswordResetTokenDocument>({
   token: {
     type: String,
     required: true,
-    unique: true,
   },
   expiresAt: {
     type: Date,

@@ -4,11 +4,10 @@ import { authOptions } from "@/lib/auth";
 import dbConnect from "@/database/mongodb";
 import Order from "@/models/Order";
 import Product from "@/models/Product";
-import User from "@/models/User";
 import { ORDER_STATUS } from "@/models/constants";
 import Refund from "@/models/Refund";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== "admin") {
@@ -63,10 +62,12 @@ export async function GET(request: NextRequest) {
       "Nov",
       "Dec",
     ];
-    const revenueByMonth = revenueByMonthAgg.map((r: any) => ({
-      month: monthLabels[r._id.m - 1],
-      total: r.total,
-    }));
+    const revenueByMonth = revenueByMonthAgg.map(
+      (r: { _id: { m: number }; total: number }) => ({
+        month: monthLabels[r._id.m - 1],
+        total: r.total,
+      })
+    );
 
     // Orders by status (current month)
     const ordersByStatusAgg = await Order.aggregate([
@@ -81,7 +82,10 @@ export async function GET(request: NextRequest) {
       ORDER_STATUS.CANCELLED,
     ].map((s) => ({
       status: s,
-      count: ordersByStatusAgg.find((x: any) => x._id === s)?.count || 0,
+      count:
+        ordersByStatusAgg.find(
+          (x: { _id: string; count: number }) => x._id === s
+        )?.count || 0,
     }));
 
     // Top products by units (year-to-date)
@@ -155,7 +159,7 @@ export async function GET(request: NextRequest) {
       },
       { $group: { _id: { $toLower: "$contact.email" } } },
       { $count: "count" },
-    ]).catch(() => [] as any[]);
+    ]).catch(() => [] as { count: number }[]);
     const activeCustomers = activeEmails[0]?.count || 0;
 
     // Additional KPIs
@@ -167,7 +171,7 @@ export async function GET(request: NextRequest) {
     const todayAgg = await Order.aggregate([
       { $match: { createdAt: { $gte: startOfToday } } },
       { $group: { _id: null, orders: { $sum: 1 }, sales: { $sum: "$total" } } },
-    ]).catch(() => [] as any[]);
+    ]).catch(() => [] as { orders: number; sales: number }[]);
     const today = {
       orders: todayAgg[0]?.orders || 0,
       sales: todayAgg[0]?.sales || 0,
@@ -189,7 +193,7 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-    ]).catch(() => [] as any[]);
+    ]).catch(() => [] as unknown[]);
     const aov = aovAgg[0]?.aov || 0;
 
     // 14-day orders trend
@@ -211,31 +215,37 @@ export async function GET(request: NextRequest) {
         },
       },
       { $sort: { "_id.y": 1, "_id.m": 1, "_id.d": 1 } },
-    ]).catch(() => [] as any[]);
-    const ordersTrend = ordersTrendAgg.map((r: any) => ({
-      date: `${r._id.m}/${r._id.d}`,
-      count: r.count,
-    }));
+    ]).catch(() => [] as unknown[]);
+    const ordersTrend = ordersTrendAgg.map(
+      (r: { _id: { m: number; d: number }; count: number }) => ({
+        date: `${r._id.m}/${r._id.d}`,
+        count: r.count,
+      })
+    );
 
     // Payment status split (YTD)
     const paymentStatusAgg = await Order.aggregate([
       { $match: { createdAt: { $gte: startOfYear } } },
       { $group: { _id: "$payment.status", count: { $sum: 1 } } },
-    ]).catch(() => [] as any[]);
-    const paymentStatus = paymentStatusAgg.map((x: any) => ({
-      status: x._id,
-      count: x.count,
-    }));
+    ]).catch(() => [] as unknown[]);
+    const paymentStatus = paymentStatusAgg.map(
+      (x: { _id: string; count: number }) => ({
+        status: x._id,
+        count: x.count,
+      })
+    );
 
     // Shipping method split (YTD)
     const shippingSplitAgg = await Order.aggregate([
       { $match: { createdAt: { $gte: startOfYear } } },
       { $group: { _id: "$shippingMethod", count: { $sum: 1 } } },
-    ]).catch(() => [] as any[]);
-    const shippingSplit = shippingSplitAgg.map((x: any) => ({
-      method: x._id,
-      count: x.count,
-    }));
+    ]).catch(() => [] as unknown[]);
+    const shippingSplit = shippingSplitAgg.map(
+      (x: { _id: string; count: number }) => ({
+        method: x._id,
+        count: x.count,
+      })
+    );
 
     // Refunds summary (YTD)
     const refundsAgg = await Refund.aggregate([
@@ -247,12 +257,14 @@ export async function GET(request: NextRequest) {
           amount: { $sum: "$amount" },
         },
       },
-    ]).catch(() => [] as any[]);
-    const refunds = refundsAgg.map((r: any) => ({
-      status: r._id,
-      count: r.count,
-      amount: r.amount,
-    }));
+    ]).catch(() => [] as { _id: string; count: number; amount: number }[]);
+    const refunds = refundsAgg.map(
+      (r: { _id: string; count: number; amount: number }) => ({
+        status: r._id,
+        count: r.count,
+        amount: r.amount,
+      })
+    );
 
     // New vs Repeat by normalized email (YTD)
     const ytdByEmail = await Order.aggregate([
@@ -271,12 +283,12 @@ export async function GET(request: NextRequest) {
         },
       },
       { $project: { _id: 0, new: 1, repeat: 1 } },
-    ]).catch(() => [] as any[]);
+    ]).catch(() => [] as unknown[]);
     const newCustomers = ytdByEmail[0]?.new || 0;
     const repeatCustomers = ytdByEmail[0]?.repeat || 0;
 
     // Top categories by sales (YTD) - robust pipeline with safe lookups
-    let topCategories: any[] = [];
+    let topCategories: { category: string; sales: number }[] = [];
     try {
       const topCategoriesAgg = await Order.aggregate([
         { $match: { createdAt: { $gte: startOfYear } } },
@@ -337,7 +349,7 @@ export async function GET(request: NextRequest) {
         },
       ]);
       topCategories = topCategoriesAgg.filter(
-        (c: any) => c.id || c.name === "Uncategorized"
+        (c: { id?: string; name: string }) => c.id || c.name === "Uncategorized"
       );
     } catch (e) {
       console.error("Top categories aggregation failed:", e);
@@ -359,10 +371,13 @@ export async function GET(request: NextRequest) {
       topCategories,
       refunds,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error computing analytics:", error);
     return NextResponse.json(
-      { error: "Failed to compute analytics", details: error.message },
+      {
+        error: "Failed to compute analytics",
+        details: error instanceof Error ? error.message : "An error occurred",
+      },
       { status: 500 }
     );
   }

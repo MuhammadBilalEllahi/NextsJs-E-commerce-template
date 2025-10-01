@@ -4,7 +4,7 @@ import { useWishlist } from "@/lib/providers/wishlistProvider";
 import { useCart } from "@/lib/providers/cartContext";
 import { useAuth } from "@/lib/providers/authProvider";
 import { Button } from "@/components/ui/button";
-import { Heart, Trash2, AlertCircle } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { products } from "@/mock_data/mock-data";
@@ -27,8 +27,8 @@ type WishlistItem = {
 };
 
 export default function WishlistPage() {
-  const { ids, items, clear, isLoading } = useWishlist();
-  const { add, remove, isAdding } = useCart();
+  const { ids, clear, isLoading } = useWishlist();
+  const { add } = useCart();
   const { isAuthenticated } = useAuth();
   const [wishlistData, setWishlistData] = useState<WishlistItem[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -94,7 +94,6 @@ export default function WishlistPage() {
   }, [isAuthenticated, ids]);
 
   const handleAddToCart = (item: WishlistItem) => {
-    if (isAdding) return;
     add(
       {
         id: item.productId,
@@ -109,7 +108,7 @@ export default function WishlistPage() {
     );
   };
 
-  const handleRemoveFromWishlist = async (productId: string) => {
+  const handleRemoveFromWishlist = async () => {
     // This will be handled by the wishlist provider
     // The UI will update automatically through the provider
   };

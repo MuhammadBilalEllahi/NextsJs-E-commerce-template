@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
       } else {
         setError(data.error || "Failed to send reset email");
       }
-    } catch (error) {
+    } catch {
       setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
             <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-4">Check Your Email</h1>
             <p className="text-neutral-600 dark:text-neutral-400 mb-6">
-              We've sent a password reset link to <strong>{email}</strong>.
+              We&apos;ve sent a password reset link to <strong>{email}</strong>.
               Please check your email and click the link to reset your password.
             </p>
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
@@ -91,8 +91,8 @@ export default function ForgotPasswordPage() {
             Reset Password
           </CardTitle>
           <p className="text-neutral-600 dark:text-neutral-400">
-            Enter your email address and we'll send you a link to reset your
-            password.
+            Enter your email address and we&apos;ll send you a link to reset
+            your password.
           </p>
         </CardHeader>
         <CardContent>

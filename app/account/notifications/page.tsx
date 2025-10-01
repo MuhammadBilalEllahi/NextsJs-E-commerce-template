@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -21,9 +20,7 @@ import {
   Truck,
   AlertCircle,
   Gift,
-  Calendar,
   Eye,
-  EyeOff,
 } from "lucide-react";
 
 interface Notification {
@@ -38,13 +35,12 @@ interface Notification {
     refId: string;
     status: string;
   };
-  metadata: any;
+  metadata: Record<string, unknown>;
   createdAt: string;
   readAt?: string;
 }
 
 export default function NotificationsPage() {
-  const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -278,7 +274,8 @@ export default function NotificationsPage() {
             <div className="text-6xl mb-4">🔔</div>
             <h3 className="text-lg font-semibold mb-2">No notifications</h3>
             <p className="text-neutral-600 dark:text-neutral-400">
-              You're all caught up! We'll notify you when there's something new.
+              You&apos;re all caught up! We&apos;ll notify you when there&apos;s
+              something new.
             </p>
           </CardContent>
         </Card>

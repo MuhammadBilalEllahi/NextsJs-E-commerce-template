@@ -27,7 +27,6 @@ export default function ResetPasswordPage() {
   const [isValidToken, setIsValidToken] = useState<boolean | null>(null);
 
   const searchParams = useSearchParams();
-  const router = useRouter();
   const token = searchParams.get("token");
 
   useEffect(() => {
@@ -77,7 +76,7 @@ export default function ResetPasswordPage() {
       } else {
         setError(data.error || "Failed to reset password");
       }
-    } catch (error) {
+    } catch {
       setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
@@ -139,8 +138,8 @@ export default function ResetPasswordPage() {
             Set New Password
           </CardTitle>
           <p className="text-neutral-600 dark:text-neutral-400">
-            Enter your new password below. Make sure it's secure and easy to
-            remember.
+            Enter your new password below. Make sure it&apos;s secure and easy
+            to remember.
           </p>
         </CardHeader>
         <CardContent>

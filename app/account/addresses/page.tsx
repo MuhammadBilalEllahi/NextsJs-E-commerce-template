@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { CitySelect } from "@/components/ui/city-select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/lib/providers/authProvider";
 import {
@@ -19,7 +19,6 @@ import {
   Building,
   CreditCard,
 } from "lucide-react";
-import { formatCurrency } from "@/lib/constants/currency";
 
 interface Address {
   _id: string;
@@ -41,7 +40,6 @@ interface Address {
 }
 
 export default function AddressesPage() {
-  const { user } = useAuth();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);

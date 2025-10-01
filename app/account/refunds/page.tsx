@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,11 +20,8 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  AlertCircle,
   Eye,
   Package,
-  Calendar,
-  DollarSign,
   FileText,
 } from "lucide-react";
 import Link from "next/link";
@@ -69,7 +65,6 @@ interface Refund {
 }
 
 export default function CustomerRefundsPage() {
-  const { user } = useAuth();
   const [refunds, setRefunds] = useState<Refund[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -100,7 +95,7 @@ export default function CustomerRefundsPage() {
 
   useEffect(() => {
     fetchRefunds();
-  }, [filters]);
+  }, [filters, fetchRefunds]);
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
@@ -224,7 +219,7 @@ export default function CustomerRefundsPage() {
             <div className="text-6xl mb-4">💰</div>
             <h3 className="text-lg font-semibold mb-2">No refund requests</h3>
             <p className="text-neutral-600 dark:text-neutral-400 mb-4">
-              You haven't submitted any refund requests yet.
+              You haven&apos;t submitted any refund requests yet.
             </p>
             <Link href="/account/orders">
               <Button variant="outline">View Order History</Button>

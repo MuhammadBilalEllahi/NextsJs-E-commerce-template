@@ -25,7 +25,6 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);

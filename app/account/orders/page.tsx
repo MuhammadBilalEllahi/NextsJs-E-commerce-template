@@ -27,11 +27,11 @@ import {
   Eye,
   RefreshCw,
   AlertCircle,
-  Calendar,
   CreditCard,
   MapPin,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface OrderItem {
   productTitle: string;
@@ -42,6 +42,18 @@ interface OrderItem {
   productSlug: string;
   variantSku: string;
   totalPrice: number;
+}
+
+interface Address {
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  postalCode: string;
+  country: string;
+  phone: string;
 }
 
 interface Order {
@@ -60,9 +72,9 @@ interface Order {
   tracking: string;
   cancellationReason: string;
   items: OrderItem[];
-  shippingAddress: any;
-  billingAddress: any;
-  contact: any;
+  shippingAddress: Address;
+  billingAddress: Address;
+  contact: Address;
 }
 
 interface Refund {
@@ -80,7 +92,6 @@ interface Refund {
 }
 
 export default function OrdersPage() {
-  const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [refunds, setRefunds] = useState<Refund[]>([]);
   const [loading, setLoading] = useState(true);
@@ -297,9 +308,11 @@ export default function OrdersPage() {
                                 key={index}
                                 className="flex items-center gap-3 p-3 border rounded-lg"
                               >
-                                <img
+                                <Image
                                   src={item.image}
                                   alt={item.productTitle}
+                                  width={48}
+                                  height={48}
                                   className="h-12 w-12 rounded object-cover"
                                 />
                                 <div className="flex-1">

@@ -22,7 +22,6 @@ const ContentPageSchema: Schema = new Schema(
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
     title: {
       type: String,
