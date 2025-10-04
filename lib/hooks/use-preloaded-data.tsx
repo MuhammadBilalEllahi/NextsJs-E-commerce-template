@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllCategories, getAllActiveBrands } from "@/database/data-service";
+import {
+  getAllCategoriesWithProducts,
+  getAllActiveBrands,
+} from "@/database/data-service";
 
 interface PreloadedData {
   categories: any[];
@@ -70,7 +73,7 @@ export const preloadHoverData = async (): Promise<PreloadedData> => {
 
     // Load all data in parallel using Promise.all
     const [categories, brands] = await Promise.all([
-      getAllCategories(),
+      getAllCategoriesWithProducts(6), // Get 6 products per category for hover navigation
       getAllActiveBrands(),
     ]);
 

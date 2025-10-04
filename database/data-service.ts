@@ -773,6 +773,88 @@ export async function getAllCategories() {
   }
 }
 
+export async function getAllCategoriesWithProducts(productsPerCategory = 6) {
+  try {
+    await dbConnect();
+
+    // Check Redis cache first
+    const cacheKey = `${CACHE_CATEGORIES_KEY}_with_products_${productsPerCategory}`;
+    const cachedData = await RedisClient.get(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+
+    // Fetch categories from database
+    const categories = (await Category.find({ isActive: true })
+      .populate("parent", "name")
+      .sort({ order: 1, name: 1 })
+      .lean<CategoryType[]>()) as CategoryType[];
+
+    // Fetch products for each category in parallel
+    const categoriesWithProducts = await Promise.all(
+      categories.map(async (category) => {
+        // Find products in this category
+        const products = (await Product.find({
+          isActive: true,
+          isOutOfStock: false,
+          categories: category._id,
+        })
+          .populate("brand", "name")
+          .populate({
+            path: "variants",
+            match: { isActive: true, isOutOfStock: false },
+          })
+          .sort({ createdAt: -1 })
+          .limit(productsPerCategory)
+          .lean<ProductType[]>()) as ProductType[];
+
+        const formattedProducts = products.map((product: ProductType) => ({
+          id: String(product._id),
+          slug: product.slug,
+          name: product.name,
+          price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+          images: product.images,
+          image:
+            product.images && product.images.length > 0
+              ? product.images[0]
+              : undefined,
+          brand: product.brand?.name || "Dehli Mirch",
+        }));
+
+        return {
+          id: String(category._id),
+          name: category.name,
+          slug: category.slug,
+          description: category.description,
+          image: category.image,
+          parent: category.parent
+            ? {
+                id: String(category.parent._id),
+                name: category.parent.name,
+              }
+            : null,
+          productCount: formattedProducts.length,
+          products: formattedProducts,
+        };
+      })
+    );
+
+    // Cache the results for 2 hours (shorter than categories since products change more frequently)
+    if (categoriesWithProducts.length > 0) {
+      await RedisClient.set(
+        cacheKey,
+        JSON.stringify(categoriesWithProducts),
+        7200
+      ); // 2 hours
+    }
+
+    return categoriesWithProducts;
+  } catch (error) {
+    console.error("Error fetching categories with products:", error);
+    return [];
+  }
+}
+
 // Brand data functions
 export async function getAllBrands() {
   try {

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
-import { getProductsByCategory } from "@/database/data-service";
 import { usePreloadedData } from "@/lib/hooks/use-preloaded-data";
 import { CURRENCY } from "@/lib/constants";
 import { Category, Product } from "@/types";
@@ -23,86 +22,20 @@ export function HoverNavigation({
 }: HoverNavigationProps) {
   const { categories, isLoaded } = usePreloadedData();
   const [hoveredCategory, setHoveredCategory] = useState<Category | null>(null);
-  const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
   const [showProducts, setShowProducts] = useState(false);
-
-  // Cache keys and expiry times for products
-  const PRODUCTS_CACHE_KEY_PREFIX = "dehli_mirch_products_";
-  const CACHE_EXPIRY_TIME = 30 * 60 * 1000; // 30 minutes in milliseconds
-
-  // Helper function to check if cache is expired
-  const isCacheExpired = (timestamp: number) => {
-    return Date.now() - timestamp > CACHE_EXPIRY_TIME;
-  };
-
-  // Helper function to get cached data
-  const getCachedData = (key: string) => {
-    try {
-      const cached = localStorage.getItem(key);
-      if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        if (!isCacheExpired(timestamp)) {
-          return data;
-        } else {
-          // Remove expired cache
-          localStorage.removeItem(key);
-        }
-      }
-    } catch (error) {
-      console.error("Error reading from cache:", error);
-    }
-    return null;
-  };
-
-  // Helper function to set cached data
-  const setCachedData = (key: string, data: any) => {
-    try {
-      const cacheData = {
-        data,
-        timestamp: Date.now(),
-      };
-      localStorage.setItem(key, JSON.stringify(cacheData));
-    } catch (error) {
-      console.error("Error writing to cache:", error);
-    }
-  };
 
   useEffect(() => {
     if (hoveredCategory) {
       setShowProducts(true);
-      fetchCategoryProducts(hoveredCategory.slug);
     } else {
       setShowProducts(false);
-      setCategoryProducts([]);
     }
   }, [hoveredCategory]);
 
-  const fetchCategoryProducts = async (categorySlug: string) => {
-    setLoading(true);
-    try {
-      const cacheKey = `${PRODUCTS_CACHE_KEY_PREFIX}${categorySlug}`;
-
-      // Check localStorage cache first
-      const cachedProducts = getCachedData(cacheKey);
-      if (cachedProducts) {
-        setCategoryProducts(cachedProducts);
-        setLoading(false);
-        return;
-      }
-
-      // Fetch from server if not in cache
-      const products = await getProductsByCategory(categorySlug, 6);
-      setCategoryProducts(products);
-
-      // Cache the results
-      setCachedData(cacheKey, products);
-    } catch (error) {
-      console.error("Error fetching category products:", error);
-      setCategoryProducts([]);
-    } finally {
-      setLoading(false);
-    }
+  // Get products for the hovered category from preloaded data
+  const getCategoryProducts = (categorySlug: string): Product[] => {
+    const category = categories.find((cat: any) => cat.slug === categorySlug);
+    return category?.products || [];
   };
 
   if (!isOpen) return null;
@@ -144,46 +77,47 @@ export function HoverNavigation({
         {showProducts && hoveredCategory && (
           <div className="bg-popover text-popover-foreground border border-border shadow-md">
             <div className="p-0 py-1">
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="w-6 h-6 border-2 border-muted-foreground border-t-foreground rounded-full animate-spin"></div>
-                </div>
-              ) : (
-                <>
-                  {categoryProducts.map((product, index) => (
-                    <div key={product.id}>
-                      <Link
-                        href={`/product/${product.slug}`}
-                        className="flex items-center justify-between py-2 px-4 hover:underline cursor-pointer group transition-all"
-                        onClick={onClose}
-                      >
-                        <span className="text-xs font-medium w-28">
-                          {product.name}
-                        </span>
-                      </Link>
-                      {index < categoryProducts.length - 1 && (
-                        <div className="border-b border-border mx-4"></div>
-                      )}
-                    </div>
-                  ))}
+              {(() => {
+                const categoryProducts = getCategoryProducts(
+                  hoveredCategory.slug
+                );
+                return (
+                  <>
+                    {categoryProducts.map((product, index) => (
+                      <div key={product.id}>
+                        <Link
+                          href={`/product/${product.slug}`}
+                          className="flex items-center justify-between py-2 px-4 hover:underline cursor-pointer group transition-all"
+                          onClick={onClose}
+                        >
+                          <span className="text-xs font-medium w-28">
+                            {product.name}
+                          </span>
+                        </Link>
+                        {index < categoryProducts.length - 1 && (
+                          <div className="border-b border-border mx-4"></div>
+                        )}
+                      </div>
+                    ))}
 
-                  {/* More link */}
-                  {categoryProducts.length > 0 && (
-                    <div>
-                      <div className="border-b border-border mx-4"></div>
-                      <Link
-                        href={`/category/${hoveredCategory.slug}`}
-                        className="flex items-center justify-between py-2 px-4 hover:underline cursor-pointer group transition-all"
-                        onClick={onClose}
-                      >
-                        <span className="text-xs font-medium">More</span>
-                        <ChevronRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
-                      </Link>
-                    </div>
-                  )}
-                </>
-              )}
-              {categoryProducts.length === 0 && !loading && (
+                    {/* More link */}
+                    {categoryProducts.length > 0 && (
+                      <div>
+                        <div className="border-b border-border mx-4"></div>
+                        <Link
+                          href={`/category/${hoveredCategory.slug}`}
+                          className="flex items-center justify-between py-2 px-4 hover:underline cursor-pointer group transition-all"
+                          onClick={onClose}
+                        >
+                          <span className="text-xs font-medium">More</span>
+                          <ChevronRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                        </Link>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+              {getCategoryProducts(hoveredCategory.slug).length === 0 && (
                 <div className="text-center py-8">
                   <p className="text-xs text-muted-foreground">
                     No products found
