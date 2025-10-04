@@ -13,14 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
-
-interface ContactFormData {
-  name: string;
-  email: string;
-  phone: string;
-  subject: string;
-  message: string;
-}
+import { ContactFormData } from "@/types";
 
 const subjects = [
   "General Inquiry",

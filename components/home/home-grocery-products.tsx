@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Product } from "@/mock_data/mock-data";
+import { Product } from "@/types";
 import { ProductCard } from "@/components/product/product-card";
 
 export function HomeGroceryProducts({
@@ -81,7 +81,7 @@ export function HomeGroceryProducts({
 
       {/* Mobile: 2x2 mini grid */}
       <div className="md:hidden grid grid-cols-2 gap-2">
-        {products.slice(0, 4).map((product) => (
+        {products.slice(0, 4).map((product: Product) => (
           <ProductCard key={product.id} product={product} variant="mini" />
         ))}
       </div>
@@ -107,7 +107,7 @@ export function HomeGroceryProducts({
           ref={scroller}
           className="hide-scrollbar flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2"
         >
-          {products.map((product) => (
+          {products.map((product: Product) => (
             <div key={product.id} className="snap-start animate-fadeIn">
               <ProductCard product={product} className="w-72" />
             </div>

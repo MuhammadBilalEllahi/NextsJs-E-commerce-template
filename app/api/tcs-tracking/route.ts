@@ -27,7 +27,7 @@ function formatOrder(order: any) {
       status: order.payment.status,
     },
     items: order.items.map((item: any) => {
-      console.log("Processing item:", item);
+      console.debug("Processing item:", item);
       return {
         productTitle:
           item.product?.name || item.product?.slug || "Unknown Product",
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
 
     // Alternative approach: try without lean() if population fails
     if (order && order.items?.length > 0 && !order.items[0].product?.name) {
-      console.log("Population failed, trying without lean()...");
+      console.debug("Population failed, trying without lean()...");
       order = await Order.findOne(query)
         .populate("items.product", "name images slug description price")
         .populate("items.variant", "label sku price stock");
@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
 
     if (isTCS) {
       // Find TCS order
-      const tcsOrder = await TCSOrder.findOne({ order: order._id });
+      const tcsOrder = await TCSOrder.findOne({ order: order.id });
 
       if (!tcsOrder) {
         // Return formatted order without TCS data

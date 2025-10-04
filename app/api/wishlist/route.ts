@@ -78,13 +78,13 @@ export async function GET(req: NextRequest) {
       }
 
       return {
-        id: item._id,
-        productId: product._id,
+        id: item.id,
+        productId: product.id,
         productSlug: product.slug,
         productName: product.name,
         productImage: product.images?.[0] || "/placeholder.svg",
         productPrice: variant ? variant.price : product.price,
-        variantId: variant?._id || null,
+        variantId: variant?.id || null,
         variantLabel: variant?.label || null,
         isOutOfStock,
         availableStock,
@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
     // If variantId is provided, check if variant exists and belongs to product
     if (variantId) {
       const variant = await Variant.findOne({
-        _id: variantId,
+        id: variantId,
         product: productId,
       });
       if (!variant) {

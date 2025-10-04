@@ -6,11 +6,7 @@ import { getOrCreateGuestId } from "@/lib/utils/uuid";
 
 const STORAGE_KEY = "dm-wishlist";
 
-type WishlistItem = {
-  productId: string;
-  variantId?: string;
-  addedAt: string;
-};
+import { WishlistItem } from "@/types";
 
 type WishlistCtx = {
   ids: Set<string>;

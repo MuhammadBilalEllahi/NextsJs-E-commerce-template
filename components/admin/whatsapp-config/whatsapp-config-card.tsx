@@ -52,7 +52,7 @@ export function WhatsAppConfigCard() {
       required: true,
     },
     {
-      name: "WHATSAPP_PHONE_NUMBER_ID",
+      name: "WHATSAPP_PHONE_NUMBERid",
       description: "Your WhatsApp Business phone number ID",
       required: true,
     },

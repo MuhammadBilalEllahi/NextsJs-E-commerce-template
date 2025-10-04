@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
       const userIdentifier = user
         ? {
             type: "registered",
-            userId: user._id,
+            userId: user.id,
             userName: user.name,
             userEmail: user.email,
           }
@@ -99,14 +99,14 @@ export async function GET(req: NextRequest) {
           };
 
       return {
-        id: item._id,
+        id: item.id,
         ...userIdentifier,
-        productId: product._id,
+        productId: product.id,
         productSlug: product.slug,
         productName: product.name,
         productImage: product.images?.[0] || "/placeholder.svg",
         productPrice: variant ? variant.price : product.price,
-        variantId: variant?._id || null,
+        variantId: variant?.id || null,
         variantLabel: variant?.label || null,
         isOutOfStock,
         availableStock,
@@ -152,7 +152,7 @@ export async function DELETE(req: NextRequest) {
     let query: any = { isActive: true };
 
     if (wishlistId) {
-      query._id = wishlistId;
+      query.id = wishlistId;
     } else if (userId && productId) {
       query.user = userId;
       query.product = productId;

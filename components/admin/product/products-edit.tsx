@@ -35,52 +35,7 @@ import {
   updateCategory,
 } from "@/lib/api/admin/category/categories";
 import { createBrand } from "@/lib/api/admin/brand/brand";
-
-type Brand = { _id: string; name: string; description?: string; logo?: string };
-type Category = {
-  _id: string;
-  name: string;
-  parent?: { _id: string; name: string } | string | null;
-  description?: string;
-  image?: string;
-};
-type Variant = {
-  _id?: string;
-  sku: string;
-  slug: string;
-  label: string;
-  price: number;
-  stock: number;
-  discount: number;
-  images: string[];
-  isActive: boolean;
-  isOutOfStock: boolean;
-  newImages?: File[];
-};
-type Product = {
-  isGrocery: boolean;
-  isSpecial: boolean;
-  _id: string;
-  name: string;
-  description: string;
-  ingredients?: string;
-  price: number;
-  stock: number;
-  discount: number;
-  brand: { _id: string; name: string };
-  categories: { _id: string; name: string }[];
-  images: string[];
-  variants: Variant[];
-  isActive: boolean;
-  isOutOfStock: boolean;
-  isFeatured: boolean;
-  isTopSelling: boolean;
-  isNewArrival: boolean;
-  isBestSelling: boolean;
-  slug: string;
-  createdAt: string;
-  updatedAt: string;
-};
+import { Brand, Category, Product, Variant } from "@/types";
 
 interface ProductsEditAdminUIProps {
   product: Product;
@@ -106,8 +61,8 @@ export default function ProductsEditAdminUI({
     price: product.price,
     stock: product.stock,
     discount: product.discount || 0,
-    brand: product.brand?._id || "",
-    categories: product.categories?.map((c) => c._id) || [],
+    brand: (product.brand as Brand).id || "",
+    categories: (product.categories as Category[])?.map((c) => c.id) || [],
     images: product.images || [],
     isActive: product.isActive || false,
     isOutOfStock: product.isOutOfStock || false,
@@ -187,7 +142,7 @@ export default function ProductsEditAdminUI({
     try {
       // Prepare form data for the API
       const formData = new FormData();
-      formData.append("id", product._id);
+      formData.append("id", product.id);
       formData.append("name", form.name);
       formData.append("description", form.description);
       formData.append("ingredients", form.ingredients);
@@ -246,7 +201,7 @@ export default function ProductsEditAdminUI({
       }
 
       // Send the request directly to the API
-      const response = await fetch(`/api/admin/product?id=${product._id}`, {
+      const response = await fetch(`/api/admin/product?id=${product.id}`, {
         method: "PUT",
         body: formData,
       });
@@ -296,9 +251,9 @@ export default function ProductsEditAdminUI({
     try {
       const fd = new FormData();
 
-      if (editingVariant._id) {
+      if (editingVariant.id) {
         // Update existing variant
-        fd.append("id", editingVariant._id);
+        fd.append("id", editingVariant.id);
         fd.append("isActive", String(editingVariant.isActive));
         fd.append("isOutOfStock", String(editingVariant.isOutOfStock));
         fd.append("stock", String(editingVariant.stock));
@@ -326,14 +281,12 @@ export default function ProductsEditAdminUI({
         const updatedVariant = await res.json();
         setVariants((prev) =>
           prev.map((v) =>
-            v._id === editingVariant._id
-              ? { ...v, ...updatedVariant.variant }
-              : v
+            v.id === editingVariant.id ? { ...v, ...updatedVariant.variant } : v
           )
         );
       } else {
         // Create new variant
-        fd.append("product", product._id);
+        fd.append("product", product.id);
         fd.append("sku", editingVariant.sku);
         fd.append("label", editingVariant.label);
         if (editingVariant.slug) fd.append("slug", editingVariant.slug);
@@ -382,7 +335,7 @@ export default function ProductsEditAdminUI({
       });
       if (!res.ok) throw new Error("Failed to delete variant");
 
-      setVariants((prev) => prev.filter((v) => v._id !== variantId));
+      setVariants((prev) => prev.filter((v) => v.id !== variantId));
       alert("Variant deleted successfully ✅");
     } catch (err: any) {
       alert("Error deleting variant: " + err.message);
@@ -408,7 +361,7 @@ export default function ProductsEditAdminUI({
     };
     const created = await createBrand(data);
     setBrands((prev) => [...prev, created]);
-    setForm((f) => ({ ...f, brand: created._id }));
+    setForm((f) => ({ ...f, brand: created.id }));
     setBrandOpen(false);
     setBrandDraft({ name: "", description: "" });
   };
@@ -752,7 +705,7 @@ export default function ProductsEditAdminUI({
                 </SelectTrigger>
                 <SelectContent>
                   {brands.map((b) => (
-                    <SelectItem key={b._id} value={b._id}>
+                    <SelectItem key={b.id} value={b.id}>
                       {b.name}
                     </SelectItem>
                   ))}
@@ -853,9 +806,9 @@ export default function ProductsEditAdminUI({
                 </SelectTrigger>
                 <SelectContent>
                   {categories
-                    .filter((c) => !form.categories.includes(c._id))
+                    .filter((c) => !form.categories.includes(c.id))
                     .map((c) => (
-                      <SelectItem key={c._id} value={c._id}>
+                      <SelectItem key={c.id} value={c.id}>
                         {c.name}
                       </SelectItem>
                     ))}
@@ -906,7 +859,7 @@ export default function ProductsEditAdminUI({
                         <SelectContent>
                           <SelectItem value="none">No parent</SelectItem>
                           {categories.map((c) => (
-                            <SelectItem key={c._id} value={c._id}>
+                            <SelectItem key={c.id} value={c.id}>
                               {c.name}
                             </SelectItem>
                           ))}
@@ -970,7 +923,7 @@ export default function ProductsEditAdminUI({
             {form.categories.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {form.categories.map((categoryId) => {
-                  const category = categories.find((c) => c._id === categoryId);
+                  const category = categories.find((c) => c.id === categoryId);
                   return (
                     <div
                       key={categoryId}
@@ -1055,7 +1008,7 @@ export default function ProductsEditAdminUI({
             <div className="grid gap-4">
               {variants.map((variant, index) => (
                 <div
-                  key={variant._id || index}
+                  key={variant.id || index}
                   className="border rounded-lg p-4"
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -1085,7 +1038,7 @@ export default function ProductsEditAdminUI({
                         size="sm"
                         variant="outline"
                         className="text-red-600 hover:text-red-700"
-                        onClick={() => deleteVariant(variant._id!)}
+                        onClick={() => deleteVariant(variant.id!)}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -1124,7 +1077,7 @@ export default function ProductsEditAdminUI({
                           <div
                             key={imgIndex}
                             className="relative group cursor-pointer"
-                            onClick={() => setSelectedImage(img)}
+                            onClick={() => setSelectedImage(img as string)}
                           >
                             <img
                               src={img}
@@ -1153,7 +1106,7 @@ export default function ProductsEditAdminUI({
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingVariant?._id ? "Edit Variant" : "Create New Variant"}
+              {editingVariant?.id ? "Edit Variant" : "Create New Variant"}
             </DialogTitle>
           </DialogHeader>
 
@@ -1171,7 +1124,7 @@ export default function ProductsEditAdminUI({
                         prev ? { ...prev, sku: e.target.value } : prev
                       )
                     }
-                    disabled={!!editingVariant._id} // Can't change SKU for existing variants
+                    disabled={!!editingVariant.id} // Can't change SKU for existing variants
                   />
                 </div>
 
@@ -1312,7 +1265,7 @@ export default function ProductsEditAdminUI({
                             src={img}
                             className="w-16 h-16 rounded object-cover border cursor-pointer hover:border-blue-400 transition-colors"
                             alt={`Current image ${index + 1}`}
-                            onClick={() => setSelectedImage(img)}
+                            onClick={() => setSelectedImage(img as string)}
                           />
                           <button
                             type="button"
@@ -1402,7 +1355,7 @@ export default function ProductsEditAdminUI({
                   className="bg-green-600 hover:bg-green-700"
                   onClick={saveVariant}
                 >
-                  {editingVariant._id ? "Update Variant" : "Create Variant"}
+                  {editingVariant.id ? "Update Variant" : "Create Variant"}
                 </Button>
               </div>
             </div>

@@ -24,7 +24,7 @@ const OrderItemSchema = new mongoose.Schema(
     priceAtPurchase: { type: Number, required: true },
     label: { type: String, default: "" },
   },
-  { _id: false }
+  { id: false }
 );
 
 const OrderHistorySchema = new mongoose.Schema(
@@ -34,7 +34,7 @@ const OrderHistorySchema = new mongoose.Schema(
     changedBy: { type: String, required: true }, // "system", "userId", "adminId"
     reason: { type: String, default: "" }, // For cancellation reasons
   },
-  { _id: false }
+  { id: false }
 );
 
 const OrderSchema = new mongoose.Schema(

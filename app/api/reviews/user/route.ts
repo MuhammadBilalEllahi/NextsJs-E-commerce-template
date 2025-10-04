@@ -36,9 +36,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       reviews: reviews.map((review) => ({
-        id: review._id,
+        id: review.id,
         product: {
-          id: review.product._id,
+          id: review.product.id,
           name: review.product.name,
           slug: review.product.slug,
           images: review.product.images,

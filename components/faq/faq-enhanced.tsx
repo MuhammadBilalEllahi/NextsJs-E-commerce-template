@@ -1,19 +1,23 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Search, HelpCircle, ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
-interface FAQ {
-  id: string;
-  question: string;
-  answer: string;
-  category: string;
-  tags: string[];
-  helpfulCount: number;
-}
+import { useState, useEffect } from "react";
+import {
+  Search,
+  HelpCircle,
+  ChevronDown,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { FAQ } from "@/types";
 
 interface FAQEnhancedProps {
   productId?: string;
@@ -21,11 +25,11 @@ interface FAQEnhancedProps {
 }
 
 export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
-  const [faqs, setFaqs] = useState<FAQ[]>([])
-  const [loading, setLoading] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState(category)
-  const [expandedFaqs, setExpandedFaqs] = useState<Set<string>>(new Set())
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(category);
+  const [expandedFaqs, setExpandedFaqs] = useState<Set<string>>(new Set());
 
   const categories = [
     { value: "all", label: "All Categories" },
@@ -34,8 +38,8 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
     { value: "shipping", label: "Shipping" },
     { value: "returns", label: "Returns" },
     { value: "payment", label: "Payment" },
-    { value: "account", label: "Account" }
-  ]
+    { value: "account", label: "Account" },
+  ];
 
   // Fetch FAQs from backend
   const fetchFAQs = async (cat = selectedCategory, search = searchTerm) => {
@@ -44,10 +48,10 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
       const params = new URLSearchParams();
       if (cat && cat !== "all") params.append("category", cat);
       if (search) params.append("search", search);
-      
+
       const response = await fetch(`/api/faqs?${params.toString()}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setFaqs(data.faqs);
       }
@@ -87,7 +91,7 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
 
   // Handle search on Enter key
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSearch();
     }
   };
@@ -114,7 +118,7 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
             className="pl-10"
           />
         </div>
-        
+
         <Select value={selectedCategory} onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Select category" />
@@ -127,7 +131,7 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
             ))}
           </SelectContent>
         </Select>
-        
+
         <Button onClick={handleSearch} disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
         </Button>
@@ -143,7 +147,9 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
           <div className="text-center py-8 text-muted-foreground">
             <HelpCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>No FAQs found for your search criteria.</p>
-            <p className="text-sm">Try adjusting your search or category filter.</p>
+            <p className="text-sm">
+              Try adjusting your search or category filter.
+            </p>
           </div>
         ) : (
           faqs.map((faq) => (
@@ -164,12 +170,14 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
                   )}
                 </div>
               </button>
-              
+
               {expandedFaqs.has(faq.id) && (
                 <div className="px-4 pb-4 border-t bg-gray-50">
                   <div className="pt-4 space-y-3">
-                    <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
-                    
+                    <p className="text-gray-700 leading-relaxed">
+                      {faq.answer}
+                    </p>
+
                     {faq.tags && faq.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {faq.tags.map((tag, index) => (
@@ -182,9 +190,15 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
                         ))}
                       </div>
                     )}
-                    
+
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <span>Category: {categories.find(c => c.value === faq.category)?.label}</span>
+                      <span>
+                        Category:{" "}
+                        {
+                          categories.find((c) => c.value === faq.category)
+                            ?.label
+                        }
+                      </span>
                       <button className="flex items-center gap-1 hover:text-gray-700">
                         <span>Helpful ({faq.helpfulCount})</span>
                       </button>
@@ -210,7 +224,7 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
               Contact Us
             </Button>
           </div>
-          
+
           <div className="text-center p-4 border rounded-lg hover:border-blue-300 transition-colors">
             <h5 className="font-medium mb-2">Live Chat</h5>
             <p className="text-sm text-muted-foreground mb-3">
@@ -223,5 +237,5 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -10,6 +10,7 @@ import dbConnect from "@/database/mongodb";
 import RedisClient from "@/database/redisClient";
 import Banner from "@/models/Banner";
 import GlobalSettings from "@/models/GlobalSettings";
+import Blog from "@/models/Blog";
 import {
   CACHE_EXPIRE_TIME,
   CACHE_BANNER_KEY,
@@ -17,10 +18,26 @@ import {
   CACHE_GLOBAL_SETTINGS_KEY,
   CACHE_CATEGORIES_KEY,
   CACHE_PRODUCTS_BY_CATEGORY_KEY,
+  CACHE_CATEGORIES_WITH_CHILDREN_KEY,
 } from "@/lib/cacheConstants";
 import Branch from "@/models/Branches";
 import ContentPage from "@/models/ContentPage";
-import { ProductTypeVariant, Variant as VariantType } from "@/mock_data/data";
+import {
+  ProductTypeVariant,
+  Product as ProductType,
+  Review as ReviewType,
+  Variant as VariantType,
+  Brand as BrandType,
+  Category as CategoryType,
+  VariantLabel,
+  User as UserType,
+  ContentPage as ContentPageType,
+  Blog as BlogType,
+  FAQ as FAQType,
+  Branch as BranchType,
+  GlobalSettings as GlobalSettingsType,
+  Banner as BannerType,
+} from "@/types";
 
 export async function getAllBranches() {
   try {
@@ -29,7 +46,9 @@ export async function getAllBranches() {
     if (cachedBranches) {
       return JSON.parse(cachedBranches);
     }
-    const branches = await Branch.find({ isActive: true }).lean();
+    const branches = (await Branch.find({ isActive: true }).lean<
+      BranchType[]
+    >()) as BranchType[];
     if (branches.length > 0) {
       await RedisClient.set(
         CACHE_BRANCH_KEY,
@@ -51,7 +70,9 @@ export async function getGlobalSettings() {
     if (cachedSettings) {
       return JSON.parse(cachedSettings);
     }
-    const globalSettings = await GlobalSettings.findOne({}).lean();
+    const globalSettings = (await GlobalSettings.findOne(
+      {}
+    ).lean<GlobalSettingsType>()) as GlobalSettingsType;
     if (globalSettings) {
       await RedisClient.set(
         CACHE_GLOBAL_SETTINGS_KEY,
@@ -73,9 +94,10 @@ export async function getAllBanners() {
     if (cachedBanners) {
       return JSON.parse(cachedBanners);
     }
-    const banners = await Banner.find({ isActive: true })
+    const banners = (await Banner.find({ isActive: true })
+      .lean<BannerType[]>()
       .sort({ createdAt: -1 })
-      .lean();
+      .lean<BannerType[]>()) as BannerType[];
 
     // Filter out expired banners
     const activeBanners = banners.filter((banner) => {
@@ -110,9 +132,9 @@ export async function getAllTopSellingProducts(limit = 10, page = 1) {
     await dbConnect();
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({ isActive: true, isTopSelling: true })
-      // .populate("brand", "name")
-      // .populate("categories", "name")
+    const products = (await Product.find({ isActive: true, isTopSelling: true })
+      .populate("brand", "name")
+      .populate("categories", "name")
       .populate({
         path: "variants",
         match: { isActive: true, isOutOfStock: false },
@@ -120,21 +142,21 @@ export async function getAllTopSellingProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean<ProductType[]>()) as ProductType[];
 
     const total = await Product.countDocuments({
       isActive: true,
       isTopSelling: true,
     });
-    console.log(
+    console.debug(
       "products in getAllTopSellingProducts",
       JSON.stringify(products, null, 2)
     );
     return {
-      products: products.map((product) => ({
+      products: products.map((product: ProductType) => ({
         id: String(product._id),
         slug: product.slug,
-        title: product.name,
+        name: product.name,
         description: product.description,
         price: product?.variants?.[0]?.price ?? product?.price ?? 0,
         images: product.images,
@@ -151,8 +173,8 @@ export async function getAllTopSellingProducts(limit = 10, page = 1) {
         // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
         tags: [], // Can be added to product model later
         variants: (product?.variants || [])
-          .filter((variant: any) => variant.isActive) // Only show active variants
-          .sort((a: any, b: any) => {
+          .filter((variant: VariantType) => variant.isActive) // Only show active variants
+          .sort((a: VariantType, b: VariantType) => {
             // Sort: available first, then out-of-stock
             const aAvailable = !a.isOutOfStock && a.stock > 0;
             const bAvailable = !b.isOutOfStock && b.stock > 0;
@@ -160,8 +182,8 @@ export async function getAllTopSellingProducts(limit = 10, page = 1) {
             if (!aAvailable && bAvailable) return 1;
             return 0;
           })
-          .map((variant: any) => ({
-            _id: String(variant._id),
+          .map((variant: VariantType) => ({
+            id: String(variant._id),
             label: variant.label,
             price: variant.price,
             stock: variant.stock,
@@ -195,9 +217,9 @@ export async function getAllFeaturedProducts(limit = 10, page = 1) {
     await dbConnect();
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({ isActive: true, isFeatured: true })
-      // .populate("brand", "name")
-      // .populate("categories", "name")
+    const products = (await Product.find({ isActive: true, isFeatured: true })
+      .populate("brand", "name")
+      .populate("categories", "name")
       .populate({
         path: "variants",
         match: { isActive: true, isOutOfStock: false },
@@ -205,21 +227,21 @@ export async function getAllFeaturedProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean<ProductType[]>()) as ProductType[];
 
     const total = await Product.countDocuments({
       isActive: true,
       isFeatured: true,
     });
-    console.log(
+    console.debug(
       "products in getAllFeaturedProducts",
       JSON.stringify(products, null, 2)
     );
     return {
-      products: products.map((product) => ({
+      products: products.map((product: ProductType) => ({
         id: String(product._id),
         slug: product.slug,
-        title: product.name,
+        name: product.name,
         description: product.description,
         price: product?.variants?.[0]?.price ?? product?.price ?? 0,
         images: product.images,
@@ -236,8 +258,8 @@ export async function getAllFeaturedProducts(limit = 10, page = 1) {
         // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
         tags: [], // Can be added to product model later
         variants: (product?.variants || [])
-          .filter((variant: any) => variant.isActive) // Only show active variants
-          .sort((a: any, b: any) => {
+          .filter((variant: VariantType) => variant.isActive) // Only show active variants
+          .sort((a: VariantType, b: VariantType) => {
             // Sort: available first, then out-of-stock
             const aAvailable = !a.isOutOfStock && a.stock > 0;
             const bAvailable = !b.isOutOfStock && b.stock > 0;
@@ -245,8 +267,8 @@ export async function getAllFeaturedProducts(limit = 10, page = 1) {
             if (!aAvailable && bAvailable) return 1;
             return 0;
           })
-          .map((variant: any) => ({
-            _id: String(variant._id),
+          .map((variant: VariantType) => ({
+            id: String(variant._id),
             label: variant.label,
             price: variant.price,
             stock: variant.stock,
@@ -280,9 +302,9 @@ export async function getAllNewArrivalsProducts(limit = 10, page = 1) {
     await dbConnect();
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({ isActive: true, isNewArrival: true })
-      // .populate("brand", "name")
-      // .populate("categories", "name")
+    const products = (await Product.find({ isActive: true, isNewArrival: true })
+      .populate("brand", "name")
+      .populate("categories", "name")
       .populate({
         path: "variants",
         match: { isActive: true, isOutOfStock: false },
@@ -290,18 +312,18 @@ export async function getAllNewArrivalsProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean<ProductType[]>()) as ProductType[];
 
     const total = await Product.countDocuments({
       isActive: true,
       isNewArrival: true,
     });
-    // console.log("products in getAllNewArrivalsProducts", JSON.stringify(products, null, 2));
+    // console.debug("products in getAllNewArrivalsProducts", JSON.stringify(products, null, 2));
     return {
-      products: products.map((product) => ({
+      products: products.map((product: ProductType) => ({
         id: String(product._id),
         slug: product.slug,
-        title: product.name,
+        name: product.name,
         description: product.description,
         price: product?.variants?.[0]?.price ?? product?.price ?? 0,
         images: product.images,
@@ -318,8 +340,8 @@ export async function getAllNewArrivalsProducts(limit = 10, page = 1) {
         // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
         tags: [], // Can be added to product model later
         variants: (product?.variants || [])
-          .filter((variant: any) => variant.isActive) // Only show active variants
-          .sort((a: any, b: any) => {
+          .filter((variant: VariantType) => variant.isActive) // Only show active variants
+          .sort((a: VariantType, b: VariantType) => {
             // Sort: available first, then out-of-stock
             const aAvailable = !a.isOutOfStock && a.stock > 0;
             const bAvailable = !b.isOutOfStock && b.stock > 0;
@@ -327,8 +349,8 @@ export async function getAllNewArrivalsProducts(limit = 10, page = 1) {
             if (!aAvailable && bAvailable) return 1;
             return 0;
           })
-          .map((variant: any) => ({
-            _id: String(variant._id),
+          .map((variant: VariantType) => ({
+            id: String(variant._id),
             label: variant.label,
             price: variant.price,
             stock: variant.stock,
@@ -360,39 +382,47 @@ export async function getAllNewArrivalsProducts(limit = 10, page = 1) {
 export async function getAllProducts() {
   try {
     await dbConnect();
-    const products = await Product.find({ isActive: true, isOutOfStock: false })
+    const products = (await Product.find({
+      isActive: true,
+      isOutOfStock: false,
+    })
       .populate("brand", "name")
       .populate("categories", "name")
+      .populate("reviews", "user rating comment createdAt")
       .populate({
         path: "variants",
         match: { isActive: true, isOutOfStock: false },
       })
       .sort({ createdAt: -1 })
-      .lean();
+      .lean<ProductType[]>()) as ProductType[] &
+      BrandType &
+      CategoryType &
+      VariantType[] &
+      ReviewType[];
 
-    // console.log("products in getAllProducts", JSON.stringify(products, null, 2));
+    // console.debug("products in getAllProducts", JSON.stringify(products, null, 2));
 
-    return products.map((product) => ({
+    return products.map((product: ProductType) => ({
       id: String(product._id),
       slug: product.slug,
-      title: product.name,
+      name: product.name,
       description: product.description,
       price: product.price,
       images: product.images,
       rating: product.ratingAvg,
       ingredients: product.ingredients,
       instructions: "", // Can be added to product model later
-      category: product.categories?.[0]?.name || "spices",
-      brand: product.brand?.name || "Dehli Mirch",
+      category: (product.categories?.[0] as CategoryType)?.name || "",
+      brand: (product.brand as BrandType)?.name || "Dehli Mirch",
       stock:
         product.variants?.reduce(
-          (sum: number, v: any) => sum + (v.stock || 0),
+          (sum: number, v: VariantType) => sum + (v.stock || 0),
           0
         ) || 0,
       tags: [], // Can be added to product model later
       variants: (product.variants || [])
-        .filter((variant: any) => variant.isActive) // Only show active variants
-        .sort((a: any, b: any) => {
+        .filter((variant: VariantType) => variant.isActive) // Only show active variants
+        .sort((a: VariantType, b: VariantType) => {
           // Sort: available first, then out-of-stock
           const aAvailable = !a.isOutOfStock && a.stock > 0;
           const bAvailable = !b.isOutOfStock && b.stock > 0;
@@ -400,8 +430,8 @@ export async function getAllProducts() {
           if (!aAvailable && bAvailable) return 1;
           return 0;
         })
-        .map((variant: any) => ({
-          _id: String(variant._id),
+        .map((variant: VariantType) => ({
+          id: String(variant._id),
           label: variant.label,
           price: variant.price,
           stock: variant.stock,
@@ -410,9 +440,9 @@ export async function getAllProducts() {
           images: variant.images,
         })),
       reviews:
-        product.reviews?.map((review: any) => ({
+        (product.reviews as ReviewType[])?.map((review: ReviewType) => ({
           id: String(review._id),
-          user: review.user?.name || "Anonymous",
+          user: (review.user as UserType)?.name || "Anonymous",
           rating: review.rating,
           comment: review.comment,
           date: review.createdAt,
@@ -430,7 +460,7 @@ export async function getAllSpecialProducts(limit = 10, page = 1) {
     await dbConnect();
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({ isActive: true, isSpecial: true })
+    const products = (await Product.find({ isActive: true, isSpecial: true })
       .populate({
         path: "variants",
         match: { isActive: true, isOutOfStock: false },
@@ -438,21 +468,21 @@ export async function getAllSpecialProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean<ProductType[]>()) as ProductType[];
 
     const total = await Product.countDocuments({
       isActive: true,
       isSpecial: true,
     });
-    console.log(
+    console.debug(
       "products in getAllSpecialProducts",
       JSON.stringify(products, null, 2)
     );
     return {
-      products: products.map((product) => ({
+      products: products.map((product: ProductType) => ({
         id: String(product._id),
         slug: product.slug,
-        title: product.name,
+        name: product.name,
         description: product.description,
         price: product?.variants?.[0]?.price ?? product?.price ?? 0,
         images: product.images,
@@ -469,8 +499,8 @@ export async function getAllSpecialProducts(limit = 10, page = 1) {
         // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
         tags: [], // Can be added to product model later
         variants: (product?.variants || [])
-          .filter((variant: any) => variant.isActive) // Only show active variants
-          .sort((a: any, b: any) => {
+          .filter((variant: VariantType) => variant.isActive) // Only show active variants
+          .sort((a: VariantType, b: VariantType) => {
             // Sort: available first, then out-of-stock
             const aAvailable = !a.isOutOfStock && a.stock > 0;
             const bAvailable = !b.isOutOfStock && b.stock > 0;
@@ -478,8 +508,8 @@ export async function getAllSpecialProducts(limit = 10, page = 1) {
             if (!aAvailable && bAvailable) return 1;
             return 0;
           })
-          .map((variant: any) => ({
-            _id: String(variant._id),
+          .map((variant: VariantType) => ({
+            id: String(variant._id),
             label: variant.label,
             price: variant.price,
             stock: variant.stock,
@@ -506,7 +536,7 @@ export async function getAllGroceryProducts(limit = 10, page = 1) {
     await dbConnect();
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({ isActive: true, isGrocery: true })
+    const products = (await Product.find({ isActive: true, isGrocery: true })
       .populate({
         path: "variants",
         match: { isActive: true, isOutOfStock: false },
@@ -514,21 +544,21 @@ export async function getAllGroceryProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean<ProductType[]>()) as ProductType[];
 
     const total = await Product.countDocuments({
       isActive: true,
       isGrocery: true,
     });
-    console.log(
+    console.debug(
       "products in getAllGroceryProducts",
       JSON.stringify(products, null, 2)
     );
     return {
-      products: products.map((product) => ({
+      products: products.map((product: ProductType) => ({
         id: String(product._id),
         slug: product.slug,
-        title: product.name,
+        name: product.name,
         description: product.description,
         price: product?.variants?.[0]?.price ?? product?.price ?? 0,
         images: product.images,
@@ -545,8 +575,8 @@ export async function getAllGroceryProducts(limit = 10, page = 1) {
         // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
         tags: [], // Can be added to product model later
         variants: (product?.variants || [])
-          .filter((variant: any) => variant.isActive) // Only show active variants
-          .sort((a: any, b: any) => {
+          .filter((variant: VariantType) => variant.isActive) // Only show active variants
+          .sort((a: VariantType, b: VariantType) => {
             // Sort: available first, then out-of-stock
             const aAvailable = !a.isOutOfStock && a.stock > 0;
             const bAvailable = !b.isOutOfStock && b.stock > 0;
@@ -554,8 +584,8 @@ export async function getAllGroceryProducts(limit = 10, page = 1) {
             if (!aAvailable && bAvailable) return 1;
             return 0;
           })
-          .map((variant: any) => ({
-            _id: String(variant._id),
+          .map((variant: VariantType) => ({
+            id: String(variant._id),
             label: variant.label,
             price: variant.price,
             stock: variant.stock,
@@ -583,11 +613,13 @@ export async function getAllActiveBrands() {
     await dbConnect();
 
     // Get all active brands
-    const brands = await Brand.find({ isActive: true }).lean();
+    const brands = (await Brand.find({
+      isActive: true,
+    }).lean<BrandType[]>()) as BrandType[];
 
     // Get product count for each brand and sort by product count
     const brandsWithProductCount = await Promise.all(
-      brands.map(async (brand) => {
+      brands.map(async (brand: BrandType) => {
         const productCount = await Product.countDocuments({
           brand: brand._id,
           isActive: true,
@@ -607,11 +639,19 @@ export async function getAllActiveBrands() {
 
     // Sort by product count in descending order (highest to lowest)
     const sortedBrands = brandsWithProductCount.sort(
-      (a, b) => b.productCount - a.productCount
+      (a: BrandType, b: BrandType) => b.productCount - a.productCount
     );
 
     // Return only the brand data without productCount (as requested)
-    return sortedBrands.map(({ productCount, ...brand }) => brand);
+    return sortedBrands.map(
+      ({
+        productCount,
+        ...brand
+      }: {
+        productCount: number;
+        brand: BrandType;
+      }) => brand
+    );
   } catch (error) {
     console.error("Error fetching active brands:", error);
     return [];
@@ -621,23 +661,23 @@ export async function getAllActiveBrands() {
 export async function getProductBySlug(slug: string) {
   try {
     await dbConnect();
-    const product = await Product.findOne({ slug, isActive: true })
+    const product = (await Product.findOne({ slug, isActive: true })
       .populate("brand", "name")
       .populate("categories", "name")
       .populate("variants")
-      .lean<ProductTypeVariant>();
+      .lean<ProductType>()) as ProductType;
     // .lean();
 
     if (!product) return null;
 
     // Filter and sort variants: available first, then out-of-stock
     const availableVariants: VariantType[] = (product.variants || []).filter(
-      (variant: any) =>
+      (variant: VariantType) =>
         variant.isActive && !variant.isOutOfStock && variant.stock > 0
     );
 
     const outOfStockVariants: VariantType[] = (product.variants || []).filter(
-      (variant: any) =>
+      (variant: VariantType) =>
         variant.isActive && (variant.isOutOfStock || variant.stock <= 0)
     );
 
@@ -647,7 +687,7 @@ export async function getProductBySlug(slug: string) {
     return {
       id: String(product._id),
       slug: product.slug,
-      title: product.name,
+      name: product.name,
       description: product.description,
       price: product.price,
       images: product.images,
@@ -657,12 +697,12 @@ export async function getProductBySlug(slug: string) {
       category: product.categories?.[0]?.name || "spices",
       brand: product.brand?.name || "Dehli Mirch",
       stock: availableVariants.reduce(
-        (sum: number, v: any) => sum + (v.stock || 0),
+        (sum: number, v: VariantType) => sum + (v.stock || 0),
         0
       ),
       tags: [], // Can be added later
-      variants: sortedVariants.map((variant: any) => ({
-        _id: String(variant._id),
+      variants: sortedVariants.map((variant: VariantType) => ({
+        id: String(variant._id),
         label: variant.label,
         price: variant.price,
         stock: variant.stock,
@@ -671,9 +711,9 @@ export async function getProductBySlug(slug: string) {
         images: variant.images,
       })),
       reviews:
-        product.reviews?.map((review: any) => ({
+        product.reviews?.map((review: ReviewType) => ({
           id: String(review._id),
-          user: review.user?.name || "Anonymous",
+          user: (review.user as UserType)?.name || "Anonymous",
           rating: review.rating,
           comment: review.comment,
           date: review.createdAt,
@@ -697,10 +737,10 @@ export async function getAllCategories() {
     }
 
     // Fetch from database if not in cache
-    const categories = await Category.find({ isActive: true })
+    const categories = (await Category.find({ isActive: true })
       .populate("parent", "name")
       .sort({ order: 1, name: 1 })
-      .lean();
+      .lean<CategoryType[]>()) as CategoryType[];
 
     const formattedCategories = categories.map((category) => ({
       id: String(category._id),
@@ -737,9 +777,9 @@ export async function getAllCategories() {
 export async function getAllBrands() {
   try {
     await dbConnect();
-    const brands = await Brand.find({ isActive: true })
+    const brands = (await Brand.find({ isActive: true })
       .sort({ name: 1 })
-      .lean();
+      .lean<BrandType[]>()) as BrandType[];
 
     return brands.map((brand) => ({
       id: String(brand._id),
@@ -763,7 +803,7 @@ export async function getProductReviews(
     await dbConnect();
     const skip = (page - 1) * limit;
 
-    const reviews = await Review.find({
+    const reviews = (await Review.find({
       product: productId,
       isActive: true,
     })
@@ -771,7 +811,7 @@ export async function getProductReviews(
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean<ReviewType[]>()) as ReviewType[];
 
     const total = await Review.countDocuments({
       product: productId,
@@ -779,9 +819,9 @@ export async function getProductReviews(
     });
 
     return {
-      reviews: reviews.map((review) => ({
+      reviews: reviews.map((review: ReviewType) => ({
         id: String(review._id),
-        user: review.user?.name || "Anonymous",
+        user: (review.user as UserType)?.name || "Anonymous",
         rating: review.rating,
         title: review.title,
         comment: review.comment,
@@ -815,10 +855,10 @@ export async function getProductsByBrand(brandName: string, limit = 10) {
     if (!brand) return [];
 
     // Find products for this brand
-    const products = await Product.find({
+    const products = (await Product.find({
       isActive: true,
       isOutOfStock: false,
-      brand: (brand as any)._id,
+      brand: (brand as BrandType)._id,
     })
       .populate("brand", "name")
       .populate({
@@ -827,12 +867,12 @@ export async function getProductsByBrand(brandName: string, limit = 10) {
       })
       .sort({ createdAt: -1 })
       .limit(limit)
-      .lean();
+      .lean<ProductType[]>()) as ProductType[];
 
-    const formattedProducts = products.map((product) => ({
+    const formattedProducts = products.map((product: ProductType) => ({
       id: String(product._id),
       slug: product.slug,
-      title: product.name,
+      name: product.name,
       description: product.description,
       price: product?.variants?.[0]?.price ?? product?.price ?? 0,
       images: product.images,
@@ -843,9 +883,9 @@ export async function getProductsByBrand(brandName: string, limit = 10) {
       rating: product.ratingAvg,
       brand: product.brand?.name || "Dehli Mirch",
       variants: (product.variants || [])
-        .filter((variant: any) => variant.isActive)
-        .map((variant: any) => ({
-          _id: String(variant._id),
+        .filter((variant: VariantType) => variant.isActive)
+        .map((variant: VariantType) => ({
+          id: String(variant._id),
           label: variant.label,
           price: variant.price,
           stock: variant.stock,
@@ -877,17 +917,17 @@ export async function getProductsByCategory(categorySlug: string, limit = 10) {
     }
 
     // First find the category
-    const category = await Category.findOne({
+    const category = (await Category.findOne({
       slug: categorySlug,
       isActive: true,
-    }).lean();
+    }).lean<CategoryType>()) as CategoryType;
     if (!category) return [];
 
     // Find products in this category
-    const products = await Product.find({
+    const products = (await Product.find({
       isActive: true,
       isOutOfStock: false,
-      categories: (category as any)._id,
+      categories: category._id,
     })
       .populate("brand", "name")
       .populate({
@@ -896,12 +936,12 @@ export async function getProductsByCategory(categorySlug: string, limit = 10) {
       })
       .sort({ createdAt: -1 })
       .limit(limit)
-      .lean();
+      .lean<ProductType[]>()) as ProductType[];
 
-    const formattedProducts = products.map((product) => ({
+    const formattedProducts = products.map((product: ProductType) => ({
       id: String(product._id),
       slug: product.slug,
-      title: product.name,
+      name: product.name,
       price: product?.variants?.[0]?.price ?? product?.price ?? 0,
       images: product.images,
       image:
@@ -929,7 +969,7 @@ export async function getTrendingProducts(limit = 6) {
     await dbConnect();
 
     // Get top selling products first
-    const topSelling = await Product.find({
+    const topSelling = (await Product.find({
       isActive: true,
       isTopSelling: true,
       isOutOfStock: false,
@@ -942,17 +982,17 @@ export async function getTrendingProducts(limit = 6) {
       })
       .sort({ createdAt: -1 })
       .limit(Math.ceil(limit / 2))
-      .lean();
+      .lean<ProductType[]>()) as ProductType[];
 
     // Get new arrivals to fill remaining slots
     const remainingLimit = limit - topSelling.length;
     const newArrivals =
       remainingLimit > 0
-        ? await Product.find({
+        ? ((await Product.find({
             isActive: true,
             isNewArrival: true,
             isOutOfStock: false,
-            _id: { $nin: topSelling.map((p) => p._id) }, // Exclude already selected products
+            id: { $nin: topSelling.map((p) => p._id) }, // Exclude already selected products
           })
             .populate("brand", "name")
             .populate("categories", "name")
@@ -962,8 +1002,8 @@ export async function getTrendingProducts(limit = 6) {
             })
             .sort({ createdAt: -1 })
             .limit(remainingLimit)
-            .lean()
-        : [];
+            .lean<ProductType[]>()) as ProductType[])
+        : ([] as ProductType[]);
 
     // Combine and format products
     const allProducts = [...topSelling, ...newArrivals];
@@ -971,7 +1011,7 @@ export async function getTrendingProducts(limit = 6) {
     return allProducts.map((product) => ({
       id: String(product._id),
       slug: product.slug,
-      title: product.name,
+      name: product.name,
       price: product?.variants?.[0]?.price ?? product?.price ?? 0,
       images: product.images,
       image:
@@ -996,7 +1036,11 @@ export async function getFAQs(category = "all", search = "") {
   try {
     await dbConnect();
 
-    let query: any = { isActive: true };
+    let query: {
+      isActive: boolean;
+      category?: string;
+      $text?: { $search: string };
+    } = { isActive: true };
 
     if (category && category !== "all") {
       query.category = category;
@@ -1006,10 +1050,12 @@ export async function getFAQs(category = "all", search = "") {
       query.$text = { $search: search };
     }
 
-    const faqs = await FAQ.find(query).sort({ order: 1, createdAt: -1 }).lean();
+    const faqs = (await FAQ.find(query)
+      .sort({ order: 1, createdAt: -1 })
+      .lean<FAQType[]>()) as FAQType[];
 
     return faqs.map((faq) => ({
-      id: faq._id,
+      id: String(faq._id),
       question: faq.question,
       answer: faq.answer,
       category: faq.category,
@@ -1026,10 +1072,10 @@ export async function getFAQs(category = "all", search = "") {
 export async function getContentPage(slug: string) {
   try {
     await dbConnect();
-    const contentPage = await ContentPage.findOne({
+    const contentPage = (await ContentPage.findOne({
       slug,
       isActive: true,
-    }).lean();
+    }).lean<ContentPageType>()) as ContentPageType;
 
     return contentPage;
   } catch (error) {
@@ -1079,13 +1125,36 @@ export async function getFooterNavigation() {
 export async function getAllContentPages() {
   try {
     await dbConnect();
-    const contentPages = await ContentPage.find({ isActive: true })
+    const contentPages = (await ContentPage.find({ isActive: true })
       .sort({ updatedAt: -1 })
-      .lean();
+      .lean<ContentPageType[]>()) as ContentPageType[];
 
     return contentPages;
   } catch (error) {
     console.error("Error fetching content pages:", error);
+    return [];
+  }
+}
+
+// Blog data functions
+export async function getFeaturedBlogs(limit = 6) {
+  try {
+    await dbConnect();
+    const blogs = (await Blog.find({ isActive: true })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean<BlogType[]>()) as BlogType[];
+
+    return blogs.map((b: BlogType) => ({
+      slug: b.slug,
+      title: b.title,
+      excerpt: b.excerpt ?? "",
+      content: b.content,
+      image: b.image ?? "",
+      tags: b.tags ?? [],
+    }));
+  } catch (error) {
+    console.error("Error fetching featured blogs:", error);
     return [];
   }
 }

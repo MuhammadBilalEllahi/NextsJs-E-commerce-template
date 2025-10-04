@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from "lucide-react";
-import { Category } from "@/mock_data/mock-data";
+import { Category } from "@/types";
 import { ProductCard } from "@/components/product/product-card";
 import { getProductsByCategory } from "@/database/data-service";
 

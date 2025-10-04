@@ -9,7 +9,7 @@ const TCSTrackingHistorySchema = new mongoose.Schema(
     description: { type: String, default: "" },
     updatedBy: { type: String, default: "TCS" }, // "TCS", "admin", "system"
   },
-  { _id: false }
+  { id: false }
 );
 
 const TCSOrderSchema = new mongoose.Schema(

@@ -33,9 +33,9 @@ export async function GET(req: NextRequest, context: RouteContext) {
 
     // Format order for detailed display
     const formattedOrder = {
-      id: order._id.toString(),
-      orderId: order.orderId || order._id.toString().slice(-8).toUpperCase(),
-      refId: order.refId || order._id.toString().slice(-8).toUpperCase(),
+      id: order.id.toString(),
+      orderId: order.orderId || order.id.toString().slice(-8).toUpperCase(),
+      refId: order.refId || order.id.toString().slice(-8).toUpperCase(),
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       status: order.status,

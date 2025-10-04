@@ -1,48 +1,51 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { AlertTriangle } from "lucide-react"
-
-type Brand = {
-  _id: string
-  name: string
-  description: string
-  logo?: string
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-}
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AlertTriangle } from "lucide-react";
+import { Brand } from "@/types";
 
 interface BrandDeleteModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onConfirm: () => void
-  brand: Brand | null
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  brand: Brand | null;
 }
 
-export default function BrandDeleteModal({ isOpen, onClose, onConfirm, brand }: BrandDeleteModalProps) {
-  const [isDeleting, setIsDeleting] = useState(false)
+export default function BrandDeleteModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  brand,
+}: BrandDeleteModalProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async () => {
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
-      await onConfirm()
+      await onConfirm();
     } catch (error) {
-      console.error("Error deleting brand:", error)
+      console.error("Error deleting brand:", error);
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   const handleClose = () => {
     if (!isDeleting) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
-  if (!brand) return null
+  if (!brand) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -53,7 +56,8 @@ export default function BrandDeleteModal({ isOpen, onClose, onConfirm, brand }: 
             <DialogTitle>Delete Brand</DialogTitle>
           </div>
           <DialogDescription>
-            Are you sure you want to delete this brand? This action cannot be undone.
+            Are you sure you want to delete this brand? This action cannot be
+            undone.
           </DialogDescription>
         </DialogHeader>
 
@@ -103,5 +107,5 @@ export default function BrandDeleteModal({ isOpen, onClose, onConfirm, brand }: 
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

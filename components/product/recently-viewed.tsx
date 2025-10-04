@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { getAllProducts } from "@/database/data-service";
-import type { Product } from "@/mock_data/data";
+import type { Product } from "@/types";
 
 export function RecentlyViewed({ currentId }: { currentId: string }) {
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
@@ -17,7 +17,7 @@ export function RecentlyViewed({ currentId }: { currentId: string }) {
         const viewedIds = JSON.parse(raw) as string[];
 
         // Filter out current product and get unique products
-        const uniqueIds = viewedIds.filter((id) => id !== currentId);
+        const uniqueIds = viewedIds.filter((id: string) => id !== currentId);
         const uniqueRecentIds = [...new Set(uniqueIds)].slice(0, 8); // Get up to 8 unique products
 
         if (uniqueRecentIds.length === 0) {
@@ -28,10 +28,10 @@ export function RecentlyViewed({ currentId }: { currentId: string }) {
 
         // Fetch all products and filter by recently viewed IDs
         const allProducts = await getAllProducts();
-        const recent = allProducts.filter((product) =>
+        const recent = allProducts.filter((product: Product) =>
           uniqueRecentIds.includes(product.id)
         );
-        setRecentProducts(recent);
+        setRecentProducts(recent as Product[]);
       } catch (error) {
         console.error("Error loading recently viewed products:", error);
         setRecentProducts([]);
@@ -52,7 +52,7 @@ export function RecentlyViewed({ currentId }: { currentId: string }) {
       // Add current product to the beginning if not already there
       const updatedIds = [
         currentId,
-        ...viewedIds.filter((id) => id !== currentId),
+        ...viewedIds.filter((id: string) => id !== currentId),
       ];
 
       // Keep only the last 20 viewed products
@@ -96,7 +96,7 @@ export function RecentlyViewed({ currentId }: { currentId: string }) {
           {recentProducts.map((product) => (
             <ProductCard
               key={String(product.id)}
-              product={{ ...product, id: String(product.id) }}
+              product={{ ...product, id: String(product.id) } as Product}
               variant="grid"
             />
           ))}

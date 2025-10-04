@@ -1,14 +1,19 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useState, useRef } from "react"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import type { Category, Product } from "@/mock_data/mock-data"
-import { Loader2 } from "lucide-react"
-import { formatPriceRange } from "@/lib/constants/currency"
+import { useEffect, useMemo, useState, useRef } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Category, Product } from "@/types";
+import { Loader2 } from "lucide-react";
+import { formatPriceRange } from "@/lib/constants/currency";
 
 export function FiltersSidebar({
   slug,
@@ -17,119 +22,138 @@ export function FiltersSidebar({
   categories,
   availableBrands,
 }: {
-  slug: string
-  initial: { pmin: number; pmax: number;  brands: string[]; category: string[] }
-  onApply: (entries: Record<string, string  | undefined | null>) => void
-  categories: Category[]
-  availableBrands: string[]
+  slug: string;
+  initial: { pmin: number; pmax: number; brands: string[]; category: string[] };
+  onApply: (entries: Record<string, string | undefined | null>) => void;
+  categories: Category[];
+  availableBrands: string[];
 }) {
-  const [pmin, setPmin] = useState(initial.pmin)
-  const [pmax, setPmax] = useState(initial.pmax)
-  
-  const [brands, setBrands] = useState<string[]>(initial.brands || [])
-  const [category, setCategory] = useState<string[]>(initial.category || [])
+  const [pmin, setPmin] = useState(initial.pmin);
+  const [pmax, setPmax] = useState(initial.pmax);
+
+  const [brands, setBrands] = useState<string[]>(initial.brands || []);
+  const [category, setCategory] = useState<string[]>(initial.category || []);
 
   // Auto-apply timer ref
-  const autoApplyTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const [isAutoApplying, setIsAutoApplying] = useState(false)
-
+  const autoApplyTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isAutoApplying, setIsAutoApplying] = useState(false);
 
   useEffect(() => {
-    setPmin(initial.pmin)
-    setPmax(initial.pmax)
+    setPmin(initial.pmin);
+    setPmax(initial.pmax);
 
-    setBrands(initial.brands || [])
-    setCategory(initial.category || [])
-  }, [initial.pmin, initial.pmax,  JSON.stringify(initial.brands), JSON.stringify(initial.category)])
-
+    setBrands(initial.brands || []);
+    setCategory(initial.category || []);
+  }, [
+    initial.pmin,
+    initial.pmax,
+    JSON.stringify(initial.brands),
+    JSON.stringify(initial.category),
+  ]);
 
   const scheduleAutoApply = (nextFilters?: {
-    pmin?: number
-    pmax?: number
-    brands?: string[]
-    category?: string[]
+    pmin?: number;
+    pmax?: number;
+    brands?: string[];
+    category?: string[];
   }) => {
     if (autoApplyTimerRef.current) {
-      clearTimeout(autoApplyTimerRef.current)
+      clearTimeout(autoApplyTimerRef.current);
     }
 
-    setIsAutoApplying(true)
+    setIsAutoApplying(true);
 
     autoApplyTimerRef.current = setTimeout(() => {
-      apply(nextFilters)
-    }, 1000)
-  }
+      apply(nextFilters);
+    }, 1000);
+  };
 
-  const apply = (overrides: Partial<{
-    pmin: number
-    pmax: number
-    brands: string[]
-    category: string[]
-  }> = {}) => {
+  const apply = (
+    overrides: Partial<{
+      pmin: number;
+      pmax: number;
+      brands: string[];
+      category: string[];
+    }> = {}
+  ) => {
     if (autoApplyTimerRef.current) {
-      clearTimeout(autoApplyTimerRef.current)
-      autoApplyTimerRef.current = null
+      clearTimeout(autoApplyTimerRef.current);
+      autoApplyTimerRef.current = null;
     }
 
-    setIsAutoApplying(false)
+    setIsAutoApplying(false);
 
     const filters: Record<string, string | null | undefined> = {
-      pmin: typeof (overrides.pmin ?? pmin) === "number" ? String(overrides.pmin ?? pmin) : undefined,
-      pmax: typeof (overrides.pmax ?? pmax) === "number" && (overrides.pmax ?? pmax) !== 9999 ? String(overrides.pmax ?? pmax) : undefined,
-      brands: (overrides.brands ?? brands).length ? (overrides.brands ?? brands).join(",") : undefined,
-      category: (overrides.category ?? category).length ? (overrides.category ?? category).join(",") : undefined,
-    }
+      pmin:
+        typeof (overrides.pmin ?? pmin) === "number"
+          ? String(overrides.pmin ?? pmin)
+          : undefined,
+      pmax:
+        typeof (overrides.pmax ?? pmax) === "number" &&
+        (overrides.pmax ?? pmax) !== 9999
+          ? String(overrides.pmax ?? pmax)
+          : undefined,
+      brands: (overrides.brands ?? brands).length
+        ? (overrides.brands ?? brands).join(",")
+        : undefined,
+      category: (overrides.category ?? category).length
+        ? (overrides.category ?? category).join(",")
+        : undefined,
+    };
 
-    onApply(filters)
-  }
-
+    onApply(filters);
+  };
 
   const reset = () => {
-    setPmin(0)
-    setPmax(9999)
-    setBrands([])
-    setCategory([])
+    setPmin(0);
+    setPmax(9999);
+    setBrands([]);
+    setCategory([]);
 
     // Clear auto-apply timer and apply immediately
     if (autoApplyTimerRef.current) {
-      clearTimeout(autoApplyTimerRef.current)
-      autoApplyTimerRef.current = null
+      clearTimeout(autoApplyTimerRef.current);
+      autoApplyTimerRef.current = null;
     }
 
     // Hide auto-applying state
-    setIsAutoApplying(false)
+    setIsAutoApplying(false);
 
-    onApply({ pmin: undefined, pmax: undefined, brands: undefined, category: undefined, page: undefined })
-  }
-
-
+    onApply({
+      pmin: undefined,
+      pmax: undefined,
+      brands: undefined,
+      category: undefined,
+      page: undefined,
+    });
+  };
 
   const toggleBrand = (b: string) => {
     const newBrands = brands.includes(b)
       ? brands.filter((x) => x !== b)
-      : [...brands, b]
+      : [...brands, b];
 
-    setBrands(newBrands)
-    scheduleAutoApply({ brands: newBrands })
-  }
+    setBrands(newBrands);
+    scheduleAutoApply({ brands: newBrands });
+  };
 
   const toggleCategory = (s: string) => {
     const newCategories = category.includes(s)
       ? category.filter((x) => x !== s)
-      : [...category, s]
+      : [...category, s];
 
-    setCategory(newCategories)
-    scheduleAutoApply({ category: newCategories })
-  }
+    setCategory(newCategories);
+    scheduleAutoApply({ category: newCategories });
+  };
 
   // Cleanup timer on unmount
   useEffect(() => {
     return () => {
       if (autoApplyTimerRef.current) {
-        clearTimeout(autoApplyTimerRef.current)
+        clearTimeout(autoApplyTimerRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   return (
     <>
@@ -145,10 +169,13 @@ export function FiltersSidebar({
       <div className="bg-white dark:bg-neutral-950 p-4 sticky top-4 h-fit">
         <div className="mb-4">
           <h2 className="text-lg font-semibold">Filters</h2>
-          
         </div>
 
-        <Accordion type="multiple" defaultValue={["price",  "brand", "category"]} className="w-full">
+        <Accordion
+          type="multiple"
+          defaultValue={["price", "brand", "category"]}
+          className="w-full"
+        >
           <AccordionItem value="category">
             <AccordionTrigger>Category</AccordionTrigger>
             <AccordionContent>
@@ -168,8 +195,6 @@ export function FiltersSidebar({
               </div>
             </AccordionContent>
           </AccordionItem>
-
-          
 
           <AccordionItem value="brand">
             <AccordionTrigger>Brand</AccordionTrigger>
@@ -196,17 +221,22 @@ export function FiltersSidebar({
             <AccordionContent>
               <div className="px-1 py-2">
                 <Slider
-                  defaultValue={[Math.min(0, pmin), Math.max(10, Math.min(9999, pmax))]}
+                  defaultValue={[
+                    Math.min(0, pmin),
+                    Math.max(10, Math.min(9999, pmax)),
+                  ]}
                   min={0}
                   max={5000}
                   step={10}
                   onValueChange={(v) => {
-                    setPmin(v[0] ?? 0)
-                    setPmax(v[1] ?? 5000)
-                    scheduleAutoApply()
+                    setPmin(v[0] ?? 0);
+                    setPmax(v[1] ?? 5000);
+                    scheduleAutoApply();
                   }}
                 />
-                <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{formatPriceRange(pmin, pmax === 9999 ? "Max" : pmax)}</div>
+                <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                  {formatPriceRange(pmin, pmax === 9999 ? "Max" : pmax)}
+                </div>
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -214,16 +244,17 @@ export function FiltersSidebar({
 
         <div className="mt-4 flex gap-2">
           <Button
-            className={`w-full transition-all duration-200 ${isAutoApplying
-                ? 'bg-blue-500 hover:bg-blue-600'
-                : 'bg-black hover:bg-gray-800'
-              }`}
-            onClick={()=>apply()}
+            className={`w-full transition-all duration-200 ${
+              isAutoApplying
+                ? "bg-blue-500 hover:bg-blue-600"
+                : "bg-black hover:bg-gray-800"
+            }`}
+            onClick={() => apply()}
           >
-            {isAutoApplying ? 'Auto-applying...' : 'Apply Filters'}
+            {isAutoApplying ? "Auto-applying..." : "Apply Filters"}
           </Button>
         </div>
       </div>
     </>
-  )
+  );
 }

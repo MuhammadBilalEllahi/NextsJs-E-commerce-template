@@ -6,7 +6,7 @@
  *
  * Required:
  * - WHATSAPP_ACCESS_TOKEN: Your WhatsApp Business API access token
- * - WHATSAPP_PHONE_NUMBER_ID: Your WhatsApp Business phone number ID
+ * - WHATSAPP_PHONE_NUMBERid: Your WhatsApp Business phone number ID
  *
  * Optional:
  * - WHATSAPP_API_URL: WhatsApp API base URL (defaults to v18.0)
@@ -21,7 +21,7 @@ export interface WhatsAppConfig {
 
 export function getWhatsAppConfig(): WhatsAppConfig {
   const accessToken = process.env.WHATSAPP_ACCESS_TOKEN || "";
-  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID || "";
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBERid || "";
   const apiUrl =
     process.env.WHATSAPP_API_URL || "https://graph.facebook.com/v18.0";
 
@@ -45,7 +45,7 @@ export function validateWhatsAppConfig(): {
   }
 
   if (!config.phoneNumberId) {
-    errors.push("WHATSAPP_PHONE_NUMBER_ID is required");
+    errors.push("WHATSAPP_PHONE_NUMBERid is required");
   }
 
   return {
@@ -65,7 +65,7 @@ export const WHATSAPP_ENV_DOCS = `
 WHATSAPP_ACCESS_TOKEN=your_access_token_here
 
 # Required: Your WhatsApp Business phone number ID
-WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id_here
+WHATSAPP_PHONE_NUMBERid=your_phone_numberid_here
 
 # Optional: WhatsApp API base URL (defaults to v18.0)
 WHATSAPP_API_URL=https://graph.facebook.com/v18.0
@@ -77,4 +77,3 @@ WHATSAPP_API_URL=https://graph.facebook.com/v18.0
 # 4. Get your access token from the WhatsApp API settings
 # 5. Get your phone number ID from the WhatsApp Business phone numbers section
 `;
-

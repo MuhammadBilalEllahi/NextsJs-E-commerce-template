@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { fetchBanners, Banner } from "@/lib/api/banner/banner";
-import {
-  fetchGlobalSettings,
-  GlobalSettings,
-} from "@/lib/api/admin/global-settings/global-settings";
+import { Banner, GlobalSettings } from "@/types";
 
 export function HomeHero({
   banners,
@@ -36,7 +32,7 @@ export function HomeHero({
           return true;
         });
 
-        // console.log("Active banners:", activeBanners)
+        // console.debug("Active banners:", activeBanners)
         // setBanners(activeBanners)
         // setGlobalSettings(fetchedSettings)
       } catch (error) {
@@ -44,7 +40,7 @@ export function HomeHero({
         // Fallback to default banners if API fails
         // setBanners([
         //   {
-        //     _id: "fallback-1",
+        //     id: "fallback-1",
         //     title: "Summer Heat Sale",
         //     description: "Up to 30% off select spices & masalas",
         //     image: "/spice-banner-red.png",
@@ -60,7 +56,7 @@ export function HomeHero({
         //     updatedAt: ""
         //   },
         //   {
-        //     _id: "fallback-2",
+        //     id: "fallback-2",
         //     title: "Pickle Perfection",
         //     description: "Tangy, spicy, homemade-style pickles",
         //     image: "/dehli-mirch-ecommerce-banner.png",
@@ -78,7 +74,7 @@ export function HomeHero({
         // ])
         // Set default global settings
         // setGlobalSettings({
-        //   _id: "default",
+        //   id: "default",
         //   bannerScrollTime: 5000,
         //   updatedAt: new Date().toISOString()
         // })

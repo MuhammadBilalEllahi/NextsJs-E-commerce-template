@@ -8,22 +8,9 @@ import { Search, Star, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { getTrendingProducts } from "@/database/data-service";
 import { formatCurrency } from "@/lib/constants/currency";
-import type { Category } from "@/mock_data/mock-data";
-
-interface Product {
-  id: string;
-  slug: string;
-  title: string;
-  price: number;
-  image?: string;
-  brand: string;
-  rating: number;
-  reviewCount: number;
-  category: string;
-}
+import { Category, Product } from "@/types";
 
 export function HomeSearchBar({ categories }: { categories: Category[] }) {
   const [q, setQ] = useState("");
@@ -43,7 +30,7 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
       setIsLoadingTrending(true);
       getTrendingProducts(6)
         .then((products) => {
-          setTrendingProducts(products as Product[]);
+          setTrendingProducts(products);
           setIsLoadingTrending(false);
         })
         .catch(() => {
@@ -214,10 +201,10 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                       >
                         <div className="space-y-2">
                           <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-                            {product?.image ? (
+                            {product?.images ? (
                               <Image
-                                src={product.image}
-                                alt={product.title}
+                                src={product.images[0] as string}
+                                alt={product.name}
                                 width={80}
                                 height={80}
                                 className="object-cover group-hover:scale-105 transition-transform"
@@ -232,18 +219,18 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                           </div>
                           <div>
                             <h4 className="font-medium text-sm text-foreground line-clamp-2">
-                              {product.title}
+                              {product.name}
                             </h4>
                             <div className="flex items-center gap-1 mt-1">
                               <div className="flex items-center">
-                                {renderStars(product.rating)}
+                                {renderStars(product.ratingAvg)}
                               </div>
                               <span className="text-xs text-muted-foreground">
-                                {product.reviewCount} reviews
+                                {product.reviews?.length} reviews
                               </span>
                             </div>
                             <p className="text-sm font-semibold text-foreground mt-1">
-                              {formatCurrency(product.price)}
+                              {formatCurrency(product.variants?.[0]?.price)}
                             </p>
                           </div>
                         </div>
@@ -310,10 +297,10 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                         >
                           <div className="space-y-2">
                             <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-                              {product.image ? (
+                              {product.images ? (
                                 <Image
-                                  src={product.image}
-                                  alt={product.title}
+                                  src={product.images[0] as string}
+                                  alt={product.name}
                                   width={80}
                                   height={80}
                                   className="object-cover group-hover:scale-105 transition-transform"
@@ -328,18 +315,18 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                             </div>
                             <div>
                               <h4 className="font-medium text-sm text-foreground line-clamp-2">
-                                {product.title}
+                                {product.name}
                               </h4>
                               <div className="flex items-center gap-1 mt-1">
                                 <div className="flex items-center">
-                                  {renderStars(product.rating)}
+                                  {renderStars(product.ratingAvg)}
                                 </div>
                                 <span className="text-xs text-muted-foreground">
-                                  {product.reviewCount} reviews
+                                  {product.reviews?.length} reviews
                                 </span>
                               </div>
                               <p className="text-sm font-semibold text-foreground mt-1">
-                                {formatCurrency(product.price)}
+                                {formatCurrency(product.variants?.[0]?.price)}
                               </p>
                             </div>
                           </div>

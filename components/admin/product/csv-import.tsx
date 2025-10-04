@@ -12,15 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Upload, Download, AlertCircle, CheckCircle, X } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-interface ImportResult {
-  totalProcessed: number;
-  productsCreated: number;
-  variantsCreated: number;
-  success: number;
-  errors: number;
-  errorDetails: string[];
-}
+import { ImportResult } from "@/types";
 
 export default function CSVImportComponent({
   onImportComplete,

@@ -5,32 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Clock, ExternalLink } from "lucide-react";
-
-interface Branch {
-  _id: string;
-  name: string;
-  address: string;
-  phoneNumber: string;
-  email: string;
-  logo?: string;
-  branchNumber: string;
-  location: string;
-  city: string;
-  state: string;
-  coordinates?: {
-    latitude: number;
-    longitude: number;
-  };
-  openingHours: {
-    monday: { open: string; close: string; isOpen: boolean };
-    tuesday: { open: string; close: string; isOpen: boolean };
-    wednesday: { open: string; close: string; isOpen: boolean };
-    thursday: { open: string; close: string; isOpen: boolean };
-    friday: { open: string; close: string; isOpen: boolean };
-    saturday: { open: string; close: string; isOpen: boolean };
-    sunday: { open: string; close: string; isOpen: boolean };
-  };
-}
+import { Branch } from "@/types";
 
 interface BranchMapProps {
   branches: Branch[];
@@ -161,9 +136,9 @@ export function BranchMap({ branches }: BranchMapProps) {
         <div className="space-y-3 lg:space-y-4">
           {branches.map((branch) => (
             <Card
-              key={branch._id}
+              key={branch.id}
               className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                selectedBranch?._id === branch._id
+                selectedBranch?.id === branch.id
                   ? "ring-2 ring-red-500 shadow-lg"
                   : "hover:ring-1 hover:ring-red-300"
               }`}

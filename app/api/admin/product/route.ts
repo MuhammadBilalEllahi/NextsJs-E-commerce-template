@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
 
-    console.log("formData", formData);
+    console.debug("formData", formData);
 
     const raw = {
       name: formData.get("name")?.toString(),
@@ -46,8 +46,8 @@ export async function POST(req: Request) {
 
     const parsed = productZodSchema.safeParse(raw);
     if (!parsed.success) {
-      console.log(parsed.error);
-      console.log("parsed", parsed);
+      console.debug(parsed.error);
+      console.debug("parsed", parsed);
       return NextResponse.json(
         { error: parsed.error.message },
         { status: 400 }
@@ -118,7 +118,7 @@ export async function POST(req: Request) {
       await BrandProducts.findByIdAndUpdate(
         brand,
         {
-          $addToSet: { products: newProduct._id },
+          $addToSet: { products: newProduct.id },
         },
         { session, upsert: true }
       );
@@ -130,7 +130,7 @@ export async function POST(req: Request) {
         await CategoryProducts.findByIdAndUpdate(
           categoryId,
           {
-            $addToSet: { products: newProduct._id },
+            $addToSet: { products: newProduct.id },
           },
           { session, upsert: true }
         );
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
 
     // Upload product images
     const productImageFiles = formData.getAll("images") as File[];
-    // console.log("[POST] productImageFiles:", productImageFiles);
+    // console.debug("[POST] productImageFiles:", productImageFiles);
     const uploadedProductImages: string[] = [];
     for (const file of productImageFiles) {
       if (file instanceof Blob) {
@@ -148,7 +148,7 @@ export async function POST(req: Request) {
         try {
           await mkdir(uploadDir, { recursive: true });
         } catch (err) {
-          // console.log("Upload directory already exists or couldn't be created");
+          // console.debug("Upload directory already exists or couldn't be created");
         }
 
         // Convert File to buffer
@@ -164,10 +164,10 @@ export async function POST(req: Request) {
 
         // Save buffer to disk (uses disk storage, not RAM)
         await writeFile(tempFilePath, buffer);
-        // console.log("File saved to disk:", tempFilePath);
+        // console.debug("File saved to disk:", tempFilePath);
 
-        // console.log("tempFilePath", tempFilePath)
-        // console.log("")
+        // console.debug("tempFilePath", tempFilePath)
+        // console.debug("")
 
         const url = await uploadFileToS3(
           {
@@ -175,9 +175,9 @@ export async function POST(req: Request) {
             originalFilename: originalFilename,
             mimetype: (file as any).type || "application/octet-stream",
           },
-          `products/${newProduct._id}`
+          `products/${newProduct.id}`
         );
-        // console.log("[POST] uploadedProductImages:", uploadedProductImages);
+        // console.debug("[POST] uploadedProductImages:", uploadedProductImages);
         uploadedProductImages.push(url);
       }
     }
@@ -203,12 +203,12 @@ export async function POST(req: Request) {
           imageIndex++;
         }
 
-        console.log("variantImageFiles", variantImageFiles);
+        console.debug("variantImageFiles", variantImageFiles);
 
         const uploadedVariantImages = await uploaderFiles(
-          `products/${newProduct._id}/variants`,
+          `products/${newProduct.id}/variants`,
           variantImageFiles,
-          newProduct._id as string
+          newProduct.id as string
         );
 
         // for (const file of variantImageFiles) {
@@ -220,13 +220,13 @@ export async function POST(req: Request) {
         //         originalFilename: (file as any).name || `${Date.now()}.jpg`,
         //         mimetype: file.type,
         //       },
-        //       `products/${newProduct._id}/variants/${v.sku || i}`
+        //       `products/${newProduct.id}/variants/${v.sku || i}`
         //     );
         //     uploadedVariantImages.push(url);
         //   }
         // }
 
-        console.log("uploadedVariantImages", uploadedVariantImages);
+        console.debug("uploadedVariantImages", uploadedVariantImages);
         let finalUrls: string[] = [];
 
         uploadedVariantImages.forEach((image) => {
@@ -248,7 +248,7 @@ export async function POST(req: Request) {
         const variant = await Variant.create(
           [
             {
-              product: newProduct._id,
+              product: newProduct.id,
               sku: v.sku,
               slug: variantSlug,
               label: v.label,
@@ -260,7 +260,7 @@ export async function POST(req: Request) {
           ],
           { session }
         );
-        newProduct.variants.push(variant[0]._id);
+        newProduct.variants.push(variant[0].id);
         await newProduct.save({ session });
       }
     }
@@ -327,9 +327,9 @@ export async function PUT(req: Request) {
 
   try {
     const formData = await req.formData();
-    // console.log("[PUT] formData:", formData);
+    // console.debug("[PUT] formData:", formData);
     const productId = formData.get("id")?.toString();
-    // console.log("[PUT] productId:", productId);
+    // console.debug("[PUT] productId:", productId);
     if (!productId) {
       return NextResponse.json(
         { error: "Product ID is required" },
@@ -358,7 +358,7 @@ export async function PUT(req: Request) {
       // Check if new slug already exists
       const existingProduct = await Product.findOne({
         slug: newSlug,
-        _id: { $ne: productId },
+        id: { $ne: productId },
       }).session(session);
       if (existingProduct) {
         return NextResponse.json(
@@ -398,7 +398,7 @@ export async function PUT(req: Request) {
         await BrandProducts.findByIdAndUpdate(
           oldBrand,
           {
-            $pull: { products: product._id },
+            $pull: { products: product.id },
           },
           { session }
         );
@@ -410,7 +410,7 @@ export async function PUT(req: Request) {
         await BrandProducts.findByIdAndUpdate(
           newBrand,
           {
-            $addToSet: { products: product._id },
+            $addToSet: { products: product.id },
           },
           { session, upsert: true }
         );
@@ -434,7 +434,7 @@ export async function PUT(req: Request) {
         await CategoryProducts.findByIdAndUpdate(
           oldCatId,
           {
-            $pull: { products: product._id },
+            $pull: { products: product.id },
           },
           { session }
         );
@@ -445,7 +445,7 @@ export async function PUT(req: Request) {
         await CategoryProducts.findByIdAndUpdate(
           newCatId,
           {
-            $addToSet: { products: product._id },
+            $addToSet: { products: product.id },
           },
           { session, upsert: true }
         );
@@ -472,7 +472,7 @@ export async function PUT(req: Request) {
           try {
             await mkdir(uploadDir, { recursive: true });
           } catch (err) {
-            // console.log("Upload directory already exists or couldn't be created");
+            // console.debug("Upload directory already exists or couldn't be created");
           }
 
           // Convert File to buffer
@@ -489,10 +489,10 @@ export async function PUT(req: Request) {
 
           // Save buffer to disk (uses disk storage, not RAM)
           await writeFile(tempFilePath, buffer);
-          // console.log("File saved to disk:", tempFilePath);
+          // console.debug("File saved to disk:", tempFilePath);
 
-          // console.log("tempFilePath", tempFilePath)
-          // console.log("")
+          // console.debug("tempFilePath", tempFilePath)
+          // console.debug("")
 
           const url = await uploadFileToS3(
             {
@@ -500,7 +500,7 @@ export async function PUT(req: Request) {
               originalFilename: originalFilename,
               mimetype: (file as any).type || "application/octet-stream",
             },
-            `products/${product._id}`
+            `products/${product.id}`
           );
           finalImages.push(url);
         }
@@ -657,7 +657,7 @@ export async function DELETE(req: Request) {
 //             originalFilename: (file as any).name || `${Date.now()}.jpg`,
 //             mimetype: file.type,
 //           },
-//           `products/${newProduct._id}`
+//           `products/${newProduct.id}`
 //         );
 //         uploadedProductImages.push(url);
 //       }
@@ -687,7 +687,7 @@ export async function DELETE(req: Request) {
 //                 originalFilename: (file as any).name || `${Date.now()}.jpg`,
 //                 mimetype: file.type,
 //               },
-//               `products/${newProduct._id}/variants/${v.sku || i}`
+//               `products/${newProduct.id}/variants/${v.sku || i}`
 //             );
 //             uploadedVariantImages.push(url);
 //           }
@@ -696,7 +696,7 @@ export async function DELETE(req: Request) {
 //         await Variant.create(
 //           [
 //             {
-//               product: newProduct._id,
+//               product: newProduct.id,
 //               sku: v.sku,
 //               label: v.label,
 //               price: v.price,

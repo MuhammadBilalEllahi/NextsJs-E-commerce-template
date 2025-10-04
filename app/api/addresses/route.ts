@@ -112,7 +112,7 @@ export async function PUT(req: NextRequest) {
 
     // Check if address belongs to user
     const existingAddress = await Address.findOne({
-      _id: id,
+      id: id,
       user: session.user.id,
     });
 
@@ -131,7 +131,7 @@ export async function PUT(req: NextRequest) {
     // If this is set as default, unset other defaults
     if (parsed.data.isDefault) {
       await Address.updateMany(
-        { user: session.user.id, _id: { $ne: id } },
+        { user: session.user.id, id: { $ne: id } },
         { isDefault: false }
       );
     }
@@ -177,7 +177,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     const address = await Address.findOneAndDelete({
-      _id: id,
+      id: id,
       user: session.user.id,
     });
 

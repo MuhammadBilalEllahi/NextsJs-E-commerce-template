@@ -1,3 +1,5 @@
+import { PaginatedResponse, Review } from "@/types";
+
 export const API_URL_REVIEWS = "/api/reviews";
 export const API_URL_REVIEWS_CAN_REVIEW = "/api/reviews/can-review";
 export const API_URL_REVIEWS_USER = "/api/reviews/user";
@@ -13,26 +15,19 @@ export const checkCanReview = async (productId: string) => {
 };
 
 // Submit or update a review
-export const submitReview = async (reviewData: {
-  product: string;
-  rating: number;
-  title: string;
-  comment: string;
-  images?: File[];
-  reviewId?: string;
-}) => {
+export const submitReview = async (reviewData: any) => {
   const formData = new FormData();
-  formData.append("product", reviewData.product);
+  formData.append("product", reviewData.product.id);
   formData.append("rating", reviewData.rating.toString());
   formData.append("title", reviewData.title);
   formData.append("comment", reviewData.comment);
 
-  if (reviewData.reviewId) {
-    formData.append("reviewId", reviewData.reviewId);
+  if (reviewData.id) {
+    formData.append("reviewId", reviewData.id);
   }
 
   if (reviewData.images && reviewData.images.length > 0) {
-    reviewData.images.forEach((file) => {
+    reviewData.images.forEach((file: File | string) => {
       formData.append("images", file);
     });
   }
@@ -52,7 +47,10 @@ export const submitReview = async (reviewData: {
 };
 
 // Fetch user reviews
-export const fetchUserReviews = async (limit = 10, page = 1) => {
+export const fetchUserReviews = async (
+  limit = 10,
+  page = 1
+): Promise<PaginatedResponse<Review>> => {
   const res = await fetch(
     `${API_URL_REVIEWS_USER}?limit=${limit}&page=${page}`
   );
@@ -66,7 +64,7 @@ export const fetchProductReviews = async (
   productId: string,
   limit = 10,
   page = 1
-) => {
+): Promise<PaginatedResponse<Review>> => {
   const res = await fetch(
     `${API_URL_REVIEWS}?productId=${productId}&limit=${limit}&page=${page}`
   );

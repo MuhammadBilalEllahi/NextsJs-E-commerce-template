@@ -1,97 +1,104 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Upload, X } from "lucide-react"
-
-type Brand = {
-  _id: string
-  name: string
-  description: string
-  logo?: string
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-}
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Upload, X } from "lucide-react";
+import { Brand } from "@/types";
 
 interface BrandEditModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: { name: string; description: string; logo: File | null }) => void
-  brand: Brand | null
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: {
+    name: string;
+    description: string;
+    logo: File | null;
+  }) => void;
+  brand: Brand | null;
 }
 
-export default function BrandEditModal({ isOpen, onClose, onSubmit, brand }: BrandEditModalProps) {
+export default function BrandEditModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  brand,
+}: BrandEditModalProps) {
   const [formData, setFormData] = useState({
     name: "",
-    description: ""
-  })
-  const [logoFile, setLogoFile] = useState<File | null>(null)
-  const [logoPreview, setLogoPreview] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+    description: "",
+  });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize form data when brand changes
   useEffect(() => {
     if (brand) {
       setFormData({
         name: brand.name,
-        description: brand.description || ""
-      })
-      setLogoPreview(brand.logo || null)
-      setLogoFile(null) // Reset file selection
+        description: brand.description || "",
+      });
+      setLogoPreview(brand.logo || null);
+      setLogoFile(null); // Reset file selection
     }
-  }, [brand])
+  }, [brand]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setLogoFile(file)
-      const reader = new FileReader()
+      setLogoFile(file);
+      const reader = new FileReader();
       reader.onload = (e) => {
-        setLogoPreview(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
+        setLogoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const removeLogo = () => {
-    setLogoFile(null)
-    setLogoPreview(null)
-  }
+    setLogoFile(null);
+    setLogoPreview(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData.name.trim()) return
+    e.preventDefault();
+    if (!formData.name.trim()) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       await onSubmit({
         name: formData.name.trim(),
         description: formData.description.trim(),
-        logo: logoFile
-      })
+        logo: logoFile,
+      });
     } catch (error) {
-      console.error("Error updating brand:", error)
+      console.error("Error updating brand:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleClose = () => {
     if (!isSubmitting) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
-  if (!brand) return null
+  if (!brand) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -162,7 +169,12 @@ export default function BrandEditModal({ isOpen, onClose, onSubmit, brand }: Bra
                     disabled={isSubmitting}
                   />
                   <Label htmlFor="logo" className="cursor-pointer">
-                    <Button type="button" variant="outline" size="sm" disabled={isSubmitting}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isSubmitting}
+                    >
                       Choose File
                     </Button>
                   </Label>
@@ -195,5 +207,5 @@ export default function BrandEditModal({ isOpen, onClose, onSubmit, brand }: Bra
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

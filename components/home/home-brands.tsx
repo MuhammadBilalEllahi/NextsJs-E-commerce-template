@@ -1,12 +1,6 @@
 import Link from "next/link";
 
-type Brand = {
-  id: string;
-  name: string;
-  description: string;
-  logo?: string;
-  isActive: boolean;
-};
+import { Brand } from "@/types";
 
 export function HomeBrands({ brands }: { brands: Brand[] }) {
   // Don't render if no brands

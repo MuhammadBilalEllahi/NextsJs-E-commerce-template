@@ -1,24 +1,51 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function HomeNewsletter() {
-  const [email, setEmail] = useState("")
-  const [sent, setSent] = useState(false)
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Placeholder submit
-    setSent(true)
-    setTimeout(() => setSent(false), 2500)
-    setEmail("")
-  }
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSent(true);
+        setTimeout(() => setSent(false), 3000);
+        setEmail("");
+      } else {
+        setError(data.error || "Failed to subscribe");
+      }
+    } catch (err) {
+      setError("Failed to subscribe. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={onSubmit} className="max-w-lg">
-      <div className="text-sm mb-2">Get spicy offers and recipes in your inbox.</div>
+      <div className="text-sm mb-2">
+        Get spicy offers and recipes in your inbox.
+      </div>
+      {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
       <div className="flex gap-2">
         <Input
           type="email"
@@ -26,34 +53,72 @@ export function HomeNewsletter() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={loading}
         />
-        <Button className="bg-orange-600 hover:bg-orange-700">{sent ? "Subscribed" : "Subscribe"}</Button>
+        <Button
+          className="bg-orange-600 hover:bg-orange-700"
+          disabled={loading}
+        >
+          {loading ? "Subscribing..." : sent ? "Subscribed!" : "Subscribe"}
+        </Button>
       </div>
     </form>
-  )
+  );
 }
 
 export function NewsletterInline() {
-  const [email, setEmail] = useState("")
-  const [sent, setSent] = useState(false)
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSent(true);
+        setTimeout(() => setSent(false), 3000);
+        setEmail("");
+      } else {
+        setError(data.error || "Failed to subscribe");
+      }
+    } catch (err) {
+      setError("Failed to subscribe. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault()
-        setSent(true)
-        setTimeout(() => setSent(false), 2500)
-        setEmail("")
-      }}
-      className="space-y-2"
-    >
+    <form onSubmit={onSubmit} className="space-y-2">
+      {error && <div className="text-red-600 text-sm">{error}</div>}
       <Input
         type="email"
         placeholder="you@example.com"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
+        disabled={loading}
       />
-      <Button className="w-full bg-orange-600 hover:bg-orange-700">{sent ? "Thanks!" : "Subscribe"}</Button>
+      <Button
+        className="w-full bg-orange-600 hover:bg-orange-700"
+        disabled={loading}
+      >
+        {loading ? "Subscribing..." : sent ? "Thanks!" : "Subscribe"}
+      </Button>
     </form>
-  )
+  );
 }

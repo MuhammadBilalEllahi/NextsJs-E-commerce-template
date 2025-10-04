@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
 
     // Check if order belongs to user
     const order = await Order.findOne({
-      _id: parsed.data.order,
+      id: parsed.data.order,
       user: session.user.id,
     });
 

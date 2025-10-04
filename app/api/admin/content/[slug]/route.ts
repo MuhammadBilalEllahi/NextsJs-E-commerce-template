@@ -42,23 +42,23 @@ export async function PUT(
 ) {
   try {
     const { slug } = await params;
-    console.log("PUT request received for slug:", slug);
+    console.debug("PUT request received for slug:", slug);
 
     const session = await getServerSession(authOptions);
-    console.log("Session:", session);
+    console.debug("Session:", session);
 
     if (!session || session.user.role !== "admin") {
-      console.log("Unauthorized access attempt");
+      console.debug("Unauthorized access attempt");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    console.log("Request body:", body);
+    console.debug("Request body:", body);
 
     const { title, content, metaTitle, metaDescription, isActive } = body;
 
     if (!title || !content) {
-      console.log("Missing required fields:", {
+      console.debug("Missing required fields:", {
         title: !!title,
         content: !!content,
       });
@@ -69,7 +69,7 @@ export async function PUT(
     }
 
     await dbConnect();
-    console.log("Database connected");
+    console.debug("Database connected");
 
     const contentPage = await ContentPage.findOneAndUpdate(
       { slug: slug },
@@ -83,17 +83,17 @@ export async function PUT(
       { new: true, runValidators: true }
     );
 
-    console.log("Updated content page:", contentPage);
+    console.debug("Updated content page:", contentPage);
 
     if (!contentPage) {
-      console.log("Content page not found for slug:", slug);
+      console.debug("Content page not found for slug:", slug);
       return NextResponse.json(
         { error: "Content page not found" },
         { status: 404 }
       );
     }
 
-    console.log("Successfully updated content page");
+    console.debug("Successfully updated content page");
     return NextResponse.json({
       message: "Content page updated successfully",
       contentPage,

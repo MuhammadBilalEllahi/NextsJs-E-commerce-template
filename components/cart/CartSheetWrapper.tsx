@@ -4,15 +4,7 @@ import { useCart } from "@/lib/providers/cartContext";
 import { CartSheetUnTriggerable } from "./cart-sheet-notrigger";
 
 export default function CartSheetWrapper() {
-  const {
-    openCartSheet,
-    setOpenCartSheet,
-    items,
-    isHydrated,
-    count,
-    isAdding,
-  } = useCart();
-  console.log("openCartSheet", openCartSheet);
+  const { openCartSheet, setOpenCartSheet } = useCart();
 
   return (
     <CartSheetUnTriggerable

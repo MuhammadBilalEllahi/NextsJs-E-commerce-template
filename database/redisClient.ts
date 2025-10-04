@@ -1,28 +1,19 @@
 // lib/RedisClient.ts
-import Redis from 'ioredis';
-import type { Redis as RedisType } from 'ioredis';
+import Redis from "ioredis";
+import type { Redis as RedisType } from "ioredis";
 
 class RedisClient {
-
   private static instance: RedisType;
 
-  private constructor() { }
+  private constructor() {}
 
   private static getClient(): RedisType {
     if (!RedisClient.instance) {
-      // console.log('Creating new Redis client', process.env.REDIS_URL);
-      RedisClient.instance = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-      // console.log('Redis client created', RedisClient.instance);
+      RedisClient.instance = new Redis(
+        process.env.REDIS_URL || "redis://localhost:6379"
+      );
     }
-    // let cached : {conn: any , promise: any} = global.redis || {conn:null, promise: null};
-    // if(cached.conn) return cached.conn;
-    // if(!cached.promise){
-    //   cached.promise = Redis.createClient({
-    //     url: process.env.REDIS_URL || 'redis://localhost:6379'
-    //   }).connect();
-    // }
-    // await cached.promise;
-    // return cached.conn;
+
     return RedisClient.instance;
   }
 
@@ -31,10 +22,14 @@ class RedisClient {
     return await this.getClient().get(key);
   }
 
-  static async set(key: string, value: string, expirySeconds?: number): Promise<'OK'> {
+  static async set(
+    key: string,
+    value: string,
+    expirySeconds?: number
+  ): Promise<"OK"> {
     const client = this.getClient();
     if (expirySeconds) {
-      return await client.set(key, value, 'EX', expirySeconds);
+      return await client.set(key, value, "EX", expirySeconds);
     }
     return await client.set(key, value);
   }
@@ -44,7 +39,11 @@ class RedisClient {
   }
 
   // HASH
-  static async hset(key: string, field: string, value: string): Promise<number> {
+  static async hset(
+    key: string,
+    field: string,
+    value: string
+  ): Promise<number> {
     return await this.getClient().hset(key, field, value);
   }
 
@@ -77,7 +76,11 @@ class RedisClient {
     return await this.getClient().rpop(key);
   }
 
-  static async lrange(key: string, start: number, stop: number): Promise<string[]> {
+  static async lrange(
+    key: string,
+    start: number,
+    stop: number
+  ): Promise<string[]> {
     return await this.getClient().lrange(key, start, stop);
   }
 
@@ -103,10 +106,13 @@ class RedisClient {
     return await this.getClient().publish(channel, message);
   }
 
-  static async subscribe(channel: string, callback: (message: string) => void): Promise<void> {
-    const sub = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+  static async subscribe(
+    channel: string,
+    callback: (message: string) => void
+  ): Promise<void> {
+    const sub = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
     await sub.subscribe(channel);
-    sub.on('message', (_channel, message) => {
+    sub.on("message", (_channel, message) => {
       if (_channel === channel) callback(message);
     });
   }

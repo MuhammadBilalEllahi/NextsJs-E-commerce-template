@@ -1,4 +1,4 @@
-import Counter from "@/models/Counter"
+import Counter from "@/models/Counter";
 
 /**
  * Generate a sequential order ID using MongoDB counter
@@ -6,14 +6,17 @@ import Counter from "@/models/Counter"
  * @param padding - Number of digits to pad with zeros (default: 6)
  * @returns Promise<string> - The generated order ID
  */
-export async function generateOrderId(prefix: string = "DM", padding: number = 6): Promise<string> {
-    const counter = await Counter.findOneAndUpdate(
-        { _id: "orderId" },
-        { $inc: { seq: 1 } },
-        { new: true, upsert: true }
-    )
-    
-    return prefix + counter.seq.toString().padStart(padding, '0')
+export async function generateOrderId(
+  prefix: string = "DM",
+  padding: number = 6
+): Promise<string> {
+  const counter = await Counter.findOneAndUpdate(
+    { id: "orderId" },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+
+  return prefix + counter.seq.toString().padStart(padding, "0");
 }
 
 /**
@@ -22,14 +25,17 @@ export async function generateOrderId(prefix: string = "DM", padding: number = 6
  * @param padding - Number of digits to pad with zeros (default: 5)
  * @returns Promise<string> - The generated reference ID
  */
-export async function generateRefId(prefix: string = "REF", padding: number = 5): Promise<string> {
-    const counter = await Counter.findOneAndUpdate(
-        { _id: "refId" },
-        { $inc: { seq: 1 } },
-        { new: true, upsert: true }
-    )
-    
-    return prefix + counter.seq.toString().padStart(padding, '0')
+export async function generateRefId(
+  prefix: string = "REF",
+  padding: number = 5
+): Promise<string> {
+  const counter = await Counter.findOneAndUpdate(
+    { id: "refId" },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+
+  return prefix + counter.seq.toString().padStart(padding, "0");
 }
 
 /**
@@ -39,13 +45,13 @@ export async function generateRefId(prefix: string = "REF", padding: number = 5)
  * @returns Promise<{orderId: string, refId: string}>
  */
 export async function generateOrderIds(
-    orderPrefix: string = "DM", 
-    refPrefix: string = "REF"
-): Promise<{orderId: string, refId: string}> {
-    const [orderId, refId] = await Promise.all([
-        generateOrderId(orderPrefix),
-        generateRefId(refPrefix)
-    ])
-    
-    return { orderId, refId }
+  orderPrefix: string = "DM",
+  refPrefix: string = "REF"
+): Promise<{ orderId: string; refId: string }> {
+  const [orderId, refId] = await Promise.all([
+    generateOrderId(orderPrefix),
+    generateRefId(refPrefix),
+  ]);
+
+  return { orderId, refId };
 }

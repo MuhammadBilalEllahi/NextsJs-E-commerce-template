@@ -23,13 +23,6 @@ export async function POST(request: NextRequest) {
       randomCount,
     } = await request.json();
 
-    console.log("productIds", productIds);
-    console.log("variantIds", variantIds);
-    console.log("imageUrls", imageUrls);
-    console.log("operation", operation);
-    console.log("category", category);
-    console.log("randomCount", randomCount);
-
     if (!productIds && !variantIds) {
       return NextResponse.json(
         { error: "Product IDs or Variant IDs are required" },
@@ -41,15 +34,9 @@ export async function POST(request: NextRequest) {
 
     let imagesToApply: string[] = [];
 
-    console.log("Processing images...");
-    console.log("imageUrls exists:", !!imageUrls);
-    console.log("imageUrls length:", imageUrls?.length);
-    console.log("operation:", operation);
-
     if (imageUrls && imageUrls.length > 0) {
       // Use provided custom images
       imagesToApply = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
-      console.log("Using custom images:", imagesToApply);
     } else if (operation === "random") {
       // Get random images based on category from RandomImage collection
       const query: any = { isActive: true };
@@ -57,15 +44,11 @@ export async function POST(request: NextRequest) {
         query.category = category;
       }
 
-      console.log("Fetching random images with query:", query);
-      console.log("Random count:", randomCount);
-
       // Get all images matching the criteria
       const allImages = await RandomImage.find(query).lean();
-      console.log("Total images found:", allImages.length);
 
       if (allImages.length === 0) {
-        console.log("No random images found in database");
+        console.debug("No random images found in database");
         return NextResponse.json(
           { error: "No random images available in the selected category" },
           { status: 400 }
@@ -77,7 +60,7 @@ export async function POST(request: NextRequest) {
       const selectedImages = shuffled.slice(0, randomCount || 2);
 
       imagesToApply = selectedImages.map((img) => img.url);
-      console.log("Selected random images:", imagesToApply);
+      console.debug("Selected random images:", imagesToApply);
     }
 
     if (imagesToApply.length === 0) {

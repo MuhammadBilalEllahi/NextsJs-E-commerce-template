@@ -13,19 +13,20 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useCart } from "@/lib/providers/cartContext";
-import type { Product } from "@/mock_data/mock-data";
+import type { Product } from "@/types";
 import { formatCurrency } from "@/lib/constants/currency";
+import { Variant } from "@/types";
 
 interface QuickLookModalProps {
   product: Product & {
     variants?: Array<{
-      _id: string;
+      id: string;
       label: string;
       price: number;
       stock: number;
       isActive: boolean;
       isOutOfStock: boolean;
-      images: string[];
+      images: string[] | File[] | string;
     }>;
     ingredients?: string;
   };
@@ -38,15 +39,7 @@ export function QuickLookModal({
   isOpen,
   onClose,
 }: QuickLookModalProps) {
-  const [selectedVariant, setSelectedVariant] = useState<{
-    _id: string;
-    label: string;
-    price: number;
-    stock: number;
-    isActive: boolean;
-    isOutOfStock: boolean;
-    images: string[];
-  } | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isInitialized, setIsInitialized] = useState(false);
   const { add, isAdding } = useCart();
@@ -59,13 +52,16 @@ export function QuickLookModal({
         product.variants[0];
       if (defaultVariant) {
         setSelectedVariant({
-          _id: defaultVariant._id,
+          id: defaultVariant.id,
           label: defaultVariant.label,
           price: defaultVariant.price || 0,
           stock: defaultVariant.stock || 0,
           isActive: defaultVariant.isActive || false,
           isOutOfStock: defaultVariant.isOutOfStock || false,
-          images: defaultVariant.images || [],
+          images: defaultVariant.images || ([] as string[] | File[] | string),
+          sku: defaultVariant.sku || "",
+          slug: defaultVariant.slug || "",
+          discount: defaultVariant.discount || 0,
         });
       }
     }
@@ -120,7 +116,7 @@ export function QuickLookModal({
   const variantLabels = getVariantLabelsForImages();
 
   // Handle variant selection with validation
-  const handleVariantSelect = (variant: any) => {
+  const handleVariantSelect = (variant: Variant) => {
     if (variant.isOutOfStock || variant.stock <= 0) {
       return;
     }
@@ -145,13 +141,13 @@ export function QuickLookModal({
     if (hasVariants && selectedVariant) {
       add(
         {
-          id: `${String(product.id)}-${selectedVariant._id}`,
-          title: `${product.title} - ${selectedVariant.label}`,
+          id: `${String(product.id)}-${selectedVariant.id}`,
+          title: `${product.name} - ${selectedVariant.label}`,
           price: selectedVariant.price,
           image:
-            (currentImages && currentImages[0]) ||
-            (product.images && product.images[0]),
-          variantId: selectedVariant._id,
+            ((currentImages && currentImages[0]) as string) ||
+            ((product.images && product.images[0]) as string),
+          variantId: selectedVariant.id,
           variantLabel: selectedVariant.label,
           productId: String(product.id),
           slug: product.slug,
@@ -163,9 +159,12 @@ export function QuickLookModal({
       add(
         {
           id: String(product.id),
-          title: product.title,
+          title: product.name,
           price: product.price,
-          image: product.images?.[0] || product.image || "/placeholder.svg",
+          image:
+            (product.images?.[0] as string) ||
+            (product.images?.[0] as string) ||
+            ("/placeholder.svg" as string),
           productId: String(product.id),
           slug: product.slug,
         },
@@ -234,8 +233,8 @@ export function QuickLookModal({
               {/* Product Images */}
               <div>
                 <ProductImages
-                  images={currentImages}
-                  title={product.title}
+                  images={currentImages as string[]}
+                  title={product.name}
                   variantLabels={variantLabels}
                 />
               </div>
@@ -244,11 +243,11 @@ export function QuickLookModal({
               <div className="">
                 <div className="flex items-start justify-between gap-3">
                   <h1 className="text-xl font-bold line-clamp-2">
-                    {product.title}
+                    {product.name}
                   </h1>
                   <AddToWishlistButton
                     productId={String(product.id)}
-                    variantId={selectedVariant?._id}
+                    variantId={selectedVariant?.id}
                   />
                 </div>
 
@@ -275,7 +274,7 @@ export function QuickLookModal({
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {product.variants.map((variant) => {
-                        const isSelected = selectedVariant?._id === variant._id;
+                        const isSelected = selectedVariant?.id === variant.id;
                         const isAvailable =
                           variant.isActive &&
                           !variant.isOutOfStock &&
@@ -284,7 +283,7 @@ export function QuickLookModal({
 
                         return (
                           <Button
-                            key={variant._id}
+                            key={variant.id}
                             variant={isSelected ? "default" : "outline"}
                             size="sm"
                             onClick={() => handleVariantSelect(variant)}

@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
         canReview: true,
         hasReviewed: true,
         existingReview: {
-          id: existingReview._id,
+          id: existingReview.id,
           rating: existingReview.rating,
           title: existingReview.title,
           comment: existingReview.comment,

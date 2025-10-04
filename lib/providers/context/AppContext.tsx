@@ -9,13 +9,7 @@ import {
   useState,
   useEffect,
 } from "react";
-
-type User = {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-};
+import { User } from "@/types";
 
 type AppContextType = {
   router: ReturnType<typeof useRouter>;
@@ -92,7 +86,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       });
 
       const data = await response.json();
-      console.log("Login data:", data);
+      console.debug("Login data:", data);
 
       if (data.success) {
         setUser(data.user);

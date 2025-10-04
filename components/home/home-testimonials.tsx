@@ -1,33 +1,64 @@
-// "use client"
+"use client";
 
-// import { useEffect, useState } from "react"
-// import { Star } from 'lucide-react'
-// import { testimonials } from "@/lib/mock-data"
+import { useEffect, useState } from "react";
+import { TestimonialsSlider } from "./testimonials-slider";
 
-// export function HomeTestimonials() {
-//   const [index, setIndex] = useState(0)
-//   useEffect(() => {
-//     const id = setInterval(() => setIndex((i) => (i + 1) % testimonials.length), 3500)
-//     return () => clearInterval(id)
-//   }, [])
-//   const t = testimonials[index]
+export function HomeTestimonials() {
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-//   return (
-//     <div className="rounded-2xl border bg-white dark:bg-neutral-900 p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
-//       <img
-//         src={t.avatar || "/placeholder.svg?height=64&width=64&query=avatar"}
-//         alt={t.name}
-//         className="h-16 w-16 rounded-full object-cover ring-2 ring-orange-500/40"
-//       />
-//       <div className="flex-1">
-//         <div className="flex items-center gap-1 text-yellow-500">
-//           {Array.from({ length: 5 }).map((_, i) => (
-//             <Star key={i} className={`h-4 w-4 ${i < t.rating ? "fill-yellow-400" : "opacity-30"}`} />
-//           ))}
-//         </div>
-//         <blockquote className="mt-2 text-lg font-medium">{'“'}{t.quote}{'”'}</blockquote>
-//         <div className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">— {t.name}</div>
-//       </div>
-//     </div>
-//   )
-// }
+  useEffect(() => {
+    const loadTestimonials = async () => {
+      try {
+        const res = await fetch("/api/testimonials");
+        const data = await res.json();
+        if (data?.success) {
+          setTestimonials(data.testimonials || []);
+        }
+      } catch (error) {
+        console.error("Error loading testimonials:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTestimonials();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="container mx-auto px-4 py-10 md:py-14">
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <div className="h-[1px] flex-1 bg-gray-300" />
+          <h2 className="text-lg md:text-xl font-bold tracking-wide uppercase">
+            What Our Customers Say
+          </h2>
+          <div className="h-[1px] flex-1 bg-gray-300" />
+        </div>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return null; // Don't show section if no testimonials
+  }
+
+  return (
+    <section className="container mx-auto px-4 py-10 md:py-14">
+      <div className="flex items-center justify-center gap-4 mb-6">
+        <div className="h-[1px] flex-1 bg-gray-300" />
+        <h2 className="text-lg md:text-xl font-bold tracking-wide uppercase">
+          What Our Customers Say
+        </h2>
+        <div className="h-[1px] flex-1 bg-gray-300" />
+      </div>
+
+      <div className="max-w-4xl mx-auto">
+        <TestimonialsSlider />
+      </div>
+    </section>
+  );
+}
+

@@ -40,9 +40,9 @@ export async function GET(req: NextRequest) {
 
     // Format orders for display
     const formattedOrders = orders.map((order: any) => ({
-      id: order._id.toString(),
-      orderId: order.orderId || order._id.toString().slice(-8).toUpperCase(),
-      refId: order.refId || order._id.toString().slice(-8).toUpperCase(),
+      id: order.id.toString(),
+      orderId: order.orderId || order.id.toString().slice(-8).toUpperCase(),
+      refId: order.refId || order.id.toString().slice(-8).toUpperCase(),
       date: new Date(order.createdAt).toLocaleDateString(),
       status: order.status,
       total: order.total,

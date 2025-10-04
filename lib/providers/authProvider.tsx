@@ -5,13 +5,7 @@ import { useRouter } from "next/navigation";
 import { getSession, signIn, signOut, useSession } from "next-auth/react";
 import { handleCartMergeOnAuth } from "@/middlewares/cartMerge";
 import { CART_STORAGE_KEY, CartActionTypes, useCart } from "./cartContext";
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: "customer" | "admin";
-}
+import { User } from "@/types";
 
 interface AuthContextType {
   user: User | null;
@@ -61,8 +55,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (result?.error) {
         return { success: false, error: "Invalid credentials" };
       }
-      console.log("Login result:", result);
-      console.log("User:", user);
+      console.debug("Login result:", result);
+      console.debug("User:", user);
 
       if (result?.ok && user) {
         // Merge guest cart with user cart if guest cart exists

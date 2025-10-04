@@ -305,8 +305,8 @@ export async function POST(request: NextRequest) {
           product.isBestSelling = firstRow["Best Selling"] === "true";
           product.isSpecial = firstRow.Special === "true";
           product.isGrocery = firstRow.Grocery === "true";
-          product.brand = brand._id;
-          product.categories = categories.map((c) => c._id);
+          product.brand = brand.id;
+          product.categories = categories.map((c) => c.id);
           product.images = productImages;
           product.updatedAt = new Date();
 
@@ -328,8 +328,8 @@ export async function POST(request: NextRequest) {
             isBestSelling: firstRow["Best Selling"] === "true",
             isSpecial: firstRow.Special === "true",
             isGrocery: firstRow.Grocery === "true",
-            brand: brand._id,
-            categories: categories.map((c) => c._id),
+            brand: brand.id,
+            categories: categories.map((c) => c.id),
             images: productImages,
             variants: [],
             reviews: [],
@@ -369,7 +369,7 @@ export async function POST(request: NextRequest) {
             } else {
               // Create new variant
               variant = await Variant.create({
-                product: product._id,
+                product: product.id,
                 sku: row["Variant SKU"],
                 slug: row["Variant Slug"],
                 label: row["Variant Label"],
@@ -386,14 +386,14 @@ export async function POST(request: NextRequest) {
 
             // Track variant for history
             productVariants.push({
-              variantId: String(variant._id),
+              variantId: String(variant.id),
               variantSku: row["Variant SKU"],
               variantLabel: row["Variant Label"],
             });
 
             // Add variant to product if not already added
-            if (!product.variants.includes(variant._id)) {
-              product.variants.push(variant._id);
+            if (!product.variants.includes(variant.id)) {
+              product.variants.push(variant.id);
             }
           } catch (variantError: any) {
             results.errorCount++;
@@ -405,7 +405,7 @@ export async function POST(request: NextRequest) {
 
         // Track product for history
         results.importedProducts.push({
-          productId: String(product._id),
+          productId: String(product.id),
           productName: firstRow["Product Name"],
           productSlug: firstRow.Slug,
           variants: productVariants,
@@ -416,9 +416,9 @@ export async function POST(request: NextRequest) {
 
         // Update brand-products relationship
         await BrandProducts.findOneAndUpdate(
-          { _id: brand._id },
+          { id: brand.id },
           {
-            $addToSet: { products: product._id },
+            $addToSet: { products: product.id },
             $set: { updatedAt: new Date() },
           },
           { upsert: true }
@@ -427,9 +427,9 @@ export async function POST(request: NextRequest) {
         // Update category-products relationships
         for (const category of categories) {
           await CategoryProducts.findOneAndUpdate(
-            { _id: category._id },
+            { id: category.id },
             {
-              $addToSet: { products: product._id },
+              $addToSet: { products: product.id },
               $set: { updatedAt: new Date() },
             },
             { upsert: true }

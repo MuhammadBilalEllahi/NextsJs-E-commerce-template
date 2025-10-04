@@ -3,15 +3,15 @@ import { useState } from "react";
 const API_URL_PRODUCT_ADMIN = "/api/admin/product";
 
 export interface Product {
-  _id: string;
+  id: string;
   name: string;
   description: string;
   ingredients?: string;
   price: number;
   stock: number;
   discount: number;
-  brand: { _id: string; name: string };
-  categories: { _id: string; name: string }[];
+  brand: { id: string; name: string };
+  categories: { id: string; name: string }[];
   images: string[];
   variants: any[];
   isActive: boolean;
@@ -46,7 +46,7 @@ export interface CreateProductData {
 }
 
 export interface UpdateProductData extends Partial<CreateProductData> {
-  _id: string;
+  id: string;
   images?: (string | File)[];
 }
 
@@ -54,7 +54,7 @@ export interface UpdateProductData extends Partial<CreateProductData> {
 export const fetchProducts = async (): Promise<Product[]> => {
   try {
     const response = await fetch(API_URL_PRODUCT_ADMIN);
-    // console.log("[fetchProducts] response:", response);
+    // console.debug("[fetchProducts] response:", response);
     if (!response.ok) {
       throw new Error("Failed to fetch products");
     }
@@ -79,7 +79,7 @@ export const createProduct = async (
   productData: CreateProductData
 ): Promise<Product> => {
   try {
-    // console.log("[createProduct] productData:", productData);
+    // console.debug("[createProduct] productData:", productData);
     const formData = new FormData();
     if (productData.name) formData.append("name", productData.name);
     if (productData.description)
@@ -138,7 +138,7 @@ export const createProduct = async (
         });
       });
     }
-    // console.log("[createProduct] formData:", formData);
+    // console.debug("[createProduct] formData:", formData);
 
     const response = await fetch(API_URL_PRODUCT_ADMIN, {
       method: "POST",
@@ -154,7 +154,7 @@ export const createProduct = async (
     }
 
     const data = await response.json();
-    // console.log("[createProduct] data:", data);
+    // console.debug("[createProduct] data:", data);
     return data.product;
   } catch (err: any) {
     console.error("Error creating product:", err);
@@ -165,7 +165,7 @@ export const createProduct = async (
 // Delete a product
 export const deleteProduct = async (productId: string): Promise<void> => {
   try {
-    // console.log("[deleteProduct] productId:", productId);
+    // console.debug("[deleteProduct] productId:", productId);
     const response = await fetch(`${API_URL_PRODUCT_ADMIN}?id=${productId}`, {
       method: "DELETE",
     });
@@ -231,7 +231,7 @@ export const useProducts = () => {
     try {
       await deleteProduct(productId);
       setProducts((prev: Product[]) =>
-        prev.filter((p: Product) => p._id !== productId)
+        prev.filter((p: Product) => p.id !== productId)
       );
     } catch (err: any) {
       console.error("[useProducts] Error removing product:", err);

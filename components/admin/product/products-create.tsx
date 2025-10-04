@@ -34,24 +34,7 @@ import {
 } from "@/lib/api/admin/category/categories";
 import { createBrand } from "@/lib/api/admin/brand/brand";
 import { createProduct } from "@/lib/api/admin/product/products";
-
-type Brand = { _id: string; name: string; description?: string; logo?: string };
-type Category = {
-  _id: string;
-  name: string;
-  parent?: { _id: string; name: string } | string | null;
-  description?: string;
-  image?: string;
-};
-type VariantDraft = {
-  sku: string;
-  slug: string;
-  label: string;
-  price: number;
-  stock: number;
-  discount: number;
-  images: File[];
-};
+import { Brand, Category, VariantDraft } from "@/types";
 
 export default function ProductsCreateAdminUI() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -106,7 +89,7 @@ export default function ProductsCreateAdminUI() {
       return;
     }
 
-    // console.log(form)
+    // console.debug(form)
 
     try {
       // Prepare product data for the service
@@ -189,7 +172,7 @@ export default function ProductsCreateAdminUI() {
     };
     const created = await createBrand(data);
     setBrands((prev) => [...prev, created]);
-    setForm((f) => ({ ...f, brand: created._id }));
+    setForm((f) => ({ ...f, brand: created.id }));
     setBrandOpen(false);
     setBrandDraft({ name: "", description: "" });
   };
@@ -534,7 +517,7 @@ export default function ProductsCreateAdminUI() {
             </SelectTrigger>
             <SelectContent>
               {brands.map((b) => (
-                <SelectItem key={b._id} value={b._id}>
+                <SelectItem key={b.id} value={b.id}>
                   {b.name}
                 </SelectItem>
               ))}
@@ -621,9 +604,9 @@ export default function ProductsCreateAdminUI() {
               </SelectTrigger>
               <SelectContent>
                 {categories
-                  .filter((c) => !form.categories.includes(c._id))
+                  .filter((c) => !form.categories.includes(c.id))
                   .map((c) => (
-                    <SelectItem key={c._id} value={c._id}>
+                    <SelectItem key={c.id} value={c.id}>
                       {c.name}
                     </SelectItem>
                   ))}
@@ -674,7 +657,7 @@ export default function ProductsCreateAdminUI() {
                       <SelectContent>
                         <SelectItem value="none">No parent</SelectItem>
                         {categories.map((c) => (
-                          <SelectItem key={c._id} value={c._id}>
+                          <SelectItem key={c.id} value={c.id}>
                             {c.name}
                           </SelectItem>
                         ))}
@@ -733,7 +716,7 @@ export default function ProductsCreateAdminUI() {
           {form.categories.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {form.categories.map((categoryId) => {
-                const category = categories.find((c) => c._id === categoryId);
+                const category = categories.find((c) => c.id === categoryId);
                 return (
                   <div
                     key={categoryId}

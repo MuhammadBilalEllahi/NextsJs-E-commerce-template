@@ -1,3 +1,5 @@
+import { Category } from "@/types";
+
 export const API_URL_CATEGORY_ADMIN = "/api/admin/category";
 
 // fetch all categories
@@ -9,14 +11,8 @@ export const fetchCategories = async () => {
 };
 
 // create a new category
-export const createCategory = async (category: {
-  name: string;
-  parent?: string;
-  description?: string;
-  image: File;
-  isActive?: boolean;
-}) => {
-  // console.log("[createCategory]", category)
+export const createCategory = async (category: Category) => {
+  // console.debug("[createCategory]", category)
 
   const formData = new FormData();
   // formData.append("id", category.id);
@@ -27,11 +23,11 @@ export const createCategory = async (category: {
   if (category.isActive !== undefined)
     formData.append("isActive", category.isActive.toString());
 
-  if (category.image && category.image instanceof File) {
+  if (category.image && (category.image as any) instanceof File) {
     formData.append("image", category.image);
   }
 
-  // console.log("[createCategory]", formData)
+  // console.debug("[createCategory]", formData)
   const res = await fetch(`${API_URL_CATEGORY_ADMIN}`, {
     method: "POST",
     body: formData,
@@ -42,14 +38,7 @@ export const createCategory = async (category: {
   return data.category;
 };
 
-export const updateCategory = async (category: {
-  id: string;
-  name?: string;
-  parent?: string;
-  description?: string;
-  image?: File | string;
-  isActive?: boolean;
-}) => {
+export const updateCategory = async (category: Category) => {
   const formData = new FormData();
   formData.append("id", category.id);
   if (category.name) formData.append("name", category.name);
@@ -60,11 +49,11 @@ export const updateCategory = async (category: {
     formData.append("isActive", category.isActive.toString());
 
   // If the image is a File, append it, otherwise skip (keep old URL)
-  if (category.image && category.image instanceof File) {
+  if (category.image && (category.image as any) instanceof File) {
     formData.append("image", category.image);
   }
 
-  // console.log("[updateCategory]", formData)
+  // console.debug("[updateCategory]", formData)
   const res = await fetch(`${API_URL_CATEGORY_ADMIN}`, {
     method: "PUT",
     body: formData,

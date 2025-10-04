@@ -1,28 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import Link from "next/link";
-
-interface Branch {
-  _id: string;
-  name: string;
-  address: string;
-  phoneNumber: string;
-  email: string;
-  logo?: string;
-  branchNumber: string;
-  location: string;
-  city: string;
-  state: string;
-  openingHours: {
-    monday: { open: string; close: string; isOpen: boolean };
-    tuesday: { open: string; close: string; isOpen: boolean };
-    wednesday: { open: string; close: string; isOpen: boolean };
-    thursday: { open: string; close: string; isOpen: boolean };
-    friday: { open: string; close: string; isOpen: boolean };
-    saturday: { open: string; close: string; isOpen: boolean };
-    sunday: { open: string; close: string; isOpen: boolean };
-  };
-}
+import { Branch } from "@/types";
 
 interface BranchLocationsProps {
   branches: Branch[];
@@ -88,7 +67,7 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
         <div className="space-y-6">
           {branches.slice(0, 3).map((branch: Branch) => (
             <Card
-              key={branch._id}
+              key={branch.id}
               className="shadow-lg border border-red-100 dark:border-red-900/30 hover:shadow-xl transition-shadow"
             >
               <CardContent className="p-6">

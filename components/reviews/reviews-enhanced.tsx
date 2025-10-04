@@ -20,20 +20,7 @@ import {
   submitReview,
   fetchProductReviews,
 } from "@/lib/api/reviews/reviews";
-
-interface Review {
-  id: string;
-  user: string;
-  rating: number;
-  title: string;
-  comment: string;
-  date: string;
-  isVerified?: boolean;
-  helpfulCount?: number;
-  images?: string[];
-  isEdited?: boolean;
-  editedAt?: string;
-}
+import { Review } from "@/types";
 
 interface ReviewsProps {
   productId: string;
@@ -248,7 +235,7 @@ export function ReviewsEnhanced({
                     ))}
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {formatDate(review.date)}
+                    {formatDate(review.createdAt)}
                   </span>
                 </div>
               </div>
@@ -267,7 +254,7 @@ export function ReviewsEnhanced({
                       className="relative aspect-square rounded-lg overflow-hidden"
                     >
                       <Image
-                        src={image}
+                        src={image as string}
                         alt={`Review image ${index + 1}`}
                         fill
                         className="object-cover"
@@ -286,7 +273,7 @@ export function ReviewsEnhanced({
               <div className="flex items-center justify-between">
                 <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-gray-700">
                   <ThumbsUp className="h-3 w-3" />
-                  Helpful ({review.helpfulCount || 0})
+                  Helpful ({review.isHelpful || 0})
                 </button>
               </div>
             </div>
@@ -335,7 +322,7 @@ export function ReviewsEnhanced({
                     ))}
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {formatDate(existingReview.date)}
+                    {formatDate(existingReview.createdAt)}
                   </span>
                   {existingReview.isEdited && (
                     <Badge variant="outline" className="text-xs">
@@ -360,7 +347,7 @@ export function ReviewsEnhanced({
                         className="relative aspect-square rounded-lg overflow-hidden"
                       >
                         <Image
-                          src={image}
+                          src={image as string}
                           alt={`Review image ${index + 1}`}
                           fill
                           className="object-cover"

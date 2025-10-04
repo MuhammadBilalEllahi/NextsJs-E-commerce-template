@@ -1,16 +1,13 @@
 "use client";
 
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type Product, type Category } from "@/mock_data/mock-data";
+import { Product, Category } from "@/types";
 import { FiltersSidebar } from "@/components/shop/filters-sidebar";
 import { MobileFiltersSheet } from "@/components/shop/mobile-filters-sheet";
 import { ViewControls } from "@/components/shop/view-controls";
 
-import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
 import { ProductGrid } from "@/components/product/product-grid";
-import { BottomNav } from "../main_comp/bottom-nav";
 
 interface CategoryClientProps {
   slug: string;
@@ -113,7 +110,7 @@ export function CategoryClient({
             brands: (sp.get("brands") || "").split(",").filter(Boolean),
             category: (sp.get("category") || "").split(",").filter(Boolean),
           }}
-          categories={categories}
+          categories={categories as Category[]}
           availableBrands={availableBrands}
         />
       </div>
@@ -130,7 +127,7 @@ export function CategoryClient({
               category: (sp.get("category") || "").split(",").filter(Boolean),
             }}
             onApply={setParams}
-            categories={categories}
+            categories={categories as Category[]}
             availableBrands={availableBrands}
           />
         </aside>
@@ -154,7 +151,7 @@ export function CategoryClient({
           </div>
 
           <ProductGrid
-            products={filtered}
+            products={filtered as Product[]}
             view={view}
             pageSize={itemsPerPage}
             enableInfinite={true}

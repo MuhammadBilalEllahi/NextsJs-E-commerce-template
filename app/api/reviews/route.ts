@@ -127,7 +127,7 @@ export async function POST(req: Request) {
     if (reviewId) {
       // Update existing review
       const existingReview = await Review.findOne({
-        _id: reviewId,
+        id: reviewId,
         user: userId,
         product: productId,
       });
@@ -194,7 +194,7 @@ export async function POST(req: Request) {
       {
         success: true,
         review: {
-          id: review._id,
+          id: review.id,
           user: review.user?.name || "Anonymous",
           rating: review.rating,
           title: review.title,

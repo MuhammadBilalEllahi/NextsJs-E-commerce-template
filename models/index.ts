@@ -20,6 +20,13 @@ import "@/models/Wishlist";
 import "@/models/Notification";
 import "@/models/Refund";
 import "@/models/ContentPage";
+import "@/models/Blog";
+import "@/models/Career";
+import "@/models/Testimonial";
+import "@/models/JobApplication";
+import "@/models/MarketingEmail";
+import "@/models/MarketingCampaign";
+import "@/models/ChatInquiry";
 
 // Export all models for convenience
 export { default as User } from "@/models/User";
@@ -43,6 +50,13 @@ export { default as Notification } from "@/models/Notification";
 export { default as Refund } from "@/models/Refund";
 export { default as Address } from "@/models/Address";
 export { default as ContentPage } from "@/models/ContentPage";
+export { default as Blog } from "@/models/Blog";
+export { default as Career } from "@/models/Career";
+export { default as Testimonial } from "@/models/Testimonial";
+export { default as JobApplication } from "@/models/JobApplication";
+export { default as MarketingEmail } from "@/models/MarketingEmail";
+export { default as MarketingCampaign } from "@/models/MarketingCampaign";
+export { default as ChatInquiry } from "@/models/ChatInquiry";
 
 // Export Zod schemas
 export { brandZodSchema } from "@/models/Brand";

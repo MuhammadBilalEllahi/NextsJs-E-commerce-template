@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product/product-card";
 import { Search, X, TrendingUp } from "lucide-react";
 import { getAllProducts } from "@/database/data-service";
-import type { Product } from "@/mock_data/mock-data";
+import { Product } from "@/types";
 
 interface SearchSheetProps {
   isOpen: boolean;
@@ -56,7 +56,7 @@ export function SearchSheet({ isOpen, onClose }: SearchSheetProps) {
       // Get trending products (you can modify this logic based on your trending criteria)
       // For now, we'll take the first 8 products as trending
       const trending = products.slice(0, 8);
-      setTrendingProducts(trending);
+      setTrendingProducts(trending as Product[]);
     } catch (error) {
       console.error("Error loading trending products:", error);
     } finally {
@@ -74,7 +74,7 @@ export function SearchSheet({ isOpen, onClose }: SearchSheetProps) {
           product.description?.toLowerCase().includes(query.toLowerCase()) ||
           product.brand?.toLowerCase().includes(query.toLowerCase())
       );
-      setSearchResults(filtered);
+      setSearchResults(filtered as Product[]);
     } catch (error) {
       console.error("Error searching products:", error);
     } finally {
@@ -156,7 +156,7 @@ export function SearchSheet({ isOpen, onClose }: SearchSheetProps) {
                 </div>
               ) : searchResults.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
-                  {searchResults.map((product) => (
+                  {searchResults.map((product: Product) => (
                     <div key={product.id} onClick={handleProductClick}>
                       <ProductCard product={product} variant="mini" />
                     </div>
@@ -188,7 +188,7 @@ export function SearchSheet({ isOpen, onClose }: SearchSheetProps) {
                 </div>
               ) : trendingProducts.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
-                  {trendingProducts.map((product) => (
+                  {trendingProducts.map((product: Product) => (
                     <div key={product.id} onClick={handleProductClick}>
                       <ProductCard product={product} variant="mini" />
                     </div>

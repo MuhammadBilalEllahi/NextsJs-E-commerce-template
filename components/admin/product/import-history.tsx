@@ -40,39 +40,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-interface ImportHistoryItem {
-  _id: string;
-  importId: string;
-  fileName: string;
-  importedBy: {
-    name: string;
-    email: string;
-  };
-  importedAt: string;
-  totalRows: number;
-  productsCreated: number;
-  variantsCreated: number;
-  successCount: number;
-  errorCount: number;
-  errorDetails: string[];
-  products: {
-    productId: string;
-    productName: string;
-    productSlug: string;
-    variants: {
-      variantId: string;
-      variantSku: string;
-      variantLabel: string;
-    }[];
-  }[];
-  isUndone: boolean;
-  undoneAt?: string;
-  undoneBy?: {
-    name: string;
-    email: string;
-  };
-}
+import { ImportHistoryItem } from "@/types";
 
 interface ImportHistoryProps {
   onUndoComplete: () => void;

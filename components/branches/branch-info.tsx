@@ -12,35 +12,7 @@ import {
   Navigation,
   Star,
 } from "lucide-react";
-
-interface Branch {
-  _id: string;
-  name: string;
-  address: string;
-  phoneNumber: string;
-  email: string;
-  logo?: string;
-  branchNumber: string;
-  location: string;
-  city: string;
-  state: string;
-  coordinates?: {
-    latitude: number;
-    longitude: number;
-  };
-  openingHours: {
-    monday: { open: string; close: string; isOpen: boolean };
-    tuesday: { open: string; close: string; isOpen: boolean };
-    wednesday: { open: string; close: string; isOpen: boolean };
-    thursday: { open: string; close: string; isOpen: boolean };
-    friday: { open: string; close: string; isOpen: boolean };
-    saturday: { open: string; close: string; isOpen: boolean };
-    sunday: { open: string; close: string; isOpen: boolean };
-  };
-  description?: string;
-  manager?: string;
-  whatsapp?: string;
-}
+import { Branch } from "@/types";
 
 interface BranchInfoProps {
   branches: Branch[];
@@ -147,7 +119,7 @@ export function BranchInfo({ branches }: BranchInfoProps) {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
       {branches.map((branch) => (
         <Card
-          key={branch._id}
+          key={branch.id}
           className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg"
         >
           <CardHeader className="pb-3 lg:pb-4">

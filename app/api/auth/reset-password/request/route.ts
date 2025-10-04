@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     // Create password reset token
     const resetToken = await (
       PasswordResetToken as PasswordResetTokenModel
-    ).createForUser(user._id);
+    ).createForUser(user.id);
 
     // Generate reset URL
     const baseUrl = process.env.WEBSITE_URL || "http://localhost:3000";

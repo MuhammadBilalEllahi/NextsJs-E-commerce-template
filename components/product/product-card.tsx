@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AddToWishlistButton } from "@/components/wishlist/wishlist-button";
 import { useCart } from "@/lib/providers/cartContext";
-import type { Product } from "@/mock_data/mock-data";
+import type { Brand, Product, Variant } from "@/types";
 import { ShoppingCart, Star, Eye } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import { useState, useRef, useEffect } from "react";
@@ -38,8 +38,8 @@ export function ProductCard({
     if (product.images && product.images.length > 0) {
       return product.images[0];
     }
-    if (product.image) {
-      return product.image;
+    if (product.images && product.images.length > 0) {
+      return product.images[0];
     }
     return "/placeholder.svg?height=176&width=320&query=grid product";
   };
@@ -111,22 +111,22 @@ export function ProductCard({
         alert("This product is currently out of stock");
         return;
       }
-      console.log("firstVariant", firstVariant);
-      console.log("firstVariant.label", firstVariant.label);
-      console.log("firstVariant.label type:", typeof firstVariant.label);
+      console.debug("firstVariant", firstVariant);
+      console.debug("firstVariant.label", firstVariant.label);
+      console.debug("firstVariant.label type:", typeof firstVariant.label);
 
       const cartItem = {
         id: product.id,
-        title: product.title,
+        name: product.name,
         price: firstVariant.price as number,
-        image: getDisplayImage(),
+        image: getDisplayImage() as string,
         productId: product.id,
-        variantId: firstVariant._id,
+        variantId: firstVariant.id,
         variantLabel: firstVariant.label,
         slug: product.slug,
       };
-      console.log("Adding to cart:", cartItem);
-      console.log("variantLabel being sent:", cartItem.variantLabel);
+      console.debug("Adding to cart:", cartItem);
+      console.debug("variantLabel being sent:", cartItem.variantLabel);
       add(cartItem, 1);
     } else {
       // No variants, use product stock
@@ -138,9 +138,9 @@ export function ProductCard({
       add(
         {
           id: product.id,
-          title: product.title,
-          price: product.price,
-          image: getDisplayImage(),
+          name: product.name,
+          price: product.variants?.[0]?.price ?? product.price,
+          image: getDisplayImage() as string,
           productId: product.id,
           slug: product.slug,
         },
@@ -173,8 +173,8 @@ export function ProductCard({
       >
         <Link href={`/product/${product.slug}`} className="block">
           <img
-            src={getDisplayImage()}
-            alt={product.title}
+            src={getDisplayImage() as string}
+            alt={product.name}
             className="h-24 w-full rounded-sm object-contain dark:bg-neutral-900 bg-neutral-100 group-hover:scale-[1.02] transition-transform"
           />
         </Link>
@@ -183,7 +183,7 @@ export function ProductCard({
             href={`/product/${product.slug}`}
             className="font-semibold text-sm line-clamp-2 hover:text-black dark:hover:text-white hover:underline hover:underline-offset-2 hover:decoration-red-600"
           >
-            {product.title}
+            {product.name}
           </Link>
 
           <div className="flex items-center gap-1 text-[#121212] mt-1">
@@ -194,7 +194,7 @@ export function ProductCard({
               />
             ))}
             <span className="text-xs dark:text-white text-black">
-              {product.rating?.toFixed(1) ?? "4.5"}
+              {product.ratingAvg?.toFixed(1) ?? "4.5"}
             </span>
           </div>
 
@@ -238,8 +238,8 @@ export function ProductCard({
       >
         <Link href={`/product/${product.slug}`} className="block">
           <img
-            src={getDisplayImage()}
-            alt={product.title}
+            src={getDisplayImage() as string}
+            alt={product.name}
             className=" w-52 object-cover h-10 lg:h-full"
           />
         </Link>
@@ -250,7 +250,7 @@ export function ProductCard({
                 href={`/product/${product.slug}`}
                 className="font-semibold hover:text-red-600"
               >
-                {product.title}
+                {product.name}
               </Link>
               <div className="flex items-center gap-2 text-[#121212] dark:text-white">
                 {Array.from({ length: 5 }).map((_, index) => (
@@ -260,7 +260,7 @@ export function ProductCard({
                   />
                 ))}
                 <span className="text-sm text-black dark:text-white">
-                  {product.rating?.toFixed(1) ?? "4.5"}
+                  {product.ratingAvg?.toFixed(1) ?? "4.5"}
                 </span>
               </div>
             </div>
@@ -347,8 +347,8 @@ export function ProductCard({
 
       <Link href={`/product/${product.slug}`} className="block ">
         <img
-          src={getDisplayImage()}
-          alt={product.title}
+          src={getDisplayImage() as string}
+          alt={product.name}
           className="h-44 w-full rounded-sm object-contain dark:bg-neutral-900 bg-neutral-100 group-hover:scale-[1.01] transition-transform"
         />
       </Link>
@@ -358,7 +358,7 @@ export function ProductCard({
             href={`/product/${product.slug}`}
             className="font-semibold text-lg line-clamp-1 hover:text-black dark:hover:text-white hover:underline hover:underline-offset-4 hover:decoration-red-600"
           >
-            {product.title}
+            {product.name}
           </Link>
           <AddToWishlistButton productId={product.id} small />
         </div>
@@ -370,7 +370,7 @@ export function ProductCard({
             />
           ))}
           <span className="text-sm dark:text-white text-black">
-            {product.rating?.toFixed(1) ?? "4.5"}
+            {product.ratingAvg?.toFixed(1) ?? "4.5"}
           </span>
         </div>
 
@@ -394,7 +394,12 @@ export function ProductCard({
           )}
         </div>
         <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
-          Brand: {product?.brand ? product?.brand : <i>dehli mirch</i>}
+          Brand:{" "}
+          {(product?.brand as Brand) ? (
+            (product?.brand as Brand).name
+          ) : (
+            <i>dehli mirch</i>
+          )}
         </div>
         {/* {product?.brand && <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
           Brand: {product.brand}
@@ -440,15 +445,16 @@ export function ProductCard({
       <QuickLookModal
         product={{
           ...product,
-          variants: product.variants?.map((v) => ({
-            _id: v._id,
+          //@ts-ignore
+          variants: product.variants?.map((v: Variant) => ({
+            id: v.id,
             label: v.label,
             price: v.price ?? 0,
             stock: v.stock ?? 0,
             isActive: v.isActive ?? true,
             isOutOfStock: v.isOutOfStock ?? false,
             images: v.images ?? [],
-          })),
+          })) as Variant[],
         }}
         isOpen={isQuickLookOpen}
         onClose={() => setIsQuickLookOpen(false)}

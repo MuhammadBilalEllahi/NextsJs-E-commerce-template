@@ -7,7 +7,7 @@ import { useWishlist } from "@/lib/providers/wishlistProvider";
 import { CartSheet } from "@/components/cart/cart-sheet";
 import { HomeSearchBar } from "@/components/home/home-search-bar";
 import { AuthButton } from "@/components/auth/auth-button";
-import type { Category } from "@/mock_data/mock-data";
+import { Category } from "@/types";
 import { useAuth } from "@/lib/providers/authProvider";
 // import { useEffect, useState } from "react"
 
@@ -15,8 +15,6 @@ export function Header({ categories }: { categories?: Category[] }) {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth(); // Destructure isLoading as well
   const { count, isAdding, refreshCart, isHydrated } = useCart();
   const { ids: wishlistIds } = useWishlist();
-
-  console.log("count cahnges [HEADER]", count);
 
   return (
     <header className="border-b bg-white/85 dark:bg-neutral-950/85 backdrop-blur md:flex hidden z-30">
@@ -33,7 +31,7 @@ export function Header({ categories }: { categories?: Category[] }) {
         {/* Search Bar - Hidden on mobile */}
         <div className="hidden lg:flex flex-1 max-w-2xl">
           {categories ? (
-            <HomeSearchBar categories={categories} />
+            <HomeSearchBar categories={categories as Category[]} />
           ) : (
             <div className="flex-1 max-w-2xl h-10 bg-neutral-100 dark:bg-neutral-800 rounded-md flex items-center justify-center text-neutral-500 text-sm">
               Search functionality loading...

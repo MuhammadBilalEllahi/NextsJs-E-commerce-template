@@ -1,12 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-interface VariantLabel {
-  imageIndex: number;
-  label: string;
-}
-
+import { VariantLabel } from "@/types";
 export function ProductImages({
   images = [] as string[],
   title = "Product",

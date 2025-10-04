@@ -124,7 +124,7 @@ export async function PATCH(req: NextRequest) {
     } else if (notificationIds && notificationIds.length > 0) {
       await Notification.updateMany(
         {
-          _id: { $in: notificationIds },
+          id: { $in: notificationIds },
           user: session.user.id,
         },
         { isRead: true, readAt: new Date() }

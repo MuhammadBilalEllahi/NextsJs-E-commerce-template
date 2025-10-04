@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShopLocations } from "@/mock_data/mock-data";
+import { ShopLocations } from "@/types";
 import { ExternalLink, PhoneIcon } from "lucide-react";
 
 export function HomeShopLocations({
@@ -7,7 +7,7 @@ export function HomeShopLocations({
 }: {
   shopLocation: ShopLocations[];
 }) {
-  // console.log("shopLocation",shopLocation);
+  // console.debug("shopLocation",shopLocation);
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mx-10 my-8">
       {shopLocation.map((c, i) => (

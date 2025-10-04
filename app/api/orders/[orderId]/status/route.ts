@@ -67,7 +67,7 @@ export async function PUT(
       };
 
       await whatsappService.sendOrderStatusUpdate(orderDataForWhatsApp, status);
-      console.log(`WhatsApp status update sent for order ${order.orderId}`);
+      console.debug(`WhatsApp status update sent for order ${order.orderId}`);
     } catch (whatsappError) {
       console.error("Failed to send WhatsApp status update:", whatsappError);
       // Don't fail the status update if WhatsApp fails
@@ -91,4 +91,3 @@ export async function PUT(
     );
   }
 }
-

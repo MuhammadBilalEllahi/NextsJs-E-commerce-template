@@ -100,7 +100,7 @@ class WhatsAppService {
       }
 
       const result = await response.json();
-      console.log("WhatsApp message sent successfully:", result);
+      console.debug("WhatsApp message sent successfully:", result);
       return true;
     } catch (error) {
       console.error("Error sending WhatsApp message:", error);

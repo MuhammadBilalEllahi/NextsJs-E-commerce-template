@@ -28,9 +28,9 @@ export async function GET(
       .lean();
 
     const formatted = orders.map((o: any) => ({
-      id: String(o._id),
-      orderId: o.orderId || String(o._id).slice(-8).toUpperCase(),
-      refId: o.refId || String(o._id).slice(-8).toUpperCase(),
+      id: String(o.id),
+      orderId: o.orderId || String(o.id).slice(-8).toUpperCase(),
+      refId: o.refId || String(o.id).slice(-8).toUpperCase(),
       date: new Date(o.createdAt).toLocaleDateString(),
       total: o.total,
       itemsCount: (o.items || []).length,

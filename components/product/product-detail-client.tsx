@@ -35,7 +35,7 @@ import { formatCurrency } from "@/lib/constants/currency";
 interface ProductDetailClientProps {
   product: Product & {
     variants?: Array<{
-      _id: string;
+      id: string;
       label: string;
       price: number;
       stock: number;
@@ -48,7 +48,7 @@ interface ProductDetailClientProps {
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [selectedVariant, setSelectedVariant] = useState<{
-    _id: string;
+    id: string;
     label: string;
     price: number;
     stock: number;
@@ -144,7 +144,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     );
   }
 
-  // console.log("product in ProductDetailClient", product);
+  // console.debug("product in ProductDetailClient", product);
 
   // Don't render until component is initialized
   if (!isInitialized) {
@@ -162,7 +162,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     );
   }
 
-  console.log("product.reviews", product.reviews);
+  console.debug("product.reviews", product.reviews);
 
   const handleAddToCart = () => {
     if (isAdding) return;
@@ -174,11 +174,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     if (hasVariants && selectedVariant) {
       add(
         {
-          id: `${String(product.id)}-${selectedVariant._id}`, // Create unique ID for variant
+          id: `${String(product.id)}-${selectedVariant.id}`, // Create unique ID for variant
           title: `${product.title} - ${selectedVariant.label}`,
           price: selectedVariant.price,
           image: currentImages[0] || product.images[0],
-          variantId: selectedVariant._id,
+          variantId: selectedVariant.id,
           variantLabel: selectedVariant.label,
           productId: String(product.id),
           slug: product.slug,
@@ -225,7 +225,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <h1 className="text-2xl md:text-3xl font-bold">{product.title}</h1>
             <AddToWishlistButton
               productId={String(product.id)}
-              variantId={selectedVariant?._id}
+              variantId={selectedVariant?.id}
             />
           </div>
 
@@ -275,7 +275,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {product.variants.map((variant) => {
-                  const isSelected = selectedVariant?._id === variant._id;
+                  const isSelected = selectedVariant?.id === variant.id;
                   const isAvailable =
                     variant.isActive &&
                     !variant.isOutOfStock &&
@@ -283,7 +283,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                   return (
                     <Button
-                      key={variant._id}
+                      key={variant.id}
                       variant={isSelected ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleVariantSelect(variant)}

@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       { $match: { "contact.email": { $ne: "" } } },
       {
         $group: {
-          _id: { $toLower: "$contact.email" },
+          id: { $toLower: "$contact.email" },
           orders: { $sum: 1 },
           totalSpend: { $sum: "$total" },
           lastOrder: { $max: "$createdAt" },
@@ -57,8 +57,8 @@ export async function GET(req: NextRequest) {
       },
       {
         $project: {
-          _id: 0,
-          email: "$_id",
+          id: 0,
+          email: "$id",
           orders: 1,
           totalSpend: 1,
           lastOrder: 1,
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
       { $match: { "contact.email": { $ne: "" } } },
       {
         $group: {
-          _id: { $toLower: "$contact.email" },
+          id: { $toLower: "$contact.email" },
           orders: { $sum: 1 },
           totalSpend: { $sum: "$total" },
           lastOrder: { $max: "$createdAt" },
@@ -89,8 +89,8 @@ export async function GET(req: NextRequest) {
       },
       {
         $project: {
-          _id: 0,
-          email: "$_id",
+          id: 0,
+          email: "$id",
           orders: 1,
           totalSpend: 1,
           lastOrder: 1,
@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
       const stats = ordersByEmailMap.get(email);
       return {
         type: "registered" as const,
-        id: String(u._id),
+        id: String(u.id),
         name:
           u.name ||
           `${u.firstName || ""} ${u.lastName || ""}`.trim() ||
@@ -174,4 +174,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-

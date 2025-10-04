@@ -69,7 +69,7 @@ export async function POST(req: Request) {
       try {
         await mkdir(uploadDir, { recursive: true });
       } catch (err) {
-        console.log("Upload directory already exists or couldn't be created");
+        console.debug("Upload directory already exists or couldn't be created");
       }
 
       // Convert File to buffer
@@ -86,10 +86,6 @@ export async function POST(req: Request) {
 
       // Save buffer to disk (uses disk storage, not RAM)
       await writeFile(tempFilePath, buffer);
-      console.log("File saved to disk:", tempFilePath);
-
-      // console.log("tempFilePath",tempFilePath)
-      // console.log("")
 
       imageUrl = await uploadFileToS3(
         {
@@ -146,16 +142,13 @@ export async function PUT(req: Request) {
     const imageData = formData.get("image");
     let imageUrl: string | undefined;
 
-    // console.log("FORM",formData)
-    // console.log("FORM.image",imageData)
-
     if (imageData && imageData instanceof Blob) {
       // Create uploads directory if it doesn't exist
       const uploadDir = path.join(process.cwd(), "uploads", "temp");
       try {
         await mkdir(uploadDir, { recursive: true });
       } catch (err) {
-        console.log("Upload directory already exists or couldn't be created");
+        console.debug("Upload directory already exists or couldn't be created");
       }
 
       // Convert File to buffer
@@ -172,10 +165,10 @@ export async function PUT(req: Request) {
 
       // Save buffer to disk (uses disk storage, not RAM)
       await writeFile(tempFilePath, buffer);
-      console.log("File saved to disk:", tempFilePath);
+      console.debug("File saved to disk:", tempFilePath);
 
-      // console.log("tempFilePath",tempFilePath)
-      // console.log("")
+      // console.debug("tempFilePath",tempFilePath)
+      // console.debug("")
 
       imageUrl = await uploadFileToS3(
         {
@@ -189,7 +182,6 @@ export async function PUT(req: Request) {
       // imageUrl = await uploadFileToS3({ buffer, originalFilename: originalFilename, mimetype: imageData.type }, "categories");
     }
 
-    console.log("IMAGE url", imageUrl);
     // Validate partial fields
     const validated = categorySchema
       .partial()

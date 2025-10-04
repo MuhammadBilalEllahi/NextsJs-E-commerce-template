@@ -6,24 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { getProductsByCategory } from "@/database/data-service";
 import { usePreloadedData } from "@/lib/hooks/use-preloaded-data";
 import { CURRENCY } from "@/lib/constants";
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  parent: { id: string; name: string } | null;
-  description: string;
-  image: string;
-}
-
-interface Product {
-  id: string;
-  slug: string;
-  title: string;
-  price: number;
-  image?: string;
-  brand: string;
-}
+import { Category, Product } from "@/types";
 
 interface HoverNavigationProps {
   isOpen: boolean;
@@ -175,7 +158,7 @@ export function HoverNavigation({
                         onClick={onClose}
                       >
                         <span className="text-xs font-medium w-28">
-                          {product.title}
+                          {product.name}
                         </span>
                       </Link>
                       {index < categoryProducts.length - 1 && (

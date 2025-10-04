@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       query.category = category;
     }
 
-    console.log("Random images query:", query);
+    console.debug("Random images query:", query);
 
     const images = await RandomImage.find(query)
       .populate("uploadedBy", "name email")
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     const total = await RandomImage.countDocuments(query);
 
-    console.log(`Found ${images.length} random images (total: ${total})`);
+    console.debug(`Found ${images.length} random images (total: ${total})`);
 
     return NextResponse.json({
       images,

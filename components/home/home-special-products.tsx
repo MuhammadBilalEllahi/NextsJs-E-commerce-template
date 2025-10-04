@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Product } from "@/mock_data/mock-data";
+import { Product } from "@/types";
 import { ProductCard } from "@/components/product/product-card";
 
 export function HomeSpecialProducts({
@@ -86,7 +86,7 @@ export function HomeSpecialProducts({
         ref={scroller}
         className="hide-scrollbar flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2"
       >
-        {products.map((p) => (
+        {products.map((p: Product) => (
           <div key={p.id} className="snap-start animate-fadeIn">
             <ProductCard product={p} className="w-72" />
           </div>

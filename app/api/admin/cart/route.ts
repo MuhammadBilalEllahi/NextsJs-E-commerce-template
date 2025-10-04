@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     const total = await Cart.countDocuments(query);
 
     // Get order conversion data
-    const cartIds = carts.map((cart) => cart._id);
+    const cartIds = carts.map((cart) => cart.id);
     const orders = await Order.find({
       $or: [
         { user: { $in: carts.filter((c) => c.user).map((c) => c.user) } },
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
       const userIdentifier = user
         ? {
             type: "registered",
-            userId: user._id,
+            userId: user.id,
             userName: user.name,
             userEmail: user.email,
           }
@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
       // Check for order conversion
       const hasOrder = orders.some((order: any) => {
         if (user) {
-          return order.user?.toString() === user._id.toString();
+          return order.user?.toString() === user.id.toString();
         } else {
           return order.contact?.email === cart.uuidv4;
         }
@@ -109,14 +109,14 @@ export async function GET(req: NextRequest) {
       );
 
       return {
-        id: cart._id,
+        id: cart.id,
         ...userIdentifier,
         items: cart.items.map((item: any) => ({
-          productId: item.productId._id,
+          productId: item.productId.id,
           productName: item.title,
           productSlug: item.slug,
           productImage: item.image,
-          variantId: item.variantId?._id || null,
+          variantId: item.variantId?.id || null,
           variantLabel: item.label || null,
           quantity: item.quantity,
           priceSnapshot: item.priceSnapshot,

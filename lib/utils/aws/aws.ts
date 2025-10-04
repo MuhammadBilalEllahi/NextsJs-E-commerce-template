@@ -6,7 +6,7 @@ import { API_URL_CATEGORY_ADMIN } from "@/lib/api/admin/category/categories";
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    accessKeyId: process.env.AWS_ACCESS_KEYid!,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });
@@ -21,26 +21,26 @@ export async function uploadFileToS3(file: any, folder = "categories") {
     const ext = path.extname(originalName);
     const fileName = `${folder}/${Date.now()}${ext}`;
 
-     // Get file stats to determine content length
+    // Get file stats to determine content length
     const fileStats = fs.statSync(filePath);
     const fileContent = fs.readFileSync(filePath); // Read entire file into buffer
 
-    console.log("Uploading file:", filePath);
-    console.log("File size:", fileStats.size, "bytes");
+    console.debug("Uploading file:", filePath);
+    console.debug("File size:", fileStats.size, "bytes");
 
-   const letsSEE= await s3.send(
+    const letsSEE = await s3.send(
       new PutObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET_NAME!,
         Key: fileName,
         // Body: fileStream,
         Body: fileContent, // Use buffer instead of stream
         ContentType: file.mimetype || "application/octet-stream",
-        ContentLength: fileStats.size, 
-        ACL: "public-read-write" //give ACL access in aws website
+        ContentLength: fileStats.size,
+        ACL: "public-read-write", //give ACL access in aws website
       })
     );
 
-    // console.log("FILE in aws [letsSEE]", letsSEE)
+    // console.debug("FILE in aws [letsSEE]", letsSEE)
 
     return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
   } catch (err: any) {
@@ -48,9 +48,6 @@ export async function uploadFileToS3(file: any, folder = "categories") {
     throw new Error(`S3 upload error: ${err.message}`);
   }
 }
-
-
-
 
 // export async function uploadCategoryImage(file: File) {
 //   const formData = new FormData();
@@ -65,5 +62,3 @@ export async function uploadFileToS3(file: any, folder = "categories") {
 //   if (!data.success) throw new Error(data.error);
 //   return data.url; // S3 URL of uploaded image
 // }
-
-

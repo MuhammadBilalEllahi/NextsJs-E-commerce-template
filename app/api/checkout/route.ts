@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       shippingMethod,
     } = body;
 
-    console.log("body in checkout", body);
+    console.debug("body in checkout", body);
 
     // Check stock availability before creating order
     const stockCheck = await checkStockAvailability(
@@ -107,8 +107,8 @@ export async function POST(req: NextRequest) {
     // Note: Stock is decreased immediately when order is created (status: pending)
     // This ensures inventory consistency and prevents overselling
     try {
-      await decreaseStockForOrder(order._id.toString());
-      console.log(`Stock decreased for order ${orderId}`);
+      await decreaseStockForOrder(order.id.toString());
+      console.debug(`Stock decreased for order ${orderId}`);
     } catch (error) {
       console.error("Failed to decrease stock for order:", error);
       // Note: Stock decrease failed, but order was created
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
         if (tcsResponse.CN) {
           // Create TCS order record in database
           tcsOrder = new TCSOrder({
-            order: order._id,
+            order: order.id,
             consignmentNumber: tcsResponse.CN,
             customerReferenceNo: order.refId,
             userName: process.env.TCS_USERNAME || "",
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
           });
           await order.save();
 
-          console.log(
+          console.debug(
             `TCS order created for order ${orderId} with CN: ${tcsResponse.CN}`
           );
         } else {
@@ -213,7 +213,7 @@ export async function POST(req: NextRequest) {
       };
 
       await whatsappService.sendOrderConfirmation(orderDataForWhatsApp);
-      console.log(`WhatsApp notification sent for order ${orderId}`);
+      console.debug(`WhatsApp notification sent for order ${orderId}`);
     } catch (whatsappError) {
       console.error("Failed to send WhatsApp notification:", whatsappError);
       // Don't fail the checkout if WhatsApp fails
@@ -273,7 +273,7 @@ export async function POST(req: NextRequest) {
       success: true,
       orderId,
       refId,
-      order: order._id,
+      order: order.id,
     });
   } catch (error) {
     console.error("Checkout error:", error);

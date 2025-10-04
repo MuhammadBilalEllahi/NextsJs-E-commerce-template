@@ -15,17 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-interface DeliveryInfo {
-  type: "home_delivery" | "tcs";
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  coverage: string;
-  timeFrame: string;
-  cost: string;
-  features: string[];
-  color: string;
-}
+import { DeliveryInfo } from "@/types";
 
 export function HomeDeliveryInfo() {
   const deliveryOptions: DeliveryInfo[] = [

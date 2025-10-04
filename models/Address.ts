@@ -17,7 +17,7 @@ export const AddressSubSchema = new mongoose.Schema(
     countryCode: { type: String, default: "+92" },
     isDefault: { type: Boolean, default: false },
   },
-  { _id: false }
+  { id: false }
 );
 
 // Full Address schema for separate collection (for address management)

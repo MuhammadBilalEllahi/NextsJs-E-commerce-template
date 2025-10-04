@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Category } from "@/mock_data/mock-data";
+import { Category } from "@/types";
 
 export function HomeCategories({ categories }: { categories: Category[] }) {
-  console.log("categories in HomeCategories", categories);
+  console.debug("categories in HomeCategories", categories);
   return (
     <div className="flex flex-wrap gap-3 justify-center">
       {categories.map((c) => (

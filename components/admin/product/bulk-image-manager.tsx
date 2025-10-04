@@ -51,18 +51,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 
-interface RandomImage {
-  _id: string;
-  name: string;
-  url: string;
-  category: string;
-  tags: string[];
-  uploadedBy: {
-    name: string;
-    email: string;
-  };
-  uploadedAt: string;
-}
+import { RandomImage } from "@/types";
 
 interface BulkImageManagerProps {
   selectedProducts: string[];
@@ -412,7 +401,7 @@ export default function BulkImageManager({
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {images.map((image) => (
                 <div
-                  key={image._id}
+                  key={image.id}
                   className={`relative border-2 rounded-lg overflow-hidden cursor-pointer transition-all ${
                     selectedImages.includes(image.url)
                       ? "border-blue-500 ring-2 ring-blue-200"
@@ -455,7 +444,7 @@ export default function BulkImageManager({
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => handleDeleteImage(image._id)}
+                            onClick={() => handleDeleteImage(image.id)}
                             className="bg-red-600 hover:bg-red-700"
                           >
                             Delete
@@ -466,7 +455,9 @@ export default function BulkImageManager({
                   </div>
                   <div className="p-2 bg-white">
                     <p className="text-xs font-medium truncate">{image.name}</p>
-                    <p className="text-xs text-gray-500">{image.category}</p>
+                    <p className="text-xs text-gray-500">
+                      {image.category.toString()}
+                    </p>
                   </div>
                 </div>
               ))}

@@ -66,7 +66,7 @@ export const preloadHoverData = async (): Promise<PreloadedData> => {
   }
 
   try {
-    console.log("Preloading hover navigation data...");
+    console.debug("Preloading hover navigation data...");
 
     // Load all data in parallel using Promise.all
     const [categories, brands] = await Promise.all([
@@ -86,7 +86,7 @@ export const preloadHoverData = async (): Promise<PreloadedData> => {
     // Cache the results
     setCachedData(PRELOAD_CACHE_KEY, preloadedData);
 
-    console.log("Hover navigation data preloaded successfully:", {
+    console.debug("Hover navigation data preloaded successfully:", {
       categoriesCount: categories?.length || 0,
       brandsCount: brands?.length || 0,
     });

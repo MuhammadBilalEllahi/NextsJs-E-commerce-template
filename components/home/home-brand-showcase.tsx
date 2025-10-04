@@ -5,14 +5,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, ArrowRight, Star } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { getProductsByBrand } from "@/database/data-service";
-
-type Brand = {
-  id: string;
-  name: string;
-  description: string;
-  logo?: string;
-  isActive: boolean;
-};
+import { Brand } from "@/types";
 
 interface HomeBrandShowcaseProps {
   brands: Brand[];

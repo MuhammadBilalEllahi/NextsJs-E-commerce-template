@@ -16,18 +16,13 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
 
-    // console.log("FORMDATA", formData)
-
     const raw = {
       name: formData.get("name")?.toString(),
       description: formData.get("description")?.toString() ?? "",
     };
 
-    // console.log("RAW DATA", raw); // Add this to debug
-
     const parsed = brandZodSchema.safeParse(raw);
     if (!parsed.success) {
-      // console.log("ZOD VALIDATION ERRORS:", parsed.error.message); // Add this to debug
       return NextResponse.json(
         { error: "Validation failed", details: parsed.error.message },
         { status: 400 }
@@ -43,9 +38,7 @@ export async function POST(req: Request) {
       const uploadDir = path.join(process.cwd(), "uploads", "temp");
       try {
         await mkdir(uploadDir, { recursive: true });
-      } catch (err) {
-        // console.log("Upload directory already exists or couldn't be created");
-      }
+      } catch (err) {}
 
       // Convert File to buffer
       const arrayBuffer = await logoFile.arrayBuffer();
@@ -153,7 +146,7 @@ export async function PUT(req: Request) {
           originalFilename: (logoFile as any).name || `${Date.now()}.jpg`,
           mimetype: logoFile.type,
         },
-        `brands/${brand._id}/logo`
+        `brands/${brand.id}/logo`
       );
 
       brand.logo = imageUrl;

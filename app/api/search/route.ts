@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       .lean();
 
     const formattedProducts = products.map((product) => ({
-      id: String(product._id),
+      id: String(product.id),
       slug: product.slug,
       title: product.name,
       price: product?.variants?.[0]?.price ?? product?.price ?? 0,
@@ -60,4 +60,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Search failed" }, { status: 500 });
   }
 }
-
