@@ -1,4 +1,5 @@
 // "use client"
+import type { Metadata } from "next";
 import { HomeHero } from "@/components/home/home-hero";
 import { HomeFeaturedProducts } from "@/components/home/home-featured-products";
 import { HomeBestSellingAndNewArrivalProducts } from "@/components/home/home-best-selling-new-arrival-products";
@@ -25,6 +26,20 @@ import {
 } from "@/database/data-service";
 import StackedCards from "@/components/home/BranchSlidableCard";
 import { HomeDeliveryInfo } from "@/components/home/HomeDeliveryInfo";
+import { absoluteUrl } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
+  description:
+    "Shop premium spices, masalas, pickles, and snacks at Dehli Mirch. Fast delivery and authentic flavor.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
+    description:
+      "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
+    url: absoluteUrl("/"),
+  },
+};
 
 // import { useEffect, useState } from "react"
 

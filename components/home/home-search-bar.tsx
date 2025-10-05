@@ -55,6 +55,7 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
             `/api/search?q=${encodeURIComponent(q)}&limit=6`
           );
           const data = await response.json();
+          console.debug("search results", data.products);
           setSearchResults(data.products || []);
         } catch (error) {
           console.error("Search error:", error);
@@ -171,7 +172,7 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
           <CardContent className="p-0">
             {q.trim().length > 0 ? (
               // Search Results
-              <div className="p-4">
+              <div className="p-4 pt-0">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-sm text-foreground">
                     PRODUCT RESULTS
@@ -202,17 +203,16 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                         onClick={() => setIsDropdownOpen(false)}
                       >
                         <div className="space-y-2">
-                          <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                          <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden relative">
                             {product?.images ? (
                               <Image
                                 src={product.images[0] as string}
                                 alt={product.name}
-                                width={80}
-                                height={80}
+                                fill
                                 className="object-cover group-hover:scale-105 transition-transform"
                               />
                             ) : (
-                              <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center">
+                              <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center">
                                 <span className="text-muted-foreground text-xs">
                                   No Image
                                 </span>
@@ -249,7 +249,7 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
               </div>
             ) : (
               // Trending Products
-              <div className="p-4">
+              <div className="pt-0 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-sm text-foreground">
                     TRENDING NOW
@@ -264,26 +264,20 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                   <div className="space-y-3">
                     {/* Trending Search Terms */}
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {[
-                        "garam masala",
-                        "turmeric powder",
-                        "red chili",
-                        "cumin seeds",
-                        "coriander powder",
-                        "black pepper",
-                      ].map((term) => (
+                      {/* map only 10 categories only */}
+                      {categories.slice(0, 10).map((term: Category) => (
                         <Button
-                          key={term}
+                          key={term.slug}
                           variant="outline"
                           size="sm"
                           className="text-xs h-8 px-3 rounded-full hover:bg-muted"
                           onClick={() => {
-                            setQ(term);
+                            setQ(term.slug);
                             setIsDropdownOpen(false);
                           }}
                         >
                           <Search className="h-3 w-3 mr-1" />
-                          {term}
+                          {term.name}
                         </Button>
                       ))}
                     </div>
@@ -298,17 +292,16 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                           onClick={() => setIsDropdownOpen(false)}
                         >
                           <div className="space-y-2">
-                            <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                            <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden relative">
                               {product.images ? (
                                 <Image
                                   src={product.images[0] as string}
                                   alt={product.name}
-                                  width={80}
-                                  height={80}
+                                  fill
                                   className="object-cover group-hover:scale-105 transition-transform"
                                 />
                               ) : (
-                                <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center">
+                                <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center">
                                   <span className="text-muted-foreground text-xs">
                                     No Image
                                   </span>

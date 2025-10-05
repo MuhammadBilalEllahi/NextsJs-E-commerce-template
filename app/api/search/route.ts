@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Product from "@/models/Product";
 import dbConnect from "@/database/mongodb";
+import { Product as ProductType } from "@/types";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Search products by name, description, brand, and categories
-    const products = await Product.find({
+    const products = (await Product.find({
       $and: [
         { isActive: true, isOutOfStock: false },
         {
@@ -30,29 +31,49 @@ export async function GET(req: NextRequest) {
     })
       .populate("brand", "name")
       .populate("categories", "name")
+      .populate("variants", "price")
       .populate({
         path: "variants",
         match: { isActive: true, isOutOfStock: false },
       })
       .sort({ createdAt: -1 })
       .limit(limit)
-      .lean();
+      .lean()) as any[];
 
-    const formattedProducts = products.map((product) => ({
-      id: String(product.id),
-      slug: product.slug,
-      title: product.name,
-      price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-      images: product.images,
-      image:
-        product.images && product.images.length > 0
-          ? product.images[0]
-          : undefined,
-      brand: product.brand?.name || "Dehli Mirch",
-      rating: product.ratingAvg || 0,
-      reviewCount: product.reviewCount || 0,
-      category: product.categories?.[0]?.name || "spices",
-    }));
+    const formattedProducts = products.map((product: any) => {
+      const firstImage = Array.isArray(product?.images)
+        ? product.images[0]
+        : undefined;
+
+      const brandName =
+        (product?.brand && typeof product.brand === "object"
+          ? product.brand?.name
+          : undefined) || "Dehli Mirch";
+
+      const firstCategory = Array.isArray(product?.categories)
+        ? product.categories[0]
+        : undefined;
+
+      const categoryName =
+        (firstCategory &&
+          (typeof firstCategory === "object"
+            ? firstCategory?.name
+            : firstCategory)) ||
+        "spices";
+
+      return {
+        id: String(product._id),
+        slug: product.slug,
+        name: product.name,
+        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
+        images: product.images,
+        image: firstImage,
+        brand: brandName,
+        ratingAvg: product.ratingAvg || 0,
+        reviewCount: product.reviewCount || 0,
+        category: categoryName,
+      };
+    });
 
     return NextResponse.json({ products: formattedProducts });
   } catch (error) {

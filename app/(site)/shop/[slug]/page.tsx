@@ -3,6 +3,7 @@ import { getAllProducts, getAllCategories } from "@/database/data-service";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { Category } from "@/types";
+import { absoluteUrl, buildCollectionPageJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -101,13 +102,34 @@ export default async function CategoryPage({
   );
 
   return (
-    <CategoryClient
-      slug={slug}
-      allProducts={filteredProducts}
-      categories={allCategories as Category[]}
-      availableBrands={availableBrands}
-      searchParams={searchParamsResolved}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            buildCollectionPageJsonLd({
+              name: slug === "all" ? "All Products" : category?.name || slug,
+              url: absoluteUrl(`/shop/${slug}`),
+              breadcrumb: [
+                { name: "Home", item: absoluteUrl("/") },
+                { name: "Shop", item: absoluteUrl("/shop/all") },
+                {
+                  name: slug === "all" ? "All" : category?.name || slug,
+                  item: absoluteUrl(`/shop/${slug}`),
+                },
+              ],
+            })
+          ),
+        }}
+      />
+      <CategoryClient
+        slug={slug}
+        allProducts={filteredProducts}
+        categories={allCategories as Category[]}
+        availableBrands={availableBrands}
+        searchParams={searchParamsResolved}
+      />
+    </>
   );
 }
 

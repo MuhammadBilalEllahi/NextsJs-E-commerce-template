@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { VariantLabel } from "@/types";
 export function ProductImages({
   images = [] as string[],
@@ -22,12 +23,16 @@ export function ProductImages({
 
   return (
     <div className="lg:sticky top-4 h-fit">
-      <div className="relative overflow-hidden rounded-lg border max-h-[35rem]">
-        <img
+      <div
+        className={`relative overflow-hidden rounded-lg border aspect-square md:aspect-[5/5]`}
+      >
+        <Image
           src={current || "/placeholder.svg"}
           alt={name}
-          className={`w-full object-fill transition-transform duration-300 ${cursor} ${
-            zoom ? "scale-125" : "scale-100"
+          fill
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          className={`object-cover transition-transform duration-300 ${cursor} ${
+            zoom ? "scale-110" : "scale-100"
           }`}
           onClick={() => setZoom((z) => !z)}
         />
@@ -50,9 +55,11 @@ export function ProductImages({
               i === index ? "ring-2 ring-red-600" : ""
             }`}
           >
-            <img
+            <Image
               src={src || "/placeholder.svg?height=64&width=64&query=thumb"}
               alt={`${name} ${i + 1}`}
+              width={128}
+              height={128}
               className="h-16 w-full object-cover"
             />
             {/* Show variant label on thumbnail if it's a variant image */}

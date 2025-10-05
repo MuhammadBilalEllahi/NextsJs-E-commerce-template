@@ -14,25 +14,25 @@ if (!MONGODB_URI) {
 }
 
 // Apply default schema options globally
-mongoose.plugin((schema) => {
-  schema.set("toJSON", {
-    virtuals: true,
-    versionKey: false,
-    transform: (doc, ret) => {
-      ret.id = (ret._id as any).toString();
-      delete ret._id;
-    },
-  });
+// mongoose.plugin((schema) => {
+//   schema.set("toJSON", {
+//     virtuals: true,
+//     versionKey: false,
+//     transform: (doc, ret) => {
+//       ret.id = (ret._id as any).toString();
+//       delete ret._id;
+//     },
+//   });
 
-  schema.set("toObject", {
-    virtuals: true,
-    versionKey: false,
-    transform: (doc, ret) => {
-      ret.id = (ret._id as any).toString();
-      delete ret._id;
-    },
-  });
-});
+//   schema.set("toObject", {
+//     virtuals: true,
+//     versionKey: false,
+//     transform: (doc, ret) => {
+//       ret.id = (ret._id as any).toString();
+//       delete ret._id;
+//     },
+//   });
+// });
 /**
  * Cached connection for MongoDB.
  */

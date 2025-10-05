@@ -2,6 +2,11 @@ import Link from "next/link";
 import { getContentPage } from "@/database/data-service";
 import { notFound } from "next/navigation";
 import { ContentPage } from "@/types/types";
+import {
+  absoluteUrl,
+  buildBreadcrumbJsonLd,
+  buildFaqPageJsonLd,
+} from "@/lib/seo";
 
 export default async function FAQsPage() {
   const contentPage = (await getContentPage("faqs")) as ContentPage | null;
@@ -12,6 +17,29 @@ export default async function FAQsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            buildFaqPageJsonLd(
+              // naive extraction: convert headings + paragraphs into Q/A when possible
+              // assuming content contains HTML with <h3>Question</h3><p>Answer</p>
+              []
+            )
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            buildBreadcrumbJsonLd([
+              { name: "Home", item: absoluteUrl("/") },
+              { name: "FAQs", item: absoluteUrl("/faqs") },
+            ])
+          ),
+        }}
+      />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
