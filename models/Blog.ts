@@ -15,7 +15,7 @@ export interface BlogDocument extends mongoose.Document {
 const BlogSchema = new Schema<BlogDocument>(
   {
     title: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true, index: true },
+    slug: { type: String, required: true, unique: true },
     excerpt: { type: String },
     content: { type: String, required: true },
     image: { type: String },
@@ -29,4 +29,3 @@ const Blog: Model<BlogDocument> =
   mongoose.models.Blog || mongoose.model<BlogDocument>("Blog", BlogSchema);
 
 export default Blog;
-

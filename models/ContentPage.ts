@@ -64,7 +64,7 @@ const ContentPageSchema: Schema = new Schema(
 );
 
 // Ensure slug is unique
-ContentPageSchema.index({ slug: 1 }, { unique: true });
+// ContentPageSchema.index({ slug: 1 }, { unique: true }); // Removed - already unique in schema
 
 export default mongoose.models[MODELS.CONTENT_PAGE] ||
   mongoose.model<IContentPage>(MODELS.CONTENT_PAGE, ContentPageSchema);

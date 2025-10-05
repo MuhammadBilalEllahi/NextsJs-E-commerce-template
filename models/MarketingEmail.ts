@@ -31,7 +31,6 @@ const MarketingEmailSchema = new Schema<MarketingEmailDocument>(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
     isActive: { type: Boolean, default: true },
     subscribedAt: { type: Date, default: Date.now },
@@ -40,7 +39,6 @@ const MarketingEmailSchema = new Schema<MarketingEmailDocument>(
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
     campaigns: [
       {
@@ -66,10 +64,8 @@ const MarketingEmailSchema = new Schema<MarketingEmailDocument>(
 );
 
 // Indexes for performance
-MarketingEmailSchema.index({ email: 1 });
 MarketingEmailSchema.index({ isActive: 1 });
 MarketingEmailSchema.index({ "campaigns.campaignId": 1 });
-MarketingEmailSchema.index({ unsubscribeToken: 1 });
 
 const MarketingEmail: Model<MarketingEmailDocument> =
   mongoose.models.MarketingEmail ||
@@ -79,4 +75,3 @@ const MarketingEmail: Model<MarketingEmailDocument> =
   );
 
 export default MarketingEmail;
-

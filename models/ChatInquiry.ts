@@ -74,12 +74,10 @@ const ChatInquirySchema = new Schema<ChatInquiryDocument>(
     sessionId: {
       type: String,
       required: true,
-      index: true,
     },
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      index: true,
     },
     name: {
       type: String,
@@ -94,7 +92,6 @@ const ChatInquirySchema = new Schema<ChatInquiryDocument>(
       type: String,
       enum: ["open", "closed", "pending", "resolved"],
       default: "open",
-      index: true,
     },
     priority: {
       type: String,
@@ -110,7 +107,6 @@ const ChatInquirySchema = new Schema<ChatInquiryDocument>(
     lastMessageAt: {
       type: Date,
       default: Date.now,
-      index: true,
     },
     assignedTo: {
       type: Schema.Types.ObjectId,
