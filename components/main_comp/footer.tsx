@@ -1,7 +1,16 @@
 import Link from "next/link";
 import { NewsletterInline } from "@/components/home/home-newsletter";
+import { getAllCategories } from "@/database/data-service";
+import { Category } from "@/types";
 
-export function Footer() {
+export async function Footer() {
+  // Fetch categories from cache
+  const categories = await getAllCategories();
+
+  // Get top-level categories (no parent) and limit to 4 for display
+  const topCategories = categories
+    .filter((cat: Category) => !cat.parent)
+    .slice(0, 4);
   return (
     <footer className="border-t bg-white dark:bg-neutral-950">
       <div className="container mx-auto px-4 py-10 grid gap-8 md:grid-cols-4">
@@ -22,38 +31,16 @@ export function Footer() {
                 All Products
               </Link>
             </li>
-            <li>
-              <Link
-                href="/shop/all?category=spices"
-                className="hover:underline"
-              >
-                Spices
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/shop/all?category=masalas"
-                className="hover:underline"
-              >
-                Masalas
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/shop/all?category=pickles"
-                className="hover:underline"
-              >
-                Pickles
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/shop/all?category=snacks"
-                className="hover:underline"
-              >
-                Snacks
-              </Link>
-            </li>
+            {topCategories.map((category: Category) => (
+              <li key={category.id}>
+                <Link
+                  href={`/shop/all?category=${category.slug}`}
+                  className="hover:underline"
+                >
+                  {category.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>

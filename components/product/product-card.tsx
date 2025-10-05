@@ -19,6 +19,7 @@ export function ProductCard({
   variant?: "grid" | "list" | "single" | "mini";
   className?: string;
 }) {
+  console.log("product", product);
   const { add, isAdding } = useCart();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
@@ -56,7 +57,7 @@ export function ProductCard({
   // Get variant labels for display
   const getVariantLabels = () => {
     if (!product.variants || product.variants.length === 0) return [];
-    return product.variants.map((v) => v.label).slice(0, 3); // Show max 3 labels
+    return product.variants.map((v: Variant) => v.label).slice(0, 3); // Show max 3 labels
   };
 
   // Helper function to find first available variant with stock
@@ -66,7 +67,7 @@ export function ProductCard({
     // Find first variant that has stock and is active
     return (
       product.variants.find(
-        (variant) =>
+        (variant: Variant) =>
           typeof variant.stock === "number" &&
           variant.stock > 0 &&
           !variant.isOutOfStock &&
@@ -395,8 +396,10 @@ export function ProductCard({
         </div>
         <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
           Brand:{" "}
-          {(product?.brand as Brand) ? (
-            (product?.brand as Brand).name
+          {typeof product?.brand === "string" ? (
+            product?.brand
+          ) : (product?.brand as Brand)?.name ? (
+            product?.brand.name
           ) : (
             <i>dehli mirch</i>
           )}
@@ -445,15 +448,17 @@ export function ProductCard({
       <QuickLookModal
         product={{
           ...product,
-          //@ts-ignore
           variants: product.variants?.map((v: Variant) => ({
-            id: v.id,
-            label: v.label,
+            id: v.id ?? "",
+            label: v.label ?? "",
             price: v.price ?? 0,
             stock: v.stock ?? 0,
             isActive: v.isActive ?? true,
             isOutOfStock: v.isOutOfStock ?? false,
             images: v.images ?? [],
+            sku: v.sku ?? "",
+            slug: v.slug ?? "",
+            discount: v.discount ?? 0,
           })) as Variant[],
         }}
         isOpen={isQuickLookOpen}

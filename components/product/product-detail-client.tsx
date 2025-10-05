@@ -203,7 +203,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       <div className="relative grid lg:grid-cols-2 gap-8">
         <ProductImages
           images={currentImages as string[]}
-          title={product.name}
+          name={product.name}
           variantLabels={variantLabels}
         />
         <div>

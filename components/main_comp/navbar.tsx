@@ -97,7 +97,7 @@ export function Navbar() {
   return (
     <>
       <HoverDataPreloader />
-      <nav className="sticky top-0 z-40 border-b bg-white/95 dark:bg-neutral-950/95 backdrop-blur">
+      <nav className="sticky top-0 z-10 border-b bg-white/95 dark:bg-neutral-950/95 backdrop-blur">
         <div className="container mx-auto px-4 h-12 flex items-center justify-between">
           {/* Mobile Hamburger Menu */}
           <div className="flex items-center gap-3 lg:hidden">

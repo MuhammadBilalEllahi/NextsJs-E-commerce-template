@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { VariantLabel } from "@/types";
 export function ProductImages({
   images = [] as string[],
-  title = "Product",
+  name = "Product",
   variantLabels = [] as VariantLabel[],
 }) {
   const [index, setIndex] = useState(0);
@@ -25,7 +25,7 @@ export function ProductImages({
       <div className="relative overflow-hidden rounded-lg border max-h-[35rem]">
         <img
           src={current || "/placeholder.svg"}
-          alt={title}
+          alt={name}
           className={`w-full object-fill transition-transform duration-300 ${cursor} ${
             zoom ? "scale-125" : "scale-100"
           }`}
@@ -52,7 +52,7 @@ export function ProductImages({
           >
             <img
               src={src || "/placeholder.svg?height=64&width=64&query=thumb"}
-              alt={`${title} ${i + 1}`}
+              alt={`${name} ${i + 1}`}
               className="h-16 w-full object-cover"
             />
             {/* Show variant label on thumbnail if it's a variant image */}

@@ -19,15 +19,7 @@ import { Variant } from "@/types";
 
 interface QuickLookModalProps {
   product: Product & {
-    variants?: Array<{
-      id: string;
-      label: string;
-      price: number;
-      stock: number;
-      isActive: boolean;
-      isOutOfStock: boolean;
-      images: string[] | File[] | string;
-    }>;
+    variants?: Variant[];
     ingredients?: string;
   };
   isOpen: boolean;
@@ -48,20 +40,20 @@ export function QuickLookModal({
   useEffect(() => {
     if (product.variants && product.variants.length > 0) {
       const defaultVariant =
-        product.variants.find((v) => v.isActive && !v.isOutOfStock) ||
+        product.variants.find((v: Variant) => v.isActive && !v.isOutOfStock) ||
         product.variants[0];
       if (defaultVariant) {
         setSelectedVariant({
-          id: defaultVariant.id,
-          label: defaultVariant.label,
-          price: defaultVariant.price || 0,
-          stock: defaultVariant.stock || 0,
-          isActive: defaultVariant.isActive || false,
-          isOutOfStock: defaultVariant.isOutOfStock || false,
-          images: defaultVariant.images || ([] as string[] | File[] | string),
-          sku: defaultVariant.sku || "",
-          slug: defaultVariant.slug || "",
-          discount: defaultVariant.discount || 0,
+          id: defaultVariant.id ?? "",
+          label: defaultVariant.label ?? "",
+          price: defaultVariant.price ?? 0,
+          stock: defaultVariant.stock ?? 0,
+          isActive: defaultVariant.isActive ?? true,
+          isOutOfStock: defaultVariant.isOutOfStock ?? false,
+          images: defaultVariant.images ?? [],
+          sku: defaultVariant.sku ?? "",
+          slug: defaultVariant.slug ?? "",
+          discount: defaultVariant.discount ?? 0,
         });
       }
     }
@@ -97,7 +89,7 @@ export function QuickLookModal({
       });
     } else if (product.variants && product.variants.length > 0) {
       let imageIndex = 0;
-      product.variants.forEach((variant) => {
+      product.variants.forEach((variant: Variant) => {
         if (variant.images && variant.images.length > 0) {
           variant.images.forEach(() => {
             variantLabels.push({
@@ -117,10 +109,21 @@ export function QuickLookModal({
 
   // Handle variant selection with validation
   const handleVariantSelect = (variant: Variant) => {
-    if (variant.isOutOfStock || variant.stock <= 0) {
+    if (variant.isOutOfStock || (variant.stock ?? 0) <= 0) {
       return;
     }
-    setSelectedVariant(variant);
+    setSelectedVariant({
+      id: variant.id ?? "",
+      label: variant.label ?? "",
+      price: variant.price ?? 0,
+      stock: variant.stock ?? 0,
+      isActive: variant.isActive ?? true,
+      isOutOfStock: variant.isOutOfStock ?? false,
+      images: variant.images ?? [],
+      sku: variant.sku ?? "",
+      slug: variant.slug ?? "",
+      discount: variant.discount ?? 0,
+    });
     setQuantity(1);
   };
 
@@ -234,7 +237,7 @@ export function QuickLookModal({
               <div>
                 <ProductImages
                   images={currentImages as string[]}
-                  title={product.name}
+                  name={product.name}
                   variantLabels={variantLabels}
                 />
               </div>
@@ -273,17 +276,17 @@ export function QuickLookModal({
                       Variants
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {product.variants.map((variant) => {
-                        const isSelected = selectedVariant?.id === variant.id;
+                      {product.variants.map((variant: Variant) => {
+                        const isSelected =
+                          selectedVariant?.id === (variant.id ?? "");
                         const isAvailable =
-                          variant.isActive &&
-                          !variant.isOutOfStock &&
-                          variant.stock &&
-                          variant.stock > 0;
+                          (variant.isActive ?? true) &&
+                          !(variant.isOutOfStock ?? false) &&
+                          (variant.stock ?? 0) > 0;
 
                         return (
                           <Button
-                            key={variant.id}
+                            key={variant.id ?? `variant-${variant.label}`}
                             variant={isSelected ? "default" : "outline"}
                             size="sm"
                             onClick={() => handleVariantSelect(variant)}
@@ -292,7 +295,7 @@ export function QuickLookModal({
                               !isAvailable ? "opacity-50" : ""
                             }`}
                           >
-                            {variant.label}
+                            {variant.label ?? "Unknown"}
                             {!isAvailable && (
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="w-full h-0.5 bg-red-500 transform rotate-45"></div>
