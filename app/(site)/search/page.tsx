@@ -46,7 +46,9 @@ export default function SearchPage() {
         (product) =>
           product.name.toLowerCase().includes(query.toLowerCase()) ||
           product.description?.toLowerCase().includes(query.toLowerCase()) ||
-          product.brand?.toLowerCase().includes(query.toLowerCase())
+          (typeof product.brand === "string"
+            ? product.brand.toLowerCase().includes(query.toLowerCase())
+            : product.brand?.name?.toLowerCase().includes(query.toLowerCase()))
       );
       setSearchResults(filtered as Product[]);
     } catch (error) {

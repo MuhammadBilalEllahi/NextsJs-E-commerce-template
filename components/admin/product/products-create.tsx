@@ -34,7 +34,7 @@ import {
 } from "@/lib/api/admin/category/categories";
 import { createBrand } from "@/lib/api/admin/brand/brand";
 import { createProduct } from "@/lib/api/admin/product/products";
-import { Brand, Category, VariantDraft } from "@/types";
+import { Brand, Category, VariantDraft, CreateBrandData } from "@/types";
 
 export default function ProductsCreateAdminUI() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -154,23 +154,17 @@ export default function ProductsCreateAdminUI() {
   };
 
   // ===== create BRAND (name, description, logo) =====
-  const [brandDraft, setBrandDraft] = useState<{
-    name: string;
-    description: string;
-    logo?: File;
-  }>({ name: "", description: "" });
+  const [brandDraft, setBrandDraft] = useState<CreateBrandData>({
+    name: "",
+    description: "",
+  });
   const brandLogoPreview = useMemo(
     () => (brandDraft.logo ? URL.createObjectURL(brandDraft.logo) : ""),
     [brandDraft.logo]
   );
 
   const handleBrandCreate = async () => {
-    const data = {
-      name: brandDraft.name,
-      description: brandDraft.description,
-      logo: brandDraft.logo as any,
-    };
-    const created = await createBrand(data);
+    const created = await createBrand(brandDraft);
     setBrands((prev) => [...prev, created]);
     setForm((f) => ({ ...f, brand: created.id }));
     setBrandOpen(false);

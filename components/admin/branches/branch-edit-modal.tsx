@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Branch, UpdateBranchData } from "@/lib/api/admin/branches/branches";
+import { Branch, UpdateBranchData } from "@/types";
 import {
   MapPin,
   Phone,
@@ -104,7 +104,7 @@ export function BranchEditModal({
         whatsapp: branch.whatsapp || "",
         isActive: branch.isActive,
       });
-      setLogoPreview(branch.logo);
+      setLogoPreview(branch.logo || "");
       setLogoFile(null);
       setErrors({});
     }
@@ -233,7 +233,7 @@ export function BranchEditModal({
         whatsapp: branch.whatsapp || "",
         isActive: branch.isActive,
       });
-      setLogoPreview(branch.logo);
+      setLogoPreview(branch.logo || "");
       setLogoFile(null);
       setErrors({});
     }

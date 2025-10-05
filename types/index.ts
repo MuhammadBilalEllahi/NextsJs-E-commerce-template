@@ -407,6 +407,21 @@ export interface Product {
   isGrocery: boolean;
 }
 
+export interface ProductListItem {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  images: string[];
+  image?: string;
+  brand: string;
+  rating: number;
+  reviewCount: number;
+  category: string;
+  isTopSelling: boolean;
+  isNewArrival: boolean;
+}
+
 export interface CreateProductData {
   name: string;
   description: string;
@@ -484,9 +499,9 @@ export interface Branch {
   location: string;
   city: string;
   state: string;
-  zipCode: string;
-  phone: string;
-  websiteUrl?: string;
+  country: string;
+  postalCode?: string;
+  manager?: string;
   openingHours: {
     monday: { open: string; close: string; isOpen: boolean };
     tuesday: { open: string; close: string; isOpen: boolean };
@@ -496,17 +511,16 @@ export interface Branch {
     saturday: { open: string; close: string; isOpen: boolean };
     sunday: { open: string; close: string; isOpen: boolean };
   };
+  description?: string;
   coordinates?: {
-    latitude: number;
-    longitude: number;
+    latitude?: number;
+    longitude?: number;
   };
-
+  website?: string;
+  whatsapp?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  description?: string;
-  manager?: string;
-  whatsapp?: string;
 }
 
 // ===== BRAND TYPES =====
@@ -520,6 +534,12 @@ export interface Brand {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CreateBrandData {
+  name: string;
+  description: string;
+  logo?: File;
 }
 
 // ===== CATEGORY TYPES =====
@@ -566,6 +586,12 @@ export interface WishlistItem {
   variantLabel?: string;
   isOutOfStock: boolean;
   availableStock: number;
+  addedAt: string;
+}
+
+export interface WishlistProviderItem {
+  productId: string;
+  variantId?: string;
   addedAt: string;
 }
 
@@ -1112,7 +1138,7 @@ export interface CreateBranchData {
   city: string;
   state: string;
   country?: string;
-  postalCode: string;
+  postalCode?: string;
   manager?: string;
   openingHours?: {
     monday?: { open: string; close: string; isOpen: boolean };
@@ -1125,8 +1151,8 @@ export interface CreateBranchData {
   };
   description?: string;
   coordinates?: {
-    latitude: number;
-    longitude: number;
+    latitude?: number;
+    longitude?: number;
   };
   website?: string;
   whatsapp?: string;

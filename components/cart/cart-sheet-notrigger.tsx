@@ -67,21 +67,21 @@ export function CartSheetUnTriggerable({
                   >
                     <img
                       src={item.image || "/placeholder.svg"}
-                      alt={item.title}
+                      alt={item.name}
                       className="h-16 w-16 rounded object-cover"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
                           <h3 className="font-medium text-sm truncate">
-                            {item.title}
+                            {item.name}
                           </h3>
                           <p className="text-sm text-neutral-600 dark:text-neutral-400">
                             Quantity: {item.qty}
                           </p>
                         </div>
                         <button
-                          aria-label={`Remove ${item.title}`}
+                          aria-label={`Remove ${item.name}`}
                           onClick={() => remove(item.id)}
                           className="text-red-600 hover:text-red-700 p-1"
                         >

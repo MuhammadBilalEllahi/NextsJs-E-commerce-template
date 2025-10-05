@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ProductDetailClient } from "@/components/product/product-detail-client";
 import { getAllProducts, getProductBySlug } from "@/database/data-service";
+import { Product, Review } from "@/types";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -24,11 +25,11 @@ export default async function Page({
   const fixedProduct = {
     ...product,
     reviews:
-      product.reviews?.map((review: any) => ({
+      product.reviews?.map((review: Review) => ({
         ...review,
         id: String(review.id), // Keep as string to match interface
       })) ?? [],
   };
 
-  return <ProductDetailClient product={fixedProduct} />;
+  return <ProductDetailClient product={fixedProduct as unknown as Product} />;
 }

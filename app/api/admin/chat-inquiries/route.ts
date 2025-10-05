@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
       { $match: { isActive: true } },
       {
         $group: {
-          id: null,
+          _id: null,
           total: { $sum: 1 },
           open: { $sum: { $cond: [{ $eq: ["$status", "open"] }, 1, 0] } },
           pending: { $sum: { $cond: [{ $eq: ["$status", "pending"] }, 1, 0] } },

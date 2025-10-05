@@ -53,11 +53,11 @@ export function ReviewsEnhanced({
     try {
       const data = await fetchProductReviews(productId, 5, pageNum);
 
-      if (data.success) {
+      if (data.data) {
         if (append) {
-          setReviews((prev) => [...prev, ...data.reviews]);
+          setReviews((prev) => [...prev, ...data.data]);
         } else {
-          setReviews(data.reviews);
+          setReviews(data.data);
         }
         setHasMore(data.pagination.page < data.pagination.pages);
         setTotalReviews(data.pagination.total);
@@ -74,7 +74,7 @@ export function ReviewsEnhanced({
     try {
       const data = await checkCanReview(productId);
 
-      if (data.success) {
+      if (data.data) {
         setCanReview(data.canReview);
         setHasReviewed(data.hasReviewed);
         if (data.existingReview) {
@@ -119,7 +119,7 @@ export function ReviewsEnhanced({
         images,
       });
 
-      if (data.success) {
+      if (data.data) {
         // Reset form
         setTitle("");
         setComment("");

@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Branch } from "@/lib/api/admin/branches/branches"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Branch } from "@/types";
 import {
   MapPin,
   Phone,
@@ -14,28 +20,32 @@ import {
   Globe,
   MessageCircle,
   Calendar,
-  Navigation
-} from "lucide-react"
-import { Label } from "@/components/ui/label"
+  Navigation,
+} from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 interface BranchViewModalProps {
-  branch: Branch | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  branch: Branch | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalProps) {
-  if (!branch) return null
+export function BranchViewModal({
+  branch,
+  open,
+  onOpenChange,
+}: BranchViewModalProps) {
+  if (!branch) return null;
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -48,14 +58,16 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                 alt={`${branch.name} logo`}
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  const target = e.target as HTMLImageElement
-                  target.src = "/placeholder.svg"
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/placeholder.svg";
                 }}
               />
             </div>
             <div>
               <div className="text-2xl font-bold">{branch.name}</div>
-              <div className="text-sm text-muted-foreground">Branch #{branch.branchNumber}</div>
+              <div className="text-sm text-muted-foreground">
+                Branch #{branch.branchNumber}
+              </div>
             </div>
           </DialogTitle>
           <DialogDescription>
@@ -69,9 +81,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
             <Badge variant={branch.isActive ? "default" : "secondary"}>
               {branch.isActive ? "Active" : "Inactive"}
             </Badge>
-            <Badge variant="outline">
-              {branch.location}
-            </Badge>
+            <Badge variant="outline">{branch.location}</Badge>
             {branch.coordinates && (
               <Badge variant="outline" className="flex items-center gap-1">
                 <Navigation className="h-3 w-3" />
@@ -90,34 +100,46 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <div>
-                  <Label className="text-sm font-medium text-gray-600">Full Address</Label>
+                  <Label className="text-sm font-medium text-gray-600">
+                    Full Address
+                  </Label>
                   <p className="text-gray-900">{branch.address}</p>
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-gray-600">City</Label>
+                  <Label className="text-sm font-medium text-gray-600">
+                    City
+                  </Label>
                   <p className="text-gray-900">{branch.city}</p>
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-gray-600">State</Label>
+                  <Label className="text-sm font-medium text-gray-600">
+                    State
+                  </Label>
                   <p className="text-gray-900">{branch.state}</p>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <Label className="text-sm font-medium text-gray-600">Country</Label>
+                  <Label className="text-sm font-medium text-gray-600">
+                    Country
+                  </Label>
                   <p className="text-gray-900">{branch.country}</p>
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-gray-600">Postal Code</Label>
+                  <Label className="text-sm font-medium text-gray-600">
+                    Postal Code
+                  </Label>
                   <p className="text-gray-900">{branch.postalCode}</p>
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-gray-600">Location/Area</Label>
+                  <Label className="text-sm font-medium text-gray-600">
+                    Location/Area
+                  </Label>
                   <p className="text-gray-900">{branch.location}</p>
                 </div>
               </div>
@@ -125,14 +147,16 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
 
             {branch.coordinates && (
               <div className="pt-4 border-t">
-                <Label className="text-sm font-medium text-gray-600">Coordinates</Label>
+                <Label className="text-sm font-medium text-gray-600">
+                  Coordinates
+                </Label>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
-                    {branch.coordinates.latitude.toFixed(6)}
+                    {branch.coordinates.latitude?.toFixed(6)}
                   </span>
                   <span className="text-gray-400">,</span>
                   <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
-                    {branch.coordinates.longitude.toFixed(6)}
+                    {branch.coordinates.longitude?.toFixed(6)}
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
@@ -154,7 +178,9 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <div>
-                  <Label className="text-sm font-medium text-gray-600">Phone Number</Label>
+                  <Label className="text-sm font-medium text-gray-600">
+                    Phone Number
+                  </Label>
                   <p className="text-gray-900 flex items-center gap-2">
                     <Phone className="h-4 w-4" />
                     {branch.phoneNumber}
@@ -162,7 +188,9 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-gray-600">Email</Label>
+                  <Label className="text-sm font-medium text-gray-600">
+                    Email
+                  </Label>
                   <p className="text-gray-900 flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     <a
@@ -178,7 +206,9 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
               <div className="space-y-3">
                 {branch.whatsapp && (
                   <div>
-                    <Label className="text-sm font-medium text-gray-600">WhatsApp</Label>
+                    <Label className="text-sm font-medium text-gray-600">
+                      WhatsApp
+                    </Label>
                     <p className="text-gray-900 flex items-center gap-2">
                       <MessageCircle className="h-4 w-4 text-green-600" />
                       {branch.whatsapp}
@@ -188,7 +218,9 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
 
                 {branch.website && (
                   <div>
-                    <Label className="text-sm font-medium text-gray-600">Website</Label>
+                    <Label className="text-sm font-medium text-gray-600">
+                      Website
+                    </Label>
                     <p className="text-gray-900 flex items-center gap-2">
                       <Globe className="h-4 w-4" />
                       <a
@@ -219,7 +251,9 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
               <div className="space-y-3">
                 {branch.manager && (
                   <div>
-                    <Label className="text-sm font-medium text-gray-600">Manager</Label>
+                    <Label className="text-sm font-medium text-gray-600">
+                      Manager
+                    </Label>
                     <p className="text-gray-900 flex items-center gap-2">
                       <User className="h-4 w-4" />
                       {branch.manager}
@@ -229,16 +263,23 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
 
                 {branch.openingHours && (
                   <div>
-                    <Label className="text-sm font-medium text-gray-600">Opening Hours</Label>
+                    <Label className="text-sm font-medium text-gray-600">
+                      Opening Hours
+                    </Label>
                     <div className="space-y-2">
-                      {Object.entries(branch.openingHours).map(([day, hours]) => (
-                        <div key={day} className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-gray-500" />
-                          <span className="text-gray-900 capitalize">
-                            {day}: {hours.isOpen ? `${hours.open} - ${hours.close}` : 'Closed'}
-                          </span>
-                        </div>
-                      ))}
+                      {Object.entries(branch.openingHours).map(
+                        ([day, hours]) => (
+                          <div key={day} className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-gray-500" />
+                            <span className="text-gray-900 capitalize">
+                              {day}:{" "}
+                              {hours.isOpen
+                                ? `${hours.open} - ${hours.close}`
+                                : "Closed"}
+                            </span>
+                          </div>
+                        )
+                      )}
                     </div>
                   </div>
                 )}
@@ -247,7 +288,9 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
               <div className="space-y-3">
                 {branch.description && (
                   <div>
-                    <Label className="text-sm font-medium text-gray-600">Description</Label>
+                    <Label className="text-sm font-medium text-gray-600">
+                      Description
+                    </Label>
                     <p className="text-gray-900">{branch.description}</p>
                   </div>
                 )}
@@ -266,12 +309,16 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label className="text-sm font-medium text-gray-600">Created</Label>
+                <Label className="text-sm font-medium text-gray-600">
+                  Created
+                </Label>
                 <p className="text-gray-900">{formatDate(branch.createdAt)}</p>
               </div>
 
               <div>
-                <Label className="text-sm font-medium text-gray-600">Last Updated</Label>
+                <Label className="text-sm font-medium text-gray-600">
+                  Last Updated
+                </Label>
                 <p className="text-gray-900">{formatDate(branch.updatedAt)}</p>
               </div>
             </div>
@@ -303,7 +350,7 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
 
               {branch.whatsapp && (
                 <a
-                  href={`https://wa.me/${branch.whatsapp.replace(/\D/g, '')}`}
+                  href={`https://wa.me/${branch.whatsapp.replace(/\D/g, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-3 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors"
@@ -329,5 +376,5 @@ export function BranchViewModal({ branch, open, onOpenChange }: BranchViewModalP
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

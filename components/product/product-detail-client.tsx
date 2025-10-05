@@ -29,33 +29,19 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useCart } from "@/lib/providers/cartContext";
-import type { Product } from "@/mock_data/data";
+
 import { formatCurrency } from "@/lib/constants/currency";
+import { Product, Review, Variant } from "@/types";
 
 interface ProductDetailClientProps {
   product: Product & {
-    variants?: Array<{
-      id: string;
-      label: string;
-      price: number;
-      stock: number;
-      isActive: boolean;
-      isOutOfStock: boolean;
-      images: string[];
-    }>;
+    variants?: Variant[];
   };
 }
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
-  const [selectedVariant, setSelectedVariant] = useState<{
-    id: string;
-    label: string;
-    price: number;
-    stock: number;
-    isActive: boolean;
-    isOutOfStock: boolean;
-    images: string[];
-  } | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+
   const [quantity, setQuantity] = useState(1);
   const [isInitialized, setIsInitialized] = useState(false);
   const { add, isAdding } = useCart();
@@ -175,9 +161,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       add(
         {
           id: `${String(product.id)}-${selectedVariant.id}`, // Create unique ID for variant
-          title: `${product.title} - ${selectedVariant.label}`,
+          name: `${product.name} - ${selectedVariant.label}`,
           price: selectedVariant.price,
-          image: currentImages[0] || product.images[0],
+          image: (currentImages[0] as string) || (product.images[0] as string),
           variantId: selectedVariant.id,
           variantLabel: selectedVariant.label,
           productId: String(product.id),
@@ -191,9 +177,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       add(
         {
           id: String(product.id),
-          title: product.title,
+          name: product.name,
           price: product.price,
-          image: product.images[0],
+          image: product.images[0] as string,
           productId: String(product.id),
           slug: product.slug,
         },
@@ -216,13 +202,13 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     <div className="container mx-auto px-4 py-8">
       <div className="relative grid lg:grid-cols-2 gap-8">
         <ProductImages
-          images={currentImages}
-          title={product.title}
+          images={currentImages as string[]}
+          title={product.name}
           variantLabels={variantLabels}
         />
         <div>
           <div className="flex items-start justify-between gap-4">
-            <h1 className="text-2xl md:text-3xl font-bold">{product.title}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">{product.name}</h1>
             <AddToWishlistButton
               productId={String(product.id)}
               variantId={selectedVariant?.id}
@@ -233,7 +219,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
               <div className="inline-flex items-center gap-1">
                 <Star className="h-4 w-4 text-yellow-500" />
-                <span>{product.rating.toFixed(1)}</span>
+                <span>{product.ratingAvg.toFixed(1)}</span>
                 <span className="opacity-70">({product.reviews.length})</span>
               </div>
             </div>
@@ -430,20 +416,24 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   <AccordionContent>
                     <ReviewsEnhanced
                       productId={String(product.id)}
-                      initialReviews={product.reviews.map((review) => ({
-                        id: String(review.id),
-                        user:
-                          typeof review.user === "object" &&
-                          review.user !== null
-                            ? (review.user as any)?.name ||
-                              (review.user as any)?.id ||
-                              "Anonymous"
-                            : (review.user as string) || "Anonymous",
-                        rating: review.rating,
-                        title: (review as any).title || "",
-                        comment: review.comment,
-                        date: review.date,
-                      }))}
+                      initialReviews={
+                        product.reviews && Array.isArray(product.reviews)
+                          ? (product.reviews.map((review: Review) => ({
+                              id: String(review.id),
+                              user:
+                                typeof review.user === "object" &&
+                                review.user !== null
+                                  ? (review.user as any)?.name ||
+                                    (review.user as any)?.id ||
+                                    "Anonymous"
+                                  : (review.user as string) || "Anonymous",
+                              rating: review.rating,
+                              title: (review as any).title || "",
+                              comment: review.comment,
+                              date: review.createdAt,
+                            })) as any[])
+                          : []
+                      }
                     />
                   </AccordionContent>
                 )}
@@ -488,7 +478,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <a
               className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                product.title
+                product.name
               )}&url=${encodeURIComponent(
                 typeof window !== "undefined" ? window.location.href : ""
               )}`}
@@ -510,7 +500,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <a
               className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
               href={`https://wa.me/?text=${encodeURIComponent(
-                `${product.title} - ${
+                `${product.name} - ${
                   typeof window !== "undefined" ? window.location.href : ""
                 }`
               )}`}

@@ -22,6 +22,23 @@ import {
 } from "@/lib/cacheConstants";
 import Branch from "@/models/Branches";
 import ContentPage from "@/models/ContentPage";
+// Import database types for MongoDB documents
+import {
+  ProductDB,
+  ReviewDB,
+  VariantDB,
+  BrandDB,
+  CategoryDB,
+  UserDB,
+  ContentPageDB,
+  BlogDB,
+  FAQDB,
+  BranchDB,
+  GlobalSettingsDB,
+  BannerDB,
+} from "@/types/database";
+
+// Import frontend types for transformed data
 import {
   ProductTypeVariant,
   Product as ProductType,
@@ -39,6 +56,116 @@ import {
   Banner as BannerType,
 } from "@/types";
 
+// Helper function to convert MongoDB document to frontend type
+function convertProductToFrontendType(product: any): ProductType {
+  return {
+    id: String(product._id),
+    slug: product.slug,
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    images: product.images,
+    ingredients: product.ingredients,
+    categories: product.categories || [],
+    brand: product.brand?.name || "Dehli Mirch",
+    stock:
+      product.variants?.reduce(
+        (sum: number, v: any) => sum + (v.stock || 0),
+        0
+      ) || 0,
+    discount: product.discount || 0,
+    ratingAvg: product.ratingAvg || 0,
+    reviewCount: product.reviewCount || 0,
+    variants: (product.variants || [])
+      .filter((variant: any) => variant.isActive) // Only show active variants
+      .sort((a: any, b: any) => {
+        // Sort: available first, then out-of-stock
+        const aAvailable = !a.isOutOfStock && a.stock > 0;
+        const bAvailable = !b.isOutOfStock && b.stock > 0;
+        if (aAvailable && !bAvailable) return -1;
+        if (!aAvailable && bAvailable) return 1;
+        return 0;
+      })
+      .map((variant: any) => ({
+        id: String(variant._id),
+        label: variant.label,
+        price: variant.price,
+        stock: variant.stock,
+        isActive: variant.isActive,
+        isOutOfStock: variant.isOutOfStock,
+        images: variant.images,
+      })),
+    reviews:
+      (product.reviews as any[])?.map((review: any) => ({
+        id: String(review._id),
+        product: {
+          id: String(product._id),
+          name: product.name,
+          slug: product.slug,
+          images: product.images,
+        },
+        user: review.user?.name || "Anonymous",
+        rating: review.rating,
+        title: review.title || "",
+        comment: review.comment,
+        isVerified: review.isVerified || false,
+        isHelpful: review.isHelpful || 0,
+        images: review.images || [],
+        isActive: review.isActive || true,
+        isEdited: review.isEdited || false,
+        editedAt: review.editedAt,
+        createdAt: review.createdAt,
+        updatedAt: review.updatedAt,
+      })) || [],
+    isFeatured: product.isFeatured,
+    isTopSelling: product.isTopSelling,
+    isNewArrival: product.isNewArrival,
+    isBestSelling: product.isBestSelling,
+    isSpecial: product.isSpecial,
+    isGrocery: product.isGrocery,
+    isActive: product.isActive,
+    isOutOfStock: product.isOutOfStock,
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
+  };
+}
+
+// Helper function to convert MongoDB document to frontend type for product lists
+function convertProductToListType(product: any): any {
+  return {
+    id: String(product._id),
+    slug: product.slug,
+    name: product.name,
+    description: product.description,
+    price: (product?.variants as any)?.[0]?.price ?? product?.price ?? 0,
+    images: product.images,
+    image:
+      product.images && product.images.length > 0
+        ? product.images[0]
+        : undefined,
+    rating: product.ratingAvg,
+    variants: ((product?.variants as any[]) || [])
+      .filter((variant: any) => variant.isActive) // Only show active variants
+      .sort((a: any, b: any) => {
+        // Sort: available first, then out-of-stock
+        const aAvailable = !a.isOutOfStock && a.stock > 0;
+        const bAvailable = !b.isOutOfStock && b.stock > 0;
+        if (aAvailable && !bAvailable) return -1;
+        if (!aAvailable && bAvailable) return 1;
+        return 0;
+      })
+      .map((variant: any) => ({
+        id: String(variant._id),
+        label: variant.label,
+        price: variant.price,
+        stock: variant.stock,
+        isActive: variant.isActive,
+        isOutOfStock: variant.isOutOfStock,
+        images: variant.images || [],
+      })),
+  };
+}
+
 export async function getAllBranches() {
   try {
     await dbConnect();
@@ -47,8 +174,8 @@ export async function getAllBranches() {
       return JSON.parse(cachedBranches);
     }
     const branches = (await Branch.find({ isActive: true }).lean<
-      BranchType[]
-    >()) as BranchType[];
+      BranchDB[]
+    >()) as BranchDB[];
     if (branches.length > 0) {
       await RedisClient.set(
         CACHE_BRANCH_KEY,
@@ -72,7 +199,7 @@ export async function getGlobalSettings() {
     }
     const globalSettings = (await GlobalSettings.findOne(
       {}
-    ).lean<GlobalSettingsType>()) as GlobalSettingsType;
+    ).lean<GlobalSettingsDB>()) as GlobalSettingsDB;
     if (globalSettings) {
       await RedisClient.set(
         CACHE_GLOBAL_SETTINGS_KEY,
@@ -95,9 +222,9 @@ export async function getAllBanners() {
       return JSON.parse(cachedBanners);
     }
     const banners = (await Banner.find({ isActive: true })
-      .lean<BannerType[]>()
+      .lean<BannerDB[]>()
       .sort({ createdAt: -1 })
-      .lean<BannerType[]>()) as BannerType[];
+      .lean<BannerDB[]>()) as BannerDB[];
 
     // Filter out expired banners
     const activeBanners = banners.filter((banner) => {
@@ -142,7 +269,7 @@ export async function getAllTopSellingProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean<ProductType[]>()) as ProductType[];
+      .lean()) as any[];
 
     const total = await Product.countDocuments({
       isActive: true,
@@ -153,51 +280,9 @@ export async function getAllTopSellingProducts(limit = 10, page = 1) {
       JSON.stringify(products, null, 2)
     );
     return {
-      products: products.map((product: ProductType) => ({
-        id: String(product._id),
-        slug: product.slug,
-        name: product.name,
-        description: product.description,
-        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-        images: product.images,
-        image:
-          product.images && product.images.length > 0
-            ? product.images[0]
-            : undefined,
-        rating: product.ratingAvg,
+      products: products.map((product: any) => ({
+        ...convertProductToListType(product),
         isTopSelling: product.isTopSelling,
-        // ingredients: product.ingredients,
-        instructions: "", // Can be added to product model later
-        // category: product.categories?.[0]?.name || "spices",
-        // brand: product.brand?.name || "Dehli Mirch",
-        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-        tags: [], // Can be added to product model later
-        variants: (product?.variants || [])
-          .filter((variant: VariantType) => variant.isActive) // Only show active variants
-          .sort((a: VariantType, b: VariantType) => {
-            // Sort: available first, then out-of-stock
-            const aAvailable = !a.isOutOfStock && a.stock > 0;
-            const bAvailable = !b.isOutOfStock && b.stock > 0;
-            if (aAvailable && !bAvailable) return -1;
-            if (!aAvailable && bAvailable) return 1;
-            return 0;
-          })
-          .map((variant: VariantType) => ({
-            id: String(variant._id),
-            label: variant.label,
-            price: variant.price,
-            stock: variant.stock,
-            isActive: variant.isActive,
-            isOutOfStock: variant.isOutOfStock,
-            images: variant.images || [],
-          })),
-        // reviews: product.reviews?.map(review => ({
-        //   id: String(review._id),
-        //   user: review.user?.name || "Anonymous",
-        //   rating: review.rating,
-        //   comment: review.comment,
-        //   date: review.createdAt
-        // })) || []
       })),
       pagination: {
         page,
@@ -227,7 +312,7 @@ export async function getAllFeaturedProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean<ProductType[]>()) as ProductType[];
+      .lean()) as any[];
 
     const total = await Product.countDocuments({
       isActive: true,
@@ -238,51 +323,9 @@ export async function getAllFeaturedProducts(limit = 10, page = 1) {
       JSON.stringify(products, null, 2)
     );
     return {
-      products: products.map((product: ProductType) => ({
-        id: String(product._id),
-        slug: product.slug,
-        name: product.name,
-        description: product.description,
-        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-        images: product.images,
-        image:
-          product.images && product.images.length > 0
-            ? product.images[0]
-            : undefined,
-        rating: product.ratingAvg,
+      products: products.map((product: any) => ({
+        ...convertProductToListType(product),
         isFeatured: product.isFeatured,
-        // ingredients: product.ingredients,
-        instructions: "", // Can be added to product model later
-        // category: product.categories?.[0]?.name || "spices",
-        // brand: product.brand?.name || "Dehli Mirch",
-        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-        tags: [], // Can be added to product model later
-        variants: (product?.variants || [])
-          .filter((variant: VariantType) => variant.isActive) // Only show active variants
-          .sort((a: VariantType, b: VariantType) => {
-            // Sort: available first, then out-of-stock
-            const aAvailable = !a.isOutOfStock && a.stock > 0;
-            const bAvailable = !b.isOutOfStock && b.stock > 0;
-            if (aAvailable && !bAvailable) return -1;
-            if (!aAvailable && bAvailable) return 1;
-            return 0;
-          })
-          .map((variant: VariantType) => ({
-            id: String(variant._id),
-            label: variant.label,
-            price: variant.price,
-            stock: variant.stock,
-            isActive: variant.isActive,
-            isOutOfStock: variant.isOutOfStock,
-            images: variant.images || [],
-          })),
-        // reviews: product.reviews?.map(review => ({
-        //   id: String(review._id),
-        //   user: review.user?.name || "Anonymous",
-        //   rating: review.rating,
-        //   comment: review.comment,
-        //   date: review.createdAt
-        // })) || []
       })),
       pagination: {
         page,
@@ -312,7 +355,7 @@ export async function getAllNewArrivalsProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean<ProductType[]>()) as ProductType[];
+      .lean()) as any[];
 
     const total = await Product.countDocuments({
       isActive: true,
@@ -320,51 +363,9 @@ export async function getAllNewArrivalsProducts(limit = 10, page = 1) {
     });
     // console.debug("products in getAllNewArrivalsProducts", JSON.stringify(products, null, 2));
     return {
-      products: products.map((product: ProductType) => ({
-        id: String(product._id),
-        slug: product.slug,
-        name: product.name,
-        description: product.description,
-        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-        images: product.images,
-        image:
-          product.images && product.images.length > 0
-            ? product.images[0]
-            : undefined,
-        rating: product.ratingAvg,
+      products: products.map((product: any) => ({
+        ...convertProductToListType(product),
         isNewArrival: product.isNewArrival,
-        // ingredients: product.ingredients,
-        instructions: "", // Can be added to product model later
-        // category: product.categories?.[0]?.name || "spices",
-        // brand: product.brand?.name || "Dehli Mirch",
-        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-        tags: [], // Can be added to product model later
-        variants: (product?.variants || [])
-          .filter((variant: VariantType) => variant.isActive) // Only show active variants
-          .sort((a: VariantType, b: VariantType) => {
-            // Sort: available first, then out-of-stock
-            const aAvailable = !a.isOutOfStock && a.stock > 0;
-            const bAvailable = !b.isOutOfStock && b.stock > 0;
-            if (aAvailable && !bAvailable) return -1;
-            if (!aAvailable && bAvailable) return 1;
-            return 0;
-          })
-          .map((variant: VariantType) => ({
-            id: String(variant._id),
-            label: variant.label,
-            price: variant.price,
-            stock: variant.stock,
-            isActive: variant.isActive,
-            isOutOfStock: variant.isOutOfStock,
-            images: variant.images || [],
-          })),
-        // reviews: product.reviews?.map(review => ({
-        //   id: String(review._id),
-        //   user: review.user?.name || "Anonymous",
-        //   rating: review.rating,
-        //   comment: review.comment,
-        //   date: review.createdAt
-        // })) || []
       })),
       pagination: {
         page,
@@ -394,60 +395,13 @@ export async function getAllProducts() {
         match: { isActive: true, isOutOfStock: false },
       })
       .sort({ createdAt: -1 })
-      .lean<ProductType[]>()) as ProductType[] &
-      BrandType &
-      CategoryType &
-      VariantType[] &
-      ReviewType[];
+      .lean()) as any[];
 
     // console.debug("products in getAllProducts", JSON.stringify(products, null, 2));
 
-    return products.map((product: ProductType) => ({
-      id: String(product._id),
-      slug: product.slug,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      images: product.images,
-      rating: product.ratingAvg,
-      ingredients: product.ingredients,
-      instructions: "", // Can be added to product model later
-      category: (product.categories?.[0] as CategoryType)?.name || "",
-      brand: (product.brand as BrandType)?.name || "Dehli Mirch",
-      stock:
-        product.variants?.reduce(
-          (sum: number, v: VariantType) => sum + (v.stock || 0),
-          0
-        ) || 0,
-      tags: [], // Can be added to product model later
-      variants: (product.variants || [])
-        .filter((variant: VariantType) => variant.isActive) // Only show active variants
-        .sort((a: VariantType, b: VariantType) => {
-          // Sort: available first, then out-of-stock
-          const aAvailable = !a.isOutOfStock && a.stock > 0;
-          const bAvailable = !b.isOutOfStock && b.stock > 0;
-          if (aAvailable && !bAvailable) return -1;
-          if (!aAvailable && bAvailable) return 1;
-          return 0;
-        })
-        .map((variant: VariantType) => ({
-          id: String(variant._id),
-          label: variant.label,
-          price: variant.price,
-          stock: variant.stock,
-          isActive: variant.isActive,
-          isOutOfStock: variant.isOutOfStock,
-          images: variant.images,
-        })),
-      reviews:
-        (product.reviews as ReviewType[])?.map((review: ReviewType) => ({
-          id: String(review._id),
-          user: (review.user as UserType)?.name || "Anonymous",
-          rating: review.rating,
-          comment: review.comment,
-          date: review.createdAt,
-        })) || [],
-    }));
+    return products.map((product: any) =>
+      convertProductToFrontendType(product)
+    );
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
@@ -468,7 +422,7 @@ export async function getAllSpecialProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean<ProductType[]>()) as ProductType[];
+      .lean()) as any[];
 
     const total = await Product.countDocuments({
       isActive: true,
@@ -479,44 +433,9 @@ export async function getAllSpecialProducts(limit = 10, page = 1) {
       JSON.stringify(products, null, 2)
     );
     return {
-      products: products.map((product: ProductType) => ({
-        id: String(product._id),
-        slug: product.slug,
-        name: product.name,
-        description: product.description,
-        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-        images: product.images,
-        image:
-          product.images && product.images.length > 0
-            ? product.images[0]
-            : undefined,
-        rating: product.ratingAvg,
+      products: products.map((product: any) => ({
+        ...convertProductToListType(product),
         isSpecial: product.isSpecial,
-        // ingredients: product.ingredients,
-        instructions: "", // Can be added to product model later
-        // category: product.categories?.[0]?.name || "spices",
-        // brand: product.brand?.name || "Dehli Mirch",
-        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-        tags: [], // Can be added to product model later
-        variants: (product?.variants || [])
-          .filter((variant: VariantType) => variant.isActive) // Only show active variants
-          .sort((a: VariantType, b: VariantType) => {
-            // Sort: available first, then out-of-stock
-            const aAvailable = !a.isOutOfStock && a.stock > 0;
-            const bAvailable = !b.isOutOfStock && b.stock > 0;
-            if (aAvailable && !bAvailable) return -1;
-            if (!aAvailable && bAvailable) return 1;
-            return 0;
-          })
-          .map((variant: VariantType) => ({
-            id: String(variant._id),
-            label: variant.label,
-            price: variant.price,
-            stock: variant.stock,
-            isActive: variant.isActive,
-            isOutOfStock: variant.isOutOfStock,
-            images: variant.images,
-          })),
       })),
       pagination: {
         page,
@@ -544,7 +463,7 @@ export async function getAllGroceryProducts(limit = 10, page = 1) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean<ProductType[]>()) as ProductType[];
+      .lean()) as any[];
 
     const total = await Product.countDocuments({
       isActive: true,
@@ -555,44 +474,9 @@ export async function getAllGroceryProducts(limit = 10, page = 1) {
       JSON.stringify(products, null, 2)
     );
     return {
-      products: products.map((product: ProductType) => ({
-        id: String(product._id),
-        slug: product.slug,
-        name: product.name,
-        description: product.description,
-        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-        images: product.images,
-        image:
-          product.images && product.images.length > 0
-            ? product.images[0]
-            : undefined,
-        rating: product.ratingAvg,
+      products: products.map((product: any) => ({
+        ...convertProductToListType(product),
         isGrocery: product.isGrocery,
-        // ingredients: product.ingredients,
-        instructions: "", // Can be added to product model later
-        // category: product.categories?.[0]?.name || "spices",
-        // brand: product.brand?.name || "Dehli Mirch",
-        // stock: product.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0,
-        tags: [], // Can be added to product model later
-        variants: (product?.variants || [])
-          .filter((variant: VariantType) => variant.isActive) // Only show active variants
-          .sort((a: VariantType, b: VariantType) => {
-            // Sort: available first, then out-of-stock
-            const aAvailable = !a.isOutOfStock && a.stock > 0;
-            const bAvailable = !b.isOutOfStock && b.stock > 0;
-            if (aAvailable && !bAvailable) return -1;
-            if (!aAvailable && bAvailable) return 1;
-            return 0;
-          })
-          .map((variant: VariantType) => ({
-            id: String(variant._id),
-            label: variant.label,
-            price: variant.price,
-            stock: variant.stock,
-            isActive: variant.isActive,
-            isOutOfStock: variant.isOutOfStock,
-            images: variant.images,
-          })),
       })),
       pagination: {
         page,
@@ -615,11 +499,11 @@ export async function getAllActiveBrands() {
     // Get all active brands
     const brands = (await Brand.find({
       isActive: true,
-    }).lean<BrandType[]>()) as BrandType[];
+    }).lean()) as any[];
 
     // Get product count for each brand and sort by product count
     const brandsWithProductCount = await Promise.all(
-      brands.map(async (brand: BrandType) => {
+      brands.map(async (brand: any) => {
         const productCount = await Product.countDocuments({
           brand: brand._id,
           isActive: true,
@@ -639,19 +523,11 @@ export async function getAllActiveBrands() {
 
     // Sort by product count in descending order (highest to lowest)
     const sortedBrands = brandsWithProductCount.sort(
-      (a: BrandType, b: BrandType) => b.productCount - a.productCount
+      (a: any, b: any) => b.productCount - a.productCount
     );
 
     // Return only the brand data without productCount (as requested)
-    return sortedBrands.map(
-      ({
-        productCount,
-        ...brand
-      }: {
-        productCount: number;
-        brand: BrandType;
-      }) => brand
-    );
+    return sortedBrands.map(({ productCount, ...brand }: any) => brand);
   } catch (error) {
     console.error("Error fetching active brands:", error);
     return [];
@@ -665,19 +541,19 @@ export async function getProductBySlug(slug: string) {
       .populate("brand", "name")
       .populate("categories", "name")
       .populate("variants")
-      .lean<ProductType>()) as ProductType;
+      .lean()) as any;
     // .lean();
 
     if (!product) return null;
 
     // Filter and sort variants: available first, then out-of-stock
-    const availableVariants: VariantType[] = (product.variants || []).filter(
-      (variant: VariantType) =>
+    const availableVariants: any[] = (product.variants || []).filter(
+      (variant: any) =>
         variant.isActive && !variant.isOutOfStock && variant.stock > 0
     );
 
-    const outOfStockVariants: VariantType[] = (product.variants || []).filter(
-      (variant: VariantType) =>
+    const outOfStockVariants: any[] = (product.variants || []).filter(
+      (variant: any) =>
         variant.isActive && (variant.isOutOfStock || variant.stock <= 0)
     );
 
@@ -697,11 +573,11 @@ export async function getProductBySlug(slug: string) {
       category: product.categories?.[0]?.name || "spices",
       brand: product.brand?.name || "Dehli Mirch",
       stock: availableVariants.reduce(
-        (sum: number, v: VariantType) => sum + (v.stock || 0),
+        (sum: number, v: any) => sum + (v.stock || 0),
         0
       ),
       tags: [], // Can be added later
-      variants: sortedVariants.map((variant: VariantType) => ({
+      variants: sortedVariants.map((variant: any) => ({
         id: String(variant._id),
         label: variant.label,
         price: variant.price,
@@ -711,9 +587,9 @@ export async function getProductBySlug(slug: string) {
         images: variant.images,
       })),
       reviews:
-        product.reviews?.map((review: ReviewType) => ({
+        product.reviews?.map((review: any) => ({
           id: String(review._id),
-          user: (review.user as UserType)?.name || "Anonymous",
+          user: review.user?.name || "Anonymous",
           rating: review.rating,
           comment: review.comment,
           date: review.createdAt,
@@ -740,9 +616,9 @@ export async function getAllCategories() {
     const categories = (await Category.find({ isActive: true })
       .populate("parent", "name")
       .sort({ order: 1, name: 1 })
-      .lean<CategoryType[]>()) as CategoryType[];
+      .lean()) as any[];
 
-    const formattedCategories = categories.map((category) => ({
+    const formattedCategories = categories.map((category: any) => ({
       id: String(category._id),
       name: category.name,
       slug: category.slug,
@@ -788,7 +664,7 @@ export async function getAllCategoriesWithProducts(productsPerCategory = 6) {
     const categories = (await Category.find({ isActive: true })
       .populate("parent", "name")
       .sort({ order: 1, name: 1 })
-      .lean<CategoryType[]>()) as CategoryType[];
+      .lean()) as any[];
 
     // Fetch products for each category in parallel
     const categoriesWithProducts = await Promise.all(
@@ -806,9 +682,9 @@ export async function getAllCategoriesWithProducts(productsPerCategory = 6) {
           })
           .sort({ createdAt: -1 })
           .limit(productsPerCategory)
-          .lean<ProductType[]>()) as ProductType[];
+          .lean()) as any[];
 
-        const formattedProducts = products.map((product: ProductType) => ({
+        const formattedProducts = products.map((product: any) => ({
           id: String(product._id),
           slug: product.slug,
           name: product.name,
@@ -861,9 +737,9 @@ export async function getAllBrands() {
     await dbConnect();
     const brands = (await Brand.find({ isActive: true })
       .sort({ name: 1 })
-      .lean<BrandType[]>()) as BrandType[];
+      .lean()) as any[];
 
-    return brands.map((brand) => ({
+    return brands.map((brand: any) => ({
       id: String(brand._id),
       name: brand.name,
       description: brand.description,
@@ -901,9 +777,9 @@ export async function getProductReviews(
     });
 
     return {
-      reviews: reviews.map((review: ReviewType) => ({
+      reviews: reviews.map((review: any) => ({
         id: String(review._id),
-        user: (review.user as UserType)?.name || "Anonymous",
+        user: review.user?.name || "Anonymous",
         rating: review.rating,
         title: review.title,
         comment: review.comment,
@@ -940,7 +816,7 @@ export async function getProductsByBrand(brandName: string, limit = 10) {
     const products = (await Product.find({
       isActive: true,
       isOutOfStock: false,
-      brand: (brand as BrandType)._id,
+      brand: (brand as any)._id,
     })
       .populate("brand", "name")
       .populate({
@@ -949,9 +825,9 @@ export async function getProductsByBrand(brandName: string, limit = 10) {
       })
       .sort({ createdAt: -1 })
       .limit(limit)
-      .lean<ProductType[]>()) as ProductType[];
+      .lean()) as any[];
 
-    const formattedProducts = products.map((product: ProductType) => ({
+    const formattedProducts = products.map((product: any) => ({
       id: String(product._id),
       slug: product.slug,
       name: product.name,
@@ -965,8 +841,8 @@ export async function getProductsByBrand(brandName: string, limit = 10) {
       rating: product.ratingAvg,
       brand: product.brand?.name || "Dehli Mirch",
       variants: (product.variants || [])
-        .filter((variant: VariantType) => variant.isActive)
-        .map((variant: VariantType) => ({
+        .filter((variant: any) => variant.isActive)
+        .map((variant: any) => ({
           id: String(variant._id),
           label: variant.label,
           price: variant.price,
@@ -1002,7 +878,7 @@ export async function getProductsByCategory(categorySlug: string, limit = 10) {
     const category = (await Category.findOne({
       slug: categorySlug,
       isActive: true,
-    }).lean<CategoryType>()) as CategoryType;
+    }).lean()) as any;
     if (!category) return [];
 
     // Find products in this category
@@ -1018,9 +894,9 @@ export async function getProductsByCategory(categorySlug: string, limit = 10) {
       })
       .sort({ createdAt: -1 })
       .limit(limit)
-      .lean<ProductType[]>()) as ProductType[];
+      .lean()) as any[];
 
-    const formattedProducts = products.map((product: ProductType) => ({
+    const formattedProducts = products.map((product: any) => ({
       id: String(product._id),
       slug: product.slug,
       name: product.name,
@@ -1064,7 +940,7 @@ export async function getTrendingProducts(limit = 6) {
       })
       .sort({ createdAt: -1 })
       .limit(Math.ceil(limit / 2))
-      .lean<ProductType[]>()) as ProductType[];
+      .lean()) as any[];
 
     // Get new arrivals to fill remaining slots
     const remainingLimit = limit - topSelling.length;
@@ -1084,13 +960,13 @@ export async function getTrendingProducts(limit = 6) {
             })
             .sort({ createdAt: -1 })
             .limit(remainingLimit)
-            .lean<ProductType[]>()) as ProductType[])
-        : ([] as ProductType[]);
+            .lean()) as any[])
+        : ([] as any[]);
 
     // Combine and format products
     const allProducts = [...topSelling, ...newArrivals];
 
-    return allProducts.map((product) => ({
+    return allProducts.map((product: any) => ({
       id: String(product._id),
       slug: product.slug,
       name: product.name,
@@ -1134,9 +1010,9 @@ export async function getFAQs(category = "all", search = "") {
 
     const faqs = (await FAQ.find(query)
       .sort({ order: 1, createdAt: -1 })
-      .lean<FAQType[]>()) as FAQType[];
+      .lean()) as any[];
 
-    return faqs.map((faq) => ({
+    return faqs.map((faq: any) => ({
       id: String(faq._id),
       question: faq.question,
       answer: faq.answer,
@@ -1157,7 +1033,7 @@ export async function getContentPage(slug: string) {
     const contentPage = (await ContentPage.findOne({
       slug,
       isActive: true,
-    }).lean<ContentPageType>()) as ContentPageType;
+    }).lean()) as any;
 
     return contentPage;
   } catch (error) {
@@ -1209,7 +1085,7 @@ export async function getAllContentPages() {
     await dbConnect();
     const contentPages = (await ContentPage.find({ isActive: true })
       .sort({ updatedAt: -1 })
-      .lean<ContentPageType[]>()) as ContentPageType[];
+      .lean()) as any[];
 
     return contentPages;
   } catch (error) {
@@ -1225,9 +1101,9 @@ export async function getFeaturedBlogs(limit = 6) {
     const blogs = (await Blog.find({ isActive: true })
       .sort({ createdAt: -1 })
       .limit(limit)
-      .lean<BlogType[]>()) as BlogType[];
+      .lean()) as any[];
 
-    return blogs.map((b: BlogType) => ({
+    return blogs.map((b: any) => ({
       slug: b.slug,
       title: b.title,
       excerpt: b.excerpt ?? "",

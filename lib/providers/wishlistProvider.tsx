@@ -6,11 +6,11 @@ import { getOrCreateGuestId } from "@/lib/utils/uuid";
 
 const STORAGE_KEY = "dm-wishlist";
 
-import { WishlistItem } from "@/types";
+import { WishlistItem, WishlistProviderItem } from "@/types";
 
 type WishlistCtx = {
   ids: Set<string>;
-  items: WishlistItem[];
+  items: WishlistProviderItem[];
   has: (id: string) => boolean;
   toggle: (id: string, variantId?: string) => Promise<void>;
   clear: () => Promise<void>;
@@ -22,7 +22,7 @@ const Ctx = createContext<WishlistCtx | null>(null);
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [ids, setIds] = useState<Set<string>>(new Set());
-  const [items, setItems] = useState<WishlistItem[]>([]);
+  const [items, setItems] = useState<WishlistProviderItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { isAuthenticated, user } = useAuth();
 
@@ -30,7 +30,9 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      const storedItems = raw ? (JSON.parse(raw) as WishlistItem[]) : [];
+      const storedItems = raw
+        ? (JSON.parse(raw) as WishlistProviderItem[])
+        : [];
       setItems(storedItems);
       setIds(new Set(storedItems.map((item) => item.productId)));
     } catch {
@@ -64,11 +66,13 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          const dbItems: WishlistItem[] = data.wishlist.map((item: any) => ({
-            productId: item.productId,
-            variantId: item.variantId,
-            addedAt: item.addedAt,
-          }));
+          const dbItems: WishlistProviderItem[] = data.wishlist.map(
+            (item: any) => ({
+              productId: item.productId,
+              variantId: item.variantId,
+              addedAt: item.addedAt,
+            })
+          );
 
           setItems(dbItems);
           setIds(new Set(dbItems.map((item) => item.productId)));
@@ -111,7 +115,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
           });
 
           if (response.ok) {
-            const newItem: WishlistItem = {
+            const newItem: WishlistProviderItem = {
               productId,
               variantId,
               addedAt: new Date().toISOString(),
@@ -156,7 +160,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
           });
 
           if (response.ok) {
-            const newItem: WishlistItem = {
+            const newItem: WishlistProviderItem = {
               productId,
               variantId,
               addedAt: new Date().toISOString(),

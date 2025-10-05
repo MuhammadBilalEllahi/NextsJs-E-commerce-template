@@ -19,7 +19,7 @@ mongoose.plugin((schema) => {
     virtuals: true,
     versionKey: false,
     transform: (doc, ret) => {
-      ret.id = ret._id.toString();
+      ret.id = (ret._id as any).toString();
       delete ret._id;
     },
   });
@@ -28,7 +28,7 @@ mongoose.plugin((schema) => {
     virtuals: true,
     versionKey: false,
     transform: (doc, ret) => {
-      ret.id = ret._id.toString();
+      ret.id = (ret._id as any).toString();
       delete ret._id;
     },
   });

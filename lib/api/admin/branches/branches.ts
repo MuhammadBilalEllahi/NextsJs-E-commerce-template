@@ -62,7 +62,7 @@ export const createBranch = async (
     formData.append("location", branchData.location);
     formData.append("city", branchData.city);
     formData.append("state", branchData.state);
-    formData.append("postalCode", branchData.postalCode);
+    formData.append("postalCode", branchData.postalCode as string);
 
     if (branchData.country) formData.append("country", branchData.country);
     if (branchData.manager) formData.append("manager", branchData.manager);
@@ -83,12 +83,18 @@ export const createBranch = async (
 
     // Handle coordinates
     if (branchData.coordinates) {
-      formData.append("latitude", branchData.coordinates.latitude.toString());
-      formData.append("longitude", branchData.coordinates.longitude.toString());
+      formData.append(
+        "latitude",
+        branchData.coordinates.latitude?.toString() || ""
+      );
+      formData.append(
+        "longitude",
+        branchData.coordinates.longitude?.toString() || ""
+      );
     }
 
     // Append logo file
-    formData.append("logo", branchData.logo);
+    formData.append("logo", branchData.logo as File);
 
     const response = await fetch(API_URL_BRANCHES, {
       method: "POST",
@@ -154,13 +160,19 @@ export const updateBranch = async (
 
     // Handle coordinates
     if (branchData.coordinates) {
-      formData.append("latitude", branchData.coordinates.latitude.toString());
-      formData.append("longitude", branchData.coordinates.longitude.toString());
+      formData.append(
+        "latitude",
+        branchData.coordinates.latitude?.toString() || ""
+      );
+      formData.append(
+        "longitude",
+        branchData.coordinates.longitude?.toString() || ""
+      );
     }
 
     // Append logo file if provided
     if (branchData.logo) {
-      formData.append("logo", branchData.logo);
+      formData.append("logo", branchData.logo as File);
     }
 
     const response = await fetch(API_URL_BRANCHES, {

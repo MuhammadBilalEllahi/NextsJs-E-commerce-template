@@ -70,9 +70,11 @@ export function SearchSheet({ isOpen, onClose }: SearchSheetProps) {
       const products = await getAllProducts();
       const filtered = products.filter(
         (product) =>
-          product.title.toLowerCase().includes(query.toLowerCase()) ||
+          product.name.toLowerCase().includes(query.toLowerCase()) ||
           product.description?.toLowerCase().includes(query.toLowerCase()) ||
-          product.brand?.toLowerCase().includes(query.toLowerCase())
+          (typeof product.brand === "string"
+            ? product.brand.toLowerCase().includes(query.toLowerCase())
+            : product.brand?.name?.toLowerCase().includes(query.toLowerCase()))
       );
       setSearchResults(filtered as Product[]);
     } catch (error) {

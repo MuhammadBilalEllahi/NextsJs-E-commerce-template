@@ -321,13 +321,13 @@ export default function BranchesAdminPage() {
                         <div className="flex items-center gap-2 text-gray-600">
                           <Building2 className="h-4 w-4" />
                           <span>
-                            {branch.city}, {branch.state} {branch.zipCode}
+                            {branch.city}, {branch.state} {branch.postalCode}
                           </span>
                         </div>
                         {branch.coordinates && (
                           <div className="text-xs text-gray-500">
-                            📍 {branch.coordinates.latitude.toFixed(6)},{" "}
-                            {branch.coordinates.longitude.toFixed(6)}
+                            📍 {branch.coordinates.latitude?.toFixed(6)},{" "}
+                            {branch.coordinates.longitude?.toFixed(6)}
                           </div>
                         )}
                       </div>
@@ -367,11 +367,11 @@ export default function BranchesAdminPage() {
                             </div>
                           </div>
                         )}
-                        {branch.websiteUrl && (
+                        {branch.website && (
                           <div className="flex items-center gap-2">
                             <Globe className="h-4 w-4" />
                             <a
-                              href={branch.websiteUrl}
+                              href={branch.website}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-600 hover:underline"

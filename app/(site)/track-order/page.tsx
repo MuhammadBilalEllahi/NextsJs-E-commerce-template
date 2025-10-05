@@ -245,7 +245,7 @@ export default function TrackOrderPage() {
                         <Package className="h-8 w-8 text-neutral-400" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold">{item.productTitle}</h3>
+                        <h3 className="font-semibold">{item.productName}</h3>
                         <p className="text-sm text-neutral-600 dark:text-neutral-400">
                           {item.variantLabel} • Qty: {item.quantity}
                         </p>

@@ -1,23 +1,43 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { CitySelect } from "@/components/ui/city-select"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { CreateBranchData } from "@/lib/api/admin/branches/branches"
-import { MapPin, Phone, Mail, Building2, User, Clock, Globe, MessageCircle } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CitySelect } from "@/components/ui/city-select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { CreateBranchData } from "@/types";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Building2,
+  User,
+  Clock,
+  Globe,
+  MessageCircle,
+} from "lucide-react";
 
 interface BranchCreateModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSubmit: (data: CreateBranchData) => Promise<void>
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: CreateBranchData) => Promise<void>;
 }
 
-export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreateModalProps) {
+export function BranchCreateModal({
+  open,
+  onOpenChange,
+  onSubmit,
+}: BranchCreateModalProps) {
   const [formData, setFormData] = useState<CreateBranchData>({
     name: "",
     address: "",
@@ -37,92 +57,105 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
       thursday: { open: "09:00", close: "18:00", isOpen: true },
       friday: { open: "09:00", close: "18:00", isOpen: true },
       saturday: { open: "09:00", close: "18:00", isOpen: true },
-      sunday: { open: "09:00", close: "18:00", isOpen: true }
+      sunday: { open: "09:00", close: "18:00", isOpen: true },
     },
     description: "",
     website: "",
     whatsapp: "",
     isActive: true,
-    logo: null as any
-  })
+    logo: null as any,
+  });
 
-  const [logoFile, setLogoFile] = useState<File | null>(null)
-  const [logoPreview, setLogoPreview] = useState<string>("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleInputChange = (field: keyof CreateBranchData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+  const handleInputChange = (
+    field: keyof CreateBranchData,
+    value: string | boolean
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }))
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
-  }
+  };
 
-  const handleOpeningHoursChange = (day: keyof typeof formData.openingHours, field: 'open' | 'close' | 'isOpen', value: string | boolean) => {
-    setFormData(prev => ({
+  const handleOpeningHoursChange = (
+    day: keyof typeof formData.openingHours,
+    field: "open" | "close" | "isOpen",
+    value: string | boolean
+  ) => {
+    setFormData((prev) => ({
       ...prev,
       openingHours: {
         ...(prev.openingHours ?? {}),
         [day]: {
-          ...(typeof prev.openingHours?.[day] === "object" && prev.openingHours[day] !== null ? prev.openingHours[day] : { open: "", close: "", isOpen: true }),
-          [field]: value
-        }
-      }
-    }))
-  }
+          ...(typeof prev.openingHours?.[day] === "object" &&
+          prev.openingHours[day] !== null
+            ? prev.openingHours[day]
+            : { open: "", close: "", isOpen: true }),
+          [field]: value,
+        },
+      },
+    }));
+  };
 
   const handleLogoChange = (file: File | null) => {
-    setLogoFile(file)
+    setLogoFile(file);
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = () => {
-        setLogoPreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-      setFormData(prev => ({ ...prev, logo: file }))
+        setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setFormData((prev) => ({ ...prev, logo: file }));
     } else {
-      setLogoPreview("")
-      setFormData(prev => ({ ...prev, logo: null as any }))
+      setLogoPreview("");
+      setFormData((prev) => ({ ...prev, logo: null as any }));
     }
-  }
+  };
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) newErrors.name = "Branch name is required"
-    if (!formData.address.trim()) newErrors.address = "Address is required"
-    if (!formData.phoneNumber.trim()) newErrors.phoneNumber = "Phone number is required"
-    if (!formData.email.trim()) newErrors.email = "Email is required"
-    if (!formData.branchNumber.trim()) newErrors.branchNumber = "Branch number is required"
-    if (!formData.location.trim()) newErrors.location = "Location is required"
-    if (!formData.city.trim()) newErrors.city = "City is required"
-    if (!formData.state.trim()) newErrors.state = "State is required"
-    if (!formData.postalCode.trim()) newErrors.postalCode = "Postal code is required"
-    if (!logoFile) newErrors.logo = "Logo is required"
+    if (!formData.name.trim()) newErrors.name = "Branch name is required";
+    if (!formData.address.trim()) newErrors.address = "Address is required";
+    if (!formData.phoneNumber.trim())
+      newErrors.phoneNumber = "Phone number is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.branchNumber.trim())
+      newErrors.branchNumber = "Branch number is required";
+    if (!formData.location.trim()) newErrors.location = "Location is required";
+    if (!formData.city.trim()) newErrors.city = "City is required";
+    if (!formData.state.trim()) newErrors.state = "State is required";
+    if (!formData.postalCode?.trim())
+      newErrors.postalCode = "Postal code is required";
+    if (!logoFile) newErrors.logo = "Logo is required";
 
     // Email validation
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Invalid email format"
+      newErrors.email = "Invalid email format";
     }
 
     // Website validation
     if (formData.website && !/^https?:\/\/.+/.test(formData.website)) {
-      newErrors.website = "Website must start with http:// or https://"
+      newErrors.website = "Website must start with http:// or https://";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) return
+    e.preventDefault();
 
-    setIsSubmitting(true)
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
     try {
-      await onSubmit(formData)
+      await onSubmit(formData);
       // Reset form
       setFormData({
         name: "",
@@ -143,23 +176,23 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
           thursday: { open: "09:00", close: "18:00", isOpen: true },
           friday: { open: "09:00", close: "18:00", isOpen: true },
           saturday: { open: "09:00", close: "18:00", isOpen: true },
-          sunday: { open: "09:00", close: "18:00", isOpen: true }
+          sunday: { open: "09:00", close: "18:00", isOpen: true },
         },
         description: "",
         website: "",
         whatsapp: "",
         isActive: true,
-        logo: null as any
-      })
-      setLogoFile(null)
-      setLogoPreview("")
-      setErrors({})
+        logo: null as any,
+      });
+      setLogoFile(null);
+      setLogoPreview("");
+      setErrors({});
     } catch (error) {
-      console.error("Failed to create branch:", error)
+      console.error("Failed to create branch:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -181,18 +214,18 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
         thursday: { open: "09:00", close: "18:00", isOpen: true },
         friday: { open: "09:00", close: "18:00", isOpen: true },
         saturday: { open: "09:00", close: "18:00", isOpen: true },
-        sunday: { open: "09:00", close: "18:00", isOpen: true }
+        sunday: { open: "09:00", close: "18:00", isOpen: true },
       },
       description: "",
       website: "",
       whatsapp: "",
       isActive: true,
-      logo: null as any
-    })
-    setLogoFile(null)
-    setLogoPreview("")
-    setErrors({})
-  }
+      logo: null as any,
+    });
+    setLogoFile(null);
+    setLogoPreview("");
+    setErrors({});
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -216,7 +249,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                 placeholder="Enter branch name"
                 className={errors.name ? "border-red-500" : ""}
               />
-              {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-sm text-red-500">{errors.name}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -224,11 +259,15 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
               <Input
                 id="branchNumber"
                 value={formData.branchNumber}
-                onChange={(e) => handleInputChange("branchNumber", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("branchNumber", e.target.value)
+                }
                 placeholder="e.g., BR001"
                 className={errors.branchNumber ? "border-red-500" : ""}
               />
-              {errors.branchNumber && <p className="text-sm text-red-500">{errors.branchNumber}</p>}
+              {errors.branchNumber && (
+                <p className="text-sm text-red-500">{errors.branchNumber}</p>
+              )}
             </div>
           </div>
 
@@ -238,7 +277,7 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
               <MapPin className="h-5 w-5" />
               Address Information
             </h3>
-            
+
             <div className="space-y-2">
               <Label htmlFor="address">Full Address *</Label>
               <Textarea
@@ -249,7 +288,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                 rows={3}
                 className={errors.address ? "border-red-500" : ""}
               />
-              {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
+              {errors.address && (
+                <p className="text-sm text-red-500">{errors.address}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -259,7 +300,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                   onChange={(value) => handleInputChange("city", value)}
                   placeholder="Select a city"
                 />
-                {errors.city && <p className="text-sm text-red-500">{errors.city}</p>}
+                {errors.city && (
+                  <p className="text-sm text-red-500">{errors.city}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -271,7 +314,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                   placeholder="Enter state"
                   className={errors.state ? "border-red-500" : ""}
                 />
-                {errors.state && <p className="text-sm text-red-500">{errors.state}</p>}
+                {errors.state && (
+                  <p className="text-sm text-red-500">{errors.state}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -279,11 +324,15 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                 <Input
                   id="postalCode"
                   value={formData.postalCode}
-                  onChange={(e) => handleInputChange("postalCode", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("postalCode", e.target.value)
+                  }
                   placeholder="Enter postal code"
                   className={errors.postalCode ? "border-red-500" : ""}
                 />
-                {errors.postalCode && <p className="text-sm text-red-500">{errors.postalCode}</p>}
+                {errors.postalCode && (
+                  <p className="text-sm text-red-500">{errors.postalCode}</p>
+                )}
               </div>
             </div>
 
@@ -303,11 +352,15 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                 <Input
                   id="location"
                   value={formData.location}
-                  onChange={(e) => handleInputChange("location", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("location", e.target.value)
+                  }
                   placeholder="e.g., Downtown, Mall Area"
                   className={errors.location ? "border-red-500" : ""}
                 />
-                {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
+                {errors.location && (
+                  <p className="text-sm text-red-500">{errors.location}</p>
+                )}
               </div>
             </div>
           </div>
@@ -318,18 +371,22 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
               <Phone className="h-5 w-5" />
               Contact Information
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber">Phone Number *</Label>
                 <Input
                   id="phoneNumber"
                   value={formData.phoneNumber}
-                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("phoneNumber", e.target.value)
+                  }
                   placeholder="Enter phone number"
                   className={errors.phoneNumber ? "border-red-500" : ""}
                 />
-                {errors.phoneNumber && <p className="text-sm text-red-500">{errors.phoneNumber}</p>}
+                {errors.phoneNumber && (
+                  <p className="text-sm text-red-500">{errors.phoneNumber}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -342,7 +399,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                   placeholder="Enter email address"
                   className={errors.email ? "border-red-500" : ""}
                 />
-                {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email}</p>
+                )}
               </div>
             </div>
 
@@ -352,7 +411,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                 <Input
                   id="whatsapp"
                   value={formData.whatsapp}
-                  onChange={(e) => handleInputChange("whatsapp", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("whatsapp", e.target.value)
+                  }
                   placeholder="Enter WhatsApp number"
                 />
               </div>
@@ -367,7 +428,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                   placeholder="https://example.com"
                   className={errors.website ? "border-red-500" : ""}
                 />
-                {errors.website && <p className="text-sm text-red-500">{errors.website}</p>}
+                {errors.website && (
+                  <p className="text-sm text-red-500">{errors.website}</p>
+                )}
               </div>
             </div>
           </div>
@@ -378,7 +441,7 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
               <Building2 className="h-5 w-5" />
               Additional Information
             </h3>
-            
+
             <div className="flex flex-col">
               <div className="space-y-2">
                 <Label htmlFor="manager">Manager</Label>
@@ -393,35 +456,61 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
               <div className="space-y-2 w-full">
                 <Label>Opening Hours</Label>
                 <div className="space-y-3">
-                  {Object.entries(formData.openingHours?? {}).map(([day, hours]) => (
-                    <div key={day} className="flex items-center gap-3 p-3 border rounded-lg w-full">
-                      <Checkbox
-                        id={`${day}_isOpen`}
-                        checked={hours.isOpen}
-                        onCheckedChange={(checked) => handleOpeningHoursChange(day as keyof typeof formData.openingHours, 'isOpen', checked as boolean)}
-                      />
-                      <Label htmlFor={`${day}_isOpen`} className="w-20 capitalize font-medium">
-                        {day}
-                      </Label>
-                      {hours.isOpen && (
-                        <>
-                          <Input
-                            type="time"
-                            value={hours.open}
-                            onChange={(e) => handleOpeningHoursChange(day as keyof typeof formData.openingHours, 'open', e.target.value)}
-                            className="w-fit"
-                          />
-                          <span className="text-gray-500">to</span>
-                          <Input
-                            type="time"
-                            value={hours.close}
-                            onChange={(e) => handleOpeningHoursChange(day as keyof typeof formData.openingHours, 'close', e.target.value)}
-                            className="w-fit"
-                          />
-                        </>
-                      )}
-                    </div>
-                  ))}
+                  {Object.entries(formData.openingHours ?? {}).map(
+                    ([day, hours]) => (
+                      <div
+                        key={day}
+                        className="flex items-center gap-3 p-3 border rounded-lg w-full"
+                      >
+                        <Checkbox
+                          id={`${day}_isOpen`}
+                          checked={hours.isOpen}
+                          onCheckedChange={(checked) =>
+                            handleOpeningHoursChange(
+                              day as keyof typeof formData.openingHours,
+                              "isOpen",
+                              checked as boolean
+                            )
+                          }
+                        />
+                        <Label
+                          htmlFor={`${day}_isOpen`}
+                          className="w-20 capitalize font-medium"
+                        >
+                          {day}
+                        </Label>
+                        {hours.isOpen && (
+                          <>
+                            <Input
+                              type="time"
+                              value={hours.open}
+                              onChange={(e) =>
+                                handleOpeningHoursChange(
+                                  day as keyof typeof formData.openingHours,
+                                  "open",
+                                  e.target.value
+                                )
+                              }
+                              className="w-fit"
+                            />
+                            <span className="text-gray-500">to</span>
+                            <Input
+                              type="time"
+                              value={hours.close}
+                              onChange={(e) =>
+                                handleOpeningHoursChange(
+                                  day as keyof typeof formData.openingHours,
+                                  "close",
+                                  e.target.value
+                                )
+                              }
+                              className="w-fit"
+                            />
+                          </>
+                        )}
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -431,7 +520,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 placeholder="Enter branch description"
                 rows={3}
               />
@@ -441,7 +532,7 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
           {/* Logo Upload */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Branch Logo</h3>
-            
+
             <div className="space-y-2">
               <Label htmlFor="logo">Logo Image *</Label>
               <Input
@@ -451,7 +542,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
                 onChange={(e) => handleLogoChange(e.target.files?.[0] || null)}
                 className={errors.logo ? "border-red-500" : ""}
               />
-              {errors.logo && <p className="text-sm text-red-500">{errors.logo}</p>}
+              {errors.logo && (
+                <p className="text-sm text-red-500">{errors.logo}</p>
+              )}
               <p className="text-xs text-muted-foreground">
                 Upload a logo image for the branch (JPG, PNG, GIF)
               </p>
@@ -476,7 +569,9 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
             <Checkbox
               id="isActive"
               checked={formData.isActive}
-              onCheckedChange={(checked) => handleInputChange("isActive", checked as boolean)}
+              onCheckedChange={(checked) =>
+                handleInputChange("isActive", checked as boolean)
+              }
             />
             <Label htmlFor="isActive">Branch is active</Label>
           </div>
@@ -492,5 +587,5 @@ export function BranchCreateModal({ open, onOpenChange, onSubmit }: BranchCreate
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -10,13 +10,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTrendingProducts } from "@/database/data-service";
 import { formatCurrency } from "@/lib/constants/currency";
-import { Category, Product } from "@/types";
+import { Category, Product, ProductListItem } from "@/types";
 
 export function HomeSearchBar({ categories }: { categories: Category[] }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<ProductListItem[]>(
+    []
+  );
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingTrending, setIsLoadingTrending] = useState(false);
@@ -29,7 +31,7 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
     if (isDropdownOpen && trendingProducts.length === 0) {
       setIsLoadingTrending(true);
       getTrendingProducts(6)
-        .then((products) => {
+        .then((products: ProductListItem[]) => {
           setTrendingProducts(products);
           setIsLoadingTrending(false);
         })
@@ -226,11 +228,11 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                                 {renderStars(product.ratingAvg)}
                               </div>
                               <span className="text-xs text-muted-foreground">
-                                {product.reviews?.length} reviews
+                                {product.reviewCount} reviews
                               </span>
                             </div>
                             <p className="text-sm font-semibold text-foreground mt-1">
-                              {formatCurrency(product.variants?.[0]?.price)}
+                              {formatCurrency(product.price)}
                             </p>
                           </div>
                         </div>
@@ -319,14 +321,14 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                               </h4>
                               <div className="flex items-center gap-1 mt-1">
                                 <div className="flex items-center">
-                                  {renderStars(product.ratingAvg)}
+                                  {renderStars(product.rating)}
                                 </div>
                                 <span className="text-xs text-muted-foreground">
-                                  {product.reviews?.length} reviews
+                                  {product.reviewCount} reviews
                                 </span>
                               </div>
                               <p className="text-sm font-semibold text-foreground mt-1">
-                                {formatCurrency(product.variants?.[0]?.price)}
+                                {formatCurrency(product.price)}
                               </p>
                             </div>
                           </div>

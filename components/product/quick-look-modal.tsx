@@ -142,7 +142,7 @@ export function QuickLookModal({
       add(
         {
           id: `${String(product.id)}-${selectedVariant.id}`,
-          title: `${product.name} - ${selectedVariant.label}`,
+          name: `${product.name} - ${selectedVariant.label}`,
           price: selectedVariant.price,
           image:
             ((currentImages && currentImages[0]) as string) ||
@@ -159,7 +159,7 @@ export function QuickLookModal({
       add(
         {
           id: String(product.id),
-          title: product.name,
+          name: product.name,
           price: product.price,
           image:
             (product.images?.[0] as string) ||

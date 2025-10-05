@@ -91,22 +91,24 @@ export async function GET() {
     const topProductsAgg = await Order.aggregate([
       { $match: { createdAt: { $gte: startOfYear } } },
       { $unwind: "$items" },
-      { $group: { id: "$items.product", units: { $sum: "$items.quantity" } } },
+      {
+        $group: { id: "$items.productId", units: { $sum: "$items.quantity" } },
+      },
       { $sort: { units: -1 } },
       { $limit: 5 },
       {
         $lookup: {
           from: "products",
           localField: "id",
-          foreignField: "id",
+          foreignField: "_id",
           as: "product",
         },
       },
       { $unwind: "$product" },
       {
         $project: {
-          id: 0,
-          id: { $toString: "$product.id" },
+          _id: 0,
+          id: { $toString: "$product._id" },
           title: "$product.name",
           units: 1,
         },
@@ -120,7 +122,7 @@ export async function GET() {
         $lookup: {
           from: "variants",
           localField: "variants",
-          foreignField: "id",
+          foreignField: "_id",
           as: "variantDocs",
         },
       },
@@ -138,7 +140,8 @@ export async function GET() {
       { $match: { totalStock: { $lte: 10 } } },
       {
         $project: {
-          id: { $toString: "$id" },
+          _id: 0,
+          id: { $toString: "$_id" },
           title: "$name",
           qty: "$totalStock",
         },
@@ -251,15 +254,15 @@ export async function GET() {
       { $match: { createdAt: { $gte: startOfYear } } },
       {
         $group: {
-          id: "$status",
+          _id: "$status",
           count: { $sum: 1 },
           amount: { $sum: "$amount" },
         },
       },
-    ]).catch(() => [] as { id: string; count: number; amount: number }[]);
+    ]).catch(() => [] as { _id: string; count: number; amount: number }[]);
     const refunds = refundsAgg.map(
-      (r: { id: string; count: number; amount: number }) => ({
-        status: r.id,
+      (r: { _id: string; count: number; amount: number }) => ({
+        status: r._id,
         count: r.count,
         amount: r.amount,
       })
@@ -295,10 +298,10 @@ export async function GET() {
         // Compute sales per product first
         {
           $group: {
-            id: "$items.product",
+            id: "$items.productId",
             productSales: {
               $sum: {
-                $multiply: ["$items.quantity", "$items.priceAtPurchase"],
+                $multiply: ["$items.quantity", "$items.price"],
               },
             },
           },
@@ -308,7 +311,7 @@ export async function GET() {
           $lookup: {
             from: "products",
             localField: "id",
-            foreignField: "id",
+            foreignField: "_id",
             as: "prod",
           },
         },
@@ -333,15 +336,15 @@ export async function GET() {
           $lookup: {
             from: "categories",
             localField: "id",
-            foreignField: "id",
+            foreignField: "_id",
             as: "cat",
           },
         },
         { $unwind: { path: "$cat", preserveNullAndEmptyArrays: true } },
         {
           $project: {
-            id: 0,
-            id: { $toString: "$cat.id" },
+            _id: 0,
+            id: { $toString: "$cat._id" },
             name: { $ifNull: ["$cat.name", "Uncategorized"] },
             sales: 1,
           },

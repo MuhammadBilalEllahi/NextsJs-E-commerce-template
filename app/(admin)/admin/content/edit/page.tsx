@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,7 @@ interface ContentPage {
   updatedAt: string;
 }
 
-export default function EditContentPage() {
+function EditContentPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug");
@@ -437,5 +437,21 @@ export default function EditContentPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function EditContentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        </div>
+      }
+    >
+      <EditContentPageContent />
+    </Suspense>
   );
 }
