@@ -30,7 +30,7 @@ export default async function BlogDetailPage({
 
     const jsonLd = buildBlogPostingJsonLd({
       headline: post.title,
-      description: post.excerpt || post.metaDescription,
+      description: post.excerpt || undefined,
       image: post.image || undefined,
       datePublished: post.createdAt
         ? new Date(post.createdAt).toISOString()
@@ -134,7 +134,7 @@ export async function generateMetadata({
   if (!post) return {};
 
   const title = post.title;
-  const description = post.excerpt || post.metaDescription || undefined;
+  const description = post.excerpt || undefined;
   const url = absoluteUrl(`/blog/${slug}`);
   const image =
     post.image &&
