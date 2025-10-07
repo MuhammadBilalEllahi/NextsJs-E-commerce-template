@@ -36,6 +36,7 @@ import {
 } from "@/lib/api/admin/category/categories";
 import { createBrand } from "@/lib/api/admin/brand/brand";
 import { Brand, Category, Product, Variant } from "@/types";
+import Image from "next/image";
 
 interface ProductsEditAdminUIProps {
   product: Product;
@@ -967,7 +968,9 @@ export default function ProductsEditAdminUI({
               <div className="flex flex-wrap gap-2">
                 {form.images.map((image, index) => (
                   <div key={index} className="relative group">
-                    <img
+                    <Image
+                      width={100}
+                      height={100}
                       src={
                         typeof image === "string"
                           ? image
@@ -1079,8 +1082,14 @@ export default function ProductsEditAdminUI({
                             className="relative group cursor-pointer"
                             onClick={() => setSelectedImage(img as string)}
                           >
-                            <img
-                              src={img}
+                            <Image
+                              width={100}
+                              height={100}
+                              src={
+                                typeof img === "string"
+                                  ? img
+                                  : URL.createObjectURL(img)
+                              }
                               className="w-16 h-16 rounded object-cover border hover:border-blue-400 transition-colors"
                               alt={`Variant image ${imgIndex + 1}`}
                             />

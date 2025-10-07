@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -212,26 +218,39 @@ export default function ProductsTable() {
           />
         )}
 
-        {/* Product Edit Form */}
-        {editingProduct && (
-          <ProductsEditAdminUI
-            product={editingProduct as any}
-            onClose={closeAllForms}
-            onUpdate={() => {
-              loadProducts();
-              closeAllForms();
-            }}
-          />
-        )}
-
-        {/* Product View Form */}
-        {viewingProduct && (
-          <ProductsViewAdminUI
-            product={viewingProduct as any}
-            onClose={closeAllForms}
-            onEdit={() => editProduct(viewingProduct)}
-          />
-        )}
+        {/* Right-side Sheet for View/Edit */}
+        <Sheet
+          open={!!editingProduct || !!viewingProduct}
+          onOpenChange={(open) => {
+            if (!open) closeAllForms();
+          }}
+        >
+          <SheetContent
+            side="right"
+            className="w-full sm:max-w-[50vw] p-0 flex flex-col"
+          >
+            {editingProduct ? (
+              <div className="h-full overflow-y-auto ">
+                <ProductsEditAdminUI
+                  product={editingProduct as any}
+                  onClose={closeAllForms}
+                  onUpdate={() => {
+                    loadProducts();
+                    closeAllForms();
+                  }}
+                />
+              </div>
+            ) : viewingProduct ? (
+              <div className="h-full overflow-y-auto ">
+                <ProductsViewAdminUI
+                  product={viewingProduct as any}
+                  onClose={closeAllForms}
+                  onEdit={() => editProduct(viewingProduct)}
+                />
+              </div>
+            ) : null}
+          </SheetContent>
+        </Sheet>
 
         {/* Selection Summary */}
         {(selectedProducts.length > 0 || selectedVariants.length > 0) && (

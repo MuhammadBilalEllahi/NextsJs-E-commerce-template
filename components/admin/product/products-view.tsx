@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/constants/currency";
 import { Product, Variant, Brand, Category } from "@/types";
+import Image from "next/image";
 interface ProductsViewAdminUIProps {
   product: Product;
   onClose: () => void;
@@ -88,10 +89,12 @@ export default function ProductsViewAdminUI({
                       className="relative cursor-pointer group"
                       onClick={() => setSelectedImage(image as string)}
                     >
-                      <img
-                        src={image}
+                      <Image
+                        width={100}
+                        height={100}
+                        src={product.images[0] as string}
                         alt={`Product image ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg border hover:border-blue-400 transition-colors"
+                        className="w-fit h-32 object-cover rounded-lg border hover:border-blue-400 transition-colors"
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
                         <span className="text-white opacity-0 group-hover:opacity-100 text-sm font-medium">
@@ -453,9 +456,15 @@ export default function ProductsViewAdminUI({
                       </label>
                       <div className="flex gap-2">
                         {variant.images.map((img, imgIndex) => (
-                          <img
+                          <Image
+                            width={100}
+                            height={100}
                             key={imgIndex}
-                            src={img}
+                            src={
+                              typeof img === "string"
+                                ? img
+                                : URL.createObjectURL(img)
+                            }
                             className="w-16 h-16 rounded object-cover border cursor-pointer hover:border-blue-400 transition-colors"
                             alt={`Variant image ${imgIndex + 1}`}
                             onClick={() => setSelectedImage(img as string)}
@@ -486,7 +495,9 @@ export default function ProductsViewAdminUI({
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-4xl max-h-full">
-            <img
+            <Image
+              width={100}
+              height={100}
               src={selectedImage}
               alt="Full size view"
               className="max-w-full max-h-full object-contain rounded-lg"
