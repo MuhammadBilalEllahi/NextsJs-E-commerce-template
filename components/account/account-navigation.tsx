@@ -18,14 +18,14 @@ export function AccountNavigation({ children }: AccountNavigationProps) {
 
   return (
     <div className="grid lg:grid-cols-4 gap-8">
-      <aside className="rounded-lg border p-4 h-fit">
-        <h2 className="font-semibold mb-3">My Account</h2>
+      <aside className="rounded-lg border p-4 h-fit bg-card">
+        <h2 className="font-semibold mb-3 text-foreground">My Account</h2>
         <nav className="space-y-2">
           {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className="block text-sm hover:text-red-600"
+              className="block text-sm text-foreground hover:text-primary"
             >
               {l.label}
             </Link>

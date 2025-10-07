@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     // Format orders for admin display
     const formattedOrders = orders.map(
       (order: {
-        id: { toString: () => string };
+        _id: { toString: () => string };
         orderId: any;
         refId: any;
         createdAt: string | number | Date;
@@ -70,9 +70,9 @@ export async function GET(req: NextRequest) {
         history: any;
         billingAddress: any;
       }) => ({
-        id: order.id.toString(),
-        orderId: order.orderId || order.id.toString().slice(-8).toUpperCase(),
-        refId: order.refId || order.id.toString().slice(-8).toUpperCase(),
+        _id: order._id.toString(),
+        orderId: order.orderId || order._id.toString().slice(-8).toUpperCase(),
+        refId: order.refId || order._id.toString().slice(-8).toUpperCase(),
         date: new Date(order.createdAt).toLocaleDateString(),
         customer: order.user
           ? `${order.user.firstName || ""} ${
@@ -194,7 +194,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({
       message: "Order updated successfully",
       order: {
-        id: order.id.toString(),
+        _id: order._id.toString(),
         status: order.status,
         tracking: order.tracking,
         cancellationReason: order.cancellationReason,

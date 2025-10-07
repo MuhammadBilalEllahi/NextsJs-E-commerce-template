@@ -5,6 +5,7 @@ import Refund from "@/models/Refund";
 import { RefundZodSchema } from "@/models/Refund";
 import Order from "@/models/Order";
 import { authOptions } from "@/lib/auth";
+import { AdminRefund } from "@/types";
 
 // GET - Get all refunds (admin only)
 export async function GET(req: NextRequest) {
@@ -39,7 +40,7 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    const refunds = await Refund.find(query)
+    const refunds = (await Refund.find(query)
       .populate("order", "orderId refId createdAt status")
       .populate("user", "name email")
       .populate("product", "name images")
@@ -48,13 +49,16 @@ export async function GET(req: NextRequest) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean<any>()) as any;
 
     const total = await Refund.countDocuments(query);
 
     return NextResponse.json({
       success: true,
-      refunds,
+      refunds: refunds.map((refund: any) => ({
+        ...refund,
+        id: String(refund._id),
+      })) as AdminRefund[],
       pagination: {
         page,
         limit,

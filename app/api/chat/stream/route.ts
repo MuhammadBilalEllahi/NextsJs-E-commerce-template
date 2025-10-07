@@ -13,27 +13,51 @@ export async function GET(req: NextRequest) {
   const stream = new ReadableStream({
     start(controller) {
       const encoder = new TextEncoder();
+      let closed = false;
+
+      const safeEnqueue = (data: string) => {
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(data));
+        } catch {
+          // If enqueue throws because the controller was closed, mark closed and cleanup
+          closed = true;
+          // @ts-ignore - optional cleanup reference set below
+          (controller as any)?._cleanup?.();
+        }
+      };
 
       // Initial ping so the client connects
-      controller.enqueue(encoder.encode(`event: ping\ndata: connected\n\n`));
+      safeEnqueue(`event: ping\ndata: connected\n\n`);
 
       const unsubscribe = chatBus.subscribe(sessionId, (event) => {
-        controller.enqueue(
-          encoder.encode(
-            `event: message\ndata: ${JSON.stringify(event.payload)}\n\n`
-          )
+        safeEnqueue(
+          `event: message\ndata: ${JSON.stringify(event.payload)}\n\n`
         );
       });
 
       const keepAlive = setInterval(() => {
-        controller.enqueue(encoder.encode(`event: ping\ndata: keepalive\n\n`));
+        safeEnqueue(`event: ping\ndata: keepalive\n\n`);
       }, 25000);
 
       // Teardown
-      (controller as any)._cleanup = () => {
+      const cleanup = () => {
+        if (closed) return;
+        closed = true;
         clearInterval(keepAlive);
         unsubscribe();
+        try {
+          controller.close();
+        } catch {}
       };
+      (controller as any)._cleanup = cleanup;
+
+      // Also teardown if the request is aborted (client disconnects)
+      try {
+        // In Node.js runtime, NextRequest exposes an AbortSignal
+        // which fires when the client disconnects
+        req.signal.addEventListener("abort", cleanup, { once: true });
+      } catch {}
     },
     cancel() {
       // @ts-ignore - optional cleanup
@@ -50,4 +74,3 @@ export async function GET(req: NextRequest) {
     },
   });
 }
-

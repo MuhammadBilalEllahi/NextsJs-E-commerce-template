@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, Moon, ShoppingBag, Menu, Search } from "lucide-react";
+import { Sun, Moon, ShoppingBag, Menu, Search, Palette } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CartSheet } from "../cart/cart-sheet";
 import { useCart } from "@/lib/providers/cartContext";
@@ -12,6 +12,13 @@ import { useAuth } from "@/lib/providers/authProvider";
 import { useWishlist } from "@/lib/providers/wishlistProvider";
 import { HoverDataPreloader } from "@/lib/hooks/use-preloaded-data";
 import { HoverNavigation } from "./hover-navigation";
+import { useThemeColor } from "@/lib/providers/themeProvider";
+import { useTheme } from "next-themes";
+import {
+  SITE_NAME,
+  SITE_NAME_FIRST,
+  SITE_NAME_SECOND,
+} from "@/lib/constants/site";
 
 export function Navbar() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth(); // Destructure isLoading as well
@@ -20,6 +27,12 @@ export function Navbar() {
 
   const pathname = usePathname();
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const { theme: colorTheme, cycleTheme } = useThemeColor();
+  const {
+    theme: nextTheme,
+    setTheme: setNextTheme,
+    resolvedTheme,
+  } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -31,18 +44,9 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
-    const stored = (typeof window !== "undefined" &&
-      localStorage.getItem("dm-theme")) as "light" | "dark" | null;
-    const initial =
-      stored ??
-      (typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light");
-    setTheme(initial);
-    if (typeof document !== "undefined")
-      document.documentElement.classList.toggle("dark", initial === "dark");
-  }, []);
+    const current = (resolvedTheme as "light" | "dark") || "light";
+    setTheme(current);
+  }, [resolvedTheme]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,10 +68,7 @@ export function Navbar() {
 
   const toggleTheme = () => {
     const next = theme === "light" ? "dark" : "light";
-    setTheme(next);
-    if (typeof window !== "undefined") localStorage.setItem("dm-theme", next);
-    if (typeof document !== "undefined")
-      document.documentElement.classList.toggle("dark", next === "dark");
+    setNextTheme(next);
   };
 
   const handleHoverEnter = () => {
@@ -97,7 +98,7 @@ export function Navbar() {
   return (
     <>
       <HoverDataPreloader />
-      <nav className="sticky top-0 z-10 border-b bg-white/95 dark:bg-neutral-950/95 backdrop-blur">
+      <nav className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 h-12 flex items-center justify-between">
           {/* Mobile Hamburger Menu */}
           <div className="flex items-center gap-3 lg:hidden">
@@ -114,8 +115,8 @@ export function Navbar() {
                 <SheetHeader>
                   <div className="flex items-center gap-2">
                     <span className="font-extrabold text-xl tracking-tight">
-                      <span className="text-red-600">Dehli</span>{" "}
-                      <span className="text-green-600">Mirch</span>
+                      <span className="text-red-600">{SITE_NAME_FIRST}</span>{" "}
+                      <span className="text-green-600">{SITE_NAME_SECOND}</span>
                     </span>
                   </div>
                 </SheetHeader>
@@ -138,7 +139,7 @@ export function Navbar() {
                   </nav>
 
                   {/* Mobile Auth Button */}
-                  <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <div className="mt-8 pt-6 border-t border-border">
                     <AuthButton
                       variant="default"
                       size="default"
@@ -156,8 +157,8 @@ export function Navbar() {
               href="/"
               className="font-extrabold text-xl tracking-tight flex-shrink-0 lg:hidden"
             >
-              <span className="text-red-600">Dehli</span>{" "}
-              <span className="text-green-600">Mirch</span>
+              <span className="text-red-600">{SITE_NAME_FIRST}</span>{" "}
+              <span className="text-green-600">{SITE_NAME_SECOND}</span>
             </Link>
           )}
 
@@ -167,8 +168,8 @@ export function Navbar() {
               href="/"
               className="font-extrabold text-xl tracking-tight flex-shrink-0 hidden lg:block"
             >
-              <span className="text-red-600">Dehli</span>{" "}
-              <span className="text-green-600">Mirch</span>
+              <span className="text-red-600">{SITE_NAME_FIRST}</span>{" "}
+              <span className="text-green-600">{SITE_NAME_SECOND}</span>
             </Link>
           )}
 
@@ -231,7 +232,7 @@ export function Navbar() {
                   title="View Cart"
                   disabled={isAdding}
                 >
-                  <ShoppingBag className="h-6 w-6 text-black dark:text-gray-300" />
+                  <ShoppingBag className="h-6 w-6 text-foreground" />
                   {/* Cart count badge - positioned on top for mobile */}
                   <div className="md:flex md:flex-col md:items-start">
                     {isHydrated && count > 0 && (
@@ -242,7 +243,7 @@ export function Navbar() {
                     )}
                     {/* Desktop cart text */}
                     <div className="hidden sm:flex flex-col items-start">
-                      <p className="text-sm font-medium text-black dark:text-gray-300 tracking-wide">
+                      <p className="text-sm font-medium text-foreground tracking-wide">
                         Cart
                       </p>
                     </div>
@@ -254,7 +255,7 @@ export function Navbar() {
             {/* Auth Button - Show when scrolled */}
             {scrolled && <AuthButton variant="ghost" size="sm" />}
 
-            {/* Theme Toggle */}
+            {/* Theme Toggle (light/dark) */}
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
@@ -265,6 +266,16 @@ export function Navbar() {
               ) : (
                 <Moon className="h-4 w-4" />
               )}
+            </button>
+
+            {/* Color Theme Cycle */}
+            <button
+              onClick={cycleTheme}
+              title={`Theme: ${colorTheme}`}
+              aria-label="Cycle color theme"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            >
+              <Palette className="h-4 w-4" />
             </button>
           </div>
         </div>

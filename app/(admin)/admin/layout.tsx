@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useMemo, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/utils";
 import {
@@ -23,6 +24,12 @@ import {
   BookOpen,
   Briefcase,
   Star,
+  ChevronLeft,
+  ChevronRight,
+  Bell,
+  Moon,
+  Sun,
+  Palette,
 } from "lucide-react";
 import LogOutButton from "./components/buttons/LogOutButton";
 // import { Metadata } from "next";
@@ -65,6 +72,11 @@ import { Geist_Mono, Poppins } from "next/font/google";
 import "@/app/(site)/globals.css";
 
 import { RootProviders } from "@/lib/providers/rootProvider";
+import { SITE_NAME } from "@/lib/constants/site";
+import { AuthButton } from "@/components/auth/auth-button";
+import { useTheme } from "next-themes";
+import { useThemeColor } from "@/lib/providers/themeProvider";
+import { AdminNavbar } from "@/components/admin/sidebar/AdminNavbar";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -83,72 +95,84 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(true);
+
   const isContentEditPage =
     pathname.includes("/admin/content/edit") ||
     pathname.includes("/admin/content/create");
 
+  const gridCols = useMemo(() => {
+    if (isContentEditPage)
+      return collapsed ? "lg:grid-cols-[60px_1fr]" : "lg:grid-cols-[60px_1fr]";
+    return collapsed ? "lg:grid-cols-[72px_1fr]" : "lg:grid-cols-[240px_1fr]";
+  }, [collapsed, isContentEditPage]);
+
   return (
     <html lang="en">
       <body className={`${poppins.variable} ${geistMono.variable} antialiased`}>
-        {/* <AppProviderWrapper> */}
-        <div className="min-h-screen flex flex-col bg-white dark:bg-neutral-950">
+        <div className="min-h-screen flex flex-col bg-background">
           <RootProviders>
-            <div className="min-h-svh bg-white dark:bg-background">
-              <div className="border-b bg-gradient-to-r from-red-600 via-orange-500 to-green-600 text-white">
-                <div className="container mx-auto flex items-center justify-between px-4 py-4">
-                  <Link href="/" className="font-bold tracking-wide">
-                    Dehli Mirch Admin
-                  </Link>
-                  <nav className="hidden md:flex items-center gap-6 text-sm">
-                    {nav.slice(0, 7).map((n) => (
-                      <Link
-                        key={n.href}
-                        href={n.href}
-                        className="hover:underline"
-                      >
-                        {n.label}
-                      </Link>
-                    ))}
-                  </nav>
-                  <LogOutButton />
-                </div>
-              </div>
-              <div
-                className={`container mx-auto grid gap-6  ${
-                  isContentEditPage
-                    ? "lg:grid-cols-[60px_1fr]"
-                    : "lg:grid-cols-[240px_1fr]"
-                }`}
-              >
+            <div className="min-h-svh bg-background">
+              <div className={` grid   ${gridCols}`}>
                 <aside
-                  className={`h-fit rounded-lg border ${
-                    isContentEditPage ? "p-1" : "p-3"
-                  }`}
+                  className={`sticky top-0 self-start  border bg-background shadow-sm `}
                 >
-                  <ul className="grid gap-1">
+                  <div className="flex items-center justify-between px-3 py-2 border-b">
+                    <div className="flex items-center gap-2">
+                      <Link href="/" className="font-semibold tracking-wide">
+                        {collapsed ? "" : `${SITE_NAME} Admin`}
+                      </Link>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label={
+                        collapsed ? "Expand sidebar" : "Collapse sidebar"
+                      }
+                      className="inline-flex items-center justify-center rounded-md hover:bg-muted p-1 text-muted-foreground"
+                      onClick={() => setCollapsed((v) => !v)}
+                    >
+                      {collapsed ? (
+                        <ChevronRight className="size-4" />
+                      ) : (
+                        <ChevronLeft className="size-4" />
+                      )}
+                    </button>
+                  </div>
+
+                  <ul
+                    className={`grid gap-1 sticky top-0  max-h-svh overflow-y-auto scrollbar-hide ${
+                      isContentEditPage ? "p-1" : "p-3"
+                    }`}
+                  >
                     {nav.map((n) => (
                       <li key={n.href}>
                         <Link
                           href={n.href}
                           className={cn(
-                            "flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900",
-                            isContentEditPage && "justify-center"
+                            "flex items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-muted",
+                            (isContentEditPage || collapsed) && "justify-center"
                           )}
                           title={isContentEditPage ? n.label : undefined}
                         >
                           <n.icon className="size-4 text-red-600" />
-                          {!isContentEditPage && <span>{n.label}</span>}
+                          {!isContentEditPage && !collapsed && (
+                            <span>{n.label}</span>
+                          )}
                         </Link>
                       </li>
                     ))}
                   </ul>
                 </aside>
-                <main className="min-w-0">{children}</main>
+
+                <div className="flex flex-col ">
+                  <AdminNavbar collapsed={collapsed} />
+
+                  <main className="min-w-0 pl-2">{children}</main>
+                </div>
               </div>
             </div>
           </RootProviders>
         </div>
-        {/* </AppProviderWrapper> */}
       </body>
     </html>
   );

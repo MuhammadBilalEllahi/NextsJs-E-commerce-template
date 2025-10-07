@@ -219,7 +219,7 @@ class TCSService {
       consigneeAddress: orderData.shippingAddress.address,
       consigneeMobNo: orderData.shippingAddress.phone,
       consigneeEmail: orderData.contact.email,
-      originCityName: "Lahore", // Our shop location
+      originCityName: process.env.TCS_ORIGIN_CITY_NAME || "", // Our shop location
       destinationCityName: orderData.shippingAddress.city,
       weight: this.calculateWeight(orderData.items),
       pieces: orderData.items.length,

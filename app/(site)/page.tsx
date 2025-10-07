@@ -27,34 +27,29 @@ import {
 import StackedCards from "@/components/home/BranchSlidableCard";
 import { HomeDeliveryInfo } from "@/components/home/HomeDeliveryInfo";
 import { absoluteUrl } from "@/lib/seo";
+import { SITE_NAME } from "@/lib/constants/site";
+import { HomeTestimonials } from "@/components/home/home-testimonials";
 
 export const metadata: Metadata = {
-  title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
-  description:
-    "Shop premium spices, masalas, pickles, and snacks at Dehli Mirch. Fast delivery and authentic flavor.",
+  title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
+  description: `Shop premium spices, masalas, pickles, and snacks at ${SITE_NAME}. Fast delivery and authentic flavor.`,
   alternates: { canonical: "/" },
+  applicationName: SITE_NAME,
   openGraph: {
-    title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
+    title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
     description:
       "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
     url: absoluteUrl("/"),
   },
+  twitter: {
+    title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
+    description:
+      "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
-
-// import { useEffect, useState } from "react"
-
-// interface Banner {
-//   id: string;
-//   title: string;
-//   description: string;
-//   image: string;
-//   link: string;
-// }
-
-// interface GlobalSettings {
-//   id: string;
-//   bannerScrollTime: number;
-// }
 
 export default async function HomePage() {
   // Server Component fetching placeholder data. Interactive sections are client components.
@@ -165,11 +160,9 @@ export default async function HomePage() {
         </div> */}
       </section>
 
-      {/* <section className="container mx-auto px-4 py-10 md:py-14 pt-28">
-         <HomeTestimonials /> 
-        
-      </section> */}
-
+      <section className="container mx-auto px-4 py-10 md:py-14 pt-28">
+        <HomeTestimonials />
+      </section>
       <section className="bg-neutral-50 dark:bg-neutral-900/40">
         <div className="container mx-auto px-4 py-12">
           <HomeNewsletter />

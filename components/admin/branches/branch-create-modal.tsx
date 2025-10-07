@@ -493,7 +493,7 @@ export function BranchCreateModal({
                               }
                               className="w-fit"
                             />
-                            <span className="text-gray-500">to</span>
+                            <span className="text-muted-foreground">to</span>
                             <Input
                               type="time"
                               value={hours.close}

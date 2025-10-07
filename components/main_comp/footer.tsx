@@ -2,6 +2,11 @@ import Link from "next/link";
 import { NewsletterInline } from "@/components/home/home-newsletter";
 import { getAllCategories } from "@/database/data-service";
 import { Category } from "@/types";
+import {
+  SITE_NAME,
+  SITE_NAME_FIRST,
+  SITE_NAME_SECOND,
+} from "@/lib/constants/site";
 
 export async function Footer() {
   // Fetch categories from cache
@@ -12,12 +17,12 @@ export async function Footer() {
     .filter((cat: Category) => !cat.parent)
     .slice(0, 4);
   return (
-    <footer className="border-t bg-white dark:bg-neutral-950">
+    <footer className="border-t bg-background">
       <div className="container mx-auto px-4 py-10 grid gap-8 md:grid-cols-4">
         <div>
           <div className="font-extrabold text-lg tracking-tight mb-2">
-            <span className="text-red-600">Dehli</span>{" "}
-            <span className="text-green-600">Mirch</span>
+            <span className="text-red-600">{SITE_NAME_FIRST}</span>{" "}
+            <span className="text-green-600">{SITE_NAME_SECOND}</span>
           </div>
           <p className="text-sm text-neutral-600 dark:text-neutral-400">
             Heat you can taste, tradition you can trust.
@@ -104,7 +109,7 @@ export async function Footer() {
         </div>
       </div>
       <div className="border-t py-4 text-center text-xs text-neutral-600 dark:text-neutral-400">
-        © {new Date().getFullYear()} Dehli Mirch. All rights reserved.
+        © {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
       </div>
     </footer>
   );

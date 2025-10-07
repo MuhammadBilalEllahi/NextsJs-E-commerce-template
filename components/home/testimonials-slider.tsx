@@ -1,50 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { GlowButton } from "../ui/glow-button";
 
-export function TestimonialsSlider() {
+type TestimonialItem = {
+  author: string;
+  quote: string;
+};
+
+export function TestimonialsSlider({ items }: { items: TestimonialItem[] }) {
   const [index, setIndex] = useState(0);
-  const [items, setItems] = useState<{ author: string; quote: string }[]>([]);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetch("/api/testimonials");
-        const data = await res.json();
-        if (data?.success) {
-          setItems(
-            (data.testimonials || []).map((x: any) => ({
-              author: x.author,
-              quote: x.quote,
-            }))
-          );
-        }
-      } catch {
-        setItems([]);
-      }
-    };
-    load();
-  }, []);
-
-  useEffect(() => {
-    if (items.length === 0) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % items.length), 3000);
+    if (!items || items.length === 0) return;
+    const id = setInterval(() => setIndex((i) => (i + 1) % items.length), 4000);
     return () => clearInterval(id);
-  }, [items.length]);
+  }, [items]);
 
-  if (items.length === 0) {
+  if (!items || items.length === 0) {
     return null;
   }
+
   const item = items[index];
+
   return (
-    <div className="rounded-xl border bg-white p-6 shadow">
-      <div className="text-sm text-neutral-600 dark:text-neutral-300">
-        What our customers say
+    <div className="relative rounded-2xl">
+      <div className="border-orbit-track border-orbit">
+        <div className="border-orbit-dot" />
       </div>
-      <blockquote className="mt-2 text-lg font-medium">
-        “{item.quote}”
-      </blockquote>
-      <div className="mt-2 text-sm">— {item.author}</div>
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card/60 p-6 md:p-8 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/50">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-[var(--cta-gradient-from)] via-transparent to-[var(--cta-gradient-to)]" />
+        <div className="text-xs uppercase tracking-widest text-muted-foreground">
+          What our customers say
+        </div>
+        <blockquote className="mt-3 text-lg md:text-xl font-medium text-foreground">
+          “{item.quote}”
+        </blockquote>
+        <div className="mt-3 text-sm text-foreground/80">— {item.author}</div>
+      </div>
+      <GlowButton className="px-6 py-3 text-sm font-semibold text-foreground bg-card/60 hover:bg-card/70">
+        CSSScript
+      </GlowButton>
     </div>
   );
 }

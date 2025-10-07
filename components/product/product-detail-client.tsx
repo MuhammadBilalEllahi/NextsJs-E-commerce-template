@@ -333,7 +333,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           {/* Action Buttons */}
           <div className="mt-6 flex gap-3">
             <Button
-              className="flex-1 bg-neutral-800 hover:bg-neutral-900 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 h-12"
+              className="flex-1 bg-foreground hover:bg-foreground/90 text-background h-12"
               onClick={handleAddToCart}
               disabled={isAdding || isOutOfStock || isVariantRequired}
             >

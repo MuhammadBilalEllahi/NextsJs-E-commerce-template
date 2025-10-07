@@ -244,7 +244,7 @@ export function ReviewsEnhanced({
                 <h4 className="font-medium text-sm">{review.title}</h4>
               )}
 
-              <p className="text-sm text-gray-700">{review.comment}</p>
+              <p className="text-sm text-foreground/80">{review.comment}</p>
 
               {review.images && review.images.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -271,7 +271,7 @@ export function ReviewsEnhanced({
               )}
 
               <div className="flex items-center justify-between">
-                <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-gray-700">
+                <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
                   <ThumbsUp className="h-3 w-3" />
                   Helpful ({review.isHelpful || 0})
                 </button>
@@ -307,7 +307,7 @@ export function ReviewsEnhanced({
               You have already reviewed this product.
             </p>
             {existingReview && (
-              <div className="bg-gray-50 rounded-lg p-4 text-left">
+              <div className="bg-muted rounded-lg p-4 text-left">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -336,7 +336,7 @@ export function ReviewsEnhanced({
                     {existingReview.title}
                   </h4>
                 )}
-                <p className="text-sm text-gray-700 mb-2">
+                <p className="text-sm text-foreground/80 mb-2">
                   {existingReview.comment}
                 </p>
                 {existingReview.images && existingReview.images.length > 0 && (

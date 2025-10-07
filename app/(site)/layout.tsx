@@ -16,18 +16,18 @@ import { HeaderWithCategories } from "@/components/main_comp/header-with-categor
 import CartSheetWrapper from "@/components/cart/CartSheetWrapper";
 import { BottomNav } from "@/components/main_comp/bottom-nav";
 import { ChatWidget } from "@/components/chat/chat-widget";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/constants/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ),
   title: {
-    default: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
-    template: "%s | Dehli Mirch",
+    default: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
+    template: "%s | ${SITE_NAME}",
   },
-  description:
-    "Dehli Mirch brings authentic South Asian flavors: premium spices, masalas, pickles, and snacks. Heat you can taste, tradition you can trust.",
-  applicationName: "Dehli Mirch",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   alternates: {
     canonical: "/",
   },
@@ -44,14 +44,14 @@ export const metadata: Metadata = {
   },
   openGraph: {
     ...defaultOpenGraph,
-    title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
+    title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
     description:
       "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
     url: absoluteUrl("/"),
   },
   twitter: {
     ...defaultTwitter,
-    title: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
+    title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
     description:
       "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
     images: ["/dehli-mirch-og-banner.png"],
@@ -94,7 +94,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "Dehli Mirch",
+              name: SITE_NAME,
               url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
               logo: "/placeholder-logo.png",
               sameAs: [
@@ -111,7 +111,7 @@ export default function RootLayout({
           Skip to content
         </a>
         {/* <AppProviderWrapper> */}
-        <div className="min-h-screen flex flex-col bg-white dark:bg-neutral-950">
+        <div className="min-h-screen flex flex-col bg-background">
           <RootProviders>
             {/* <Header /> */}
             <HeaderWithCategories />

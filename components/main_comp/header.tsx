@@ -17,7 +17,7 @@ export function Header({ categories }: { categories?: Category[] }) {
   const { ids: wishlistIds } = useWishlist();
 
   return (
-    <header className="border-b bg-white/85 dark:bg-neutral-950/85 backdrop-blur md:flex hidden z-30">
+    <header className="border-b bg-background/85 backdrop-blur md:flex hidden z-30">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-6">
         {/* Website Name */}
         <Link
@@ -50,14 +50,14 @@ export function Header({ categories }: { categories?: Category[] }) {
               title="View Cart"
               disabled={isAdding}
             >
-              <ShoppingBag className="h-6 w-6 text-black dark:text-gray-300" />
+              <ShoppingBag className="h-6 w-6 text-foreground" />
               <div className="flex flex-col items-start">
                 {isHydrated && count > 0 && (
-                  <span className="h-5 min-w-[1.7rem] rounded-full bg-black dark:bg-gray-300 text-white dark:text-gray-900 text-[10px] grid place-items-center px-1">
+                  <span className="h-5 min-w-[1.7rem] rounded-full bg-foreground text-background text-[10px] grid place-items-center px-1">
                     {count}
                   </span>
                 )}
-                <p className="text-sm font-medium text-black dark:text-gray-300 tracking-wide">
+                <p className="text-sm font-medium text-foreground tracking-wide">
                   Cart
                 </p>
               </div>

@@ -36,7 +36,7 @@ export function AuthButton({
         <Button
           variant={variant}
           size={size}
-          className={`bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white ${className}`}
+          className={`bg-gradient-to-r from-[var(--cta-gradient-from)] to-[var(--cta-gradient-to)] hover:from-[var(--cta-gradient-from-hover)] hover:to-[var(--cta-gradient-to-hover)] text-white ${className}`}
         >
           Sign In
         </Button>
@@ -50,7 +50,7 @@ export function AuthButton({
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
             <AvatarImage src="" alt={user?.name} />
-            <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium">
+            <AvatarFallback className="bg-foreground text-background text-sm font-medium">
               {user?.name?.charAt(0).toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
@@ -115,7 +115,7 @@ export function AuthButton({
 
         <DropdownMenuItem
           onClick={handleLogout}
-          className="cursor-pointer text-red-600 focus:text-red-600"
+          className="cursor-pointer text-destructive focus:text-destructive"
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>

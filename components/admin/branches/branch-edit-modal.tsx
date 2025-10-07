@@ -507,7 +507,7 @@ export function BranchEditModal({
                               }
                               className="w-24"
                             />
-                            <span className="text-gray-500">to</span>
+                            <span className="text-muted-foreground">to</span>
                             <Input
                               type="time"
                               value={hours.close}

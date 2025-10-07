@@ -26,16 +26,16 @@ export function HomeTestimonials() {
 
   if (loading) {
     return (
-      <section className="container mx-auto px-4 py-10 md:py-14">
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <div className="h-[1px] flex-1 bg-gray-300" />
-          <h2 className="text-lg md:text-xl font-bold tracking-wide uppercase">
+      <section className="container mx-auto px-4 py-12 md:py-16">
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <div className="h-px flex-1 bg-border" />
+          <h2 className="text-base md:text-lg font-semibold tracking-widest uppercase text-muted-foreground">
             What Our Customers Say
           </h2>
-          <div className="h-[1px] flex-1 bg-gray-300" />
+          <div className="h-px flex-1 bg-border" />
         </div>
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div className="flex items-center justify-center py-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-border border-b-transparent"></div>
         </div>
       </section>
     );
@@ -46,19 +46,18 @@ export function HomeTestimonials() {
   }
 
   return (
-    <section className="container mx-auto px-4 py-10 md:py-14">
-      <div className="flex items-center justify-center gap-4 mb-6">
-        <div className="h-[1px] flex-1 bg-gray-300" />
-        <h2 className="text-lg md:text-xl font-bold tracking-wide uppercase">
+    <section className="container mx-auto px-4 py-12 md:py-16">
+      <div className="flex items-center justify-center gap-4 mb-8">
+        <div className="h-px flex-1 bg-border" />
+        <h2 className="text-base md:text-lg font-semibold tracking-widest uppercase text-muted-foreground">
           What Our Customers Say
         </h2>
-        <div className="h-[1px] flex-1 bg-gray-300" />
+        <div className="h-px flex-1 bg-border" />
       </div>
 
       <div className="max-w-4xl mx-auto">
-        <TestimonialsSlider />
+        <TestimonialsSlider items={testimonials} />
       </div>
     </section>
   );
 }
-

@@ -216,7 +216,7 @@ export function QuickLookModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-neutral-950 rounded-lg shadow-2xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden">
+      <div className="relative bg-card rounded-lg shadow-2xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex flex-end items-end justify-end p-1 border-b">
           <Button
@@ -347,7 +347,7 @@ export function QuickLookModal({
                 {/* Action Buttons */}
                 <div className="flex gap-3">
                   <Button
-                    className="flex-1 bg-neutral-800 hover:bg-neutral-900 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 h-12"
+                    className="flex-1 bg-foreground hover:bg-foreground/90 text-background h-12"
                     onClick={handleAddToCart}
                     disabled={isAdding || isOutOfStock || isVariantRequired}
                   >

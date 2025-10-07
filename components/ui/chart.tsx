@@ -6,7 +6,15 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils/utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: "", dark: ".dark" } as const;
+const THEMES = {
+  light: "",
+  dark: ".dark",
+  // color theme classes layer on root; keep chart tokens in sync with CSS
+  classic: ".theme-classic",
+  emerald: ".theme-emerald",
+  rose: ".theme-rose",
+  amber: ".theme-amber",
+} as const;
 
 export type ChartConfig = {
   [k in string]: {
