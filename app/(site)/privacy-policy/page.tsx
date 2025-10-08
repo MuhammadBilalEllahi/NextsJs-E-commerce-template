@@ -37,7 +37,7 @@ export default async function PrivacyPolicyPage() {
 
         {/* Navigation */}
         <div className="mt-8 text-center">
-          <Link href="/" className="text-red-600 hover:underline">
+          <Link href="/" className="text-primary hover:underline">
             ← Back to Home
           </Link>
         </div>

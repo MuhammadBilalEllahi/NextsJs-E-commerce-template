@@ -245,7 +245,7 @@ export function ChatWidget() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-red-600" />
+                <MessageCircle className="h-5 w-5 text-primary" />
                 <CardTitle className="text-lg">Live Chat Support</CardTitle>
               </div>
               <Button
@@ -358,9 +358,9 @@ export function ChatWidget() {
                         <div
                           className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
                             msg.sender === "user"
-                              ? "bg-red-600 text-white"
+                              ? "bg-primary text-white"
                               : msg.sender === "admin"
-                              ? "bg-blue-600 text-white"
+                              ? "bg-primary text-white"
                               : "bg-gray-100 text-gray-800"
                           }`}
                         >
@@ -414,13 +414,13 @@ export function ChatWidget() {
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-green-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       WhatsApp
                     </a>
                     <a
                       href="tel:+923001234567"
-                      className="text-blue-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       Call Us
                     </a>

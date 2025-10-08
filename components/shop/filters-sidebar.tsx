@@ -159,14 +159,14 @@ export function FiltersSidebar({
     <>
       {/* Full screen loader with 20% opacity background */}
       {isAutoApplying && (
-        <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 shadow-lg flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-black" />
+        <div className="fixed inset-0 bg-foreground/20 z-50 flex items-center justify-center">
+          <div className="bg-background dark:bg-neutral-800 rounded-lg p-6 shadow-lg flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-foreground" />
           </div>
         </div>
       )}
 
-      <div className="bg-white dark:bg-neutral-950 p-4 sticky top-4 h-fit">
+      <div className="bg-background dark:bg-neutral-950 p-4 sticky top-4 h-fit">
         <div className="mb-4">
           <h2 className="text-lg font-semibold">Filters</h2>
         </div>
@@ -234,7 +234,7 @@ export function FiltersSidebar({
                     scheduleAutoApply();
                   }}
                 />
-                <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <div className="mt-2 text-sm text-foreground dark:text-foreground/40">
                   {formatPriceRange(pmin, pmax === 9999 ? "Max" : pmax)}
                 </div>
               </div>
@@ -244,10 +244,10 @@ export function FiltersSidebar({
 
         <div className="mt-4 flex gap-2">
           <Button
-            className={`w-full transition-all duration-200 ${
-              isAutoApplying
-                ? "bg-blue-500 hover:bg-blue-600"
-                : "bg-black hover:bg-gray-800"
+            className={`w-full  transition-all duration-200 ${
+              !isAutoApplying
+                ? "bg-primary hover:bg-primary/90"
+                : "bg-foreground hover:bg-foreground/90 text-primary"
             }`}
             onClick={() => apply()}
           >
