@@ -8,7 +8,7 @@ export default async function ContactPage() {
   const branches = await getAllBranches();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-primary/10 to-primary/10 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900">
       {/* Hero Section */}
       <ContactHero branches={branches} />
 
@@ -18,9 +18,9 @@ export default async function ContactPage() {
           <div className="mt-16">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-4">
-                All Our <span className="text-red-600">Spice</span> Locations
+                All Our <span className="text-primary">Spice</span> Locations
               </h2>
-              <p className="text-neutral-600 dark:text-neutral-400">
+              <p className="text-foreground dark:text-foreground/40">
                 Scroll through all our branches to find the one nearest to you
               </p>
             </div>

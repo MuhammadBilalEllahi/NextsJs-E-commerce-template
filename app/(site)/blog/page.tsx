@@ -56,13 +56,13 @@ export default async function BlogListPage({
               )}
               <div className="p-4">
                 {p.tags && p.tags.length > 0 && (
-                  <div className="text-xs text-red-600 font-semibold">
+                  <div className="text-xs text-primary font-semibold">
                     {p.tags.join(" • ")}
                   </div>
                 )}
                 <h3 className="mt-1 font-semibold line-clamp-2">{p.title}</h3>
                 {p.excerpt && (
-                  <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
+                  <p className="mt-1 text-sm text-foreground dark:text-foreground/40 line-clamp-2">
                     {p.excerpt}
                   </p>
                 )}
@@ -77,7 +77,7 @@ export default async function BlogListPage({
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold">Blog</h1>
-        <p className="text-neutral-600">
+        <p className="text-foreground dark:text-foreground/40">
           Error loading blog posts. Please try again later.
         </p>
       </div>

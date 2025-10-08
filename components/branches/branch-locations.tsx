@@ -81,7 +81,7 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
   if (!branches.length) {
     return (
       <div className="text-center py-12">
-        <div className="text-gray-400 dark:text-gray-600 mb-4">
+        <div className="text-foreground dark:text-foreground/40 mb-4">
           <MapPin className="h-12 w-12 mx-auto mb-2" />
           <p className="text-lg font-medium">No branches found</p>
           <p className="text-sm">Please check back later</p>
@@ -95,43 +95,43 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
       {/* Summary Section */}
       <div className="text-center">
         <h3 className="text-2xl font-bold mb-4">
-          Visit Our <span className="text-red-600">Branches</span>
+          Visit Our <span className="text-primary">Branches</span>
         </h3>
         <p className="text-neutral-600 dark:text-neutral-400 mb-6">
           Experience the authentic taste of premium spices at any of our{" "}
-          {branches.length} branches across Lahore
+          {branches.length} branches across Karachi
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:gap-4 max-w-2xl mx-auto">
           <div className="bg-white dark:bg-neutral-800 p-3 lg:p-4 rounded-lg border">
-            <div className="text-xl lg:text-2xl font-bold text-red-600">
+            <div className="text-xl lg:text-2xl font-bold text-primary">
               {branches.length}
             </div>
-            <div className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs lg:text-sm text-foreground dark:text-foreground/40">
               Branches
             </div>
           </div>
           <div className="bg-white dark:bg-neutral-800 p-3 lg:p-4 rounded-lg border">
-            <div className="text-xl lg:text-2xl font-bold text-green-600">
+            <div className="text-xl lg:text-2xl font-bold text-primary">
               {branches.filter(isOpenNow).length}
             </div>
-            <div className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs lg:text-sm text-foreground dark:text-foreground/40">
               Open Now
             </div>
           </div>
           <div className="bg-white dark:bg-neutral-800 p-3 lg:p-4 rounded-lg border">
-            <div className="text-xl lg:text-2xl font-bold text-orange-600">
+            <div className="text-xl lg:text-2xl font-bold text-primary">
               24/7
             </div>
-            <div className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs lg:text-sm text-foreground dark:text-foreground/40">
               Support
             </div>
           </div>
           <div className="bg-white dark:bg-neutral-800 p-3 lg:p-4 rounded-lg border">
-            <div className="text-xl lg:text-2xl font-bold text-blue-600">
+            <div className="text-xl lg:text-2xl font-bold text-primary">
               Fresh
             </div>
-            <div className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-xs lg:text-sm text-foreground dark:text-foreground/40">
               Daily
             </div>
           </div>
@@ -156,10 +156,10 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
                     />
                   )}
                   <div className="min-w-0">
-                    <CardTitle className="text-lg lg:text-xl group-hover:text-red-600 transition-colors">
+                    <CardTitle className="text-lg lg:text-xl group-hover:text-primary transition-colors">
                       {branch.name}
                     </CardTitle>
-                    <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-xs lg:text-sm text-foreground dark:text-foreground/40">
                       Branch {branch.branchNumber} • {branch.city},{" "}
                       {branch.state}
                     </p>
@@ -177,10 +177,10 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
             <CardContent className="space-y-4 lg:space-y-6">
               {/* Address */}
               <div className="flex items-start gap-2 lg:gap-3">
-                <MapPin className="h-4 w-4 lg:h-5 lg:w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <MapPin className="h-4 w-4 lg:h-5 lg:w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div className="min-w-0">
                   <p className="font-medium text-sm lg:text-base">Address</p>
-                  <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs lg:text-sm text-foreground dark:text-foreground/40">
                     {branch.address}
                   </p>
                 </div>
@@ -189,12 +189,12 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
               {/* Contact Information */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
                 <div className="flex items-center gap-2 lg:gap-3">
-                  <Phone className="h-4 w-4 lg:h-5 lg:w-5 text-red-600 flex-shrink-0" />
+                  <Phone className="h-4 w-4 lg:h-5 lg:w-5 text-primary flex-shrink-0" />
                   <div className="min-w-0">
                     <p className="font-medium text-xs lg:text-sm">Phone</p>
                     <a
                       href={`tel:${branch.phoneNumber}`}
-                      className="text-xs lg:text-sm text-red-600 hover:text-red-700 break-all"
+                      className="text-xs lg:text-sm text-primary hover:text-primary break-all"
                     >
                       {branch.phoneNumber}
                     </a>
@@ -203,12 +203,12 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
 
                 {branch.email && (
                   <div className="flex items-center gap-2 lg:gap-3">
-                    <Mail className="h-4 w-4 lg:h-5 lg:w-5 text-red-600 flex-shrink-0" />
+                    <Mail className="h-4 w-4 lg:h-5 lg:w-5 text-primary flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="font-medium text-xs lg:text-sm">Email</p>
                       <a
                         href={`mailto:${branch.email}`}
-                        className="text-xs lg:text-sm text-red-600 hover:text-red-700 break-all"
+                        className="text-xs lg:text-sm text-primary hover:text-primary break-all"
                       >
                         {branch.email}
                       </a>
@@ -219,7 +219,7 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
 
               {/* Opening Hours */}
               <div className="flex items-start gap-2 lg:gap-3">
-                <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm lg:text-base mb-2">
                     Opening Hours
@@ -235,7 +235,7 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
                           key={day}
                           className={`flex justify-between items-center ${
                             isToday
-                              ? "font-semibold text-red-600"
+                              ? "font-semibold text-primary"
                               : "text-gray-600 dark:text-gray-400"
                           }`}
                         >
@@ -257,10 +257,10 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
               {/* Manager */}
               {branch.manager && (
                 <div className="flex items-center gap-3">
-                  <Users className="h-5 w-5 text-red-600 flex-shrink-0" />
+                  <Users className="h-5 w-5 text-primary flex-shrink-0" />
                   <div>
                     <p className="font-medium text-sm">Manager</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-foreground dark:text-foreground/40">
                       {branch.manager}
                     </p>
                   </div>
@@ -270,7 +270,7 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
               {/* Description */}
               {branch.description && (
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-foreground dark:text-foreground/40">
                     {branch.description}
                   </p>
                 </div>
@@ -324,7 +324,7 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
         <h3 className="text-xl lg:text-2xl font-bold mb-3 lg:mb-4">
           Can't Find What You're Looking For?
         </h3>
-        <p className="text-sm lg:text-base text-neutral-600 dark:text-neutral-400 mb-4 lg:mb-6">
+        <p className="text-sm lg:text-base text-foreground dark:text-foreground/40 mb-4 lg:mb-6">
           Contact us directly or visit any of our branches for personalized
           assistance
         </p>
@@ -333,7 +333,7 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
             onClick={() =>
               window.open(`tel:${branches[0]?.phoneNumber}`, "_self")
             }
-            className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+            className="bg-gradient-to-r from-primary to-primary hover:from-primary/90 hover:to-primary/90"
           >
             <Phone className="h-4 w-4 mr-2" />
             Call Main Branch

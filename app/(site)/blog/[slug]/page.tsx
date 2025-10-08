@@ -57,7 +57,7 @@ export default async function BlogDetailPage({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
         />
-        <Link href="/blog" className="text-red-600 underline">
+        <Link href="/blog" className="text-primary underline">
           ← Back to Blog
         </Link>
         <div className="mt-4 grid lg:grid-cols-4 gap-8">
@@ -71,7 +71,7 @@ export default async function BlogDetailPage({
             )}
             <h1 className="mt-4 text-3xl font-bold">{post.title}</h1>
             {post.tags && post.tags.length > 0 && (
-              <div className="mt-1 text-sm text-red-600">
+              <div className="mt-1 text-sm text-primary">
                 {post.tags.join(" • ")}
               </div>
             )}
@@ -104,7 +104,7 @@ export default async function BlogDetailPage({
                   )}
                   <div>
                     {r.tags && r.tags.length > 0 && (
-                      <div className="text-xs text-red-600">
+                      <div className="text-xs text-primary">
                         {r.tags.join(" • ")}
                       </div>
                     )}

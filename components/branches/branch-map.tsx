@@ -17,39 +17,11 @@ export function BranchMap({ branches }: BranchMapProps) {
 
   // Generate Google Maps embed URL with all branch locations
   const generateMapUrl = () => {
-    if (!branches.length) return "";
-
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
-    // If no API key, use a simple Google Maps search URL
-    if (!apiKey) {
-      const searchQuery = branches.map((branch) => branch.address).join(" ");
-      return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3403.0!2d74.3587!3d31.5204!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzHCsDMxJzEzLjQiTiA3NMKwMjEnMzEuMyJF!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s&q=${encodeURIComponent(
-        searchQuery
-      )}`;
-    }
-
-    // If we have coordinates, use them for better accuracy
-    const locations = branches
-      .filter(
-        (branch) =>
-          branch.coordinates?.latitude && branch.coordinates?.longitude
-      )
-      .map(
-        (branch) =>
-          `${branch.coordinates!.latitude},${branch.coordinates!.longitude}`
-      )
-      .join("|");
-
-    if (locations) {
-      return `https://www.google.com/maps/embed/v1/view?key=${apiKey}&center=31.5204,74.3587&zoom=11&maptype=roadmap&markers=${locations}`;
-    }
-
-    // Fallback to Lahore center with search query
-    const searchQuery = branches.map((branch) => branch.address).join("|");
-    return `https://www.google.com/maps/embed/v1/search?key=${apiKey}&q=${encodeURIComponent(
-      searchQuery
-    )}&center=31.5204,74.3587&zoom=11`;
+    if (!selectedBranch) return "";
+    return selectedBranch.location.replace(
+      "https://maps.app.goo.gl/",
+      "https://www.google.com/maps/embed?pb="
+    );
   };
 
   const getCurrentDayHours = (branch: Branch) => {
@@ -120,7 +92,7 @@ export function BranchMap({ branches }: BranchMapProps) {
   if (!branches.length) {
     return (
       <div className="text-center py-12">
-        <div className="text-gray-400 dark:text-gray-600 mb-4">
+        <div className="text-foreground dark:text-foreground/40 mb-4">
           <MapPin className="h-12 w-12 mx-auto mb-2" />
           <p className="text-lg font-medium">No branches found</p>
           <p className="text-sm">Please check back later</p>
@@ -139,8 +111,8 @@ export function BranchMap({ branches }: BranchMapProps) {
               key={branch.id}
               className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
                 selectedBranch?.id === branch.id
-                  ? "ring-2 ring-red-500 shadow-lg"
-                  : "hover:ring-1 hover:ring-red-300"
+                  ? "ring-2 ring-primary shadow-lg"
+                  : "hover:ring-1 hover:ring-primary"
               }`}
               onClick={() => setSelectedBranch(branch)}
             >
@@ -165,13 +137,13 @@ export function BranchMap({ branches }: BranchMapProps) {
                         {isOpenNow(branch) ? "Open" : "Closed"}
                       </Badge>
                     </div>
-                    <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    <p className="text-xs lg:text-sm text-foreground dark:text-foreground/40 mb-1">
                       Branch {branch.branchNumber}
                     </p>
-                    <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-500 truncate">
+                    <p className="text-xs lg:text-sm text-foreground dark:text-foreground/40 truncate">
                       {branch.address}
                     </p>
-                    <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
+                    <div className="flex items-center gap-1 mt-1 text-xs text-foreground dark:text-foreground/40">
                       <Clock className="h-3 w-3 flex-shrink-0" />
                       <span className="truncate">
                         {getCurrentDayHours(branch)}
@@ -204,10 +176,10 @@ export function BranchMap({ branches }: BranchMapProps) {
                   onLoad={() => setMapLoaded(true)}
                 />
                 {!mapLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                  <div className="absolute inset-0 flex items-center justify-center bg-foreground/10 dark:bg-foreground/90">
                     <div className="text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-2"></div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                      <p className="text-sm text-foreground dark:text-foreground/40">
                         Loading map...
                       </p>
                     </div>
@@ -243,7 +215,7 @@ export function BranchMap({ branches }: BranchMapProps) {
                         {isOpenNow(selectedBranch) ? "Open Now" : "Closed"}
                       </Badge>
                     </div>
-                    <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400">
+                    <p className="text-sm lg:text-base text-foreground dark:text-foreground/40">
                       Branch {selectedBranch.branchNumber} •{" "}
                       {selectedBranch.city}, {selectedBranch.state}
                     </p>
@@ -259,22 +231,22 @@ export function BranchMap({ branches }: BranchMapProps) {
 
                     <div className="space-y-3">
                       <div className="flex items-start gap-3">
-                        <MapPin className="h-5 w-5 text-red-600 mt-0.5" />
+                        <MapPin className="h-5 w-5 text-primary mt-0.5" />
                         <div>
                           <p className="font-medium">Address</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-foreground dark:text-foreground/40">
                             {selectedBranch.address}
                           </p>
                         </div>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <Phone className="h-5 w-5 text-red-600 mt-0.5" />
+                        <Phone className="h-5 w-5 text-primary mt-0.5" />
                         <div>
                           <p className="font-medium">Phone</p>
                           <a
                             href={`tel:${selectedBranch.phoneNumber}`}
-                            className="text-sm text-red-600 hover:text-red-700"
+                            className="text-sm text-primary hover:text-primary"
                           >
                             {selectedBranch.phoneNumber}
                           </a>
@@ -282,14 +254,14 @@ export function BranchMap({ branches }: BranchMapProps) {
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <ExternalLink className="h-5 w-5 text-red-600 mt-0.5" />
+                        <ExternalLink className="h-5 w-5 text-primary mt-0.5" />
                         <div>
                           <p className="font-medium">Get Directions</p>
                           <a
                             href={selectedBranch.location}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-red-600 hover:text-red-700"
+                            className="text-sm text-primary hover:text-primary"
                           >
                             View on Google Maps
                           </a>
@@ -316,8 +288,8 @@ export function BranchMap({ branches }: BranchMapProps) {
                               key={day}
                               className={`flex justify-between items-center text-sm ${
                                 isToday
-                                  ? "font-semibold text-red-600"
-                                  : "text-gray-600 dark:text-gray-400"
+                                  ? "font-semibold text-primary"
+                                  : "text-foreground dark:text-foreground/40"
                               }`}
                             >
                               <span className="capitalize">{day}</span>

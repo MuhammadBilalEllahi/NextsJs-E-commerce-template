@@ -21,6 +21,13 @@ export function TestimonialsSlider({ items }: { items: TestimonialItem[] }) {
     return null;
   }
 
+  // Reset index if it's out of bounds
+  useEffect(() => {
+    if (items.length > 0 && index >= items.length) {
+      setIndex(0);
+    }
+  }, [items.length, index]);
+
   const item = items[index];
 
   return (
@@ -33,14 +40,18 @@ export function TestimonialsSlider({ items }: { items: TestimonialItem[] }) {
         <div className="text-xs uppercase tracking-widest text-muted-foreground">
           What our customers say
         </div>
-        <blockquote className="mt-3 text-lg md:text-xl font-medium text-foreground">
-          “{item.quote}”
+        <blockquote className="mt-3 text-lg md:text-xl font-medium text-primary">
+          "{item.quote}"
         </blockquote>
         <div className="mt-3 text-sm text-foreground/80">— {item.author}</div>
+
+        {/* Debug info - remove in production */}
+        {process.env.NODE_ENV === "development" && (
+          <div className="mt-4 text-xs text-muted-foreground/50">
+            Testimonial {index + 1} of {items.length}
+          </div>
+        )}
       </div>
-      <GlowButton className="px-6 py-3 text-sm font-semibold text-foreground bg-card/60 hover:bg-card/70">
-        CSSScript
-      </GlowButton>
     </div>
   );
 }

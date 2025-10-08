@@ -105,7 +105,7 @@ export function Navbar() {
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <button
-                  className="h-8 w-8 inline-flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  className="h-8 w-8 inline-flex items-center justify-center rounded-full hover:bg-primary/10 text-foreground hover:text-primary transition-colors"
                   aria-label="Open menu"
                 >
                   <Menu className="h-5 w-5" />
@@ -115,8 +115,10 @@ export function Navbar() {
                 <SheetHeader>
                   <div className="flex items-center gap-2">
                     <span className="font-extrabold text-xl tracking-tight">
-                      <span className="text-red-600">{SITE_NAME_FIRST}</span>{" "}
-                      <span className="text-green-600">{SITE_NAME_SECOND}</span>
+                      <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
+                      <span className="text-foreground">
+                        {SITE_NAME_SECOND}
+                      </span>
                     </span>
                   </div>
                 </SheetHeader>
@@ -157,8 +159,8 @@ export function Navbar() {
               href="/"
               className="font-extrabold text-xl tracking-tight flex-shrink-0 lg:hidden"
             >
-              <span className="text-red-600">{SITE_NAME_FIRST}</span>{" "}
-              <span className="text-green-600">{SITE_NAME_SECOND}</span>
+              <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
+              <span className="text-foreground">{SITE_NAME_SECOND}</span>
             </Link>
           )}
 
@@ -168,8 +170,8 @@ export function Navbar() {
               href="/"
               className="font-extrabold text-xl tracking-tight flex-shrink-0 hidden lg:block"
             >
-              <span className="text-red-600">{SITE_NAME_FIRST}</span>{" "}
-              <span className="text-green-600">{SITE_NAME_SECOND}</span>
+              <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
+              <span className="text-foreground">{SITE_NAME_SECOND}</span>
             </Link>
           )}
 
@@ -225,27 +227,25 @@ export function Navbar() {
             {scrolled && (
               <CartSheet>
                 <button
-                  className={`relative flex flex-row items-center gap-2 px-3 py-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors ${
-                    isAdding ? "bg-green-100 dark:bg-green-900" : ""
+                  className={`relative flex flex-row items-center gap-2 px-3 py-2 rounded-full  text-foreground hover:text-primary transition-colors ${
+                    isAdding ? "bg-primary/10 " : ""
                   }`}
                   aria-label="Cart"
                   title="View Cart"
                   disabled={isAdding}
                 >
-                  <ShoppingBag className="h-6 w-6 text-foreground" />
+                  <ShoppingBag className="h-6 w-6 " />
                   {/* Cart count badge - positioned on top for mobile */}
                   <div className="md:flex md:flex-col md:items-start">
                     {isHydrated && count > 0 && (
                       // <span className={window.innerWidth > 768 ? "h-5 min-w-[1.7rem] rounded-full bg-black dark:bg-gray-300 text-white dark:text-gray-900 text-[10px] grid place-items-center px-1" :"absolute -top-0 -right-0 h-5 min-w-[1.25rem] rounded-full bg-red-600 text-white text-xs font-medium grid place-items-center px-1"}>
-                      <span className="absolute -top-0 -right-0 h-5 min-w-[1.25rem] rounded-full bg-red-600 text-white text-xs font-medium grid place-items-center px-1 md:static md:h-5 md:min-w-[1.7rem] md:rounded-full md:bg-black md:dark:bg-gray-300 md:text-white md:dark:text-gray-900 md:text-[10px] md:grid md:place-items-center md:px-1">
+                      <span className="absolute -top-0 -right-0 h-5 min-w-[1.25rem] rounded-full bg-primary text-foreground text-xs font-medium grid place-items-center px-1 md:static md:h-5 md:min-w-[1.7rem] md:rounded-full md:bg-black md:dark:bg-primary md:text-foreground md:dark:text-foreground md:text-[10px] md:grid md:place-items-center md:px-1">
                         {count}
                       </span>
                     )}
                     {/* Desktop cart text */}
                     <div className="hidden sm:flex flex-col items-start">
-                      <p className="text-sm font-medium text-foreground tracking-wide">
-                        Cart
-                      </p>
+                      <p className="text-sm font-medium  tracking-wide">Cart</p>
                     </div>
                   </div>
                 </button>
@@ -259,7 +259,7 @@ export function Navbar() {
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="h-8 w-8 inline-flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-full hover:text-primary/10 dark:hover:text-primary/90 transition-colors"
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />
@@ -273,7 +273,7 @@ export function Navbar() {
               onClick={cycleTheme}
               title={`Theme: ${colorTheme}`}
               aria-label="Cycle color theme"
-              className="h-8 w-8 inline-flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-full hover:text-primary/10 dark:hover:text-primary/90 transition-colors"
             >
               <Palette className="h-4 w-4" />
             </button>

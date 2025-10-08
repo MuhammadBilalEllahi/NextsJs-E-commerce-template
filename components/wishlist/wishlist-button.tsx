@@ -21,12 +21,12 @@ export function AddToWishlistButton({
       onClick={() => toggle(productId, variantId)}
       disabled={isLoading}
       className={`inline-flex items-center justify-center rounded ${
-        small ? "h-8 w-8 border" : "h-9 w-9 border"
-      } hover:bg-red-50 dark:hover:bg-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed`}
+        small ? "h-8 w-8 " : "h-9 w-9 "
+      } hover:bg-primary dark:hover:bg-neutral-900 disabled:opacity-50 disabled:cursor-not-allowed`}
       title={active ? "Remove from wishlist" : "Add to wishlist"}
     >
       <Heart
-        className={`h-4 w-4 ${active ? "text-red-600 fill-red-600" : ""}`}
+        className={`h-4 w-4 ${active ? "text-primary fill-primary" : ""}`}
       />
     </button>
   );

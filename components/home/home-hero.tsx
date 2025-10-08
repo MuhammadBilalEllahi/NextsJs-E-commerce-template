@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Banner, GlobalSettings } from "@/types";
+import Image from "next/image";
 
 export function HomeHero({
   banners,
@@ -15,6 +16,8 @@ export function HomeHero({
   // const [banners, setBanners] = useState<Banner[]>([])
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  const [isPaused, setIsPaused] = useState(false);
   // const [globalSettings, setGlobalSettings] = useState<GlobalSettings | null>(null)
 
   // Fetch banners and global settings on component mount
@@ -37,47 +40,6 @@ export function HomeHero({
         // setGlobalSettings(fetchedSettings)
       } catch (error) {
         console.error("Error loading data:", error);
-        // Fallback to default banners if API fails
-        // setBanners([
-        //   {
-        //     id: "fallback-1",
-        //     title: "Summer Heat Sale",
-        //     description: "Up to 30% off select spices & masalas",
-        //     image: "/spice-banner-red.png",
-        //     link: "/shop/all",
-        //     isActive: true,
-        //     expiresAt: "",
-        //     showTitle: true,
-        //     showLink: true,
-        //     showDescription: true,
-        //     mimeType: "",
-        //     timeout: undefined,
-        //     createdAt: "",
-        //     updatedAt: ""
-        //   },
-        //   {
-        //     id: "fallback-2",
-        //     title: "Pickle Perfection",
-        //     description: "Tangy, spicy, homemade-style pickles",
-        //     image: "/dehli-mirch-ecommerce-banner.png",
-        //     link: "/category/pickles",
-        //     isActive: true,
-        //     expiresAt: "",
-        //     showTitle: true,
-        //     showLink: true,
-        //     showDescription: true,
-        //     mimeType: "",
-        //     timeout: undefined,
-        //     createdAt: "",
-        //     updatedAt: ""
-        //   }
-        // ])
-        // Set default global settings
-        // setGlobalSettings({
-        //   id: "default",
-        //   bannerScrollTime: 5000,
-        //   updatedAt: new Date().toISOString()
-        // })
       } finally {
         setLoading(false);
       }
@@ -88,7 +50,7 @@ export function HomeHero({
 
   // Auto-advance slides with individual banner timeouts
   useEffect(() => {
-    if (banners.length <= 1 || !globalSettings) return;
+    if (banners.length <= 1 || !globalSettings || isPaused) return;
 
     const currentBanner = banners[index];
     const timeout = currentBanner.timeout || globalSettings.bannerScrollTime;
@@ -98,7 +60,7 @@ export function HomeHero({
     }, timeout);
 
     return () => clearInterval(t);
-  }, [banners, index, globalSettings]);
+  }, [banners, index, globalSettings, isPaused]);
 
   // Don't render if no banners or still loading
   if (loading) {
@@ -106,7 +68,12 @@ export function HomeHero({
       <section className="relative">
         <div className="relative isolate overflow-hidden rounded-none">
           <div className="w-full h-[360px] md:h-[500px] bg-gray-200 animate-pulse flex items-center justify-center">
-            <div className="text-gray-500">Loading banners...</div>
+            <Image
+              src="/dehli-mirch-ecommerce-banner.png"
+              alt="Loading banners"
+              fill
+              className="object-cover"
+            />
           </div>
         </div>
       </section>
@@ -120,30 +87,38 @@ export function HomeHero({
   const current = banners[index];
 
   return (
-    <section className="relative">
+    <section
+      className="relative"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       <div className="relative isolate overflow-hidden rounded-none ">
-        <img
-          src={current.image || "/placeholder.svg"}
-          alt={current.title}
-          className="w-full h-[360px] md:h-[500px] object-cover"
-        />
+        <div className="w-full h-[360px] md:h-[500px] ">
+          <Image
+            fill
+            src={current.image || "/placeholder.svg"}
+            alt={current.title}
+            className="object-cover"
+          />
+        </div>
+
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
         <div className="absolute inset-0 flex items-center">
           <div className="ml-10 px-6 md:px-10">
             {current.showTitle && (
-              <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white">
+              <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-foreground">
                 {current.title}
               </h1>
             )}
             {current.showDescription && (
-              <p className="mt-2 text-white/90 md:text-lg">
+              <p className="mt-2 text-foreground/90 md:text-lg">
                 {current.description}
               </p>
             )}
             {current.showLink && current.link && (
               <Link
                 href={current.link}
-                className="inline-block mt-5 rounded-md bg-white text-neutral-900 font-medium px-5 py-2.5 shadow hover:opacity-90"
+                className="inline-block mt-5 rounded-md bg-foreground text-background font-medium px-5 py-2.5 shadow hover:bg-primary"
               >
                 Learn More
               </Link>
@@ -178,7 +153,7 @@ export function HomeHero({
                   onClick={() => setIndex(i)}
                   className={`h-2 w-2 rounded-full transition-all ${
                     i === index
-                      ? "bg-red-600 w-6"
+                      ? "bg-primary w-6"
                       : "bg-white/70 hover:bg-white"
                   }`}
                 />

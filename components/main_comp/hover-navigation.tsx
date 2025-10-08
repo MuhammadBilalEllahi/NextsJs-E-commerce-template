@@ -59,7 +59,7 @@ export function HoverNavigation({
                     setShowProducts(true);
                   }}
                 >
-                  <span className="text-xs font-medium w-28">
+                  <span className="text-xs font-medium hover:text-primary hover:underline w-28">
                     {category.name}
                   </span>
                   <ChevronRight className="ml-2 h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
@@ -90,7 +90,7 @@ export function HoverNavigation({
                           className="flex items-center justify-between py-2 px-4 hover:underline cursor-pointer group transition-all"
                           onClick={onClose}
                         >
-                          <span className="text-xs font-medium w-28">
+                          <span className="text-xs font-medium hover:text-primary hover:underline w-28">
                             {product.name}
                           </span>
                         </Link>
@@ -109,7 +109,9 @@ export function HoverNavigation({
                           className="flex items-center justify-between py-2 px-4 hover:underline cursor-pointer group transition-all"
                           onClick={onClose}
                         >
-                          <span className="text-xs font-medium">More</span>
+                          <span className="text-xs font-medium hover:text-primary hover:underline">
+                            More
+                          </span>
                           <ChevronRight className="h-3 w-3 text-muted-foreground group-hover:text-foreground transition-colors" />
                         </Link>
                       </div>
@@ -119,7 +121,7 @@ export function HoverNavigation({
               })()}
               {getCategoryProducts(hoveredCategory.slug).length === 0 && (
                 <div className="text-center py-8">
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground hover:text-primary hover:underline">
                     No products found
                   </p>
                 </div>

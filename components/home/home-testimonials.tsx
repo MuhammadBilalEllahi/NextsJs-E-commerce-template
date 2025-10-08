@@ -12,8 +12,10 @@ export function HomeTestimonials() {
       try {
         const res = await fetch("/api/testimonials");
         const data = await res.json();
+        console.log("Testimonials API response:", data); // Debug log
         if (data?.success) {
           setTestimonials(data.testimonials || []);
+          console.log("Testimonials loaded:", data.testimonials); // Debug log
         }
       } catch (error) {
         console.error("Error loading testimonials:", error);

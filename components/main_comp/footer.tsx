@@ -21,18 +21,21 @@ export async function Footer() {
       <div className="container mx-auto px-4 py-10 grid gap-8 md:grid-cols-4">
         <div>
           <div className="font-extrabold text-lg tracking-tight mb-2">
-            <span className="text-red-600">{SITE_NAME_FIRST}</span>{" "}
-            <span className="text-green-600">{SITE_NAME_SECOND}</span>
+            <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
+            <span className="text-foreground">{SITE_NAME_SECOND}</span>
           </div>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="text-sm text-foreground dark:text-foreground/40">
             Heat you can taste, tradition you can trust.
           </p>
         </div>
         <div>
-          <h4 className="font-semibold mb-3">Shop</h4>
+          <h4 className="font-semibold mb-3 text-primary">Shop</h4>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link href="/shop/all" className="hover:underline">
+              <Link
+                href="/shop/all"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 All Products
               </Link>
             </li>
@@ -40,7 +43,7 @@ export async function Footer() {
               <li key={category.id}>
                 <Link
                   href={`/shop/all?category=${category.slug}`}
-                  className="hover:underline"
+                  className="hover:decoration-primary hover:text-primary hover:underline"
                 >
                   {category.name}
                 </Link>
@@ -49,67 +52,95 @@ export async function Footer() {
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-3">Company</h4>
+          <h4 className="font-semibold mb-3 text-primary">Company</h4>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link href="/about" className="hover:underline">
+              <Link
+                href="/about"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 About Us
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="hover:underline">
+              <Link
+                href="/contact"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 Contact
               </Link>
             </li>
             <li>
-              <Link href="/faqs" className="hover:underline">
+              <Link
+                href="/faqs"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 FAQs
               </Link>
             </li>
             <li>
-              <Link href="/careers" className="hover:underline">
+              <Link
+                href="/careers"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 Careers
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-3">Legal</h4>
+          <h4 className="font-semibold mb-3 text-primary">Legal</h4>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link href="/terms-of-service" className="hover:underline">
+              <Link
+                href="/terms-of-service"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 Terms of Service
               </Link>
             </li>
             <li>
-              <Link href="/privacy-policy" className="hover:underline">
+              <Link
+                href="/privacy-policy"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link href="/shipping-policy" className="hover:underline">
+              <Link
+                href="/shipping-policy"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 Shipping Policy
               </Link>
             </li>
             <li>
-              <Link href="/return-refund" className="hover:underline">
+              <Link
+                href="/return-refund"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 Return & Refund
               </Link>
             </li>
             <li>
-              <Link href="/disclaimers" className="hover:underline">
+              <Link
+                href="/disclaimers"
+                className="hover:decoration-primary hover:text-primary hover:underline"
+              >
                 Disclaimers
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-3">Stay in the loop</h4>
+          <h4 className="font-semibold mb-3 text-primary">Stay in the loop</h4>
           <NewsletterInline />
         </div>
       </div>
-      <div className="border-t py-4 text-center text-xs text-neutral-600 dark:text-neutral-400">
-        © {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
+      <div className="border-t py-4 text-center text-xs text-foreground dark:text-foreground/40">
+        © {new Date().getFullYear()}{" "}
+        <span className="text-primary">{SITE_NAME}</span>. All rights reserved.
       </div>
     </footer>
   );

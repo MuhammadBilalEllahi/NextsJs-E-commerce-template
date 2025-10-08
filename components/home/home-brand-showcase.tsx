@@ -69,11 +69,11 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
       <div className="flex items-center justify-center gap-4 mb-8">
         <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
         <div className="flex items-center gap-2">
-          <Star className="h-5 w-5 text-red-500" />
+          <Star className="h-5 w-5 text-primary" />
           <h2 className="text-lg md:text-xl font-bold tracking-wide uppercase">
             Our Brands
           </h2>
-          <Star className="h-5 w-5 text-red-500" />
+          <Star className="h-5 w-5 text-primary" />
         </div>
         <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
       </div>
@@ -86,7 +86,7 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
             onClick={() => handleBrandSelect(brand)}
             className={`group relative px-4 py-3 rounded-2xl border transition-all duration-300 ${
               activeBrand?.id === brand.id
-                ? "bg-red-500 text-white border-red-500 shadow-lg scale-105"
+                ? "bg-primary text-white border-primary shadow-lg scale-105"
                 : "bg-white dark:bg-neutral-900 border-gray-200 hover:border-red-300 hover:shadow-md"
             }`}
           >
@@ -98,7 +98,7 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
                   className={`h-8 w-8 object-contain transition-all duration-300 ${
                     activeBrand?.id === brand.id
                       ? "ring-2 ring-white/50"
-                      : "ring-1 ring-gray-200 group-hover:ring-red-300"
+                      : "ring-1 ring-gray-200 group-hover:ring-primary"
                   }`}
                 />
               )}
@@ -109,7 +109,7 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
 
             {/* Active indicator */}
             {activeBrand?.id === brand.id && (
-              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-red-500 rounded-full" />
+              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-primary rounded-full" />
             )}
           </button>
         ))}
@@ -122,7 +122,7 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
           <div className="flex items-center justify-between mb-6">
             <Link
               href={`/shop/all?brands=${encodeURIComponent(activeBrand.name)}`}
-              className="group flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-300 hover:scale-105"
+              className="group flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-all duration-300 hover:scale-105"
             >
               <span className="font-medium text-sm flex-end">View All</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -195,7 +195,7 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
           <Link
             key={brand.id}
             href={`/shop/all?brands=${encodeURIComponent(brand.name)}`}
-            className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200"
+            className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors duration-200"
           >
             {brand.name}
           </Link>

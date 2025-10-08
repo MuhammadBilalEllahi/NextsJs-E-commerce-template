@@ -60,22 +60,22 @@ export function ContactHero({ branches }: ContactHeroProps) {
 
   return (
     <div className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 via-orange-500/10 to-green-600/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/10 to-primary/10"></div>
       <div className="container mx-auto px-4 py-16 relative">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Left side - Hero content */}
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            <div className="inline-flex items-center gap-2 bg-primary/10 dark:bg-primary/90 text-primary dark:text-foreground px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
               Get in Touch with Dehli Mirch
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              <span className="text-red-600">Spice</span> Up Your{" "}
-              <span className="text-green-600">Conversation</span>
+              <span className="text-primary">Spice</span> Up Your{" "}
+              <span className="text-foreground">Conversation</span>
             </h1>
 
-            <p className="text-xl text-neutral-600 dark:text-neutral-300 mb-8 max-w-2xl mx-auto lg:mx-0">
+            <p className="text-xl text-foreground dark:text-foreground/40 mb-8 max-w-2xl mx-auto lg:mx-0">
               Have questions about our authentic spices, need help with your
               order, or want to share your culinary adventures? We're here to
               help you bring the heat to your kitchen!
@@ -83,26 +83,26 @@ export function ContactHero({ branches }: ContactHeroProps) {
 
             {/* Quick Contact Info */}
             <div className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-lg border border-red-100 dark:border-red-900/30">
-                <Phone className="h-8 w-8 text-red-600 mx-auto mb-3" />
+              <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-lg border border-primary/10 dark:border-primary/90">
+                <Phone className="h-8 w-8 text-primary mx-auto mb-3" />
                 <h3 className="font-semibold mb-2">Call Us</h3>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="text-sm text-foreground dark:text-foreground/40">
                   {primaryBranch?.phoneNumber || "+92 321 4375872"}
                 </p>
               </div>
 
-              <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-lg border border-orange-100 dark:border-orange-900/30">
-                <Mail className="h-8 w-8 text-orange-600 mx-auto mb-3" />
+              <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-lg border border-primary/10 dark:border-primary/90">
+                <Mail className="h-8 w-8 text-primary mx-auto mb-3" />
                 <h3 className="font-semibold mb-2">Email Us</h3>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="text-sm text-foreground dark:text-foreground/40">
                   {primaryBranch?.email || "info@dehlimirchmasalajaat.com"}
                 </p>
               </div>
 
-              <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-lg border border-green-100 dark:border-green-900/30">
-                <Clock className="h-8 w-8 text-green-600 mx-auto mb-3" />
+              <div className="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-lg border border-primary/10 dark:border-primary/90">
+                <Clock className="h-8 w-8 text-primary mx-auto mb-3" />
                 <h3 className="font-semibold mb-2">Business Hours</h3>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-line">
+                <p className="text-sm text-foreground dark:text-foreground/40 whitespace-pre-line">
                   {getBusinessHours()}
                 </p>
               </div>

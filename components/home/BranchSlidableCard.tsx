@@ -4,6 +4,7 @@ import React from "react";
 import { ExternalLink, PhoneIcon } from "lucide-react";
 import Link from "next/link";
 import { Branch } from "@/types";
+import Image from "next/image";
 export default function StackedCards({ branches }: { branches: Branch[] }) {
   return (
     <div className="w-full ">
@@ -19,7 +20,9 @@ export default function StackedCards({ branches }: { branches: Branch[] }) {
             }}
           >
             {/* Logo */}
-            <img
+            <Image
+              width={100}
+              height={100}
               src={c.logo || "/placeholder.svg"}
               alt={c.name}
               className="mx-auto h-24 w-24 object-contain rounded-xl ring-1 ring-black/5"
@@ -27,13 +30,13 @@ export default function StackedCards({ branches }: { branches: Branch[] }) {
 
             {/* Branch badge */}
             <div className="absolute top-4 right-4 z-10">
-              <span className="bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+              <span className="bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
                 Branch {c.branchNumber}
               </span>
             </div>
 
             {/* Title */}
-            <div className="mt-4 text-center font-semibold text-lg group-hover:text-red-600">
+            <div className="mt-4 text-center font-semibold text-lg group-hover:text-primary">
               {c.name}
             </div>
 
@@ -41,7 +44,7 @@ export default function StackedCards({ branches }: { branches: Branch[] }) {
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 text-center px-3">
               {c.address}
               <Link
-                className="inline-flex items-center text-red-600 hover:text-red-800 pt-1"
+                className="inline-flex items-center text-primary hover:text-primary pt-1"
                 href={c.location}
                 target="_blank"
                 rel="noopener noreferrer"

@@ -119,7 +119,7 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
-        <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+        <Star key={i} className="h-3 w-3 fill-foreground text-foreground/80" />
       );
     }
 
@@ -127,14 +127,16 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
       stars.push(
         <Star
           key="half"
-          className="h-3 w-3 fill-yellow-400/50 text-yellow-400"
+          className="h-3 w-3 fill-foreground/70 text-foreground/80"
         />
       );
     }
 
     const remainingStars = 5 - Math.ceil(rating);
     for (let i = 0; i < remainingStars; i++) {
-      stars.push(<Star key={`empty-${i}`} className="h-3 w-3 text-gray-300" />);
+      stars.push(
+        <Star key={`empty-${i}`} className="h-3 w-3 text-foreground/50" />
+      );
     }
 
     return stars;
@@ -181,7 +183,7 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-xs"
+                      className="text-xs hover:bg-primary/10"
                       onClick={onSubmit}
                     >
                       VIEW ALL RESULTS ({searchResults.length})
@@ -213,21 +215,21 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                               />
                             ) : (
                               <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center">
-                                <span className="text-muted-foreground text-xs">
+                                <span className="text-primary/50 text-xs">
                                   No Image
                                 </span>
                               </div>
                             )}
                           </div>
                           <div>
-                            <h4 className="font-medium text-sm text-foreground line-clamp-2">
+                            <h4 className="font-medium text-sm text-primary/90 hover:text-primary hover:underline underline-offset-2 line-clamp-2">
                               {product.name}
                             </h4>
                             <div className="flex items-center gap-1 mt-1">
                               <div className="flex items-center">
                                 {renderStars(product.ratingAvg)}
                               </div>
-                              <span className="text-xs text-muted-foreground">
+                              <span className="text-xs text-foreground/50">
                                 {product.reviewCount} reviews
                               </span>
                             </div>
@@ -270,13 +272,13 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                           key={term.slug}
                           variant="outline"
                           size="sm"
-                          className="text-xs h-8 px-3 rounded-full hover:bg-muted"
+                          className="text-xs h-8 px-3 rounded-full hover:text-primary"
                           onClick={() => {
                             setQ(term.slug);
                             setIsDropdownOpen(false);
                           }}
                         >
-                          <Search className="h-3 w-3 mr-1" />
+                          <Search className="h-3 w-3 mr-1 " />
                           {term.name}
                         </Button>
                       ))}
@@ -309,14 +311,14 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
                               )}
                             </div>
                             <div>
-                              <h4 className="font-medium text-sm text-foreground line-clamp-2">
+                              <h4 className="font-medium text-sm text-primary/90 hover:text-primary hover:underline underline-offset-2 line-clamp-2">
                                 {product.name}
                               </h4>
                               <div className="flex items-center gap-1 mt-1">
                                 <div className="flex items-center">
                                   {renderStars(product.rating)}
                                 </div>
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-xs text-foreground/50">
                                   {product.reviewCount} reviews
                                 </span>
                               </div>

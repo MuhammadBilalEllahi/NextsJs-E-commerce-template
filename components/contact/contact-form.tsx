@@ -99,19 +99,19 @@ export function ContactForm() {
   return (
     <Card className="shadow-xl border-0 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm">
       <CardHeader className="text-center pb-6">
-        <CardTitle className="text-2xl font-bold text-red-600">
+        <CardTitle className="text-2xl font-bold text-primary">
           Send Us a Message
         </CardTitle>
-        <p className="text-neutral-600 dark:text-neutral-400">
+        <p className="text-foreground dark:text-foreground/40">
           We'll get back to you within 24 hours
         </p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {submitStatus === "success" && (
-            <div className="flex items-center gap-2 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <p className="text-green-700 dark:text-green-300 font-medium">
+            <div className="flex items-center gap-2 p-4 bg-primary/10 dark:bg-primary/90 border border-primary rounded-lg">
+              <CheckCircle className="h-5 w-5 text-primary" />
+              <p className="text-primary dark:text-primary/40 font-medium">
                 Thank you! Your message has been sent successfully. We'll get
                 back to you soon!
               </p>
@@ -119,9 +119,9 @@ export function ContactForm() {
           )}
 
           {submitStatus === "error" && (
-            <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-red-600" />
-              <p className="text-red-700 dark:text-red-300 font-medium">
+            <div className="flex items-center gap-2 p-4 bg-primary/10 dark:bg-primary/90 border border-primary rounded-lg">
+              <AlertCircle className="h-5 w-5 text-primary" />
+              <p className="text-primary dark:text-primary/40 font-medium">
                 {errorMessage}
               </p>
             </div>
@@ -139,7 +139,7 @@ export function ContactForm() {
                 onChange={handleChange}
                 placeholder="Your full name"
                 required
-                className="border-red-200 focus:border-red-500 focus:ring-red-500"
+                className="border-primary focus:border-primary focus:ring-primary"
               />
             </div>
 
@@ -155,7 +155,7 @@ export function ContactForm() {
                 onChange={handleChange}
                 placeholder="your@email.com"
                 required
-                className="border-red-200 focus:border-red-500 focus:ring-red-500"
+                className="border-primary focus:border-primary focus:ring-primary"
               />
             </div>
           </div>
@@ -172,7 +172,7 @@ export function ContactForm() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+92 300 1234567"
-                className="border-red-200 focus:border-red-500 focus:ring-red-500"
+                className="border-primary focus:border-primary focus:ring-primary"
               />
             </div>
 
@@ -188,7 +188,7 @@ export function ContactForm() {
                 onValueChange={handleSelectChange}
                 required
               >
-                <SelectTrigger className="w-full border-red-200 focus:border-red-500 focus:ring-red-500">
+                <SelectTrigger className="w-full border-primary focus:border-primary focus:ring-primary">
                   <SelectValue placeholder="Select a subject" />
                 </SelectTrigger>
                 <SelectContent>
@@ -214,14 +214,14 @@ export function ContactForm() {
               placeholder="Tell us how we can help you spice up your kitchen..."
               rows={6}
               required
-              className="border-red-200 focus:border-red-500 focus:ring-red-500"
+              className="border-primary focus:border-primary focus:ring-primary"
             />
           </div>
 
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="w-full bg-gradient-to-r from-primary to-primary hover:from-primary/90 hover:to-primary/90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             {isSubmitting ? (
               <div className="flex items-center gap-2">

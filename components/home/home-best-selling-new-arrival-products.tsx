@@ -117,8 +117,8 @@ export function HomeBestSellingAndNewArrivalProducts({
           onClick={() => setActiveTab("best")}
           className={`px-3 py-1 rounded transition ${
             activeTab === "best"
-              ? "bg-red-500 text-white"
-              : "hover:text-red-600 text-gray-700 dark:text-gray-300"
+              ? "bg-primary text-white"
+              : "hover:text-primary text-gray-700 dark:text-gray-300"
           }`}
         >
           Best Sellings
@@ -128,8 +128,8 @@ export function HomeBestSellingAndNewArrivalProducts({
           onClick={() => setActiveTab("new")}
           className={`px-3 py-1 rounded transition ${
             activeTab === "new"
-              ? "bg-red-500 text-white"
-              : "hover:text-red-600 text-gray-700 dark:text-gray-300"
+              ? "bg-primary text-white"
+              : "hover:text-primary text-gray-700 dark:text-gray-300"
           }`}
         >
           New Arrivals

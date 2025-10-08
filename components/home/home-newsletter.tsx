@@ -42,10 +42,8 @@ export function HomeNewsletter() {
 
   return (
     <form onSubmit={onSubmit} className="max-w-lg">
-      <div className="text-sm mb-2">
-        Get spicy offers and recipes in your inbox.
-      </div>
-      {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
+      <div className="text-sm mb-2">Get offers and recipes in your inbox.</div>
+      {error && <div className="text-primary text-sm mb-2">{error}</div>}
       <div className="flex gap-2">
         <Input
           type="email"
@@ -55,10 +53,7 @@ export function HomeNewsletter() {
           required
           disabled={loading}
         />
-        <Button
-          className="bg-orange-600 hover:bg-orange-700"
-          disabled={loading}
-        >
+        <Button className="bg-primary hover:bg-primary/90" disabled={loading}>
           {loading ? "Subscribing..." : sent ? "Subscribed!" : "Subscribe"}
         </Button>
       </div>
@@ -104,7 +99,7 @@ export function NewsletterInline() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-2">
-      {error && <div className="text-red-600 text-sm">{error}</div>}
+      {error && <div className="text-primary text-sm">{error}</div>}
       <Input
         type="email"
         placeholder="you@example.com"
@@ -114,7 +109,7 @@ export function NewsletterInline() {
         disabled={loading}
       />
       <Button
-        className="w-full bg-orange-600 hover:bg-orange-700"
+        className="w-full bg-primary hover:bg-primary/90"
         disabled={loading}
       >
         {loading ? "Subscribing..." : sent ? "Thanks!" : "Subscribe"}

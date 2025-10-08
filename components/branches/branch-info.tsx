@@ -133,10 +133,10 @@ export function BranchInfo({ branches }: BranchInfoProps) {
                   />
                 )}
                 <div className="min-w-0">
-                  <CardTitle className="text-base lg:text-lg group-hover:text-red-600 transition-colors truncate">
+                  <CardTitle className="text-base lg:text-lg group-hover:text-primary transition-colors truncate">
                     {branch.name}
                   </CardTitle>
-                  <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs lg:text-sm text-foreground dark:text-foreground/40">
                     Branch {branch.branchNumber}
                   </p>
                 </div>
@@ -153,13 +153,13 @@ export function BranchInfo({ branches }: BranchInfoProps) {
           <CardContent className="space-y-3 lg:space-y-4">
             {/* Address */}
             <div className="flex items-start gap-2 lg:gap-3">
-              <MapPin className="h-4 w-4 lg:h-5 lg:w-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <MapPin className="h-4 w-4 lg:h-5 lg:w-5 text-primary mt-0.5 flex-shrink-0" />
               <div className="min-w-0">
                 <p className="font-medium text-xs lg:text-sm">Address</p>
-                <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-xs lg:text-sm text-foreground dark:text-foreground/40">
                   {branch.address}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500">
+                <p className="text-xs text-foreground dark:text-foreground/40">
                   {branch.city}, {branch.state}
                 </p>
               </div>
@@ -168,12 +168,12 @@ export function BranchInfo({ branches }: BranchInfoProps) {
             {/* Contact Information */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 lg:gap-3">
-                <Phone className="h-4 w-4 text-red-600 flex-shrink-0" />
+                <Phone className="h-4 w-4 text-primary flex-shrink-0" />
                 <div className="min-w-0">
                   <p className="text-xs lg:text-sm font-medium">Phone</p>
                   <a
                     href={`tel:${branch.phoneNumber}`}
-                    className="text-xs lg:text-sm text-red-600 hover:text-red-700 break-all"
+                    className="text-xs lg:text-sm text-primary hover:text-primary break-all"
                   >
                     {branch.phoneNumber}
                   </a>
@@ -182,12 +182,12 @@ export function BranchInfo({ branches }: BranchInfoProps) {
 
               {branch.email && (
                 <div className="flex items-center gap-2 lg:gap-3">
-                  <Mail className="h-4 w-4 text-red-600 flex-shrink-0" />
+                  <Mail className="h-4 w-4 text-primary flex-shrink-0" />
                   <div className="min-w-0">
                     <p className="text-xs lg:text-sm font-medium">Email</p>
                     <a
                       href={`mailto:${branch.email}`}
-                      className="text-xs lg:text-sm text-red-600 hover:text-red-700 break-all"
+                      className="text-xs lg:text-sm text-primary hover:text-primary break-all"
                     >
                       {branch.email}
                     </a>
@@ -198,15 +198,15 @@ export function BranchInfo({ branches }: BranchInfoProps) {
 
             {/* Opening Hours */}
             <div className="flex items-start gap-2 lg:gap-3">
-              <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-primary mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-xs lg:text-sm mb-1">
                   Opening Hours
                 </p>
-                <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-xs lg:text-sm text-foreground dark:text-foreground/40">
                   {getCurrentDayHours(branch)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500">
+                <p className="text-xs text-foreground dark:text-foreground/40">
                   {getWeekdayHours(branch)}
                 </p>
               </div>
@@ -215,7 +215,7 @@ export function BranchInfo({ branches }: BranchInfoProps) {
             {/* Manager */}
             {branch.manager && (
               <div className="flex items-center gap-3">
-                <Star className="h-4 w-4 text-red-600 flex-shrink-0" />
+                <Star className="h-4 w-4 text-primary flex-shrink-0" />
                 <div>
                   <p className="text-sm font-medium">Manager</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">

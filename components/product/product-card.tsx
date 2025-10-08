@@ -9,6 +9,7 @@ import { ShoppingCart, Star, Eye } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import { useState, useRef, useEffect } from "react";
 import { QuickLookModal } from "@/components/product/quick-look-modal";
+import Image from "next/image";
 
 export function ProductCard({
   product,
@@ -173,7 +174,9 @@ export function ProductCard({
         )}
       >
         <Link href={`/product/${product.slug}`} className="block">
-          <img
+          <Image
+            width={100}
+            height={100}
             src={getDisplayImage() as string}
             alt={product.name}
             className="h-24 w-full rounded-sm object-contain dark:bg-neutral-900 bg-neutral-100 group-hover:scale-[1.02] transition-transform"
@@ -182,7 +185,7 @@ export function ProductCard({
         <div className="p-1">
           <Link
             href={`/product/${product.slug}`}
-            className="font-semibold text-sm line-clamp-2 hover:text-black dark:hover:text-white hover:underline hover:underline-offset-2 hover:decoration-red-600"
+            className="font-semibold text-sm line-clamp-2 hover:text-black dark:hover:text-white hover:underline hover:underline-offset-2 hover:decoration-primary"
           >
             {product.name}
           </Link>
@@ -199,7 +202,7 @@ export function ProductCard({
             </span>
           </div>
 
-          <div className="font-bold text-red-600 text-sm mt-1">
+          <div className="font-bold text-primary text-sm mt-1">
             Rs.{getDisplayPrice()}
           </div>
 
@@ -238,7 +241,9 @@ export function ProductCard({
         )}
       >
         <Link href={`/product/${product.slug}`} className="block">
-          <img
+          <Image
+            width={100}
+            height={100}
             src={getDisplayImage() as string}
             alt={product.name}
             className=" w-52 object-cover h-10 lg:h-full"
@@ -249,7 +254,7 @@ export function ProductCard({
             <div className="flex flex-col">
               <Link
                 href={`/product/${product.slug}`}
-                className="font-semibold hover:text-red-600"
+                className="font-semibold hover:text-primary"
               >
                 {product.name}
               </Link>
@@ -280,14 +285,14 @@ export function ProductCard({
             {showReadMore && (
               <button
                 onClick={toggleReadMore}
-                className="text-red-600 hover:text-red-700 text-xs mt-1"
+                className="text-primary hover:underline text-xs mt-1"
               >
                 {isExpanded ? "Read Less" : "Read More"}
               </button>
             )}
           </div>
 
-          <div className="font-bold text-red-600">Rs.{getDisplayPrice()}</div>
+          <div className="font-bold text-primary">Rs.{getDisplayPrice()}</div>
           <div className="mt-3 flex items-center justify-between gap-2">
             <a
               className="flex-1 rounded-sm px-2 py-2 md:px-4 md:py-2 text-sm text-center  md:text-sm lg:text-md  font-semibold border-[#727272] hover:border-black bg-white dark:bg-black dark:hover:bg-white dark:text-white dark:hover:text-black hover:bg-black hover:text-white transition-colors duration-400 dark:border-gray-400 dark:hover:border-gray-500 border-1"
@@ -347,7 +352,9 @@ export function ProductCard({
       )}
 
       <Link href={`/product/${product.slug}`} className="block ">
-        <img
+        <Image
+          width={100}
+          height={100}
           src={getDisplayImage() as string}
           alt={product.name}
           className="h-44 w-full rounded-sm object-contain dark:bg-neutral-900 bg-neutral-100 group-hover:scale-[1.01] transition-transform"
@@ -357,7 +364,7 @@ export function ProductCard({
         <div className="flex items-end justify-between gap-2">
           <Link
             href={`/product/${product.slug}`}
-            className="font-semibold text-lg line-clamp-1 hover:text-black dark:hover:text-white hover:underline hover:underline-offset-4 hover:decoration-red-600"
+            className="font-semibold text-lg line-clamp-1 hover:text-black dark:hover:text-white hover:underline hover:underline-offset-4 hover:decoration-primary"
           >
             {product.name}
           </Link>
@@ -388,7 +395,7 @@ export function ProductCard({
           {showReadMore && (
             <button
               onClick={toggleReadMore}
-              className="text-red-600 hover:text-red-700 text-xs "
+              className="text-primary hover:underline text-xs "
             >
               {isExpanded ? "Read Less" : "Read More"}
             </button>
@@ -408,7 +415,7 @@ export function ProductCard({
           Brand: {product.brand}
         </div>} */}
 
-        <div className="font-bold text-red-600 mt-auto">
+        <div className="font-bold text-primary mt-auto">
           Rs.{getDisplayPrice()}
         </div>
 

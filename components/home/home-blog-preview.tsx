@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import type { Blog } from "@/types";
+import Image from "next/image";
 
 export function HomeBlogPreview({ blogs }: { blogs: Blog[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,7 +41,9 @@ export function HomeBlogPreview({ blogs }: { blogs: Blog[] }) {
         <div className="bg-white dark:bg-neutral-900 rounded-xl overflow-hidden border shadow-sm">
           <Link href={`/blog/${featuredBlog?.slug}`} className="block">
             <div className="relative">
-              <img
+              <Image
+                width={100}
+                height={100}
                 src={featuredBlog?.image || "/placeholder.svg"}
                 alt={featuredBlog?.title}
                 className="w-full h-64 object-cover"
@@ -50,7 +53,7 @@ export function HomeBlogPreview({ blogs }: { blogs: Blog[] }) {
               </div>
             </div>
             <div className="p-6">
-              <div className="flex items-center gap-2 text-sm text-green-600 mb-3">
+              <div className="flex items-center gap-2 text-sm text-primary mb-3">
                 <span>🌿</span>
                 <span>Health</span>
               </div>
@@ -64,7 +67,7 @@ export function HomeBlogPreview({ blogs }: { blogs: Blog[] }) {
                 <span className="text-xs text-neutral-500 dark:text-neutral-400">
                   NOV 16, 2024
                 </span>
-                <span className="text-green-600 text-sm font-medium hover:underline">
+                <span className="text-primary text-sm font-medium hover:underline">
                   Read More
                 </span>
               </div>
@@ -82,7 +85,9 @@ export function HomeBlogPreview({ blogs }: { blogs: Blog[] }) {
               <Link href={`/blog/${blog.slug}`} className="block">
                 <div className="flex">
                   <div className="relative w-24 h-20 flex-shrink-0">
-                    <img
+                    <Image
+                      width={100}
+                      height={100}
                       src={blog.image || "/placeholder.svg"}
                       alt={blog.title}
                       className="w-full h-full object-cover"
@@ -99,7 +104,7 @@ export function HomeBlogPreview({ blogs }: { blogs: Blog[] }) {
                       {blog.excerpt}
                     </p>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1 text-xs text-green-600">
+                      <div className="flex items-center gap-1 text-xs text-primary">
                         <span>🌿</span>
                         <span>Health</span>
                       </div>
@@ -116,7 +121,7 @@ export function HomeBlogPreview({ blogs }: { blogs: Blog[] }) {
           <div className="pt-4">
             <Link
               href="/blog"
-              className="text-green-600 hover:underline font-medium text-sm"
+              className="text-primary hover:underline font-medium text-sm"
             >
               Explore all posts →
             </Link>
