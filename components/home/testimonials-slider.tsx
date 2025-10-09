@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GlowButton } from "../ui/glow-button";
 
 type TestimonialItem = {
   author: string;
