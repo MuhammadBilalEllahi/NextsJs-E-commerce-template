@@ -16,17 +16,16 @@ export function TestimonialsSlider({ items }: { items: TestimonialItem[] }) {
     const id = setInterval(() => setIndex((i) => (i + 1) % items.length), 4000);
     return () => clearInterval(id);
   }, [items]);
-
-  if (!items || items.length === 0) {
-    return null;
-  }
-
   // Reset index if it's out of bounds
   useEffect(() => {
     if (items.length > 0 && index >= items.length) {
       setIndex(0);
     }
   }, [items.length, index]);
+
+  if (!items || items.length === 0) {
+    return null;
+  }
 
   const item = items[index];
 
