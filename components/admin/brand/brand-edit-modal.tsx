@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Upload, X } from "lucide-react";
 import { Brand } from "@/types";
+import Image from "next/image";
 
 interface BrandEditModalProps {
   isOpen: boolean;
@@ -140,7 +141,9 @@ export default function BrandEditModal({
             <div className="space-y-3">
               {logoPreview ? (
                 <div className="relative inline-block">
-                  <img
+                  <Image
+                    width={128}
+                    height={128}
                     src={logoPreview}
                     alt="Logo preview"
                     className="w-24 h-24 object-cover rounded-lg border"

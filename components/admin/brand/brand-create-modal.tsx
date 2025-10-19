@@ -1,80 +1,96 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Upload, X } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Upload, X } from "lucide-react";
+import Image from "next/image";
 
 interface BrandCreateModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: { name: string; description: string; logo: File | null }) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: {
+    name: string;
+    description: string;
+    logo: File | null;
+  }) => void;
 }
 
-export default function BrandCreateModal({ isOpen, onClose, onSubmit }: BrandCreateModalProps) {
+export default function BrandCreateModal({
+  isOpen,
+  onClose,
+  onSubmit,
+}: BrandCreateModalProps) {
   const [formData, setFormData] = useState({
     name: "",
-    description: ""
-  })
-  const [logoFile, setLogoFile] = useState<File | null>(null)
-  const [logoPreview, setLogoPreview] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+    description: "",
+  });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setLogoFile(file)
-      const reader = new FileReader()
+      setLogoFile(file);
+      const reader = new FileReader();
       reader.onload = (e) => {
-        setLogoPreview(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
+        setLogoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const removeLogo = () => {
-    setLogoFile(null)
-    setLogoPreview(null)
-  }
+    setLogoFile(null);
+    setLogoPreview(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData.name.trim()) return
+    e.preventDefault();
+    if (!formData.name.trim()) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       await onSubmit({
         name: formData.name.trim(),
         description: formData.description.trim(),
-        logo: logoFile
-      })
-      
+        logo: logoFile,
+      });
+
       // Reset form
-      setFormData({ name: "", description: "" })
-      setLogoFile(null)
-      setLogoPreview(null)
+      setFormData({ name: "", description: "" });
+      setLogoFile(null);
+      setLogoPreview(null);
     } catch (error) {
-      console.error("Error creating brand:", error)
+      console.error("Error creating brand:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleClose = () => {
     if (!isSubmitting) {
-      setFormData({ name: "", description: "" })
-      setLogoFile(null)
-      setLogoPreview(null)
-      onClose()
+      setFormData({ name: "", description: "" });
+      setLogoFile(null);
+      setLogoPreview(null);
+      onClose();
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -116,7 +132,9 @@ export default function BrandCreateModal({ isOpen, onClose, onSubmit }: BrandCre
             <div className="space-y-3">
               {logoPreview ? (
                 <div className="relative inline-block">
-                  <img
+                  <Image
+                    width={128}
+                    height={128}
                     src={logoPreview}
                     alt="Logo preview"
                     className="w-24 h-24 object-cover rounded-lg border"
@@ -135,7 +153,9 @@ export default function BrandCreateModal({ isOpen, onClose, onSubmit }: BrandCre
               ) : (
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                   <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600 mb-2">Upload brand logo</p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Upload brand logo
+                  </p>
                   <Input
                     id="logo"
                     type="file"
@@ -145,7 +165,12 @@ export default function BrandCreateModal({ isOpen, onClose, onSubmit }: BrandCre
                     disabled={isSubmitting}
                   />
                   <Label htmlFor="logo" className="cursor-pointer">
-                    <Button type="button" variant="outline" size="sm" disabled={isSubmitting}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isSubmitting}
+                    >
                       Choose File
                     </Button>
                   </Label>
@@ -173,5 +198,5 @@ export default function BrandCreateModal({ isOpen, onClose, onSubmit }: BrandCre
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

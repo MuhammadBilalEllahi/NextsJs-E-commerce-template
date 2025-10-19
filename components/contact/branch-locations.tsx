@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import Link from "next/link";
 import { Branch } from "@/types";
+import Image from "next/image";
 
 interface BranchLocationsProps {
   branches: Branch[];
@@ -73,7 +74,9 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
-                    <img
+                    <Image
+                      width={128}
+                      height={128}
                       src={branch.logo || "/placeholder.svg"}
                       alt={branch.name}
                       className="w-16 h-16 object-contain rounded-lg ring-1 ring-red-200 dark:ring-red-800"

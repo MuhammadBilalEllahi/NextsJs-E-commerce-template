@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Clock, ExternalLink } from "lucide-react";
 import { Branch } from "@/types";
+import Image from "next/image";
 
 interface BranchMapProps {
   branches: Branch[];
@@ -119,7 +120,9 @@ export function BranchMap({ branches }: BranchMapProps) {
               <CardContent className="p-3 lg:p-4">
                 <div className="flex items-start gap-2 lg:gap-3">
                   {branch.logo && (
-                    <img
+                    <Image
+                      width={128}
+                      height={128}
                       src={branch.logo}
                       alt={branch.name}
                       className="w-10 h-10 lg:w-12 lg:h-12 object-contain rounded-lg flex-shrink-0"
@@ -195,7 +198,9 @@ export function BranchMap({ branches }: BranchMapProps) {
               <CardContent className="p-4 lg:p-6">
                 <div className="flex flex-col sm:flex-row items-start gap-3 lg:gap-4 mb-4 lg:mb-6">
                   {selectedBranch.logo && (
-                    <img
+                    <Image
+                      width={128}
+                      height={128}
                       src={selectedBranch.logo}
                       alt={selectedBranch.name}
                       className="w-12 h-12 lg:w-16 lg:h-16 object-contain rounded-lg flex-shrink-0 mx-auto sm:mx-0"

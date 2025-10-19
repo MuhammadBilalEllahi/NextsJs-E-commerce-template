@@ -14,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import { Branch } from "@/types";
+import Image from "next/image";
 
 interface BranchLocationsProps {
   branches: Branch[];
@@ -149,7 +150,9 @@ export function BranchLocations({ branches }: BranchLocationsProps) {
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                 <div className="flex items-center gap-3 lg:gap-4">
                   {branch.logo && (
-                    <img
+                    <Image
+                      width={128}
+                      height={128}
                       src={branch.logo}
                       alt={branch.name}
                       className="w-12 h-12 lg:w-16 lg:h-16 object-contain rounded-lg ring-1 ring-gray-200 flex-shrink-0"

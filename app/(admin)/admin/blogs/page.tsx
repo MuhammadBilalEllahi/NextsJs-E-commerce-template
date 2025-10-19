@@ -58,6 +58,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import { TiptapMenuBar } from "@/components/admin/blogs/tiptap-menu-bar";
+import NextImage from "next/image";
 
 interface Blog {
   id: string;
@@ -369,7 +370,9 @@ export default function BlogsPage() {
                   />
                   {imagePreview && (
                     <div className="mt-2">
-                      <img
+                      <NextImage
+                        width={128}
+                        height={128}
                         src={imagePreview}
                         alt="Preview"
                         className="w-32 h-32 object-cover rounded-lg border"
@@ -485,7 +488,9 @@ export default function BlogsPage() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {blog.image && (
-                          <img
+                          <NextImage
+                            width={128}
+                            height={128}
                             src={blog.image}
                             alt={blog.title}
                             className="w-10 h-10 object-cover rounded"

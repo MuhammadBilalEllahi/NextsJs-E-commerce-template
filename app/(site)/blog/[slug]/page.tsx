@@ -8,6 +8,7 @@ import {
   buildBlogPostingJsonLd,
   buildBreadcrumbJsonLd,
 } from "@/lib/seo";
+import Image from "next/image";
 
 export default async function BlogDetailPage({
   params,
@@ -63,8 +64,10 @@ export default async function BlogDetailPage({
         <div className="mt-4 grid lg:grid-cols-4 gap-8">
           <article className="lg:col-span-3">
             {post.image && (
-              <img
-                src={post.image}
+              <Image
+                width={128}
+                height={128}
+                src={post.image || ""}
                 alt={post.title}
                 className="w-full max-h-[420px] object-cover rounded-lg"
               />
@@ -96,8 +99,10 @@ export default async function BlogDetailPage({
                   className="flex gap-3 rounded border p-2 hover:shadow"
                 >
                   {r.image && (
-                    <img
-                      src={r.image}
+                    <Image
+                      width={128}
+                      height={128}
+                      src={r.image || ""}
                       alt={r.title}
                       className="h-16 w-24 object-cover rounded"
                     />

@@ -33,6 +33,7 @@ import { BranchCreateModal } from "@/components/admin/branches/branch-create-mod
 import { BranchEditModal } from "@/components/admin/branches/branch-edit-modal";
 import { BranchViewModal } from "@/components/admin/branches/branch-view-modal";
 import { Branch, CreateBranchData, UpdateBranchData } from "@/types";
+import Image from "next/image";
 export default function BranchesAdminPage() {
   const {
     branches,
@@ -253,14 +254,12 @@ export default function BranchesAdminPage() {
                 <div className="flex flex-col lg:flex-row gap-4">
                   {/* Logo */}
                   <div className="flex-shrink-0">
-                    <img
-                      src={branch.logo}
+                    <Image
+                      width={128}
+                      height={128}
+                      src={branch.logo || ""}
                       alt={`${branch.name} logo`}
                       className="w-20 h-20 object-cover rounded-lg border"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = "/placeholder.svg";
-                      }}
                     />
                   </div>
 

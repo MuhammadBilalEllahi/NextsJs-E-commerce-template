@@ -13,6 +13,7 @@ import {
   Star,
 } from "lucide-react";
 import { Branch } from "@/types";
+import Image from "next/image";
 
 interface BranchInfoProps {
   branches: Branch[];
@@ -126,7 +127,9 @@ export function BranchInfo({ branches }: BranchInfoProps) {
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
               <div className="flex items-center gap-2 lg:gap-3">
                 {branch.logo && (
-                  <img
+                  <Image
+                    width={128}
+                    height={128}
                     src={branch.logo}
                     alt={branch.name}
                     className="w-10 h-10 lg:w-12 lg:h-12 object-contain rounded-lg ring-1 ring-gray-200 flex-shrink-0"

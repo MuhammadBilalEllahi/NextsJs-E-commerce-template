@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import NextImage from "next/image";
 import {
   Card,
   CardContent,
@@ -765,7 +766,9 @@ export default function ProductsEditAdminUI({
                     />
                     {brandLogoPreview ? (
                       <div className="relative w-20 h-20">
-                        <img
+                        <Image
+                          width={128}
+                          height={128}
                           src={brandLogoPreview}
                           alt="logo preview"
                           className="w-20 h-20 object-cover rounded-md border"
@@ -890,7 +893,9 @@ export default function ProductsEditAdminUI({
                         }
                       />
                       {catImagePreview ? (
-                        <img
+                        <Image
+                          width={128}
+                          height={128}
                           src={catImagePreview}
                           alt="category preview"
                           className="w-24 h-24 object-cover rounded-md border"
@@ -1270,8 +1275,10 @@ export default function ProductsEditAdminUI({
                     <div className="flex flex-wrap gap-2 mt-2">
                       {editingVariant.images.map((img, index) => (
                         <div key={index} className="relative group">
-                          <img
-                            src={img}
+                          <NextImage
+                            width={128}
+                            height={128}
+                            src={img as string}
                             className="w-16 h-16 rounded object-cover border cursor-pointer hover:border-blue-400 transition-colors"
                             alt={`Current image ${index + 1}`}
                             onClick={() => setSelectedImage(img as string)}
@@ -1326,8 +1333,10 @@ export default function ProductsEditAdminUI({
                       <div className="flex flex-wrap gap-2 mt-2">
                         {editingVariant.newImages.map((file, index) => (
                           <div key={index} className="relative group">
-                            <img
-                              src={URL.createObjectURL(file)}
+                            <NextImage
+                              width={128}
+                              height={128}
+                              src={URL.createObjectURL(file) || ""}
                               className="w-16 h-16 rounded object-cover border"
                               alt={`New image ${index + 1}`}
                             />
@@ -1379,8 +1388,10 @@ export default function ProductsEditAdminUI({
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-4xl max-h-full">
-            <img
-              src={selectedImage}
+            <NextImage
+              width={128}
+              height={128}
+              src={selectedImage || ""}
               alt="Full size view"
               className="max-w-full max-h-full object-contain rounded-lg"
             />

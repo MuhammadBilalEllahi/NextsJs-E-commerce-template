@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Input } from "@/components/ui/input";
 import dbConnect from "@/database/mongodb";
 import Blog from "@/models/Blog";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Dehli Mirch Blog",
@@ -48,8 +49,10 @@ export default async function BlogListPage({
               className="rounded-lg border overflow-hidden hover:shadow"
             >
               {p.image && (
-                <img
-                  src={p.image}
+                <Image
+                  src={p.image || ""}
+                  width={128}
+                  height={128}
                   alt={p.title}
                   className="h-40 w-full object-cover"
                 />

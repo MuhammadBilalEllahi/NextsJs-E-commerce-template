@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Category } from "@/types";
+import Image from "next/image";
 
 export function HomeCategories({ categories }: { categories: Category[] }) {
   console.debug("categories in HomeCategories", categories);
@@ -12,7 +13,9 @@ export function HomeCategories({ categories }: { categories: Category[] }) {
           className="group inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-white dark:bg-neutral-900 hover:shadow-md transition-all duration-200 hover:scale-105"
         >
           {c.image && (
-            <img
+            <Image
+              width={128}
+              height={128}
               src={c.image}
               alt={c.name}
               className="h-6 w-6 object-cover rounded-full ring-1 ring-black/5"

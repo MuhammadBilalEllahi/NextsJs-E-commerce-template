@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Brand } from "@/types";
+import Image from "next/image";
 
 export function HomeBrands({ brands }: { brands: Brand[] }) {
   // Don't render if no brands
@@ -17,7 +18,9 @@ export function HomeBrands({ brands }: { brands: Brand[] }) {
           className="group rounded-2xl border bg-white dark:bg-neutral-900 p-4 hover:shadow-md transition-shadow"
         >
           {brand.logo ? (
-            <img
+            <Image
+              width={128}
+              height={128}
               src={brand.logo}
               alt={brand.name}
               className="mx-auto h-16 w-16 object-contain rounded-xl ring-1 ring-black/5"

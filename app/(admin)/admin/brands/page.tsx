@@ -22,6 +22,7 @@ import {
 import BrandCreateModal from "@/components/admin/brand/brand-create-modal";
 import BrandEditModal from "@/components/admin/brand/brand-edit-modal";
 import BrandDeleteModal from "@/components/admin/brand/brand-delete-modal";
+import Image from "next/image";
 
 type Brand = {
   id: string;
@@ -234,8 +235,10 @@ export default function BrandsAdminPage() {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
                         {brand.logo ? (
-                          <img
-                            src={brand.logo}
+                          <Image
+                            width={128}
+                            height={128}
+                            src={brand.logo || ""}
                             alt={brand.name}
                             className="w-12 h-12 rounded-lg object-cover border"
                           />

@@ -52,6 +52,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { RandomImage } from "@/types";
+import Image from "next/image";
 
 interface BulkImageManagerProps {
   selectedProducts: string[];
@@ -409,7 +410,9 @@ export default function BulkImageManager({
                   }`}
                   onClick={() => handleImageSelect(image.url)}
                 >
-                  <img
+                  <Image
+                    width={128}
+                    height={128}
                     src={image.url}
                     alt={image.name}
                     className="w-full h-24 object-cover"

@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from "lucide-react";
 import { Category } from "@/types";
 import { ProductCard } from "@/components/product/product-card";
 import { getProductsByCategory } from "@/database/data-service";
+import Image from "next/image";
 
 interface HomeCategoryShowcaseProps {
   categories: Category[];
@@ -94,7 +95,9 @@ export function HomeCategoryShowcase({
           >
             <div className="flex items-center gap-2">
               {category.image && (
-                <img
+                <Image
+                  width={128}
+                  height={128}
                   src={category.image}
                   alt={category.name}
                   className={`h-5 w-5 object-cover rounded-full transition-all duration-300 ${

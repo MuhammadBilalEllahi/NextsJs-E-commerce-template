@@ -26,6 +26,7 @@ import {
   Globe,
   MessageCircle,
 } from "lucide-react";
+import Image from "next/image";
 
 interface BranchCreateModalProps {
   open: boolean;
@@ -554,7 +555,9 @@ export function BranchCreateModal({
               <div className="space-y-2">
                 <Label>Logo Preview</Label>
                 <div className="w-32 h-32 border rounded-lg overflow-hidden">
-                  <img
+                  <Image
+                    width={128}
+                    height={128}
                     src={logoPreview}
                     alt="Logo preview"
                     className="w-full h-full object-cover"

@@ -12,6 +12,7 @@ import {
   calculateTotalWithShipping,
 } from "@/lib/constants/currency";
 import { RootProviders } from "@/lib/providers/rootProvider";
+import Image from "next/image";
 
 export default function CartPage() {
   // Important: do NOT call useCart here. Wrap children with providers first.
@@ -39,8 +40,10 @@ function CartContent() {
                 key={it.id}
                 className="flex items-center gap-4 rounded-lg border p-4"
               >
-                <img
+                <Image
                   src={it.image || "/placeholder.svg"}
+                  width={128}
+                  height={128}
                   alt={(it as any).name}
                   className="h-20 w-20 rounded object-cover"
                 />

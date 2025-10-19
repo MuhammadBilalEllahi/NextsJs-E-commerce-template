@@ -23,6 +23,7 @@ import {
   Navigation,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import Image from "next/image";
 
 interface BranchViewModalProps {
   branch: Branch | null;
@@ -53,14 +54,12 @@ export function BranchViewModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg overflow-hidden border">
-              <img
-                src={branch.logo}
+              <Image
+                width={128}
+                height={128}
+                src={branch.logo || ""}
                 alt={`${branch.name} logo`}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "/placeholder.svg";
-                }}
               />
             </div>
             <div>

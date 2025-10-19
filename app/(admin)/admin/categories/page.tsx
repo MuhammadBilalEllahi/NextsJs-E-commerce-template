@@ -15,6 +15,7 @@ import {
   createCategory,
   updateCategory,
 } from "@/lib/api/admin/category/categories";
+import Image from "next/image";
 
 type Category = {
   id: string;
@@ -171,8 +172,10 @@ export default function CategoriesAdminPage() {
                     }
                   />
                   {image && typeof image === "string" && (
-                    <img
-                      src={image}
+                    <Image
+                      width={128}
+                      height={128}
+                      src={image || ""}
                       alt="preview"
                       className="mt-2 w-24 h-24 object-cover rounded"
                     />
@@ -228,8 +231,10 @@ export default function CategoriesAdminPage() {
                     </td>
                     <td className="p-3">
                       {c.image ? (
-                        <img
-                          src={c.image}
+                        <Image
+                          width={128}
+                          height={128}
+                          src={c.image || ""}
                           alt={c.name}
                           className="w-12 h-12 object-cover rounded"
                         />

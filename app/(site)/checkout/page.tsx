@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants/currency";
+import Image from "next/image";
 
 export default function CheckoutPage() {
   const { user, isAuthenticated } = useAuth();
@@ -925,7 +926,9 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center gap-3">
                     <div className="relative">
-                      <img
+                      <Image
+                        width={128}
+                        height={128}
                         src={item.image || "/placeholder.svg"}
                         alt={(item as any).title}
                         className="h-12 w-12 rounded-full object-cover"

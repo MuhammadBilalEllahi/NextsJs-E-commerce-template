@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 export type VariantLabel = {
@@ -37,7 +38,9 @@ export function ProductImages({
   return (
     <div className="grid gap-2">
       <div className="relative aspect-square w-full overflow-hidden rounded-lg border bg-card">
-        <img
+        <Image
+          width={128}
+          height={128}
           src={images[activeIndex]}
           alt={`${name} image ${activeIndex + 1}`}
           className="h-full w-full object-cover"
@@ -63,7 +66,13 @@ export function ProductImages({
             }`}
             aria-label={`Preview image ${i + 1}`}
           >
-            <img src={src} alt="thumb" className="h-full w-full object-cover" />
+            <Image
+              width={128}
+              height={128}
+              src={src}
+              alt="thumb"
+              className="h-full w-full object-cover"
+            />
             {i === activeIndex && (
               <div className="absolute inset-0 bg-foreground/10" />
             )}

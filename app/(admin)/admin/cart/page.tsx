@@ -20,6 +20,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 type CartItem = {
   productId: string;
@@ -331,8 +332,10 @@ export default function AdminCartPage() {
                           key={index}
                           className="flex items-center gap-3 p-2 bg-neutral-50 dark:bg-neutral-800 rounded"
                         >
-                          <img
-                            src={item.productImage}
+                          <Image
+                            width={128}
+                            height={128}
+                            src={item.productImage || ""}
                             alt={item.productName}
                             className="w-12 h-12 object-cover rounded"
                           />

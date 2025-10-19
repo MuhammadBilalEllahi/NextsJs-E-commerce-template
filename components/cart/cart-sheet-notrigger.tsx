@@ -15,6 +15,7 @@ import {
   calculateShippingCost,
   calculateTotalWithShipping,
 } from "@/lib/constants/currency";
+import Image from "next/image";
 
 interface CartSheetUnTriggerableProps {
   open: boolean;
@@ -65,7 +66,9 @@ export function CartSheetUnTriggerable({
                     key={item.id}
                     className="flex items-center gap-3 rounded-lg border p-3"
                   >
-                    <img
+                    <Image
+                      width={128}
+                      height={128}
                       src={item.image || "/placeholder.svg"}
                       alt={item.name}
                       className="h-16 w-16 rounded object-cover"

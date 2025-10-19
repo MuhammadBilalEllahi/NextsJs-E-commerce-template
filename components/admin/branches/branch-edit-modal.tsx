@@ -27,6 +27,7 @@ import {
   MessageCircle,
   X,
 } from "lucide-react";
+import Image from "next/image";
 
 interface BranchEditModalProps {
   branch: Branch | null;
@@ -564,7 +565,9 @@ export function BranchEditModal({
               <div className="space-y-2">
                 <Label>Current Logo</Label>
                 <div className="relative w-32 h-32 border rounded-lg overflow-hidden">
-                  <img
+                  <Image
+                    width={128}
+                    height={128}
                     src={logoPreview}
                     alt="Branch logo"
                     className="w-full h-full object-cover"

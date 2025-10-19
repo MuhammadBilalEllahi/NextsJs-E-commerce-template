@@ -32,6 +32,7 @@ import CSVImportComponent from "@/components/admin/product/csv-import";
 import ImportHistoryComponent from "@/components/admin/product/import-history";
 import BulkImageManager from "@/components/admin/product/bulk-image-manager";
 import { useProducts, Product } from "@/lib/api/admin/product/products";
+import Image from "next/image";
 
 export default function ProductsTable() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -382,8 +383,10 @@ export default function ProductsTable() {
                       <td className="p-4 align-middle">
                         <div className="flex items-center gap-3">
                           {product.images && product.images.length > 0 ? (
-                            <img
-                              src={product.images[0]}
+                            <Image
+                              width={128}
+                              height={128}
+                              src={product.images[0] || ""}
                               alt={product.name}
                               className="h-10 w-10 rounded-md object-cover"
                             />

@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, ArrowRight, Star } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { getProductsByBrand } from "@/database/data-service";
 import { Brand } from "@/types";
-
+import Image from "next/image";
 interface HomeBrandShowcaseProps {
   brands: Brand[];
 }
@@ -92,7 +92,9 @@ export function HomeBrandShowcase({ brands }: HomeBrandShowcaseProps) {
           >
             <div className="flex items-center gap-3">
               {brand.logo && (
-                <img
+                <Image
+                  width={128}
+                  height={128}
                   src={brand.logo}
                   alt={brand.name}
                   className={`h-8 w-8 object-contain transition-all duration-300 ${

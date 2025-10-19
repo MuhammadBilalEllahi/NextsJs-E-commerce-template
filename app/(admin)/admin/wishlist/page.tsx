@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { WishlistItem, Pagination } from "@/types";
+import Image from "next/image";
 
 export default function AdminWishlistPage() {
   const [wishlistData, setWishlistData] = useState<WishlistItem[]>([]);
@@ -200,8 +201,10 @@ export default function AdminWishlistPage() {
                   className="border rounded-lg p-4 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition"
                 >
                   <div className="flex items-start gap-4">
-                    <img
-                      src={item.productImage}
+                    <Image
+                      width={128}
+                      height={128}
+                      src={item.productImage || ""}
                       alt={item.productName}
                       className="w-16 h-16 object-cover rounded"
                     />

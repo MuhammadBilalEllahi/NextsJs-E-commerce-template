@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { AlertTriangle } from "lucide-react";
 import { Brand } from "@/types";
+import Image from "next/image";
 
 interface BrandDeleteModalProps {
   isOpen: boolean;
@@ -65,7 +66,9 @@ export default function BrandDeleteModal({
           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
             <div className="flex items-center gap-3">
               {brand.logo ? (
-                <img
+                <Image
+                  width={128}
+                  height={128}
                   src={brand.logo}
                   alt={brand.name}
                   className="w-12 h-12 rounded-lg object-cover border"

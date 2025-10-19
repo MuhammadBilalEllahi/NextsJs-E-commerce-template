@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSession, signIn, signOut, useSession } from "next-auth/react";
-import { handleCartMergeOnAuth } from "@/middlewares/cartMerge";
+import { handleCartMergeOnAuth } from "@/middleware";
 import { CART_STORAGE_KEY, CartActionTypes, useCart } from "./cartContext";
 import { User } from "@/types";
 
