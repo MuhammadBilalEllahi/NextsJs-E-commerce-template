@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { subscribeNewsletter } from "@/lib/api/newsletter";
 
 export function HomeNewsletter() {
   const [email, setEmail] = useState("");
@@ -16,16 +17,7 @@ export function HomeNewsletter() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/newsletter", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
+      const data = await subscribeNewsletter(email);
       if (data.success) {
         setSent(true);
         setTimeout(() => setSent(false), 3000);
@@ -73,16 +65,7 @@ export function NewsletterInline() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/newsletter", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
+      const data = await subscribeNewsletter(email);
       if (data.success) {
         setSent(true);
         setTimeout(() => setSent(false), 3000);

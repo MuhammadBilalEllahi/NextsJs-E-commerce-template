@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Loader2 } from "lucide-react";
+import { sendOrderWhatsApp } from "@/lib/api/admin/orders/whatsapp";
 
 interface WhatsAppNotificationButtonProps {
   orderId: string;
@@ -20,21 +21,8 @@ export function WhatsAppNotificationButton({
   const sendWhatsAppNotification = async (type: "confirmation" | "status") => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}/whatsapp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert(data.message);
-      } else {
-        alert(data.message || "Failed to send WhatsApp notification");
-      }
+      const data = await sendOrderWhatsApp(orderId, type);
+      alert(data.message || "WhatsApp notification sent");
     } catch (error) {
       console.error("Error sending WhatsApp notification:", error);
       alert("Failed to send WhatsApp notification");

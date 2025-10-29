@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getTrendingProducts } from "@/database/data-service";
 import { formatCurrency } from "@/lib/constants/currency";
 import { Category, Product, ProductListItem } from "@/types/types";
+import { searchProducts } from "@/lib/api/search";
 
 export function HomeSearchBar({ categories }: { categories: Category[] }) {
   const [q, setQ] = useState("");
@@ -51,10 +52,7 @@ export function HomeSearchBar({ categories }: { categories: Category[] }) {
       debounceRef.current = setTimeout(async () => {
         setIsSearching(true);
         try {
-          const response = await fetch(
-            `/api/search?q=${encodeURIComponent(q)}&limit=6`
-          );
-          const data = await response.json();
+          const data = await searchProducts(q, 6);
           console.debug("search results", data.products);
           setSearchResults(data.products || []);
         } catch (error) {

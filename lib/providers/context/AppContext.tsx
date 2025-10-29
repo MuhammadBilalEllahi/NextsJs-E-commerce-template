@@ -10,6 +10,7 @@ import {
   useEffect,
 } from "react";
 import { User } from "@/types/types";
+import { getMe, loginApi, logoutApi } from "@/lib/api/auth";
 
 type AppContextType = {
   router: ReturnType<typeof useRouter>;
@@ -64,14 +65,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch("/api/auth/me");
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
+      const data = await getMe();
+      setUser(data.user);
+    } catch (_) {
       setUser(null);
     }
   };
@@ -79,25 +75,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
+      const data = await loginApi(email, password);
       console.debug("Login data:", data);
-
-      if (data.success) {
-        setUser(data.user);
-        return true;
-      } else {
-        setError(data.error);
-        return false;
-      }
-    } catch (error) {
+      setUser(data.user);
+      return true;
+    } catch (error: any) {
       console.error("Login error:", error);
-      setError(error instanceof Error ? error.message : "Login failed");
+      setError(error?.message || "Login failed");
       return false;
     } finally {
       setIsLoading(false);
@@ -106,7 +90,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await logoutApi();
       setUser(null);
       router.push("/account/login");
     } catch (error) {

@@ -19,6 +19,7 @@ import {
 import { formatCurrency } from "@/lib/constants/currency";
 import { OrderData, TCSOrderData, TrackingData } from "@/types/types";
 import { useSearchParams } from "next/navigation";
+import { getTrackingByRefId } from "@/lib/api/tcs/tracking";
 
 export default function TrackOrderPage() {
   const [trackingData, setTrackingData] = useState<TrackingData | null>(null);
@@ -48,15 +49,7 @@ export default function TrackOrderPage() {
       setError(null);
 
       try {
-        const response = await fetch(
-          `/api/tcs-tracking?refId=${encodeURIComponent(orderRef)}`
-        );
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to fetch tracking information");
-        }
-
+        const data = await getTrackingByRefId(orderRef);
         setTrackingData(data.data || data);
       } catch (err) {
         setError(

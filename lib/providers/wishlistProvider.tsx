@@ -149,24 +149,14 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     try {
       if (isAuthenticated && user?.id) {
         // For authenticated users, clear from database
-        for (const item of items) {
-          await fetch(`/api/wishlist?productId=${item.productId}`, {
-            method: "DELETE",
-          });
-        }
+        for (const item of items) await removeFromWishlist(item.productId);
         setItems([]);
         setIds(new Set());
       } else {
         // For guest users, clear from database using session ID
         const guestSessionId = getOrCreateGuestId();
-        for (const item of items) {
-          await fetch(
-            `/api/wishlist?productId=${item.productId}&sessionId=${guestSessionId}`,
-            {
-              method: "DELETE",
-            }
-          );
-        }
+        for (const item of items)
+          await removeFromWishlist(item.productId, guestSessionId);
         setItems([]);
         setIds(new Set());
       }

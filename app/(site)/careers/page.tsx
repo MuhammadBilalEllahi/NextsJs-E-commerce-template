@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { listCareersPublic, submitJobApplication } from "@/lib/api/careers";
 import {
   Briefcase,
   MapPin,
@@ -63,8 +64,7 @@ export default function CareersPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/api/careers");
-        const data = await res.json();
+        const data = await listCareersPublic();
         if (data?.success) setJobs(data.careers || []);
       } finally {
         setLoading(false);
@@ -115,17 +115,9 @@ export default function CareersPage() {
       formData.append("email", form.email);
       formData.append("phone", form.phone);
       formData.append("coverLetter", form.coverLetter);
+      if (resumeFile) formData.append("resume", resumeFile);
 
-      if (resumeFile) {
-        formData.append("resume", resumeFile);
-      }
-
-      const res = await fetch("/api/applications", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
+      const data = await submitJobApplication(formData);
       if (data?.success) {
         setSuccess(true);
         setForm({

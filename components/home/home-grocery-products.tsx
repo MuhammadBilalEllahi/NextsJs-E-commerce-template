@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Product } from "@/types/types";
 import { ProductCard } from "@/components/product/product-card";
+import { listGroceryProducts } from "@/lib/api/products/home";
 
 export function HomeGroceryProducts({
   groceryProducts: initialProducts,
@@ -21,10 +22,7 @@ export function HomeGroceryProducts({
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `/api/products/grocery?page=${currentPage + 1}&limit=6`
-      );
-      const data = await response.json();
+      const data = await listGroceryProducts(currentPage + 1, 6);
 
       if (data.products && data.products.length > 0) {
         setProducts((prev) => [...prev, ...data.products]);

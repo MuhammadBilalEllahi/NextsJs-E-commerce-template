@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { TestimonialsSlider } from "./testimonials-slider";
+import { listPublicTestimonials } from "@/lib/api/testimonials";
 
 export function HomeTestimonials() {
   const [testimonials, setTestimonials] = useState<any[]>([]);
@@ -10,8 +11,7 @@ export function HomeTestimonials() {
   useEffect(() => {
     const loadTestimonials = async () => {
       try {
-        const res = await fetch("/api/testimonials");
-        const data = await res.json();
+        const data = await listPublicTestimonials();
         console.log("Testimonials API response:", data); // Debug log
         if (data?.success) {
           setTestimonials(data.testimonials || []);

@@ -24,6 +24,7 @@ import {
 } from "recharts";
 import { useEffect, useMemo, useState } from "react";
 import { CURRENCY } from "@/lib/constants";
+import { getAdminAnalytics } from "@/lib/api/admin/analytics";
 
 type AnalyticsResponse = {
   revenueByMonth: { month: string; total: number }[];
@@ -48,14 +49,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
-    fetch("/api/admin/analytics", { cache: "no-store" })
-      .then(async (res) => {
-        if (!res.ok) {
-          const j = await res.json().catch(() => ({ error: res.statusText }));
-          throw new Error(j.error || "Failed to load analytics");
-        }
-        return res.json();
-      })
+    getAdminAnalytics()
       .then((j: AnalyticsResponse) => {
         if (isMounted) {
           setData(j);
@@ -63,14 +57,10 @@ export default function AdminDashboardPage() {
         }
       })
       .catch((e) => {
-        if (isMounted) {
-          setError(e.message || "Error");
-        }
+        if (isMounted) setError(e.message || "Error");
       })
       .finally(() => {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       });
     return () => {
       isMounted = false;

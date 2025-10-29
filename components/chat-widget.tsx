@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send, PhoneCall } from "lucide-react";
+import { postChatMessage } from "@/lib/api/chat";
 
 type ChatMsg = { role: "user" | "assistant"; text: string };
 
@@ -29,11 +30,7 @@ export function ChatWidget() {
     setMsgs((m) => [...m, { role: "user", text: prompt }]);
     setInput("");
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        body: JSON.stringify({ prompt }),
-      });
-      const data = await res.json().catch(() => ({}));
+      const data = await postChatMessage({ message: prompt });
       setMsgs((m) => [
         ...m,
         {

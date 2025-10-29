@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { unsubscribeNewsletter } from "@/lib/api/newsletter";
 
 export default function UnsubscribePage() {
   const searchParams = useSearchParams();
@@ -26,15 +27,7 @@ export default function UnsubscribePage() {
 
   const unsubscribe = async () => {
     try {
-      const response = await fetch("/api/unsubscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token }),
-      });
-
-      const data = await response.json();
+      const data = await unsubscribeNewsletter(token!);
 
       if (data.success) {
         setStatus("success");
@@ -118,4 +111,3 @@ export default function UnsubscribePage() {
     </div>
   );
 }
-

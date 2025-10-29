@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Copy,
 } from "lucide-react";
+import { getWhatsAppConfigStatus } from "@/lib/api/whatsapp/config";
 
 export function WhatsAppConfigCard() {
   const [config, setConfig] = useState<{
@@ -26,9 +27,8 @@ export function WhatsAppConfigCard() {
   const checkConfiguration = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/admin/whatsapp/config");
-      const data = await response.json();
-      setConfig(data);
+      const data = await getWhatsAppConfigStatus();
+      setConfig(data as any);
     } catch (error) {
       console.error("Error checking WhatsApp configuration:", error);
       setConfig({

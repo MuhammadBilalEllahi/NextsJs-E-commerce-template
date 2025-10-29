@@ -53,6 +53,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import { RandomImage } from "@/types/types";
 import Image from "next/image";
+import {
+  listRandomImages,
+  uploadRandomImages,
+  deleteRandomImage,
+  applyBulkImages,
+} from "@/lib/api/admin/random-images";
 
 interface BulkImageManagerProps {
   selectedProducts: string[];
@@ -99,15 +105,7 @@ export default function BulkImageManager({
   const fetchImages = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `/api/admin/random-images?category=${category}&limit=50`
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch images");
-      }
-
+      const data = await listRandomImages(category, 50);
       setImages(data.images);
     } catch (err: any) {
       setError(err.message || "Failed to fetch images");
@@ -144,27 +142,14 @@ export default function BulkImageManager({
       setError("");
       setSuccess("");
 
-      const response = await fetch("/api/admin/product/bulk-images", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          productIds: selectedProducts,
-          variantIds: selectedVariants,
-          imageUrls: useRandom ? null : selectedImages,
-          operation: useRandom ? "random" : operation,
-          category: useRandom ? category : null,
-          randomCount: useRandom ? randomCount : null,
-        }),
+      const data = await applyBulkImages({
+        productIds: selectedProducts,
+        variantIds: selectedVariants,
+        imageUrls: useRandom ? null : selectedImages,
+        operation: useRandom ? "random" : operation,
+        category: useRandom ? category : null,
+        randomCount: useRandom ? randomCount : null,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to apply images");
-      }
-
       setSuccess(
         `Images applied successfully! Updated ${data.results.productsUpdated} products and ${data.results.variantsUpdated} variants.`
       );
@@ -194,17 +179,7 @@ export default function BulkImageManager({
       formData.append("category", uploadCategory);
       formData.append("tags", uploadTags);
 
-      const response = await fetch("/api/admin/random-images", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to upload images");
-      }
-
+      const data = await uploadRandomImages(formData);
       setSuccess(`Successfully uploaded ${data.uploaded} images!`);
       setUploadFiles([]);
       setUploadCategory("general");
@@ -220,14 +195,7 @@ export default function BulkImageManager({
 
   const handleDeleteImage = async (imageId: string) => {
     try {
-      const response = await fetch(`/api/admin/random-images?id=${imageId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete image");
-      }
-
+      await deleteRandomImage(imageId);
       setSuccess("Image deleted successfully!");
       fetchImages(); // Refresh images list
     } catch (err: any) {

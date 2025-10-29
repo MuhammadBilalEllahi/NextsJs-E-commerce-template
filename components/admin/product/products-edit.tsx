@@ -35,9 +35,14 @@ import {
   createCategory,
   updateCategory,
 } from "@/lib/api/admin/category/categories";
-import { createBrand } from "@/lib/api/admin/brand/brand";
+import { createBrand, fetchBrands } from "@/lib/api/admin/brand/brand";
 import { Brand, Category, Product, Variant } from "@/types/types";
 import Image from "next/image";
+import {
+  createVariant,
+  updateVariant as updateVariantApi,
+  deleteVariantApi,
+} from "@/lib/api/admin/variant";
 
 interface ProductsEditAdminUIProps {
   product: Product;
@@ -118,11 +123,11 @@ export default function ProductsEditAdminUI({
   useEffect(() => {
     async function load() {
       const [bRes, cRes] = await Promise.all([
-        fetch("/api/admin/brand").then((r) => r.json()),
-        fetch(API_URL_CATEGORY_ADMIN).then((r) => r.json()),
+        fetchBrands(),
+        fetchCategories(),
       ]);
-      setBrands(bRes.brands || []);
-      setCategories(cRes.categories || []);
+      setBrands(bRes || []);
+      setCategories(cRes || []);
     }
     load();
   }, []);
@@ -202,16 +207,11 @@ export default function ProductsEditAdminUI({
         );
       }
 
-      // Send the request directly to the API
-      const response = await fetch(`/api/admin/product?id=${product.id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => null);
-        throw new Error(error?.error || "Failed to update product");
-      }
+      // Send the request using API wrapper
+      const { updateProductById } = await import(
+        "@/lib/api/admin/product/products"
+      );
+      await updateProductById(product.id, formData);
 
       alert("Product updated successfully ✅");
       onUpdate();
@@ -274,13 +274,7 @@ export default function ProductsEditAdminUI({
           fd.append("images", file);
         });
 
-        const res = await fetch("/api/admin/variant", {
-          method: "PUT",
-          body: fd,
-        });
-        if (!res.ok) throw new Error("Failed to update variant");
-
-        const updatedVariant = await res.json();
+        const updatedVariant = await updateVariantApi(fd);
         setVariants((prev) =>
           prev.map((v) =>
             v.id === editingVariant.id ? { ...v, ...updatedVariant.variant } : v
@@ -303,13 +297,7 @@ export default function ProductsEditAdminUI({
           fd.append("images", file);
         });
 
-        const res = await fetch("/api/admin/variant", {
-          method: "POST",
-          body: fd,
-        });
-        if (!res.ok) throw new Error("Failed to create variant");
-
-        const newVariant = await res.json();
+        const newVariant = await createVariant(fd);
         setVariants((prev) => [
           ...prev,
           { ...newVariant.variant, newImages: [] },
@@ -328,14 +316,7 @@ export default function ProductsEditAdminUI({
     if (!confirm("Are you sure you want to delete this variant?")) return;
 
     try {
-      const fd = new FormData();
-      fd.append("id", variantId);
-
-      const res = await fetch("/api/admin/variant", {
-        method: "DELETE",
-        body: fd,
-      });
-      if (!res.ok) throw new Error("Failed to delete variant");
+      await deleteVariantApi(variantId);
 
       setVariants((prev) => prev.filter((v) => v.id !== variantId));
       alert("Variant deleted successfully ✅");

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 
 import { FAQ } from "@/types/types";
+import { listFaqs } from "@/lib/api/faq";
 
 interface FAQEnhancedProps {
   productId?: string;
@@ -46,12 +47,10 @@ export function FAQEnhanced({ productId, category = "all" }: FAQEnhancedProps) {
   const fetchFAQs = async (cat = selectedCategory, search = searchTerm) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (cat && cat !== "all") params.append("category", cat);
-      if (search) params.append("search", search);
-
-      const response = await fetch(`/api/faqs?${params.toString()}`);
-      const data = await response.json();
+      const data = await listFaqs({
+        category: cat !== "all" ? cat : undefined,
+        search,
+      });
 
       if (data.success) {
         setFaqs(data.faqs);

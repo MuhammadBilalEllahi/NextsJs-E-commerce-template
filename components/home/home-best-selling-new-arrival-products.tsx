@@ -4,6 +4,10 @@ import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Product } from "@/types/types";
 import { ProductCard } from "@/components/product/product-card";
+import {
+  listNewArrivalProducts,
+  listTopSellingProducts,
+} from "@/lib/api/products/home";
 
 export function HomeBestSellingAndNewArrivalProducts({
   bestSellings: initialBestSellings,
@@ -36,11 +40,9 @@ export function HomeBestSellingAndNewArrivalProducts({
 
     setLoading(true);
     try {
-      const endpoint = isBestSelling ? "top-selling" : "new-arrivals";
-      const response = await fetch(
-        `/api/products/${endpoint}?page=${currentPage + 1}&limit=6`
-      );
-      const data = await response.json();
+      const data = isBestSelling
+        ? await listTopSellingProducts(currentPage + 1, 6)
+        : await listNewArrivalProducts(currentPage + 1, 6);
 
       if (data.products && data.products.length > 0) {
         if (isBestSelling) {

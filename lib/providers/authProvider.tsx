@@ -6,6 +6,7 @@ import { getSession, signIn, signOut, useSession } from "next-auth/react";
 import { handleCartMergeOnAuth } from "@/middleware";
 import { CART_STORAGE_KEY, CartActionTypes, useCart } from "./cartContext";
 import { User } from "@/types/types";
+import { registerApi, getMe } from "@/lib/api/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -78,14 +79,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (name: string, email: string, password: string) => {
     setIsFormLoading(true);
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
+      const data = await registerApi({ name, email, password });
+      if (data?.success) {
         const loginResult = await signIn("credentials", {
           email,
           password,
@@ -93,16 +88,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
 
         if (loginResult?.ok) {
-          // Force session refresh
-          const sessionResponse = await fetch("/api/auth/session");
-          const sessionData = await sessionResponse.json();
-
-          // Wait for session to update
-          const session = await getSession();
-
-          if (sessionData?.user?.id) {
-            await handleCartMergeOnAuth(sessionData.user.id);
-            return { success: true, user: sessionData.user };
+          const me = await getMe().catch(() => null);
+          const userId = me?.user?.id;
+          if (userId) {
+            await handleCartMergeOnAuth(userId);
+            return { success: true, user: me.user };
           }
         }
       }
@@ -122,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       //   }
       // }
 
-      return { success: false, error: data.error || "Registration failed" };
+      return { success: false, error: data?.error || "Registration failed" };
     } catch (error) {
       console.error("Registration error:", error);
       return { success: false, error: "Network error" };

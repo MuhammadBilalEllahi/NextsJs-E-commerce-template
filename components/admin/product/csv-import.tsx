@@ -13,6 +13,7 @@ import {
 import { Upload, Download, AlertCircle, CheckCircle, X } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ImportResult } from "@/types/types";
+import { importProductsCSV } from "@/lib/api/admin/product/import";
 
 export default function CSVImportComponent({
   onImportComplete,
@@ -54,18 +55,7 @@ export default function CSVImportComponent({
     try {
       const formData = new FormData();
       formData.append("csvFile", file);
-
-      const response = await fetch("/api/admin/product/import", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Upload failed");
-      }
-
+      const data = await importProductsCSV(formData);
       setResult(data.results);
       if (onImportComplete) {
         onImportComplete();

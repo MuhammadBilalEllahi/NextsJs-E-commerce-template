@@ -34,6 +34,9 @@ import {
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants/currency";
 import Image from "next/image";
+import { listAddresses, saveAddress } from "@/lib/api/account/addresses";
+import { getShippingMethods } from "@/lib/api/shipping";
+import { createCheckout } from "@/lib/api/checkout";
 
 export default function CheckoutPage() {
   const { user, isAuthenticated } = useAuth();
@@ -121,9 +124,8 @@ export default function CheckoutPage() {
 
     try {
       setIsLoadingAddresses(true);
-      const response = await fetch("/api/addresses");
-      if (response.ok) {
-        const data = await response.json();
+      const data = await listAddresses();
+      if (data) {
         setSavedAddresses(data.addresses || []);
 
         // Auto-select default address if available
@@ -170,9 +172,13 @@ export default function CheckoutPage() {
         subtotal: subtotal.toString(),
       });
 
-      const response = await fetch(`/api/shipping-methods?${params}`);
-      if (response.ok) {
-        const data = await response.json();
+      const data = await getShippingMethods({
+        city: formData.city,
+        state: "Punjab",
+        country: "Pakistan",
+        subtotal,
+      });
+      if (data) {
         setShippingMethods(data.methods);
 
         // Auto-select appropriate shipping method
@@ -440,20 +446,14 @@ export default function CheckoutPage() {
         sessionId: !user ? localStorage.getItem("dm-guest-id") : null,
       };
 
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
+      try {
+        const result = await createCheckout(orderData);
         clear();
         router.push(
           `/order/success?orderId=${result.orderId}&refId=${result.refId}`
         );
-      } else {
-        throw new Error("Checkout failed");
+      } catch (e) {
+        throw e;
       }
     } catch (error) {
       console.error("Checkout error:", error);
@@ -534,16 +534,8 @@ export default function CheckoutPage() {
         isBilling: true,
       };
 
-      const response = await fetch("/api/addresses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(addressData),
-      });
-
-      if (response.ok) {
-        // Refresh saved addresses
-        await fetchSavedAddresses();
-      }
+      await saveAddress(addressData);
+      await fetchSavedAddresses();
     } catch (error) {
       console.error("Failed to save address:", error);
     }

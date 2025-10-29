@@ -41,6 +41,10 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ImportHistoryItem } from "@/types/types";
+import {
+  listImportHistories,
+  undoImport,
+} from "@/lib/api/admin/product/import-history";
 
 interface ImportHistoryProps {
   onUndoComplete: () => void;
@@ -58,13 +62,7 @@ export default function ImportHistoryComponent({
   const fetchHistories = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/admin/product/undo?limit=20");
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch import history");
-      }
-
+      const data = await listImportHistories(20);
       setHistories(data.histories);
     } catch (err: any) {
       setError(err.message || "Failed to fetch import history");
@@ -96,23 +94,11 @@ export default function ImportHistoryComponent({
       setUndoing(`${importId}-${type}-${id || "all"}`);
       setError("");
 
-      const response = await fetch("/api/admin/product/undo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          importId,
-          productId: type === "product" ? id : undefined,
-          variantId: type === "variant" ? id : undefined,
-        }),
+      await undoImport({
+        importId,
+        productId: type === "product" ? id : undefined,
+        variantId: type === "variant" ? id : undefined,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to undo");
-      }
 
       // Refresh histories
       await fetchHistories();
