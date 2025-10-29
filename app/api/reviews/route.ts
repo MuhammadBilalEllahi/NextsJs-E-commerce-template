@@ -6,7 +6,7 @@ import Order from "@/models/Order";
 import { reviewZodSchema } from "@/models/Review";
 import { uploaderFiles } from "@/lib/utils/imageUploader/awsImageUploader";
 import dbConnect from "@/database/mongodb";
-import { ORDER_STATUS } from "@/lib/constants";
+import { ORDER_STATUS } from "@/models/constants/constants";
 import path from "path";
 import { mkdir, writeFile } from "fs/promises";
 

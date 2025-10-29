@@ -46,7 +46,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/constants/currency";
-import { TCS_STATUS } from "@/lib/constants";
+import { TCS_STATUS } from "@/models/constants/constants";
 import { TCSTrackingHistory } from "@/types/types";
 
 export default function TCSOrdersManagement() {

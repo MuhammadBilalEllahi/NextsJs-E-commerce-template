@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/database/mongodb";
 import Order from "@/models/Order";
 import tcsService from "@/lib/api/tcs/tcsService";
-import { TCS_STATUS, ORDER_STATUS } from "@/lib/constants";
+import { TCS_STATUS, ORDER_STATUS } from "@/models/constants/constants";
 
 // Get specific TCS order details
 interface RouteContext {

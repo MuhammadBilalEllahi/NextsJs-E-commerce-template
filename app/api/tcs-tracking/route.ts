@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/database/mongodb";
 import Order from "@/models/Order";
 import tcsService from "@/lib/api/tcs/tcsService";
-import { ORDER_TYPE } from "@/lib/constants";
+import { ORDER_TYPE } from "@/models/constants/constants";
 
 // Helper function to format order data
 function formatOrder(order: any) {

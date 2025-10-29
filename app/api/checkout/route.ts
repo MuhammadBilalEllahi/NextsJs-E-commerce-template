@@ -7,7 +7,7 @@ import {
   ORDER_PAYMENT_STATUS,
   PAYMENT_TYPE,
   ORDER_TYPE,
-} from "@/lib/constants";
+} from "@/models/constants/constants";
 import {
   checkStockAvailability,
   decreaseStockForOrder,
