@@ -1,6 +1,7 @@
 // models/Cart.ts
 import mongoose from "mongoose";
 import { MODELS } from "@/models/constants";
+import { CURRENCY } from "@/lib/constants";
 
 const CartItemSchema = new mongoose.Schema(
   {
@@ -36,7 +37,7 @@ const CartSchema = new mongoose.Schema({
   },
   uuidv4: { type: String, default: null }, // for guests
   items: [CartItemSchema],
-  currency: { type: String, default: "PKR" },
+  currency: { type: String, default: CURRENCY.SYMBOL },
   updatedAt: { type: Date, default: Date.now },
   version: { type: Number, default: 1 }, // For optimistic concurrency control
 });

@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/database/mongodb";
 import Order from "@/models/Order";
-import TCSOrder from "@/models/TCSOrder";
 import { generateOrderIds } from "@/lib/utils/orderIds";
 import {
   ORDER_STATUS,
   ORDER_PAYMENT_STATUS,
   PAYMENT_TYPE,
   ORDER_TYPE,
-  TCS_STATUS,
 } from "@/models/constants";
 import {
   checkStockAvailability,
@@ -18,6 +16,7 @@ import { Resend } from "resend";
 import ScheduledJob, { SCHEDULE_TYPES } from "@/models/ScheduledJob";
 import tcsService from "@/lib/api/tcs/tcsService";
 import whatsappService from "@/lib/api/whatsapp/whatsappService";
+import { getProvider } from "@/lib/api/shipping/providers";
 
 export async function POST(req: NextRequest) {
   try {
@@ -116,16 +115,13 @@ export async function POST(req: NextRequest) {
       // In production, you might want to rollback the order creation if stock decrease fails
     }
 
-    // Check if order should be sent via TCS
-    const shouldUseTCS =
-      shippingMethod === ORDER_TYPE.TCS ||
-      tcsService.isOutsideLahore(shippingAddress.city);
+    // Use provider registry to handle courier booking dynamically
+    const selectedProvider = getProvider(shippingMethod);
+    const shouldUseCourier = Boolean(selectedProvider);
 
-    let tcsOrder = null;
-    if (shouldUseTCS) {
+    if (shouldUseCourier) {
       try {
-        // Prepare TCS order data
-        const tcsOrderData = tcsService.mapOrderToTCSFormat({
+        const providerOrderData = selectedProvider?.mapFromOrder?.({
           orderId: order.orderId,
           refId: order.refId,
           shippingAddress: order.shippingAddress,
@@ -134,66 +130,81 @@ export async function POST(req: NextRequest) {
           total: order.total,
         });
 
-        // Create TCS order via API
-        const tcsResponse = await tcsService.createOrder(tcsOrderData);
+        const created = await selectedProvider!.create(providerOrderData);
 
-        if (tcsResponse.CN) {
-          // Create TCS order record in database
-          tcsOrder = new TCSOrder({
-            order: order.id,
-            consignmentNumber: tcsResponse.CN,
+        if (created.tracking) {
+          // Embed courier info into the main order
+          order.courier = {
+            provider: shippingMethod,
+            consignmentNumber: created.tracking,
             customerReferenceNo: order.refId,
-            userName: process.env.TCS_USERNAME || "",
-            password: process.env.TCS_PASSWORD || "",
-            costCenterCode: process.env.TCS_COST_CENTER_CODE || "",
-            consigneeName: tcsOrderData.consigneeName,
-            consigneeAddress: tcsOrderData.consigneeAddress,
-            consigneeMobNo: tcsOrderData.consigneeMobNo,
-            consigneeEmail: tcsOrderData.consigneeEmail,
-            originCityName: tcsOrderData.originCityName,
-            destinationCityName: tcsOrderData.destinationCityName,
-            weight: tcsOrderData.weight,
-            pieces: tcsOrderData.pieces,
-            codAmount: tcsOrderData.codAmount,
-            productDetails: tcsOrderData.productDetails,
-            fragile: tcsOrderData.fragile,
-            remarks: tcsOrderData.remarks,
-            insuranceValue: tcsOrderData.insuranceValue,
-            services: tcsOrderData.services,
-            status: TCS_STATUS.CREATED,
-            tcsResponse: tcsResponse,
-            estimatedDelivery: new Date(
-              Date.now() +
-                tcsService.getEstimatedDeliveryDays(shippingAddress.city) *
-                  24 *
-                  60 *
-                  60 *
-                  1000
-            ),
-          });
+            credentials: {
+              userName: process.env.TCS_USERNAME || "",
+              password: process.env.TCS_PASSWORD || "",
+              costCenterCode: process.env.TCS_COST_CENTER_CODE || "",
+              accountNo: process.env.TCS_ACCOUNT_NO || "",
+            },
+            consigneeName: providerOrderData.consigneeName,
+            consigneeAddress: providerOrderData.consigneeAddress,
+            consigneeMobNo: providerOrderData.consigneeMobNo,
+            consigneeEmail: providerOrderData.consigneeEmail,
+            originCityName: providerOrderData.originCityName,
+            destinationCityName: providerOrderData.destinationCityName,
+            weight: providerOrderData.weight,
+            pieces: providerOrderData.pieces,
+            codAmount: providerOrderData.codAmount,
+            productDetails: providerOrderData.productDetails,
+            fragile: providerOrderData.fragile,
+            remarks: providerOrderData.remarks,
+            insuranceValue: providerOrderData.insuranceValue,
+            services: providerOrderData.services,
+            status: "created",
+            apiResponse: created.raw,
+            lastApiCall: new Date(),
+            trackingHistory: [
+              {
+                status: "created",
+                location: providerOrderData.originCityName,
+                timestamp: new Date(),
+                description: `Order booked with tracking ${created.tracking}`,
+                updatedBy: "system",
+              },
+            ],
+            estimatedDelivery: selectedProvider?.estimateDays
+              ? new Date(
+                  Date.now() +
+                    selectedProvider.estimateDays(shippingAddress.city) *
+                      24 *
+                      60 *
+                      60 *
+                      1000
+                )
+              : undefined,
+            pickupStatus: "pending",
+            paymentStatus: "pending",
+            paymentDetails: {},
+          } as any;
 
-          await tcsOrder.save();
-
-          // Update main order with TCS tracking
-          order.tracking = tcsResponse.CN;
+          // Update main order with tracking
+          order.tracking = created.tracking;
           order.status = ORDER_STATUS.CONFIRMED;
           order.history.push({
             status: ORDER_STATUS.CONFIRMED,
             changedAt: new Date(),
             changedBy: "system",
-            reason: `TCS order created with CN: ${tcsResponse.CN}`,
+            reason: `Courier order created with tracking: ${created.tracking}`,
           });
           await order.save();
 
           console.debug(
-            `TCS order created for order ${orderId} with CN: ${tcsResponse.CN}`
+            `Courier order created for ${orderId} with tracking: ${created.tracking}`
           );
         } else {
-          console.error("Failed to create TCS order:", tcsResponse);
+          console.error("Failed to create courier order:", created.raw);
         }
       } catch (error) {
-        console.error("Failed to create TCS order:", error);
-        // Continue with regular order processing even if TCS fails
+        console.error("Failed to create courier order:", error);
+        // Continue with regular order processing even if provider fails
       }
     }
 
@@ -245,22 +256,20 @@ export async function POST(req: NextRequest) {
           month: "long",
           day: "numeric",
         }),
-        estimatedDelivery:
-          shouldUseTCS && tcsOrder
-            ? `${tcsService.getEstimatedDeliveryDays(
-                shippingAddress.city
-              )} business days`
-            : shippingMethod === "home_delivery"
-            ? "Today"
-            : "3-5 business days",
-        status:
-          shouldUseTCS && tcsOrder
-            ? ORDER_STATUS.CONFIRMED
-            : ORDER_STATUS.PENDING,
-        tcsInfo: tcsOrder
+        estimatedDelivery: shouldUseCourier
+          ? `${tcsService.getEstimatedDeliveryDays(
+              shippingAddress.city
+            )} business days`
+          : shippingMethod === "home_delivery"
+          ? "Today"
+          : "3-5 business days",
+        status: shouldUseCourier
+          ? ORDER_STATUS.CONFIRMED
+          : ORDER_STATUS.PENDING,
+        tcsInfo: shouldUseCourier
           ? {
-              consignmentNumber: tcsOrder.consignmentNumber,
-              estimatedDelivery: tcsOrder.estimatedDelivery,
+              consignmentNumber: order.tracking,
+              estimatedDelivery: order.courier?.estimatedDelivery,
               isOutsideLahore: tcsService.isOutsideLahore(shippingAddress.city),
             }
           : null,

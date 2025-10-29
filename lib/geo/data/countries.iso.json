@@ -1,0 +1,7 @@
+{
+  "US": { "name": "United States", "hasStates": true },
+  "CA": { "name": "Canada", "hasStates": true },
+  "GB": { "name": "United Kingdom", "hasStates": true },
+  "IN": { "name": "India", "hasStates": true },
+  "PK": { "name": "Pakistan", "hasStates": true }
+}

@@ -5,9 +5,24 @@ export const API_URL_CATEGORY_ADMIN = "/api/admin/category";
 // fetch all categories
 export const fetchCategories = async () => {
   const res = await fetch(API_URL_CATEGORY_ADMIN);
-  if (!res.ok) throw new Error("Failed to fetch categories");
   const data = await res.json();
-  return data.categories;
+  if (!res.ok) {
+    const message =
+      data?.error ||
+      data?.details ||
+      data?.errors ||
+      "Failed to fetch categories";
+    throw new Error(message);
+  }
+  const categories = (data.categories || []).map((c: any) => ({
+    ...c,
+    id: c.id || c._id || c?.id,
+    parent:
+      typeof c.parent === "object" && c.parent !== null
+        ? c.parent.id || c.parent._id
+        : c.parent,
+  }));
+  return categories;
 };
 
 // create a new category
@@ -33,9 +48,17 @@ export const createCategory = async (category: Category) => {
     body: formData,
   });
 
-  if (!res.ok) throw new Error("Failed to create category");
   const data = await res.json();
-  return data.category;
+  if (!res.ok) {
+    const message =
+      data?.error ||
+      data?.details ||
+      data?.errors ||
+      "Failed to create category";
+    throw new Error(message);
+  }
+  const c = data.category || {};
+  return { ...c, id: c.id || c._id } as any;
 };
 
 export const updateCategory = async (category: Category) => {
@@ -59,8 +82,15 @@ export const updateCategory = async (category: Category) => {
     body: formData,
   });
 
-  if (!res.ok) throw new Error("Failed to update category");
-
   const data = await res.json();
-  return data.category;
+  if (!res.ok) {
+    const message =
+      data?.error ||
+      data?.details ||
+      data?.errors ||
+      "Failed to update category";
+    throw new Error(message);
+  }
+  const c = data.category || {};
+  return { ...c, id: c.id || c._id } as any;
 };

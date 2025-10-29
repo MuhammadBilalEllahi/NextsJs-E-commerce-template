@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import dbConnect from "@/database/mongodb";
 import Cart from "@/models/Cart";
+import { CURRENCY } from "@/lib/constants";
 
 export async function GET(
   req: NextRequest,
@@ -23,12 +24,16 @@ export async function GET(
       updatedAt?: Date;
     } | null;
     if (!cart) {
-      return NextResponse.json({ items: [], currency: "PKR", updatedAt: null });
+      return NextResponse.json({
+        items: [],
+        currency: CURRENCY.SYMBOL,
+        updatedAt: null,
+      });
     }
 
     return NextResponse.json({
       items: cart.items || [],
-      currency: cart.currency || "PKR",
+      currency: cart.currency || CURRENCY.SYMBOL,
       updatedAt: cart.updatedAt || null,
     });
   } catch (error: any) {

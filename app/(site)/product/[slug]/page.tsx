@@ -9,6 +9,7 @@ import {
   buildProductJsonLd,
   buildCanonical,
 } from "@/lib/seo";
+import { CURRENCY } from "@/lib/constants";
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -80,7 +81,7 @@ export default async function Page({
     description: fixedProduct.description,
     images: fixedProduct.images,
     price: fixedProduct.price,
-    currency: "PKR",
+    currency: CURRENCY.SYMBOL,
     inStock: !fixedProduct.stock,
     aggregateRating:
       fixedProduct.reviews.length > 0

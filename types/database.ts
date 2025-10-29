@@ -368,70 +368,7 @@ export interface WishlistDB extends BaseDBDocument {
   addedAt: Date;
 }
 
-// ===== TCS ORDER DATABASE TYPES =====
-export interface TCSTrackingHistoryDB {
-  status: string;
-  location: string;
-  timestamp: Date;
-  description: string;
-  updatedBy: string;
-}
-
-export interface TCSOrderDB extends BaseDBDocument {
-  order: Types.ObjectId;
-  consignmentNumber?: string;
-  customerReferenceNo: string;
-  userName: string;
-  password: string;
-  costCenterCode: string;
-  tcsAccountNo: string;
-  consigneeName: string;
-  consigneeAddress: string;
-  consigneeMobNo: string;
-  consigneeEmail: string;
-  consigneeLandLine: string;
-  originCityName: string;
-  destinationCityName: string;
-  weight: number;
-  pieces: number;
-  codAmount: string;
-  productDetails: string;
-  fragile: string;
-  remarks: string;
-  insuranceValue: number;
-  services: string;
-  transactionType: number;
-  vendorName: string;
-  vendorAddressName: string;
-  vendorAddressDistrict: string;
-  vendorAddressCity: string;
-  vendorAddressArea: string;
-  vendorContactNo: string;
-  bookingInfo: string;
-  shippingType: string;
-  dsFlag: string;
-  carrierSlug: string;
-  status:
-    | "pending"
-    | "created"
-    | "picked_up"
-    | "in_transit"
-    | "out_for_delivery"
-    | "delivered"
-    | "failed"
-    | "cancelled";
-  tcsResponse: Record<string, any>;
-  lastApiCall: string;
-  apiErrors: string[];
-  trackingHistory: TCSTrackingHistoryDB[];
-  estimatedDelivery?: string;
-  actualDelivery?: string;
-  paymentStatus: "pending" | "collected" | "failed" | "refunded";
-  paymentDetails: Record<string, any>;
-  pickupStatus: "pending" | "scheduled" | "picked_up" | "failed";
-  pickupDate?: string;
-  pickupTime?: string;
-}
+// (Deprecated) Standalone TCS order types removed in favor of embedded courier in Order
 
 // ===== CHAT INQUIRY DATABASE TYPES =====
 export interface ChatMessageDB {

@@ -49,7 +49,7 @@ export default function TrackOrderPage() {
 
       try {
         const response = await fetch(
-          `/api/track-order?refId=${encodeURIComponent(orderRef)}`
+          `/api/tcs-tracking?refId=${encodeURIComponent(orderRef)}`
         );
         const data = await response.json();
 
@@ -57,7 +57,7 @@ export default function TrackOrderPage() {
           throw new Error(data.error || "Failed to fetch tracking information");
         }
 
-        setTrackingData(data);
+        setTrackingData(data.data || data);
       } catch (err) {
         setError(
           err instanceof Error

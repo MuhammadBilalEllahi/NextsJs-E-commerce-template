@@ -8,6 +8,7 @@ import { ReactNode } from "react";
 import { AppProvider } from "./context/AppContext";
 import { ThemeProvider } from "./themeProvider";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { Toaster } from "@/components/ui/toast";
 
 export function RootProviders({ children }: { children: ReactNode }) {
   // Provider hierarchy: Session -> Auth -> Cart -> Wishlist
@@ -19,7 +20,10 @@ export function RootProviders({ children }: { children: ReactNode }) {
           <AppProvider>
             <AuthProvider>
               <CartProvider>
-                <WishlistProvider>{children}</WishlistProvider>
+                <WishlistProvider>
+                  {children}
+                  <Toaster />
+                </WishlistProvider>
               </CartProvider>
             </AuthProvider>
           </AppProvider>

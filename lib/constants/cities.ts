@@ -1,7 +1,7 @@
 export const PAKISTAN_CITIES = [
   // Major Cities (Alphabetical)
   "Abbottabad",
-  "Bahawalpur", 
+  "Bahawalpur",
   "Faisalabad",
   "Gujranwala",
   "Gujrat",
@@ -15,7 +15,7 @@ export const PAKISTAN_CITIES = [
   "Rawalpindi",
   "Sargodha",
   "Sialkot",
-  
+
   // Punjab Cities
   "Arifwala",
   "Attock",
@@ -48,7 +48,7 @@ export const PAKISTAN_CITIES = [
   "Toba Tek Singh",
   "Vehari",
   "Wazirabad",
-  
+
   // Sindh Cities
   "Badin",
   "Dadu",
@@ -72,7 +72,7 @@ export const PAKISTAN_CITIES = [
   "Tharparkar",
   "Thatta",
   "Umerkot",
-  
+
   // Khyber Pakhtunkhwa Cities
   "Bannu",
   "Battagram",
@@ -96,7 +96,7 @@ export const PAKISTAN_CITIES = [
   "Swat",
   "Tank",
   "Upper Dir",
-  
+
   // Balochistan Cities
   "Awaran",
   "Barkhan",
@@ -128,7 +128,7 @@ export const PAKISTAN_CITIES = [
   "Washuk",
   "Zhob",
   "Ziarat",
-  
+
   // Gilgit-Baltistan Cities
   "Astore",
   "Diamer",
@@ -138,7 +138,7 @@ export const PAKISTAN_CITIES = [
   "Kharmang",
   "Nagar",
   "Skardu",
-  
+
   // Azad Jammu & Kashmir Cities
   "Bagh",
   "Bhimber",
@@ -149,12 +149,12 @@ export const PAKISTAN_CITIES = [
   "Muzaffarabad",
   "Neelum",
   "Poonch",
-  "Sudhnoti"
-].sort()
+  "Sudhnoti",
+].sort();
 
 export const MAJOR_CITIES = [
   "Lahore",
-  "Karachi", 
+  "Karachi",
   "Islamabad",
   "Rawalpindi",
   "Faisalabad",
@@ -162,5 +162,5 @@ export const MAJOR_CITIES = [
   "Peshawar",
   "Quetta",
   "Gujranwala",
-  "Sialkot"
-]
+  "Sialkot",
+];

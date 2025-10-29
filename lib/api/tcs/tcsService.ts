@@ -1,5 +1,5 @@
-// TCS API Service Layer
-// This service handles all TCS API interactions
+// Courier Provider Adapter: TCS
+// Adapter implements a common interface used by the provider registry
 import {
   TCSCity,
   TCSOrigin,
@@ -209,7 +209,7 @@ class TCSService {
     }
   }
 
-  // Helper method to map our order data to TCS format
+  // Map our generic order data to TCS API format
   mapOrderToTCSFormat(orderData: any): TCSOrderRequest {
     return {
       userName: process.env.TCS_USERNAME || "",
@@ -246,7 +246,7 @@ class TCSService {
       .join(", ");
   }
 
-  // Helper method to determine if city is outside Lahore
+  // Heuristics for shipping config (kept for backward-compatibility). Prefer using shipping methods API.
   isOutsideLahore(cityName: string): boolean {
     const lahoreVariations = ["lahore", "lhr", "لاہور"];
     return !lahoreVariations.some((variation) =>
@@ -254,7 +254,7 @@ class TCSService {
     );
   }
 
-  // Helper method to get estimated delivery days
+  // Heuristics for estimated days (kept for backward-compatibility)
   getEstimatedDeliveryDays(cityName: string): number {
     if (!this.isOutsideLahore(cityName)) {
       return 1; // Same day for Lahore

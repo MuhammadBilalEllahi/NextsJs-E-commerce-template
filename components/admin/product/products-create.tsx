@@ -27,21 +27,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
-import { API_URL_CATEGORY_ADMIN } from "@/lib/api/admin/category/categories";
 import {
+  API_URL_CATEGORY_ADMIN,
   fetchCategories,
   createCategory,
   updateCategory,
 } from "@/lib/api/admin/category/categories";
-import { createBrand } from "@/lib/api/admin/brand/brand";
+// removed duplicate import of category services above
+import { createBrand, fetchBrands } from "@/lib/api/admin/brand/brand";
 import { createProduct } from "@/lib/api/admin/product/products";
 import { Brand, Category, VariantDraft, CreateBrandData } from "@/types";
 import Image from "next/image";
+import { useToast, toastPresets } from "@/components/ui/toast";
 
 export default function ProductsCreateAdminUI() {
+  const { toast } = useToast();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [variants, setVariants] = useState<VariantDraft[]>([]);
+  const [loadingBrands, setLoadingBrands] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -71,19 +79,37 @@ export default function ProductsCreateAdminUI() {
   // --- fetch brands & categories ---
   useEffect(() => {
     async function load() {
-      const [bRes, cRes] = await Promise.all([
-        fetch("/api/admin/brand").then((r) => r.json()),
-        fetch(API_URL_CATEGORY_ADMIN).then((r) => r.json()),
-      ]);
-      setBrands(bRes.brands || []);
-      setCategories(cRes.categories || []);
+      setLoadError(null);
+      setLoadingBrands(true);
+      setLoadingCategories(true);
+      try {
+        const [b, c] = await Promise.all([fetchBrands(), fetchCategories()]);
+        setBrands(b || []);
+        setCategories(c || []);
+      } catch (err: any) {
+        setLoadError(err?.message || "Failed to load brands/categories");
+      } finally {
+        setLoadingBrands(false);
+        setLoadingCategories(false);
+      }
     }
     load();
   }, []);
 
   // ===== create PRODUCT =====
   const saveProduct = async () => {
-    if (!form.name || !form.price || form.categories.length === 0) return;
+    setSaveError(null);
+    setSaveSuccess(null);
+    if (!form.name || !form.price || form.categories.length === 0) {
+      const msg = !form.name
+        ? "Product name is required"
+        : !form.price
+        ? "Price is required"
+        : "Select at least one category";
+      setSaveError(msg);
+      toastPresets.error(toast, "Validation error", msg);
+      return;
+    }
 
     // Validate stock requirement based on variants
     if (variants.length === 0 && (form.stock === undefined || form.stock < 0)) {
@@ -127,7 +153,12 @@ export default function ProductsCreateAdminUI() {
       // Use the service to create product
       await createProduct(productData);
 
-      alert("Product created ✅");
+      setSaveSuccess("Product created successfully");
+      toastPresets.success(
+        toast,
+        "Product created",
+        `${form.name} has been saved.`
+      );
       // reset
       setForm({
         name: "",
@@ -151,7 +182,9 @@ export default function ProductsCreateAdminUI() {
       });
       setVariants([]);
     } catch (err: any) {
-      alert(err.message || "Failed to create product");
+      const em = err?.message || "Failed to create product";
+      setSaveError(em);
+      toastPresets.error(toast, "Create failed", em);
     }
   };
 
@@ -166,11 +199,15 @@ export default function ProductsCreateAdminUI() {
   );
 
   const handleBrandCreate = async () => {
-    const created = await createBrand(brandDraft);
-    setBrands((prev) => [...prev, created]);
-    setForm((f) => ({ ...f, brand: created.id }));
-    setBrandOpen(false);
-    setBrandDraft({ name: "", description: "" });
+    try {
+      const created = await createBrand(brandDraft);
+      setBrands((prev) => [...prev, created as any]);
+      setForm((f) => ({ ...f, brand: (created as any).id }));
+      setBrandOpen(false);
+      setBrandDraft({ name: "", description: "" });
+    } catch (err: any) {
+      alert(err?.message || "Failed to create brand");
+    }
   };
 
   // ===== create CATEGORY (name, parent, description, image) =====
@@ -295,6 +332,21 @@ export default function ProductsCreateAdminUI() {
         <CardDescription>Create and manage products</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
+        {loadError && (
+          <div className="p-3 rounded bg-red-50 text-red-700 border border-red-200">
+            {loadError}
+          </div>
+        )}
+        {saveError && (
+          <div className="p-3 rounded bg-red-50 text-red-700 border border-red-200">
+            {saveError}
+          </div>
+        )}
+        {saveSuccess && (
+          <div className="p-3 rounded bg-green-50 text-green-700 border border-green-200">
+            {saveSuccess}
+          </div>
+        )}
         {/* core fields */}
         <Input
           placeholder="Product name"
@@ -509,14 +561,24 @@ export default function ProductsCreateAdminUI() {
             onValueChange={(val) => setForm((f) => ({ ...f, brand: val }))}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select brand" />
+              <SelectValue
+                placeholder={
+                  loadingBrands ? "Loading brands..." : "Select brand"
+                }
+              />
             </SelectTrigger>
             <SelectContent>
-              {brands.map((b) => (
-                <SelectItem key={b.id} value={b.id}>
-                  {b.name}
-                </SelectItem>
-              ))}
+              {brands.length === 0 && !loadingBrands ? (
+                <div className="px-2 py-1 text-sm text-muted-foreground">
+                  No brands found
+                </div>
+              ) : (
+                brands.map((b) => (
+                  <SelectItem key={(b as any).id} value={(b as any).id}>
+                    {b.name}
+                  </SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
           <Dialog open={brandOpen} onOpenChange={setBrandOpen}>
@@ -598,16 +660,30 @@ export default function ProductsCreateAdminUI() {
               onValueChange={setSelectedCategoryId}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select category to add" />
+                <SelectValue
+                  placeholder={
+                    loadingCategories
+                      ? "Loading categories..."
+                      : "Select category to add"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {categories
-                  .filter((c) => !form.categories.includes(c.id))
-                  .map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
+                {categories.filter(
+                  (c) => !form.categories.includes((c as any).id)
+                ).length === 0 && !loadingCategories ? (
+                  <div className="px-2 py-1 text-sm text-muted-foreground">
+                    No categories available
+                  </div>
+                ) : (
+                  categories
+                    .filter((c) => !form.categories.includes((c as any).id))
+                    .map((c) => (
+                      <SelectItem key={(c as any).id} value={(c as any).id}>
+                        {c.name}
+                      </SelectItem>
+                    ))
+                )}
               </SelectContent>
             </Select>
             <Button
@@ -716,7 +792,9 @@ export default function ProductsCreateAdminUI() {
           {form.categories.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {form.categories.map((categoryId) => {
-                const category = categories.find((c) => c.id === categoryId);
+                const category = categories.find(
+                  (c) => (c as any).id === categoryId
+                );
                 return (
                   <div
                     key={categoryId}

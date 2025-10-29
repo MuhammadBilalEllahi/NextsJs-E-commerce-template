@@ -12,16 +12,25 @@ export const createBrand = async (brand: CreateBrandData) => {
   const res = await fetch(API_URL_BRAND_ADMIN, { method: "POST", body: fd });
   const data = await res.json();
 
-  if (!res.ok) throw new Error("Failed to create brand");
-  return data.brand;
+  if (!res.ok) {
+    const message =
+      data?.error || data?.details || data?.errors || "Failed to create brand";
+    throw new Error(message);
+  }
+  const b = data.brand || {};
+  return { ...b, id: b.id || b._id } as any;
 };
 
 // fetch all brands
 export const fetchBrands = async () => {
   const res = await fetch(API_URL_BRAND_ADMIN);
-  if (!res.ok) throw new Error("Failed to fetch brands");
   const data = await res.json();
-  return data.brands;
+  if (!res.ok) {
+    const message =
+      data?.error || data?.details || data?.errors || "Failed to fetch brands";
+    throw new Error(message);
+  }
+  return (data.brands || []).map((b: any) => ({ ...b, id: b.id || b._id }));
 };
 
 // update brand
@@ -36,8 +45,13 @@ export const updateBrand = async (id: string, brand: Brand) => {
   const res = await fetch(API_URL_BRAND_ADMIN, { method: "PUT", body: fd });
   const data = await res.json();
 
-  if (!res.ok) throw new Error("Failed to update brand");
-  return data.brand;
+  if (!res.ok) {
+    const message =
+      data?.error || data?.details || data?.errors || "Failed to update brand";
+    throw new Error(message);
+  }
+  const b = data.brand || {};
+  return { ...b, id: b.id || b._id } as any;
 };
 
 // delete brand
@@ -49,7 +63,11 @@ export const deleteBrand = async (id: string) => {
   });
   const data = await res.json();
 
-  if (!res.ok) throw new Error("Failed to delete brand");
+  if (!res.ok) {
+    const message =
+      data?.error || data?.details || data?.errors || "Failed to delete brand";
+    throw new Error(message);
+  }
   return data.brand;
 };
 
@@ -62,6 +80,14 @@ export const toggleBrandStatus = async (id: string, isActive: boolean) => {
   });
   const data = await res.json();
 
-  if (!res.ok) throw new Error("Failed to toggle brand status");
-  return data.brand;
+  if (!res.ok) {
+    const message =
+      data?.error ||
+      data?.details ||
+      data?.errors ||
+      "Failed to toggle brand status";
+    throw new Error(message);
+  }
+  const b = data.brand || {};
+  return { ...b, id: b.id || b._id } as any;
 };

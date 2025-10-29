@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/database/mongodb";
-import TCSOrder from "@/models/TCSOrder";
 import Order from "@/models/Order";
 import tcsService from "@/lib/api/tcs/tcsService";
 import { TCS_STATUS, ORDER_STATUS } from "@/models/constants";
@@ -14,18 +13,18 @@ export async function GET(req: NextRequest, context: RouteContext) {
   try {
     await dbConnect();
     const { id } = await context.params;
-    const tcsOrder = await TCSOrder.findById(id).populate("order");
+    const order = await Order.findById(id);
 
-    if (!tcsOrder) {
+    if (!order || order.courier?.provider !== "tcs") {
       return NextResponse.json(
-        { error: "TCS order not found" },
+        { error: "Order with TCS courier not found" },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      data: tcsOrder,
+      data: order,
     });
   } catch (error) {
     console.error("Failed to fetch TCS order:", error);
@@ -45,45 +44,44 @@ export async function PUT(req: NextRequest, context: RouteContext) {
 
     const { action, ...actionData } = body;
 
-    const tcsOrder = await TCSOrder.findById(id).populate("order");
-
-    if (!tcsOrder) {
+    const order = await Order.findById(id);
+    if (!order || order.courier?.provider !== "tcs") {
       return NextResponse.json(
-        { error: "TCS order not found" },
+        { error: "Order with TCS courier not found" },
         { status: 404 }
       );
     }
 
     switch (action) {
       case "track":
-        await handleTrackOrder(tcsOrder);
+        await handleTrackOrder(order);
         break;
 
       case "cancel":
-        await handleCancelOrder(tcsOrder, actionData);
+        await handleCancelOrder(order, actionData);
         break;
 
       case "update_status":
-        await handleUpdateStatus(tcsOrder, actionData);
+        await handleUpdateStatus(order, actionData);
         break;
 
       case "get_pickup_status":
-        await handleGetPickupStatus(tcsOrder);
+        await handleGetPickupStatus(order);
         break;
 
       case "get_payment_details":
-        await handleGetPaymentDetails(tcsOrder);
+        await handleGetPaymentDetails(order);
         break;
 
       default:
         return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
-    await tcsOrder.save();
+    await order.save();
 
     return NextResponse.json({
       success: true,
-      data: tcsOrder,
+      data: order,
       message: `Action ${action} completed successfully`,
     });
   } catch (error) {
@@ -99,21 +97,22 @@ export async function PUT(req: NextRequest, context: RouteContext) {
 }
 
 // Helper functions for different actions
-async function handleTrackOrder(tcsOrder: any) {
+async function handleTrackOrder(order: any) {
   try {
     const trackingResponse = await tcsService.trackOrder(
-      tcsOrder.userName,
-      tcsOrder.password,
-      tcsOrder.customerReferenceNo
+      order.courier?.credentials?.userName,
+      order.courier?.credentials?.password,
+      order.courier?.customerReferenceNo || order.refId
     );
 
-    tcsOrder.lastApiCall = new Date();
+    order.courier.lastApiCall = new Date();
+    order.courier.apiResponse = trackingResponse;
 
     if (trackingResponse.cnDetail && trackingResponse.cnDetail.length > 0) {
       const cnDetail = trackingResponse.cnDetail[0];
 
       // Update tracking history
-      tcsOrder.trackingHistory.push({
+      order.courier.trackingHistory.push({
         status: "tracked",
         location: cnDetail.destination || "",
         timestamp: new Date(),
@@ -124,11 +123,9 @@ async function handleTrackOrder(tcsOrder: any) {
       // Update status based on TCS response
       // Note: TCS API doesn't provide detailed status, so we maintain our own status
     }
-
-    tcsOrder.tcsResponse = trackingResponse;
   } catch (error) {
     console.error("Failed to track TCS order:", error);
-    tcsOrder.apiErrors.push(
+    order.courier.apiErrors.push(
       `Track failed: ${
         error instanceof Error ? error.message : "Unknown error"
       }`
@@ -136,39 +133,35 @@ async function handleTrackOrder(tcsOrder: any) {
   }
 }
 
-async function handleCancelOrder(tcsOrder: any, actionData: any) {
+async function handleCancelOrder(order: any, actionData: any) {
   try {
-    if (!tcsOrder.consignmentNumber) {
+    if (!order.courier?.consignmentNumber) {
       throw new Error("No consignment number available for cancellation");
     }
 
     const cancelResponse = await tcsService.cancelOrder({
-      userName: tcsOrder.userName,
-      password: tcsOrder.password,
-      consignmentNumber: tcsOrder.consignmentNumber,
+      userName: order.courier.credentials?.userName,
+      password: order.courier.credentials?.password,
+      consignmentNumber: order.courier.consignmentNumber,
     });
 
-    tcsOrder.status = TCS_STATUS.CANCELLED;
-    tcsOrder.lastApiCall = new Date();
-    tcsOrder.tcsResponse = cancelResponse;
+    order.courier.status = "cancelled";
+    order.courier.lastApiCall = new Date();
+    order.courier.apiResponse = cancelResponse;
 
     // Update main order status
-    if (tcsOrder.order) {
-      tcsOrder.order.status = ORDER_STATUS.CANCELLED;
-      tcsOrder.order.cancellationReason =
-        actionData.reason || "Cancelled via TCS";
-      tcsOrder.order.history.push({
-        status: ORDER_STATUS.CANCELLED,
-        changedAt: new Date(),
-        changedBy: "admin",
-        reason: `TCS order cancelled: ${
-          actionData.reason || "No reason provided"
-        }`,
-      });
-      await tcsOrder.order.save();
-    }
+    order.status = ORDER_STATUS.CANCELLED;
+    order.cancellationReason = actionData.reason || "Cancelled via TCS";
+    order.history.push({
+      status: ORDER_STATUS.CANCELLED,
+      changedAt: new Date(),
+      changedBy: "admin",
+      reason: `TCS order cancelled: ${
+        actionData.reason || "No reason provided"
+      }`,
+    });
 
-    tcsOrder.trackingHistory.push({
+    order.courier.trackingHistory.push({
       status: "cancelled",
       location: "",
       timestamp: new Date(),
@@ -179,7 +172,7 @@ async function handleCancelOrder(tcsOrder: any, actionData: any) {
     });
   } catch (error) {
     console.error("Failed to cancel TCS order:", error);
-    tcsOrder.apiErrors.push(
+    order.courier.apiErrors.push(
       `Cancel failed: ${
         error instanceof Error ? error.message : "Unknown error"
       }`
@@ -187,16 +180,16 @@ async function handleCancelOrder(tcsOrder: any, actionData: any) {
   }
 }
 
-async function handleUpdateStatus(tcsOrder: any, actionData: any) {
+async function handleUpdateStatus(order: any, actionData: any) {
   const { status, reason } = actionData;
 
-  if (!Object.values(TCS_STATUS).includes(status)) {
+  if (!status) {
     throw new Error("Invalid status");
   }
 
-  tcsOrder.status = status;
+  order.courier.status = status;
 
-  tcsOrder.trackingHistory.push({
+  order.courier.trackingHistory.push({
     status: status,
     location: actionData.location || "",
     timestamp: new Date(),
@@ -205,56 +198,55 @@ async function handleUpdateStatus(tcsOrder: any, actionData: any) {
   });
 
   // Update main order status if needed
-  if (tcsOrder.order) {
-    let orderStatus = tcsOrder.order.status;
+  if (order) {
+    let orderStatus = order.status;
 
     switch (status) {
-      case TCS_STATUS.PICKED_UP:
+      case "picked_up":
         orderStatus = ORDER_STATUS.CONFIRMED;
         break;
-      case TCS_STATUS.IN_TRANSIT:
-      case TCS_STATUS.OUT_FOR_DELIVERY:
+      case "in_transit":
+      case "out_for_delivery":
         orderStatus = ORDER_STATUS.SHIPPED;
         break;
-      case TCS_STATUS.DELIVERED:
+      case "delivered":
         orderStatus = ORDER_STATUS.DELIVERED;
-        tcsOrder.actualDelivery = new Date();
+        order.courier.actualDelivery = new Date();
         break;
-      case TCS_STATUS.CANCELLED:
+      case "cancelled":
         orderStatus = ORDER_STATUS.CANCELLED;
         break;
     }
 
-    if (orderStatus !== tcsOrder.order.status) {
-      tcsOrder.order.status = orderStatus;
-      tcsOrder.order.history.push({
+    if (orderStatus !== order.status) {
+      order.status = orderStatus;
+      order.history.push({
         status: orderStatus,
         changedAt: new Date(),
         changedBy: "admin",
-        reason: `TCS status updated to ${status}`,
+        reason: `Courier status updated to ${status}`,
       });
-      await tcsOrder.order.save();
     }
   }
 }
 
-async function handleGetPickupStatus(tcsOrder: any) {
+async function handleGetPickupStatus(order: any) {
   try {
-    if (!tcsOrder.consignmentNumber) {
+    if (!order.courier?.consignmentNumber) {
       throw new Error("No consignment number available");
     }
 
     const pickupResponse = await tcsService.getPickupStatus(
-      tcsOrder.consignmentNumber
+      order.courier.consignmentNumber
     );
 
-    tcsOrder.lastApiCall = new Date();
-    tcsOrder.pickupStatus =
+    order.courier.lastApiCall = new Date();
+    order.courier.pickupStatus =
       pickupResponse.returnStatus?.status === "SUCCESS"
         ? "picked_up"
         : "pending";
 
-    tcsOrder.trackingHistory.push({
+    order.courier.trackingHistory.push({
       status: "pickup_checked",
       location: "",
       timestamp: new Date(),
@@ -265,7 +257,7 @@ async function handleGetPickupStatus(tcsOrder: any) {
     });
   } catch (error) {
     console.error("Failed to get pickup status:", error);
-    tcsOrder.apiErrors.push(
+    order.courier.apiErrors.push(
       `Pickup status check failed: ${
         error instanceof Error ? error.message : "Unknown error"
       }`
@@ -273,20 +265,20 @@ async function handleGetPickupStatus(tcsOrder: any) {
   }
 }
 
-async function handleGetPaymentDetails(tcsOrder: any) {
+async function handleGetPaymentDetails(order: any) {
   try {
-    if (!tcsOrder.consignmentNumber) {
+    if (!order.courier?.consignmentNumber) {
       throw new Error("No consignment number available");
     }
 
     const paymentResponse = await tcsService.getPaymentDetails(
-      tcsOrder.consignmentNumber
+      order.courier.consignmentNumber
     );
 
-    tcsOrder.lastApiCall = new Date();
-    tcsOrder.paymentDetails = paymentResponse;
+    order.courier.lastApiCall = new Date();
+    order.courier.paymentDetails = paymentResponse;
 
-    tcsOrder.trackingHistory.push({
+    order.courier.trackingHistory.push({
       status: "payment_checked",
       location: "",
       timestamp: new Date(),
@@ -297,7 +289,7 @@ async function handleGetPaymentDetails(tcsOrder: any) {
     });
   } catch (error) {
     console.error("Failed to get payment details:", error);
-    tcsOrder.apiErrors.push(
+    order.courier.apiErrors.push(
       `Payment details check failed: ${
         error instanceof Error ? error.message : "Unknown error"
       }`

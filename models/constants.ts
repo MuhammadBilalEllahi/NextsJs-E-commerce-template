@@ -17,7 +17,6 @@ export const MODELS = {
   BRANCH: "Branch",
   SHIPPING_METHOD: "ShippingMethod",
   SCHEDULED_JOBS: "ScheduledJob",
-  TCS_ORDER: "TCSOrder",
   WISHLIST: "Wishlist",
   NOTIFICATION: "Notification",
   ADDRESS: "Address",

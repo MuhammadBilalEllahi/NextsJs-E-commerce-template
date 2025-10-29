@@ -444,7 +444,7 @@ This comprehensive audit evaluates the Dehli Mirch Next.js e-commerce applicatio
 
 ### **Configuration Options**
 
-- ✅ Currency settings (PKR support)
+- ✅ Currency settings ($ support)
 - ✅ City lists for Pakistan
 - ✅ Shipping method configuration
 - ✅ Global settings management

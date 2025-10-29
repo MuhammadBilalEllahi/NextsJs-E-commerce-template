@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { CURRENCY } from "@/lib/constants";
 
 type Customer = {
   id: string;
@@ -96,7 +97,10 @@ export default function CustomersAdminPage() {
         });
         if (cartRes.ok) {
           const j = await cartRes.json();
-          setModalCart({ items: j.items || [], currency: j.currency || "PKR" });
+          setModalCart({
+            items: j.items || [],
+            currency: j.currency || CURRENCY.SYMBOL,
+          });
         }
       }
     } catch (e) {

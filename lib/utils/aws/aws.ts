@@ -6,7 +6,7 @@ import { API_URL_CATEGORY_ADMIN } from "@/lib/api/admin/category/categories";
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEYid!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 });

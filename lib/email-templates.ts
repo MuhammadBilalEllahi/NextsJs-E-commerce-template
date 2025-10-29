@@ -1,5 +1,7 @@
 // Email templates for marketing campaigns
 
+import { CURRENCY } from "./constants";
+
 export const emailTemplates = {
   default: {
     name: "Default Template",
@@ -185,7 +187,9 @@ export function generateOrderConfirmationEmail(data: OrderEmailData): string {
             }</div>
           </td>
           <td style="padding: 12px 0; text-align: right; vertical-align: top;">
-            <div style="font-weight: 600; color: #1a1a1a;">PKR ${item.priceAtPurchase.toLocaleString()}</div>
+            <div style="font-weight: 600; color: #1a1a1a;"> ${
+              CURRENCY.SYMBOL
+            } ${item.priceAtPurchase.toLocaleString()}</div>
           </td>
         </tr>
       `
@@ -277,25 +281,33 @@ export function generateOrderConfirmationEmail(data: OrderEmailData): string {
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         <span>Subtotal:</span>
-                        <span>PKR ${data.subtotal.toLocaleString()}</span>
+                        <span>${
+                          CURRENCY.SYMBOL
+                        } ${data.subtotal.toLocaleString()}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         <span>Shipping (${data.shippingMethod}):</span>
-                        <span>PKR ${data.shippingFee.toLocaleString()}</span>
+                        <span>${
+                          CURRENCY.SYMBOL
+                        } ${data.shippingFee.toLocaleString()}</span>
                     </div>
                     ${
                       data.tcsFee
                         ? `
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         <span>TCS Fee:</span>
-                        <span>PKR ${data.tcsFee.toLocaleString()}</span>
+                        <span>${
+                          CURRENCY.SYMBOL
+                        } ${data.tcsFee.toLocaleString()}</span>
                     </div>
                     `
                         : ""
                     }
                     <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 18px; color: #dc2626; border-top: 2px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
                         <span>Total:</span>
-                        <span>PKR ${data.total.toLocaleString()}</span>
+                        <span>${
+                          CURRENCY.SYMBOL
+                        } ${data.total.toLocaleString()}</span>
                     </div>
                 </div>
 

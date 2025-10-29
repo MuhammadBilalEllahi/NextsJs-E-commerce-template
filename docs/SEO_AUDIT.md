@@ -326,7 +326,7 @@ NEXT_PUBLIC_SITE_URL=https://www.example.com
     - `+ added generateMetadata`
     - `+ injected Product and Breadcrumb JSON-LD`
   - `tests: lint pass`
-  - `notes: currency hardcoded to PKR; TODO: standardize via constant if exists`
+  - `notes: currency hardcoded to $; TODO: standardize via constant if exists`
   - `prev_iteration_refs: n/a`
 
 - `path: app/(site)/blog/page.tsx`

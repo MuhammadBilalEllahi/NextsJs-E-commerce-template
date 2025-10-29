@@ -1,3 +1,5 @@
+import { CURRENCY } from "../constants";
+
 export const contentPagesSeedData = [
   // Parent pages for navigation
   {
@@ -493,7 +495,7 @@ export const contentPagesSeedData = [
       <p>We are not responsible for any damages or losses that may result from the use of our website, including but not limited to technical issues, data loss, or service interruptions.</p>
       
       <h2>Pricing and Availability Disclaimer</h2>
-      <p>All prices are subject to change without notice. Prices displayed on our website are in Pakistani Rupees (PKR) unless otherwise stated.</p>
+      <p>All prices are subject to change without notice. Prices displayed on our website are in ${CURRENCY.NAME} (${CURRENCY.SYMBOL}) unless otherwise stated.</p>
       
       <p>Product availability is subject to change. We reserve the right to discontinue any product at any time without prior notice.</p>
       

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     ).createForUser(user.id);
 
     // Generate reset URL
-    const baseUrl = process.env.WEBSITE_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     const resetUrl = `${baseUrl}/account/reset-password?token=${resetToken.token}`;
 
     // Send password reset email

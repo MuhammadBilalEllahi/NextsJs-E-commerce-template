@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "init-schemas": "tsx scripts/init-relationship-schemas.ts"
+    "init-schemas": "tsx scripts/init-relationship-schemas.ts",
+    "geo:import:un": "node scripts/geo/import.js --mode un --input data/world.un.json",
+    "geo:import:iso": "node scripts/geo/import.js --mode iso --input data/world.iso.json"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.873.0",

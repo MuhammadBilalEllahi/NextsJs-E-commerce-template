@@ -635,6 +635,8 @@ export interface TCSOrderData {
   updatedBy: string;
 }
 
+// Deprecated: standalone TCSOrder model removed in favor of embedded courier on Order
+/*
 export interface TCSOrder {
   id: string;
 
@@ -694,6 +696,7 @@ export interface TCSOrder {
   updatedAt: string;
   order: Order;
 }
+*/
 
 export interface TCSTrackingHistory {
   status: string;

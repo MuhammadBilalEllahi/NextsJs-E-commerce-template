@@ -47,16 +47,16 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/constants/currency";
 import { TCS_STATUS } from "@/models/constants";
-import { Order, TCSOrder, TCSTrackingHistory } from "@/types";
+import { TCSTrackingHistory } from "@/types";
 
 export default function TCSOrdersManagement() {
-  const [tcsOrders, setTcsOrders] = useState<TCSOrder[]>([]);
+  const [tcsOrders, setTcsOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedOrder, setSelectedOrder] = useState<TCSOrder | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [trackingHistory, setTrackingHistory] = useState<TCSTrackingHistory[]>(
     []
   );
@@ -115,8 +115,8 @@ export default function TCSOrdersManagement() {
       const data = await response.json();
       if (data.success) {
         await fetchTCSOrders();
-        if (action === "track" && data.data.trackingHistory) {
-          setTrackingHistory(data.data.trackingHistory);
+        if (action === "track" && data.data?.courier?.trackingHistory) {
+          setTrackingHistory(data.data.courier.trackingHistory);
         }
       }
     } catch (error) {
@@ -231,42 +231,49 @@ export default function TCSOrdersManagement() {
             </TableHeader>
             <TableBody>
               {tcsOrders.map((order) => (
-                <TableRow key={order.id}>
+                <TableRow key={order._id}>
                   <TableCell className="font-mono">
-                    {order.consignmentNumber || "N/A"}
+                    {order.courier?.consignmentNumber || "N/A"}
                   </TableCell>
-                  <TableCell className="font-mono">
-                    {order.customerReferenceNo}
-                  </TableCell>
+                  <TableCell className="font-mono">{order.refId}</TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{order.consigneeName}</div>
+                      <div className="font-medium">
+                        {order.courier?.consigneeName}
+                      </div>
                       <div className="text-sm text-gray-500 flex items-center gap-1">
                         <Phone className="h-3 w-3" />
-                        {order.consigneeMobNo}
+                        {order.courier?.consigneeMobNo}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
-                      {order.destinationCityName}
+                      {order.courier?.destinationCityName}
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge
                       className={
-                        statusColors[order.status as keyof typeof statusColors]
+                        statusColors[
+                          (order.courier?.status ||
+                            TCS_STATUS.PENDING) as keyof typeof statusColors
+                        ]
                       }
                     >
                       <span className="flex items-center gap-1">
-                        {getStatusIcon(order.status)}
-                        {order.status.replace("_", " ").toUpperCase()}
+                        {getStatusIcon(order.courier?.status)}
+                        {(order.courier?.status || "")
+                          .replace("_", " ")
+                          .toUpperCase()}
                       </span>
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium">
-                    {formatCurrency(parseFloat(order.codAmount))}
+                    {formatCurrency(
+                      parseFloat(order.courier?.codAmount || "0")
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
@@ -290,7 +297,8 @@ export default function TCSOrdersManagement() {
                           <DialogHeader>
                             <DialogTitle>TCS Order Details</DialogTitle>
                             <DialogDescription>
-                              Order #{order.id} - CN: {order.consignmentNumber}
+                              Order #{order.orderId} - CN:{" "}
+                              {order.courier?.consignmentNumber}
                             </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4">
@@ -300,13 +308,16 @@ export default function TCSOrdersManagement() {
                                   Customer Information
                                 </h4>
                                 <p>
-                                  <strong>Name:</strong> {order.consigneeName}
+                                  <strong>Name:</strong>{" "}
+                                  {order.courier?.consigneeName}
                                 </p>
                                 <p>
-                                  <strong>Phone:</strong> {order.consigneeMobNo}
+                                  <strong>Phone:</strong>{" "}
+                                  {order.courier?.consigneeMobNo}
                                 </p>
                                 <p>
-                                  <strong>Email:</strong> {order.consigneeEmail}
+                                  <strong>Email:</strong>{" "}
+                                  {order.courier?.consigneeEmail}
                                 </p>
                               </div>
                               <div>
@@ -314,14 +325,18 @@ export default function TCSOrdersManagement() {
                                   Package Details
                                 </h4>
                                 <p>
-                                  <strong>Weight:</strong> {order.weight} kg
+                                  <strong>Weight:</strong>{" "}
+                                  {order.courier?.weight} kg
                                 </p>
                                 <p>
-                                  <strong>Pieces:</strong> {order.pieces}
+                                  <strong>Pieces:</strong>{" "}
+                                  {order.courier?.pieces}
                                 </p>
                                 <p>
                                   <strong>COD Amount:</strong>{" "}
-                                  {formatCurrency(parseFloat(order.codAmount))}
+                                  {formatCurrency(
+                                    parseFloat(order.courier?.codAmount || "0")
+                                  )}
                                 </p>
                               </div>
                             </div>
@@ -330,40 +345,42 @@ export default function TCSOrdersManagement() {
                                 Tracking History
                               </h4>
                               <div className="space-y-2">
-                                {trackingHistory.map((entry, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex items-center gap-3 p-2 bg-gray-50 rounded"
-                                  >
-                                    <div className="p-1 rounded-full bg-blue-100">
-                                      <Package className="h-3 w-3 text-blue-600" />
-                                    </div>
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2">
-                                        <span className="font-medium text-sm">
-                                          {entry.status}
-                                        </span>
-                                        <span className="text-xs text-gray-500">
-                                          {new Date(
-                                            entry.timestamp
-                                          ).toLocaleString()}
-                                        </span>
+                                {(order.courier?.trackingHistory || []).map(
+                                  (entry: any, index: number) => (
+                                    <div
+                                      key={index}
+                                      className="flex items-center gap-3 p-2 bg-gray-50 rounded"
+                                    >
+                                      <div className="p-1 rounded-full bg-blue-100">
+                                        <Package className="h-3 w-3 text-blue-600" />
                                       </div>
-                                      <p className="text-xs text-gray-600">
-                                        {entry.description}
-                                      </p>
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-medium text-sm">
+                                            {entry.status}
+                                          </span>
+                                          <span className="text-xs text-gray-500">
+                                            {new Date(
+                                              entry.timestamp
+                                            ).toLocaleString()}
+                                          </span>
+                                        </div>
+                                        <p className="text-xs text-gray-600">
+                                          {entry.description}
+                                        </p>
+                                      </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  )
+                                )}
                               </div>
                             </div>
                           </div>
                           <DialogFooter>
                             <Button
-                              onClick={() => handleAction(order.id, "track")}
-                              disabled={actionLoading === order.id}
+                              onClick={() => handleAction(order._id, "track")}
+                              disabled={actionLoading === order._id}
                             >
-                              {actionLoading === order.id ? (
+                              {actionLoading === order._id ? (
                                 <RefreshCw className="h-4 w-4 animate-spin mr-2" />
                               ) : (
                                 <RefreshCw className="h-4 w-4 mr-2" />
@@ -377,10 +394,10 @@ export default function TCSOrdersManagement() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleAction(order.id, "track")}
-                        disabled={actionLoading === order.id}
+                        onClick={() => handleAction(order._id, "track")}
+                        disabled={actionLoading === order._id}
                       >
-                        {actionLoading === order.id ? (
+                        {actionLoading === order._id ? (
                           <RefreshCw className="h-4 w-4 animate-spin" />
                         ) : (
                           <RefreshCw className="h-4 w-4" />
@@ -391,9 +408,9 @@ export default function TCSOrdersManagement() {
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          handleAction(order.id, "get_pickup_status")
+                          handleAction(order._id, "get_pickup_status")
                         }
-                        disabled={actionLoading === order.id}
+                        disabled={actionLoading === order._id}
                       >
                         <Truck className="h-4 w-4" />
                       </Button>
@@ -406,12 +423,12 @@ export default function TCSOrdersManagement() {
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
 
-                      {order.status !== TCS_STATUS.CANCELLED &&
-                        order.status !== TCS_STATUS.DELIVERED && (
+                      {order.courier?.status !== TCS_STATUS.CANCELLED &&
+                        order.courier?.status !== TCS_STATUS.DELIVERED && (
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => handleCancelOrder(order.id)}
+                            onClick={() => handleCancelOrder(order._id)}
                           >
                             <X className="h-4 w-4" />
                           </Button>

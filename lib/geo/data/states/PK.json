@@ -1,0 +1,9 @@
+{
+  "PB": { "name": "Punjab" },
+  "SD": { "name": "Sindh" },
+  "KP": { "name": "Khyber Pakhtunkhwa" },
+  "BA": { "name": "Balochistan" },
+  "GB": { "name": "Gilgit-Baltistan" },
+  "AJK": { "name": "Azad Jammu and Kashmir" },
+  "ICT": { "name": "Islamabad Capital Territory" }
+}

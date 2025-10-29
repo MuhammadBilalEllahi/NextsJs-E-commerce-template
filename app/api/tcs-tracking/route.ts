@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/database/mongodb";
-import TCSOrder from "@/models/TCSOrder";
 import Order from "@/models/Order";
 import tcsService from "@/lib/api/tcs/tcsService";
 import { ORDER_TYPE } from "@/models/constants";
@@ -93,10 +92,10 @@ export async function GET(req: NextRequest) {
     const isTCS: boolean = order.shippingMethod === ORDER_TYPE.TCS;
 
     if (isTCS) {
-      // Find TCS order
-      const tcsOrder = await TCSOrder.findOne({ order: order.id });
+      // Use embedded courier info on the order
+      const courier = (order as any).courier;
 
-      if (!tcsOrder) {
+      if (!courier || courier.provider !== "tcs") {
         // Return formatted order without TCS data
         const formattedOrder = formatOrder(order);
         return NextResponse.json({
@@ -122,16 +121,23 @@ export async function GET(req: NextRequest) {
       let latestTracking = null;
       try {
         const trackingResponse = await tcsService.trackOrder(
-          tcsOrder.userName,
-          tcsOrder.password,
-          tcsOrder.customerReferenceNo
+          courier.credentials?.userName,
+          courier.credentials?.password,
+          courier.customerReferenceNo || order.refId
         );
 
         latestTracking = trackingResponse;
 
         // Update last API call time
-        tcsOrder.lastApiCall = new Date();
-        await tcsOrder.save();
+        await Order.updateOne(
+          { _id: order._id },
+          {
+            $set: {
+              "courier.lastApiCall": new Date(),
+              "courier.apiResponse": trackingResponse,
+            },
+          }
+        );
       } catch (error) {
         console.error("Failed to get latest TCS tracking:", error);
         // Continue with cached data
@@ -143,24 +149,26 @@ export async function GET(req: NextRequest) {
       // Prepare response data for TCS orders
       const responseData = {
         order: formattedOrder,
-        tcsOrder: {
-          consignmentNumber: tcsOrder.consignmentNumber,
-          status: tcsOrder.status,
-          estimatedDelivery: tcsOrder.estimatedDelivery,
-          actualDelivery: tcsOrder.actualDelivery,
-          trackingHistory: tcsOrder.trackingHistory,
-          pickupStatus: tcsOrder.pickupStatus,
-          paymentStatus: tcsOrder.paymentStatus,
-          weight: tcsOrder.weight,
-          pieces: tcsOrder.pieces,
-          codAmount: tcsOrder.codAmount,
-          originCityName: tcsOrder.originCityName,
-          destinationCityName: tcsOrder.destinationCityName,
-          services: tcsOrder.services,
-          fragile: tcsOrder.fragile,
-          remarks: tcsOrder.remarks,
-          lastApiCall: tcsOrder.lastApiCall,
-        },
+        tcsOrder: courier
+          ? {
+              consignmentNumber: courier.consignmentNumber,
+              status: courier.status,
+              estimatedDelivery: courier.estimatedDelivery,
+              actualDelivery: courier.actualDelivery,
+              trackingHistory: courier.trackingHistory || [],
+              pickupStatus: courier.pickupStatus,
+              paymentStatus: courier.paymentStatus,
+              weight: courier.weight,
+              pieces: courier.pieces,
+              codAmount: courier.codAmount,
+              originCityName: courier.originCityName,
+              destinationCityName: courier.destinationCityName,
+              services: courier.services,
+              fragile: courier.fragile,
+              remarks: courier.remarks,
+              lastApiCall: courier.lastApiCall,
+            }
+          : null,
         latestTracking: latestTracking,
         deliveryInfo: {
           isOutsideLahore: tcsService.isOutsideLahore(

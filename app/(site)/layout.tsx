@@ -20,7 +20,7 @@ import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/constants/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
   ),
   title: {
     default: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
@@ -95,7 +95,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: SITE_NAME,
-              url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+              url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
               logo: "/placeholder-logo.png",
               sameAs: [
                 "https://www.facebook.com/",
