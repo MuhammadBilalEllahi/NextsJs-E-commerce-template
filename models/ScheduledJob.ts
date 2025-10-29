@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { MODELS } from "@/models/constants/constants";
+import { z } from "zod";
 
 export const SCHEDULE_TYPES = {
   CHECKOUT_COMPLETE: "sendCheckoutCompleteEmail",
@@ -24,3 +25,12 @@ const ScheduledJobSchema = new Schema(
 
 export default mongoose.models[MODELS.SCHEDULED_JOBS] ||
   mongoose.model<ScheduledJobDoc>(MODELS.SCHEDULED_JOBS, ScheduledJobSchema);
+
+export const scheduledJobZodSchema = z.object({
+  type: z.string().min(1),
+  payload: z.record(z.string(), z.any()),
+  runAt: z.date(),
+  status: z.enum(["pending", "done", "failed"]).default("pending"),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});

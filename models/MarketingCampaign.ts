@@ -1,5 +1,6 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { MODELS } from "@/models/constants/constants";
+import { z } from "zod";
 
 export interface MarketingCampaignDocument extends mongoose.Document {
   name: string;
@@ -74,3 +75,23 @@ const MarketingCampaign: Model<MarketingCampaignDocument> =
   );
 
 export default MarketingCampaign;
+
+export const marketingCampaignZodSchema = z.object({
+  name: z.string().min(1),
+  subject: z.string().min(1),
+  content: z.string().min(1),
+  template: z.string().default("default"),
+  status: z
+    .enum(["draft", "scheduled", "sending", "sent", "paused", "cancelled"])
+    .default("draft"),
+  scheduledAt: z.date().optional(),
+  sentAt: z.date().optional(),
+  totalRecipients: z.number().int().nonnegative().default(0),
+  sentCount: z.number().int().nonnegative().default(0),
+  openedCount: z.number().int().nonnegative().default(0),
+  clickedCount: z.number().int().nonnegative().default(0),
+  bouncedCount: z.number().int().nonnegative().default(0),
+  createdBy: z.string().regex(/^[a-f\d]{24}$/i, "Invalid User ID"),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});

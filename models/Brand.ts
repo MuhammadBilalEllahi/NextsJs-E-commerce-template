@@ -3,7 +3,14 @@ const Schema = mongoose.Schema;
 import { MODELS } from "@/models/constants/constants";
 import { z } from "zod";
 
-const brandSchema = new Schema({
+export interface BrandDocument extends mongoose.Document {
+  name: string;
+  logo?: string;
+  description?: string;
+  isActive: boolean;
+}
+
+const brandSchema = new Schema<BrandDocument>({
   name: {
     type: String,
     required: true,

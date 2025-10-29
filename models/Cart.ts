@@ -2,8 +2,23 @@
 import mongoose from "mongoose";
 import { MODELS } from "@/models/constants/constants";
 import { CURRENCY } from "@/lib/constants";
+import { z } from "zod";
 
-const CartItemSchema = new mongoose.Schema(
+export interface CartItemDocument extends mongoose.Document {
+  productId: mongoose.Types.ObjectId;
+  variantId?: mongoose.Types.ObjectId;
+  quantity: number;
+  priceSnapshot: number;
+  label?: string;
+  sku?: string;
+  title: string;
+  slug: string;
+  image?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const CartItemSchema = new mongoose.Schema<CartItemDocument>(
   {
     productId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -29,7 +44,16 @@ const CartItemSchema = new mongoose.Schema(
   { id: false }
 );
 
-const CartSchema = new mongoose.Schema({
+export interface CartDocument extends mongoose.Document {
+  user?: mongoose.Types.ObjectId | null;
+  uuidv4?: string | null;
+  items: Array<CartItemDocument>;
+  currency: string;
+  updatedAt: Date;
+  version: number;
+}
+
+const CartSchema = new mongoose.Schema<CartDocument>({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.USER,
@@ -53,4 +77,34 @@ CartSchema.index(
 );
 
 export default mongoose.models[MODELS.CART] ||
-  mongoose.model(MODELS.CART, CartSchema);
+  mongoose.model<CartDocument>(MODELS.CART, CartSchema);
+
+export const cartItemZodSchema = z.object({
+  productId: z.string().regex(/^[a-f\d]{24}$/i, "Invalid Product ID"),
+  variantId: z
+    .string()
+    .regex(/^[a-f\d]{24}$/i, "Invalid Variant ID")
+    .optional(),
+  quantity: z.number().int().min(1),
+  priceSnapshot: z.number(),
+  label: z.string().optional(),
+  sku: z.string().optional(),
+  title: z.string().min(1),
+  slug: z.string().min(1),
+  image: z.string().optional(),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});
+
+export const cartZodSchema = z.object({
+  user: z
+    .string()
+    .regex(/^[a-f\d]{24}$/i, "Invalid User ID")
+    .nullable()
+    .optional(),
+  uuidv4: z.string().nullable().optional(),
+  items: z.array(cartItemZodSchema).default([]),
+  currency: z.string().default(CURRENCY.SYMBOL),
+  updatedAt: z.date().default(() => new Date()),
+  version: z.number().int().default(1),
+});

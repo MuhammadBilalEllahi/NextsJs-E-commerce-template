@@ -1,5 +1,6 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { MODELS } from "@/models/constants/constants";
+import { z } from "zod";
 
 export interface JobApplicationDocument extends mongoose.Document {
   job: mongoose.Types.ObjectId;
@@ -45,3 +46,18 @@ const JobApplication: Model<JobApplicationDocument> =
   );
 
 export default JobApplication;
+
+export const jobApplicationZodSchema = z.object({
+  job: z.string().regex(/^[a-f\d]{24}$/i, "Invalid Career ID"),
+  name: z.string().min(1),
+  email: z.string().email(),
+  phone: z.string().optional(),
+  resumeUrl: z.string().url().optional(),
+  coverLetter: z.string().optional(),
+  status: z
+    .enum(["pending", "reviewed", "shortlisted", "rejected", "hired"])
+    .default("pending"),
+  notes: z.string().optional(),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});

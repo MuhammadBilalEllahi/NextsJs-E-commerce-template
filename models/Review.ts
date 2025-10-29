@@ -2,7 +2,23 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import { MODELS } from "@/models/constants/constants";
 
-const ReviewSchema = new mongoose.Schema({
+export interface ReviewDocument extends mongoose.Document {
+  product: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+  rating: number;
+  title: string;
+  comment: string;
+  isVerified: boolean;
+  isHelpful: number;
+  images: string[];
+  isActive: boolean;
+  isEdited: boolean;
+  editedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const ReviewSchema = new mongoose.Schema<ReviewDocument>({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.PRODUCT,

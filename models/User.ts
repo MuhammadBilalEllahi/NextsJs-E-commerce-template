@@ -3,7 +3,23 @@ import { z } from "zod";
 import { MODELS, UserTypes } from "@/models/constants/constants";
 import { AddressSubSchema, AddressSubZodSchema } from "@/models/Address";
 
-const UserSchema = new mongoose.Schema({
+export interface UserDocument extends mongoose.Document {
+  name: string;
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  passwordHash: string;
+  role: string;
+  phone?: string;
+  city?: string;
+  addresses: Array<any>;
+  wishlist: mongoose.Types.ObjectId[];
+  cart?: mongoose.Types.ObjectId | null;
+  isActive: boolean;
+  createdAt: Date;
+}
+
+const UserSchema = new mongoose.Schema<UserDocument>({
   name: { type: String, required: true },
   firstName: { type: String },
   lastName: { type: String },

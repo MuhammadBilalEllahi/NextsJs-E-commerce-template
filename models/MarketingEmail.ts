@@ -1,5 +1,6 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { MODELS } from "./constants/constants";
+import { z } from "zod";
 
 export interface MarketingEmailDocument extends mongoose.Document {
   email: string;
@@ -76,3 +77,30 @@ const MarketingEmail: Model<MarketingEmailDocument> =
   );
 
 export default MarketingEmail;
+
+export const marketingEmailZodSchema = z.object({
+  email: z.string().email(),
+  isActive: z.boolean().default(true),
+  subscribedAt: z.date().default(() => new Date()),
+  unsubscribedAt: z.date().optional(),
+  unsubscribeToken: z.string().min(1),
+  campaigns: z
+    .array(
+      z.object({
+        campaignId: z.string().regex(/^[a-f\d]{24}$/i, "Invalid Campaign ID"),
+        campaignName: z.string(),
+        sent: z.boolean().default(false),
+        sentAt: z.date().optional(),
+        opened: z.boolean().default(false),
+        openedAt: z.date().optional(),
+        clicked: z.boolean().default(false),
+        clickedAt: z.date().optional(),
+        bounced: z.boolean().default(false),
+        bouncedAt: z.date().optional(),
+        bouncedReason: z.string().optional(),
+      })
+    )
+    .default([]),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});

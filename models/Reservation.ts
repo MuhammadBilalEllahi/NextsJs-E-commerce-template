@@ -1,7 +1,19 @@
 import mongoose from "mongoose";
 import { MODELS, RESERVATION_STATUS } from "@/models/constants/constants";
+import { z } from "zod";
 
-const ReservationSchema = new mongoose.Schema({
+export interface ReservationDocument extends mongoose.Document {
+  variant: mongoose.Types.ObjectId;
+  user?: mongoose.Types.ObjectId | null;
+  uuidv4?: string | null;
+  quantity: number;
+  status: string;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const ReservationSchema = new mongoose.Schema<ReservationDocument>({
   variant: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.VARIANT,
@@ -48,3 +60,24 @@ ReservationSchema.index({ variant: 1, status: 1 });
 
 export default mongoose.models[MODELS.RESERVATION] ||
   mongoose.model(MODELS.RESERVATION, ReservationSchema);
+
+export const reservationZodSchema = z.object({
+  variant: z.string().regex(/^[a-f\d]{24}$/i, "Invalid Variant ID"),
+  user: z
+    .string()
+    .regex(/^[a-f\d]{24}$/i, "Invalid User ID")
+    .nullable()
+    .optional(),
+  uuidv4: z.string().nullable().optional(),
+  quantity: z.number().int().min(1),
+  status: z
+    .enum([
+      RESERVATION_STATUS.ACTIVE,
+      RESERVATION_STATUS.CANCELLED,
+      RESERVATION_STATUS.CONSUMED,
+    ])
+    .default(RESERVATION_STATUS.ACTIVE),
+  expiresAt: z.date(),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});

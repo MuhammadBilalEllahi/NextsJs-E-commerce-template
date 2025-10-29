@@ -4,7 +4,21 @@ import { z } from "zod";
 
 const Schema = mongoose.Schema;
 
-const BannerSchema = new Schema({
+export interface BannerDocument extends mongoose.Document {
+  title?: string;
+  description?: string;
+  image?: string;
+  link?: string;
+  isActive: boolean;
+  expiresAt?: Date;
+  showTitle: boolean;
+  showLink: boolean;
+  showDescription: boolean;
+  mimeType: string;
+  timeout: number | null;
+}
+
+const BannerSchema = new Schema<BannerDocument>({
   title: { type: String },
   description: { type: String },
   image: { type: String },

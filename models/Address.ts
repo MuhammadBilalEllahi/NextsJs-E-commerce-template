@@ -20,8 +20,27 @@ export const AddressSubSchema = new mongoose.Schema(
   { id: false }
 );
 
+export interface AddressDocument extends mongoose.Document {
+  user: mongoose.Types.ObjectId;
+  label: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode?: string;
+  phone: string;
+  countryCode: string;
+  isDefault: boolean;
+  isBilling: boolean;
+  isShipping: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Full Address schema for separate collection (for address management)
-const AddressSchema = new mongoose.Schema({
+const AddressSchema = new mongoose.Schema<AddressDocument>({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.USER,

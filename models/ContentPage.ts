@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { MODELS } from "@/models/constants/constants";
+import { z } from "zod";
 
 export interface IContentPage extends Document {
   slug: string;
@@ -68,3 +69,18 @@ const ContentPageSchema: Schema = new Schema(
 
 export default mongoose.models[MODELS.CONTENT_PAGE] ||
   mongoose.model<IContentPage>(MODELS.CONTENT_PAGE, ContentPageSchema);
+
+export const contentPageZodSchema = z.object({
+  slug: z.string().min(1, "Slug is required"),
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  isActive: z.boolean().default(true),
+  parentSlug: z.string().nullable().optional(),
+  sortOrder: z.number().int().default(0),
+  showInFooter: z.boolean().default(false),
+  showInHeader: z.boolean().default(false),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});

@@ -4,7 +4,17 @@ import { z } from "zod";
 
 const Schema = mongoose.Schema;
 
-const GlobalSettingsSchema = new Schema({
+export interface GlobalSettingsDocument extends mongoose.Document {
+  bannerScrollTime: number;
+  refundSettings?: {
+    defaultRefundDurationDays: number;
+    maxRefundDurationDays: number;
+    allowUnlimitedRefunds: boolean;
+  };
+  updatedAt: Date;
+}
+
+const GlobalSettingsSchema = new Schema<GlobalSettingsDocument>({
   bannerScrollTime: { type: Number, default: 5000 }, // Overall banner scroll time in milliseconds
   refundSettings: {
     defaultRefundDurationDays: { type: Number, default: 30 }, // Default refund period in days

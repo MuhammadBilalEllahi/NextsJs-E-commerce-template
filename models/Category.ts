@@ -2,7 +2,17 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import { MODELS } from "@/models/constants/constants";
 
-const CategorySchema = new mongoose.Schema({
+export interface CategoryDocument extends mongoose.Document {
+  name: string;
+  slug?: string;
+  parent?: mongoose.Types.ObjectId | null;
+  description?: string;
+  image?: string;
+  isActive: boolean;
+  createdAt: Date;
+}
+
+const CategorySchema = new mongoose.Schema<CategoryDocument>({
   name: { type: String, required: true },
   slug: { type: String, unique: true }, // SEO friendly URL
   parent: {

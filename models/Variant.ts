@@ -3,7 +3,22 @@ import { MODELS } from "@/models/constants/constants";
 import { z } from "zod";
 
 // Variant Schema
-const VariantSchema = new mongoose.Schema({
+export interface VariantDocument extends mongoose.Document {
+  product: mongoose.Types.ObjectId;
+  sku: string;
+  slug?: string;
+  label?: string;
+  price: number;
+  discount?: number;
+  stock: number;
+  images: string[];
+  isActive: boolean;
+  isOutOfStock: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const VariantSchema = new mongoose.Schema<VariantDocument>({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.PRODUCT,

@@ -2,7 +2,26 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import { MODELS } from "@/models/constants/constants";
 
-const RefundSchema = new mongoose.Schema({
+export interface RefundDocument extends mongoose.Document {
+  order: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+  product: mongoose.Types.ObjectId;
+  variant?: mongoose.Types.ObjectId;
+  quantity: number;
+  amount: number;
+  reason: string;
+  status: "pending" | "approved" | "rejected" | "processing" | "completed";
+  adminNotes?: string;
+  customerNotes?: string;
+  refundMethod: "original_payment" | "store_credit" | "bank_transfer";
+  processedBy?: mongoose.Types.ObjectId;
+  processedAt?: Date;
+  refundDurationLimit?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const RefundSchema = new mongoose.Schema<RefundDocument>({
   order: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.ORDER,

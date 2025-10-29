@@ -4,7 +4,34 @@ const Schema = mongoose.Schema;
 import { z } from "zod";
 import { MODELS } from "@/models/constants/constants";
 
-const ProductSchema = new Schema({
+export interface ProductDocument extends mongoose.Document {
+  name: string;
+  slug?: string;
+  description?: string;
+  ingredients?: string;
+  price: number;
+  stock?: number;
+  discount?: number;
+  categories: mongoose.Types.ObjectId[];
+  images: string[];
+  isFeatured: boolean;
+  isTopSelling: boolean;
+  isNewArrival: boolean;
+  isBestSelling: boolean;
+  isSpecial: boolean;
+  isGrocery: boolean;
+  brand?: mongoose.Types.ObjectId;
+  variants: mongoose.Types.ObjectId[];
+  reviews: mongoose.Types.ObjectId[];
+  ratingAvg: number;
+  reviewCount: number;
+  isActive: boolean;
+  isOutOfStock: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const ProductSchema = new Schema<ProductDocument>({
   name: { type: String, required: true },
   slug: { type: String, unique: true },
   description: String,

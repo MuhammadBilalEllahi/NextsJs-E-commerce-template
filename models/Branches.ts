@@ -3,7 +3,33 @@ import { MODELS } from "@/models/constants/constants";
 import { z } from "zod";
 const Schema = mongoose.Schema;
 
-const BranchSchema = new Schema({
+export interface BranchDocument extends mongoose.Document {
+  name: string;
+  address: string;
+  phoneNumber: string;
+  email: string;
+  isActive: boolean;
+  logo?: string;
+  branchNumber: string;
+  location: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode?: string;
+  manager?: string;
+  openingHours: Record<
+    string,
+    { open: string; close: string; isOpen: boolean }
+  >;
+  description?: string;
+  coordinates?: { latitude?: number; longitude?: number };
+  website?: string;
+  whatsapp?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const BranchSchema = new Schema<BranchDocument>({
   name: { type: String, required: true },
   address: { type: String, required: true },
   phoneNumber: { type: String, required: true },

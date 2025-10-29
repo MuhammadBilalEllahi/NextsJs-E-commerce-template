@@ -1,7 +1,33 @@
 import mongoose from "mongoose";
 import { MODELS, ORDER_TYPE } from "@/models/constants/constants";
+import { z } from "zod";
 
-const ShippingMethodSchema = new mongoose.Schema({
+export interface ShippingMethodLocation {
+  city: string;
+  state: string;
+  country: string;
+  shippingFee: number;
+  tcsFee: number;
+  estimatedDays: number;
+  isAvailable: boolean;
+}
+
+export interface ShippingMethodDocument extends mongoose.Document {
+  name: string;
+  type: string;
+  isActive: boolean;
+  locations: ShippingMethodLocation[];
+  defaultShippingFee: number;
+  defaultTcsFee: number;
+  defaultEstimatedDays: number;
+  freeShippingThreshold: number;
+  description?: string;
+  restrictions: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const ShippingMethodSchema = new mongoose.Schema<ShippingMethodDocument>({
   name: { type: String, required: true }, // e.g., "Home Delivery", "TCS"
   type: {
     type: String,
@@ -55,3 +81,28 @@ ShippingMethodSchema.index({ type: 1, isActive: 1 });
 
 export default (mongoose.models[MODELS.SHIPPING_METHOD] as any) ||
   mongoose.model(MODELS.SHIPPING_METHOD, ShippingMethodSchema);
+
+export const shippingMethodLocationZod = z.object({
+  city: z.string().min(1),
+  state: z.string().default("Punjab"),
+  country: z.string().default("Pakistan"),
+  shippingFee: z.number().nonnegative(),
+  tcsFee: z.number().nonnegative().default(0),
+  estimatedDays: z.number().int().positive().default(1),
+  isAvailable: z.boolean().default(true),
+});
+
+export const shippingMethodZodSchema = z.object({
+  name: z.string().min(1),
+  type: z.enum([ORDER_TYPE.HOME_DELIVERY, ORDER_TYPE.TCS, ORDER_TYPE.PICKUP]),
+  isActive: z.boolean().default(true),
+  locations: z.array(shippingMethodLocationZod).default([]),
+  defaultShippingFee: z.number().nonnegative().default(0),
+  defaultTcsFee: z.number().nonnegative().default(0),
+  defaultEstimatedDays: z.number().int().positive().default(3),
+  freeShippingThreshold: z.number().nonnegative().default(0),
+  description: z.string().optional(),
+  restrictions: z.array(z.string()).default([]),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});

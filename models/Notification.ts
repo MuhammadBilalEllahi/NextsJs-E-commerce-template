@@ -2,7 +2,27 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import { MODELS } from "@/models/constants/constants";
 
-const NotificationSchema = new mongoose.Schema({
+export interface NotificationDocument extends mongoose.Document {
+  user: mongoose.Types.ObjectId;
+  type:
+    | "order_status"
+    | "order_shipped"
+    | "order_delivered"
+    | "order_cancelled"
+    | "refund_approved"
+    | "refund_rejected"
+    | "promotion"
+    | "general";
+  title: string;
+  message: string;
+  isRead: boolean;
+  orderId?: mongoose.Types.ObjectId;
+  metadata: Record<string, any>;
+  createdAt: Date;
+  readAt?: Date;
+}
+
+const NotificationSchema = new mongoose.Schema<NotificationDocument>({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.USER,

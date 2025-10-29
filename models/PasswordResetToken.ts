@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import crypto from "crypto";
 import { MODELS } from "./constants/constants";
+import { z } from "zod";
 
 export interface PasswordResetTokenDocument extends Document {
   userId: mongoose.Types.ObjectId;
@@ -89,3 +90,11 @@ export default mongoose.models[MODELS.PASSWORD_RESET_TOKEN] ||
     MODELS.PASSWORD_RESET_TOKEN,
     PasswordResetTokenSchema
   );
+
+export const passwordResetTokenZodSchema = z.object({
+  userId: z.string().regex(/^[a-f\d]{24}$/i, "Invalid User ID"),
+  token: z.string().min(1),
+  expiresAt: z.date().default(() => new Date(Date.now() + 5 * 60 * 1000)),
+  used: z.boolean().default(false),
+  createdAt: z.date().default(() => new Date()),
+});

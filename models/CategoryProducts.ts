@@ -1,7 +1,15 @@
 import mongoose from "mongoose";
 import { MODELS } from "@/models/constants/constants";
+import { z } from "zod";
 
-const CategoryProductsSchema = new mongoose.Schema({
+export interface CategoryProductsDocument extends mongoose.Document {
+  id: mongoose.Types.ObjectId;
+  products: mongoose.Types.ObjectId[];
+  productCount: number;
+  updatedAt: Date;
+}
+
+const CategoryProductsSchema = new mongoose.Schema<CategoryProductsDocument>({
   id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.CATEGORY,
@@ -32,3 +40,12 @@ CategoryProductsSchema.pre("save", function (next) {
 
 export default mongoose.models[MODELS.CATEGORY_PRODUCTS] ||
   mongoose.model(MODELS.CATEGORY_PRODUCTS.toString(), CategoryProductsSchema);
+
+export const categoryProductsZodSchema = z.object({
+  id: z.string().regex(/^[a-f\d]{24}$/i, "Invalid Category ID"),
+  products: z
+    .array(z.string().regex(/^[a-f\d]{24}$/i, "Invalid Product ID"))
+    .default([]),
+  productCount: z.number().int().nonnegative().default(0),
+  updatedAt: z.date().default(() => new Date()),
+});

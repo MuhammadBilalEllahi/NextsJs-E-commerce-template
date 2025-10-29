@@ -2,7 +2,26 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import { MODELS } from "@/models/constants/constants";
 
-const FAQSchema = new mongoose.Schema({
+export interface FAQDocument extends mongoose.Document {
+  question: string;
+  answer: string;
+  category:
+    | "general"
+    | "products"
+    | "shipping"
+    | "returns"
+    | "payment"
+    | "account";
+  tags: string[];
+  isActive: boolean;
+  order: number;
+  viewCount: number;
+  helpfulCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const FAQSchema = new mongoose.Schema<FAQDocument>({
   question: { type: String, required: true, maxlength: 500 },
   answer: { type: String, required: true, maxlength: 2000 },
   category: {

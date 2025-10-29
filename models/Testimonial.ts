@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
+import { z } from "zod";
 
 export interface TestimonialDocument extends mongoose.Document {
   author: string;
@@ -23,3 +24,10 @@ const Testimonial: Model<TestimonialDocument> =
 
 export default Testimonial;
 
+export const testimonialZodSchema = z.object({
+  author: z.string().min(1),
+  quote: z.string().min(1),
+  isActive: z.boolean().default(true),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
+});
