@@ -169,7 +169,7 @@ export interface OrderDB extends BaseDBDocument {
     countryCode?: string;
     isDefault?: boolean;
   };
-  shippingMethod: "home_delivery" | "tcs";
+  shippingMethod: "home_delivery" | "tcs" | "pickup";
   payment: {
     method: "cod";
     status: "pending" | "paid" | "failed";
@@ -518,14 +518,14 @@ export interface ShippingMethodDB extends BaseDBDocument {
   defaultTcsFee: number;
   defaultEstimatedDays: number;
   freeShippingThreshold: number;
-  description: string;
+  description?: string;
   restrictions: string[];
 }
 
 // ===== COUNTER DATABASE TYPES =====
 export interface CounterDB extends BaseDBDocument {
-  name: string;
-  value: number;
+  id: string;
+  seq: number;
 }
 
 // ===== RANDOM IMAGE DATABASE TYPES =====
@@ -576,12 +576,12 @@ export interface ScheduledJobDB extends BaseDBDocument {
 
 // ===== RESERVATION DATABASE TYPES =====
 export interface ReservationDB extends BaseDBDocument {
-  user: Types.ObjectId;
-  product: Types.ObjectId;
-  variant?: Types.ObjectId;
+  variant: Types.ObjectId;
+  user?: Types.ObjectId;
+  uuidv4?: string;
   quantity: number;
-  reservedUntil: Date;
-  status: "active" | "expired" | "fulfilled" | "cancelled";
+  status: "active" | "cancelled" | "consumed";
+  expiresAt: Date;
 }
 
 // ===== PASSWORD RESET TOKEN DATABASE TYPES =====
