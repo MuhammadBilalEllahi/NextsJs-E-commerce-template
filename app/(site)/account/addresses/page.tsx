@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CitySelect } from "@/components/ui/city-select";
+import { getCountryOptions, getStateOptions, getCityOptions } from "@/lib/geo";
+import { DEFAULT_COUNTRY, DEFAULT_STATE } from "@/lib/constants/site";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,6 +28,19 @@ export default function AddressesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Geo options and selections
+  const [countryOptions, setCountryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [stateOptions, setStateOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [cityOptions, setCityOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string>("");
+  const [selectedStateCode, setSelectedStateCode] = useState<string>("");
 
   const [formData, setFormData] = useState({
     label: "",
@@ -62,6 +77,85 @@ export default function AddressesPage() {
   useEffect(() => {
     fetchAddresses();
   }, []);
+
+  // Initialize countries and select defaults by name
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const countries = await getCountryOptions();
+      if (!mounted) return;
+      setCountryOptions(countries);
+      // Find default country code by label match
+      const defCountry = countries.find(
+        (c) =>
+          c.label.toLowerCase() ===
+          (DEFAULT_COUNTRY || formData.country).toLowerCase()
+      );
+      if (defCountry) {
+        setSelectedCountryCode(defCountry.value);
+        handleInputChange("country", defCountry.label);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Load states when country changes
+  useEffect(() => {
+    let mounted = true;
+    if (!selectedCountryCode) {
+      setStateOptions([]);
+      setSelectedStateCode("");
+      setCityOptions([]);
+      return;
+    }
+    (async () => {
+      const states = await getStateOptions(selectedCountryCode);
+      if (!mounted) return;
+      setStateOptions(states);
+      // Auto-select default state by name
+      const defState = states.find(
+        (s) =>
+          s.label.toLowerCase() ===
+          (DEFAULT_STATE || formData.state).toLowerCase()
+      );
+      if (defState) {
+        setSelectedStateCode(defState.value);
+        handleInputChange("state", defState.label);
+      } else {
+        setSelectedStateCode("");
+        handleInputChange("state", "");
+      }
+      // Reset city when country changes
+      setCityOptions([]);
+      handleInputChange("city", "");
+    })();
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCountryCode]);
+
+  // Load cities when state changes
+  useEffect(() => {
+    let mounted = true;
+    if (!selectedCountryCode || !selectedStateCode) {
+      setCityOptions([]);
+      return;
+    }
+    (async () => {
+      const cities = await getCityOptions(
+        selectedCountryCode,
+        selectedStateCode
+      );
+      if (!mounted) return;
+      setCityOptions(cities);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [selectedCountryCode, selectedStateCode]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -281,23 +375,62 @@ export default function AddressesPage() {
                 />
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-3 gap-4">
                 <div>
-                  <CitySelect
-                    value={formData.city}
-                    onChange={(value) => handleInputChange("city", value)}
+                  <Label>Country</Label>
+                  <select
+                    className="w-full h-10 px-3 py-2 rounded border bg-transparent text-sm"
+                    value={selectedCountryCode}
+                    onChange={(e) => setSelectedCountryCode(e.target.value)}
                     required
-                  />
+                  >
+                    <option value="">Select country</option>
+                    {countryOptions.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
-                  <Label htmlFor="postal">Postal Code (optional)</Label>
-                  <Input
-                    id="postal"
-                    value={formData.postalCode}
-                    onChange={(e) =>
-                      handleInputChange("postalCode", e.target.value)
-                    }
-                  />
+                  <Label>State/Province</Label>
+                  <select
+                    className="w-full h-10 px-3 py-2 rounded border bg-transparent text-sm"
+                    value={selectedStateCode}
+                    onChange={(e) => {
+                      const code = e.target.value;
+                      setSelectedStateCode(code);
+                      const label =
+                        stateOptions.find((s) => s.value === code)?.label || "";
+                      handleInputChange("state", label);
+                    }}
+                    disabled={!stateOptions.length}
+                    required
+                  >
+                    <option value="">Select state/province</option>
+                    {stateOptions.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Label>City</Label>
+                  <select
+                    className="w-full h-10 px-3 py-2 rounded border bg-transparent text-sm"
+                    value={formData.city}
+                    onChange={(e) => handleInputChange("city", e.target.value)}
+                    disabled={!cityOptions.length}
+                    required
+                  >
+                    <option value="">Select city</option>
+                    {cityOptions.map((o) => (
+                      <option key={o.value} value={o.label}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

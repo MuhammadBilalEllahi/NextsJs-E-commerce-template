@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CitySelect } from "@/components/ui/city-select";
+import { getCountryOptions, getStateOptions, getCityOptions } from "@/lib/geo";
+import { DEFAULT_COUNTRY, DEFAULT_STATE } from "@/lib/constants/site";
 import {
   Select,
   SelectContent,
@@ -80,6 +82,34 @@ export default function CheckoutPage() {
   const [shippingFee, setShippingFee] = useState(0);
   const [tcsFee, setTcsFee] = useState(0);
   const [orderTotal, setOrderTotal] = useState(subtotal);
+
+  // Geo options and selections for shipping form
+  const [countryOptions, setCountryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [stateOptions, setStateOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [cityOptions, setCityOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string>("");
+  const [selectedStateCode, setSelectedStateCode] = useState<string>("");
+
+  // Geo options for billing when different
+  const [billingCountryOptions, setBillingCountryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [billingStateOptions, setBillingStateOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [billingCityOptions, setBillingCityOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [billingSelectedCountryCode, setBillingSelectedCountryCode] =
+    useState<string>("");
+  const [billingSelectedStateCode, setBillingSelectedStateCode] =
+    useState<string>("");
 
   const syncCartBackend = async () => {
     await syncAll();
@@ -186,6 +216,136 @@ export default function CheckoutPage() {
       setFormData((prev) => ({ ...prev, city: "Lahore" }));
     }
   }, []);
+
+  // Initialize shipping countries and defaults
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const countries = await getCountryOptions();
+      if (!mounted) return;
+      setCountryOptions(countries);
+      const defCountry = countries.find(
+        (c) => c.label.toLowerCase() === DEFAULT_COUNTRY.toLowerCase()
+      );
+      if (defCountry) {
+        setSelectedCountryCode(defCountry.value);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Load shipping states when country changes
+  useEffect(() => {
+    let mounted = true;
+    if (!selectedCountryCode) {
+      setStateOptions([]);
+      setSelectedStateCode("");
+      setCityOptions([]);
+      return;
+    }
+    (async () => {
+      const states = await getStateOptions(selectedCountryCode);
+      if (!mounted) return;
+      setStateOptions(states);
+      const defState = states.find(
+        (s) => s.label.toLowerCase() === DEFAULT_STATE.toLowerCase()
+      );
+      if (defState) {
+        setSelectedStateCode(defState.value);
+      } else {
+        setSelectedStateCode("");
+      }
+      setCityOptions([]);
+      setFormData((prev) => ({ ...prev, state: defState?.label || "" }));
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [selectedCountryCode]);
+
+  // Load shipping cities when state changes
+  useEffect(() => {
+    let mounted = true;
+    if (!selectedCountryCode || !selectedStateCode) {
+      setCityOptions([]);
+      return;
+    }
+    (async () => {
+      const cities = await getCityOptions(
+        selectedCountryCode,
+        selectedStateCode
+      );
+      if (!mounted) return;
+      setCityOptions(cities);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [selectedCountryCode, selectedStateCode]);
+
+  // Initialize billing countries when different billing selected
+  useEffect(() => {
+    let mounted = true;
+    if (billingAddress !== "different") return;
+    (async () => {
+      const countries = await getCountryOptions();
+      if (!mounted) return;
+      setBillingCountryOptions(countries);
+      const defCountry = countries.find(
+        (c) => c.label.toLowerCase() === DEFAULT_COUNTRY.toLowerCase()
+      );
+      if (defCountry) setBillingSelectedCountryCode(defCountry.value);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [billingAddress]);
+
+  // Load billing states when billing country changes
+  useEffect(() => {
+    let mounted = true;
+    if (!billingSelectedCountryCode) {
+      setBillingStateOptions([]);
+      setBillingSelectedStateCode("");
+      setBillingCityOptions([]);
+      return;
+    }
+    (async () => {
+      const states = await getStateOptions(billingSelectedCountryCode);
+      if (!mounted) return;
+      setBillingStateOptions(states);
+      const defState = states.find(
+        (s) => s.label.toLowerCase() === DEFAULT_STATE.toLowerCase()
+      );
+      if (defState) setBillingSelectedStateCode(defState.value);
+      setBillingCityOptions([]);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [billingSelectedCountryCode]);
+
+  // Load billing cities when billing state changes
+  useEffect(() => {
+    let mounted = true;
+    if (!billingSelectedCountryCode || !billingSelectedStateCode) {
+      setBillingCityOptions([]);
+      return;
+    }
+    (async () => {
+      const cities = await getCityOptions(
+        billingSelectedCountryCode,
+        billingSelectedStateCode
+      );
+      if (!mounted) return;
+      setBillingCityOptions(cities);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [billingSelectedCountryCode, billingSelectedStateCode]);
 
   // Update email when user data becomes available
   useEffect(() => {
@@ -583,12 +743,68 @@ export default function CheckoutPage() {
                         }
                       />
                     </div>
-                    <div>
-                      <CitySelect
-                        value={formData.city}
-                        onChange={(value) => handleInputChange("city", value)}
-                        required
-                      />
+                    <div className="sm:col-span-2 grid sm:grid-cols-3 gap-4">
+                      <div>
+                        <Label>Country</Label>
+                        <select
+                          className="w-full h-10 px-3 py-2 rounded border bg-transparent text-sm"
+                          value={selectedCountryCode}
+                          onChange={(e) =>
+                            setSelectedCountryCode(e.target.value)
+                          }
+                          required
+                        >
+                          <option value="">Select country</option>
+                          {countryOptions.map((o) => (
+                            <option key={o.value} value={o.value}>
+                              {o.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <Label>State/Province</Label>
+                        <select
+                          className="w-full h-10 px-3 py-2 rounded border bg-transparent text-sm"
+                          value={selectedStateCode}
+                          onChange={(e) => {
+                            const code = e.target.value;
+                            setSelectedStateCode(code);
+                            const label =
+                              stateOptions.find((s) => s.value === code)
+                                ?.label || "";
+                            setFormData((prev) => ({ ...prev, state: label }));
+                          }}
+                          disabled={!stateOptions.length}
+                          required
+                        >
+                          <option value="">Select state/province</option>
+                          {stateOptions.map((o) => (
+                            <option key={o.value} value={o.value}>
+                              {o.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <Label>City</Label>
+                        <select
+                          className="w-full h-10 px-3 py-2 rounded border bg-transparent text-sm"
+                          value={formData.city}
+                          onChange={(e) =>
+                            handleInputChange("city", e.target.value)
+                          }
+                          disabled={!cityOptions.length}
+                          required
+                        >
+                          <option value="">Select city</option>
+                          {cityOptions.map((o) => (
+                            <option key={o.value} value={o.label}>
+                              {o.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                     <div>
                       <Label htmlFor="postal">Postal code (optional)</Label>
@@ -825,14 +1041,69 @@ export default function CheckoutPage() {
                           }
                         />
                       </div>
-                      <div>
-                        <CitySelect
-                          value={billingFormData.city}
-                          onChange={(value) =>
-                            handleBillingInputChange("city", value)
-                          }
-                          required
-                        />
+                      <div className="sm:col-span-2 grid sm:grid-cols-3 gap-4">
+                        <div>
+                          <Label>Country</Label>
+                          <select
+                            className="w-full h-10 px-3 py-2 rounded border bg-transparent text-sm"
+                            value={billingSelectedCountryCode}
+                            onChange={(e) =>
+                              setBillingSelectedCountryCode(e.target.value)
+                            }
+                            required
+                          >
+                            <option value="">Select country</option>
+                            {billingCountryOptions.map((o) => (
+                              <option key={o.value} value={o.value}>
+                                {o.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <Label>State/Province</Label>
+                          <select
+                            className="w-full h-10 px-3 py-2 rounded border bg-transparent text-sm"
+                            value={billingSelectedStateCode}
+                            onChange={(e) => {
+                              const code = e.target.value;
+                              setBillingSelectedStateCode(code);
+                              const label =
+                                billingStateOptions.find(
+                                  (s) => s.value === code
+                                )?.label || "";
+                              handleBillingInputChange("state", label);
+                            }}
+                            disabled={!billingStateOptions.length}
+                            required
+                          >
+                            <option value="">Select state/province</option>
+                            {billingStateOptions.map((o) => (
+                              <option key={o.value} value={o.value}>
+                                {o.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <Label>City</Label>
+                          <select
+                            className="w-full h-10 px-3 py-2 rounded border bg-transparent text-sm"
+                            value={billingFormData.city}
+                            onChange={(e) =>
+                              handleBillingInputChange("city", e.target.value)
+                            }
+                            disabled={!billingCityOptions.length}
+                            required
+                          >
+                            <option value="">Select city</option>
+                            {billingCityOptions.map((o) => (
+                              <option key={o.value} value={o.label}>
+                                {o.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                       <div>
                         <Label htmlFor="billingPostal">

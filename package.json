@@ -7,9 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "init-schemas": "tsx scripts/init-relationship-schemas.ts",
-    "geo:import:un": "node scripts/geo/import.js --mode un --input data/world.un.json",
-    "geo:import:iso": "node scripts/geo/import.js --mode iso --input data/world.iso.json"
+    "init-schemas": "tsx scripts/init-relationship-schemas.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.873.0",
@@ -39,7 +37,6 @@
     "@tiptap/extension-underline": "^3.4.4",
     "@tiptap/react": "^3.4.4",
     "@tiptap/starter-kit": "^3.4.4",
-    "@types/uuid": "^11.0.0",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -59,14 +56,15 @@
     "resend": "^6.0.3",
     "tailwind-merge": "^3.3.1",
     "uuid": "^13.0.0",
-    "zod": "^4.1.0"
+    "world-countries": "^5.1.0",
+    "zod": "^4.1.0",
+    "country-state-city": "^3.2.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/mongoose": "^5.11.97",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
