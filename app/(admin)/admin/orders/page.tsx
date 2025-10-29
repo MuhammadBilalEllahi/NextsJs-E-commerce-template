@@ -13,6 +13,11 @@ import {
 import { downloadCSV } from "@/lib/csv";
 import { OrderDetailsSidebar } from "@/components/admin/orders/order-details-sidebar";
 import { AdminOrder, OrderHistory, Address, OrderItem } from "@/types/types";
+import {
+  listOrders,
+  updateOrderStatus,
+  updateOrderTracking,
+} from "@/lib/api/admin/orders";
 
 export default function OrdersAdminPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
@@ -45,21 +50,9 @@ export default function OrdersAdminPage() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "50",
-        ...(status && { status }),
-        ...(q && { search: q }),
-      });
-
-      const response = await fetch(`/api/admin/orders?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data.orders);
-        setTotalPages(data.pagination.pages);
-      } else {
-        console.error("Failed to fetch orders");
-      }
+      const data = await listOrders({ page, limit: 50, status, search: q });
+      setOrders(data.orders);
+      setTotalPages(data.pagination.pages);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {
@@ -90,31 +83,13 @@ export default function OrdersAdminPage() {
     cancellationReason?: string
   ) => {
     try {
-      const requestBody: any = {
-        orderId: id,
-        status: newStatus,
-        changedBy: "admin",
-      };
-
-      if (newStatus === "cancelled" && cancellationReason) {
-        requestBody.cancellationReason = cancellationReason;
-      }
-
-      const response = await fetch("/api/admin/orders", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (response.ok) {
+      await updateOrderStatus(id, newStatus, cancellationReason);
+      {
         // Refresh the orders list to get updated data
         await fetchOrders();
         // Clear cancellation input
         setShowCancellationInput((prev) => ({ ...prev, [id]: false }));
         setCancellationReasons((prev) => ({ ...prev, [id]: "" }));
-      } else {
-        console.error("Failed to update order status");
-        alert("Failed to update order status. Please try again.");
       }
     } catch (error) {
       console.error("Error updating order status:", error);
@@ -143,19 +118,12 @@ export default function OrdersAdminPage() {
 
   const updateTracking = async (id: string, tracking: string) => {
     try {
-      const response = await fetch("/api/admin/orders", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: id, tracking: tracking }),
-      });
-
-      if (response.ok) {
+      await updateOrderTracking(id, tracking);
+      {
         // Update the local state immediately for better UX
         setOrders((prev) =>
           prev.map((o) => (o.id === id ? { ...o, tracking: tracking } : o))
         );
-      } else {
-        console.error("Failed to update tracking number");
       }
     } catch (error) {
       console.error("Error updating tracking number:", error);

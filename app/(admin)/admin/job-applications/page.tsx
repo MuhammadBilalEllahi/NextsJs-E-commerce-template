@@ -64,6 +64,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  listJobApplications,
+  deleteJobApplication,
+  updateJobApplicationStatus,
+  sendApplicationEmail,
+} from "@/lib/api/admin/job-applications";
+import { listCareers } from "@/lib/api/admin/careers";
 
 interface JobApplication {
   id: string;
@@ -121,11 +128,8 @@ export default function JobApplicationsPage() {
 
   const fetchApplications = async () => {
     try {
-      const response = await fetch("/api/admin/job-applications");
-      const data = await response.json();
-      if (data.success) {
-        setApplications(data.applications);
-      }
+      const data = await listJobApplications();
+      if (data.success) setApplications(data.applications);
     } catch (error) {
       console.error("Error fetching applications:", error);
     } finally {
@@ -135,11 +139,8 @@ export default function JobApplicationsPage() {
 
   const fetchCareers = async () => {
     try {
-      const response = await fetch("/api/admin/careers");
-      const data = await response.json();
-      if (data.success) {
-        setCareers(data.careers);
-      }
+      const data = await listCareers();
+      if (data.success) setCareers(data.careers);
     } catch (error) {
       console.error("Error fetching careers:", error);
     }
@@ -162,22 +163,16 @@ export default function JobApplicationsPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/admin/send-application-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          applicantEmail: selectedApplication.email,
-          applicantName: selectedApplication.name,
-          jobTitle: selectedApplication.job.title,
-          templateType: emailData.templateType,
-          customMessage: emailData.customMessage,
-          nextSteps: emailData.nextSteps,
-          contactEmail: emailData.contactEmail,
-          contactPhone: emailData.contactPhone,
-        }),
+      const data = await sendApplicationEmail({
+        applicantEmail: selectedApplication.email,
+        applicantName: selectedApplication.name,
+        jobTitle: selectedApplication.job.title,
+        templateType: emailData.templateType,
+        customMessage: emailData.customMessage,
+        nextSteps: emailData.nextSteps,
+        contactEmail: emailData.contactEmail,
+        contactPhone: emailData.contactPhone,
       });
-
-      const data = await response.json();
       if (data.success) {
         setSuccess("Email sent successfully!");
         setIsEmailDialogOpen(false);
@@ -204,13 +199,7 @@ export default function JobApplicationsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch("/api/admin/job-applications", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id }),
-      });
-
-      const data = await response.json();
+      const data = await deleteJobApplication(id);
       if (data.success) {
         await fetchApplications();
         setSuccess("Application deleted successfully!");
@@ -225,13 +214,7 @@ export default function JobApplicationsPage() {
 
   const updateApplicationStatus = async (id: string, status: string) => {
     try {
-      const response = await fetch("/api/admin/job-applications", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id, status }),
-      });
-
-      const data = await response.json();
+      const data = await updateJobApplicationStatus(id, status);
       if (data.success) {
         await fetchApplications();
         setSuccess(`Application status updated to ${status}!`);

@@ -13,6 +13,7 @@ import { YouMayAlsoLike } from "@/components/product/you-may-also-like";
 import { RecentlyViewed } from "@/components/product/recently-viewed";
 
 import { Product, WishlistItem } from "@/types/types";
+import { getWishlist } from "@/lib/api/wishlist";
 
 export default function WishlistPage() {
   const { ids, clear, isLoading } = useWishlist();
@@ -28,26 +29,14 @@ export default function WishlistPage() {
       try {
         if (isAuthenticated) {
           // Authenticated user - fetch from database
-          const response = await fetch("/api/wishlist");
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success) {
-              setWishlistData(data.wishlist);
-            }
-          }
+          const data = await getWishlist();
+          if (data.success) setWishlistData(data.wishlist);
         } else {
           // Guest user - fetch from database using session ID
           const guestSessionId = localStorage.getItem("dm-guest-cart-id");
           if (guestSessionId) {
-            const response = await fetch(
-              `/api/wishlist?sessionId=${guestSessionId}`
-            );
-            if (response.ok) {
-              const data = await response.json();
-              if (data.success) {
-                setWishlistData(data.wishlist);
-              }
-            }
+            const data = await getWishlist(guestSessionId);
+            if (data.success) setWishlistData(data.wishlist);
           }
         }
       } catch (error) {

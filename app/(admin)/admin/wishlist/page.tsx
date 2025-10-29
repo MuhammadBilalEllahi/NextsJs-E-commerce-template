@@ -20,6 +20,10 @@ import {
 import Link from "next/link";
 import { WishlistItem, Pagination } from "@/types/types";
 import Image from "next/image";
+import {
+  listAdminWishlist,
+  deleteAdminWishlistItem,
+} from "@/lib/api/admin/wishlist";
 
 export default function AdminWishlistPage() {
   const [wishlistData, setWishlistData] = useState<WishlistItem[]>([]);
@@ -38,31 +42,25 @@ export default function AdminWishlistPage() {
   const fetchWishlistData = async (page = 1) => {
     setIsLoading(true);
     try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pagination.limit.toString(),
+      const data = await listAdminWishlist({
+        page,
+        limit: pagination.limit,
+        search: searchTerm,
+        userId: filterUserId,
+        productId: filterProductId,
       });
+      if (data.success) {
+        let filteredData = data.wishlist;
 
-      if (searchTerm) params.append("search", searchTerm);
-      if (filterUserId) params.append("userId", filterUserId);
-      if (filterProductId) params.append("productId", filterProductId);
-
-      const response = await fetch(`/api/admin/wishlist?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          let filteredData = data.wishlist;
-
-          // Apply client-side filters
-          if (showOutOfStockOnly) {
-            filteredData = filteredData.filter(
-              (item: WishlistItem) => item.isOutOfStock
-            );
-          }
-
-          setWishlistData(filteredData);
-          setPagination(data.pagination);
+        // Apply client-side filters
+        if (showOutOfStockOnly) {
+          filteredData = filteredData.filter(
+            (item: WishlistItem) => item.isOutOfStock
+          );
         }
+
+        setWishlistData(filteredData);
+        setPagination(data.pagination);
       }
     } catch (error) {
       console.error("Error fetching wishlist data:", error);
@@ -77,14 +75,8 @@ export default function AdminWishlistPage() {
 
   const handleRemoveItem = async (itemId: string) => {
     try {
-      const response = await fetch(`/api/admin/wishlist?id=${itemId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        // Refresh the data
-        fetchWishlistData(pagination.page);
-      }
+      await deleteAdminWishlistItem(itemId);
+      fetchWishlistData(pagination.page);
     } catch (error) {
       console.error("Error removing wishlist item:", error);
     }

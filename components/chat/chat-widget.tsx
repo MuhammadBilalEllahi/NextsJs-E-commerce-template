@@ -16,6 +16,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/providers/authProvider";
+import {
+  getChatHistory,
+  postChatMessage,
+  updateChatUser,
+} from "@/lib/api/chat";
 
 interface ChatMessage {
   id?: string;
@@ -109,8 +114,7 @@ export function ChatWidget() {
   const loadChatHistory = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/chat?sessionId=${sessionId}`);
-      const data = await response.json();
+      const data = await getChatHistory(sessionId);
 
       if (data.success && data.inquiry) {
         setInquiry(data.inquiry);
@@ -149,17 +153,7 @@ export function ChatWidget() {
     setMessages((prev) => [...prev, userMessage]);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId,
-          message,
-          ...userInfo,
-        }),
-      });
-
-      const data = await response.json();
+      const data = await postChatMessage({ sessionId, message, ...userInfo });
 
       if (data.success) {
         // Update inquiry if provided
@@ -184,16 +178,7 @@ export function ChatWidget() {
     if (!sessionId) return;
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId,
-          ...userInfo,
-        }),
-      });
-
-      const data = await response.json();
+      const data = await updateChatUser({ sessionId, ...userInfo });
 
       if (data.success) {
         setShowUserForm(false);

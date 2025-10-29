@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
 import { ContactFormData } from "@/types/types";
+import { submitContact } from "@/lib/api/contact";
 
 const subjects = [
   "General Inquiry",
@@ -49,29 +50,15 @@ export function ContactForm() {
     setErrorMessage("");
 
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      await submitContact(formData);
+      setSubmitStatus("success");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSubmitStatus("success");
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          subject: "",
-          message: "",
-        });
-      } else {
-        setSubmitStatus("error");
-        setErrorMessage(data.error || "Failed to send message");
-      }
     } catch (error) {
       setSubmitStatus("error");
       setErrorMessage("Network error. Please try again.");

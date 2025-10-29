@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Mail, CheckCircle } from "lucide-react";
+import { requestPasswordReset } from "@/lib/api/auth/password";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -20,19 +21,8 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/reset-password/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setIsSuccess(true);
-      } else {
-        setError(data.error || "Failed to send reset email");
-      }
+      await requestPasswordReset(email);
+      setIsSuccess(true);
     } catch {
       setError("An unexpected error occurred");
     } finally {

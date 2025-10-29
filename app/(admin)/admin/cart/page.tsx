@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { listAdminCarts, deleteAdminCart } from "@/lib/api/admin/cart";
 
 type CartItem = {
   productId: string;
@@ -76,35 +77,29 @@ export default function AdminCartPage() {
   const fetchCartData = async (page = 1) => {
     setIsLoading(true);
     try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pagination.limit.toString(),
+      const data = await listAdminCarts({
+        page,
+        limit: pagination.limit,
+        search: searchTerm,
+        userId: filterUserId,
+        sessionId: filterSessionId,
       });
+      if (data.success) {
+        let filteredData = data.carts;
 
-      if (searchTerm) params.append("search", searchTerm);
-      if (filterUserId) params.append("userId", filterUserId);
-      if (filterSessionId) params.append("sessionId", filterSessionId);
-
-      const response = await fetch(`/api/admin/cart?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          let filteredData = data.carts;
-
-          // Apply client-side filters
-          if (showConvertedOnly) {
-            filteredData = filteredData.filter((cart: Cart) => cart.hasOrder);
-          }
-
-          if (showOldCartsOnly) {
-            filteredData = filteredData.filter(
-              (cart: Cart) => cart.daysSinceUpdate > 7
-            );
-          }
-
-          setCartData(filteredData);
-          setPagination(data.pagination);
+        // Apply client-side filters
+        if (showConvertedOnly) {
+          filteredData = filteredData.filter((cart: Cart) => cart.hasOrder);
         }
+
+        if (showOldCartsOnly) {
+          filteredData = filteredData.filter(
+            (cart: Cart) => cart.daysSinceUpdate > 7
+          );
+        }
+
+        setCartData(filteredData);
+        setPagination(data.pagination);
       }
     } catch (error) {
       console.error("Error fetching cart data:", error);
@@ -125,14 +120,8 @@ export default function AdminCartPage() {
 
   const handleRemoveCart = async (cartId: string) => {
     try {
-      const response = await fetch(`/api/admin/cart?id=${cartId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        // Refresh the data
-        fetchCartData(pagination.page);
-      }
+      await deleteAdminCart(cartId);
+      fetchCartData(pagination.page);
     } catch (error) {
       console.error("Error removing cart:", error);
     }

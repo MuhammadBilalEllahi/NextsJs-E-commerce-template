@@ -33,6 +33,8 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Order, OrderItem, Address, Refund } from "@/types/types";
+import { getMyOrders } from "@/lib/api/account/orders";
+import { getMyRefunds, createRefund } from "@/lib/api/account/refunds";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -53,20 +55,12 @@ export default function OrdersPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [ordersResponse, refundsResponse] = await Promise.all([
-        fetch("/api/user/orders"),
-        fetch("/api/refunds"),
+      const [ordersData, refundsData] = await Promise.all([
+        getMyOrders(),
+        getMyRefunds(),
       ]);
-
-      if (ordersResponse.ok) {
-        const ordersData = await ordersResponse.json();
-        setOrders(ordersData.orders || []);
-      }
-
-      if (refundsResponse.ok) {
-        const refundsData = await refundsResponse.json();
-        setRefunds(refundsData.refunds || []);
-      }
+      setOrders(ordersData.orders || []);
+      setRefunds(refundsData.refunds || []);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -126,27 +120,17 @@ export default function OrdersPage() {
     setIsSubmittingRefund(true);
 
     try {
-      const response = await fetch("/api/refunds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          order: selectedOrder.id,
-          product: selectedItem.productSlug, // This should be product ID, but using slug for now
-          quantity: refundForm.quantity,
-          amount: selectedItem.price * refundForm.quantity,
-          reason: refundForm.reason,
-          customerNotes: refundForm.customerNotes,
-        }),
+      await createRefund({
+        order: selectedOrder.id,
+        product: selectedItem.productSlug,
+        quantity: refundForm.quantity,
+        amount: selectedItem.price * refundForm.quantity,
+        reason: refundForm.reason,
+        customerNotes: refundForm.customerNotes,
       });
-
-      if (response.ok) {
-        alert("Refund request submitted successfully!");
-        setShowRefundForm(false);
-        fetchData(); // Refresh data
-      } else {
-        const error = await response.json();
-        alert(error.error || "Failed to submit refund request");
-      }
+      alert("Refund request submitted successfully!");
+      setShowRefundForm(false);
+      fetchData();
     } catch (error) {
       console.error("Error submitting refund:", error);
       alert("Failed to submit refund request. Please try again.");

@@ -15,6 +15,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { confirmPasswordReset } from "@/lib/api/auth/password";
 
 export default function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState("");
@@ -60,22 +61,8 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/reset-password/confirm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token,
-          newPassword,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setIsSuccess(true);
-      } else {
-        setError(data.error || "Failed to reset password");
-      }
+      await confirmPasswordReset(token, newPassword);
+      setIsSuccess(true);
     } catch {
       setError("An unexpected error occurred");
     } finally {

@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/constants/currency";
 import { OrderDetails } from "@/types/types";
+import { getOrderDetails } from "@/lib/api/admin/orders/details";
 
 interface OrderDetailsSidebarProps {
   orderId: string | null;
@@ -52,13 +53,8 @@ export function OrderDetailsSidebar({
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setOrder(data.order);
-      } else {
-        console.error("Failed to fetch order details");
-      }
+      const data = await getOrderDetails(orderId);
+      setOrder(data.order);
     } catch (error) {
       console.error("Error fetching order details:", error);
     } finally {

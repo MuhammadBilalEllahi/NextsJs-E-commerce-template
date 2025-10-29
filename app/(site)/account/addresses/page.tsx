@@ -21,6 +21,11 @@ import {
   CreditCard,
 } from "lucide-react";
 import { Address } from "@/types/types";
+import {
+  listAddresses,
+  saveAddress,
+  deleteAddress as deleteAddressApi,
+} from "@/lib/api/account/addresses";
 
 export default function AddressesPage() {
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -62,11 +67,8 @@ export default function AddressesPage() {
   const fetchAddresses = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/addresses");
-      if (response.ok) {
-        const data = await response.json();
-        setAddresses(data.addresses || []);
-      }
+      const data = await listAddresses();
+      setAddresses(data.addresses || []);
     } catch (error) {
       console.error("Error fetching addresses:", error);
     } finally {
@@ -186,20 +188,11 @@ export default function AddressesPage() {
     setIsSubmitting(true);
 
     try {
-      const url = editingAddress ? "/api/addresses" : "/api/addresses";
-      const method = editingAddress ? "PUT" : "POST";
-
       const payload = editingAddress
         ? { id: (editingAddress as any).id, ...formData }
         : formData;
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
+      await saveAddress(payload);
+      {
         resetForm();
         fetchAddresses();
         alert(
@@ -207,9 +200,6 @@ export default function AddressesPage() {
             ? "Address updated successfully!"
             : "Address added successfully!"
         );
-      } else {
-        const error = await response.json();
-        alert(error.error || "Failed to save address");
       }
     } catch (error) {
       console.error("Error saving address:", error);
@@ -243,15 +233,10 @@ export default function AddressesPage() {
     if (!confirm("Are you sure you want to delete this address?")) return;
 
     try {
-      const response = await fetch(`/api/addresses?id=${addressId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
+      await deleteAddressApi(addressId);
+      {
         fetchAddresses();
         alert("Address deleted successfully!");
-      } else {
-        alert("Failed to delete address");
       }
     } catch (error) {
       console.error("Error deleting address:", error);

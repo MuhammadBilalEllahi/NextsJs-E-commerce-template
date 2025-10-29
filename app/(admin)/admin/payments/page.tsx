@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CreditCard, User, Calendar, DollarSign } from "lucide-react";
+import { listPayments, updatePayment } from "@/lib/api/admin/payments";
 
 interface Payment {
   id: string;
@@ -39,8 +40,7 @@ export default function PaymentsAdminPage() {
 
   const fetchPayments = async () => {
     try {
-      const response = await fetch("/api/admin/payments");
-      const data = await response.json();
+      const data = await listPayments();
       if (data.success) {
         setPayments(data.payments);
       } else {
@@ -56,16 +56,7 @@ export default function PaymentsAdminPage() {
 
   const updatePaymentStatus = async (orderId: string, newStatus: string) => {
     try {
-      const response = await fetch("/api/admin/payments", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId,
-          paymentStatus: newStatus,
-        }),
-      });
-
-      const data = await response.json();
+      const data = await updatePayment(orderId, newStatus);
       if (data.success) {
         await fetchPayments();
         setSuccess("Payment status updated successfully!");

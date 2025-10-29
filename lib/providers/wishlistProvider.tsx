@@ -7,6 +7,11 @@ import { getOrCreateGuestId } from "@/lib/utils/uuid";
 const STORAGE_KEY = "dm-wishlist";
 
 import { WishlistItem, WishlistProviderItem } from "@/types/types";
+import {
+  getWishlist,
+  addToWishlist,
+  removeFromWishlist,
+} from "@/lib/api/wishlist";
 
 type WishlistCtx = {
   ids: Set<string>;
@@ -62,21 +67,18 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/wishlist");
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          const dbItems: WishlistProviderItem[] = data.wishlist.map(
-            (item: any) => ({
-              productId: item.productId,
-              variantId: item.variantId,
-              addedAt: item.addedAt,
-            })
-          );
+      const data = await getWishlist();
+      if (data.success) {
+        const dbItems: WishlistProviderItem[] = data.wishlist.map(
+          (item: any) => ({
+            productId: item.productId,
+            variantId: item.variantId,
+            addedAt: item.addedAt,
+          })
+        );
 
-          setItems(dbItems);
-          setIds(new Set(dbItems.map((item) => item.productId)));
-        }
+        setItems(dbItems);
+        setIds(new Set(dbItems.map((item) => item.productId)));
       }
     } catch (error) {
       console.error("Error syncing wishlist with database:", error);
@@ -91,83 +93,48 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       if (isAuthenticated && user?.id) {
         // For authenticated users, sync with database
         if (ids.has(productId)) {
-          // Remove from wishlist
-          const response = await fetch(`/api/wishlist?productId=${productId}`, {
-            method: "DELETE",
+          await removeFromWishlist(productId);
+          setItems((prev) =>
+            prev.filter((item) => item.productId !== productId)
+          );
+          setIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(productId);
+            return newSet;
           });
-
-          if (response.ok) {
-            setItems((prev) =>
-              prev.filter((item) => item.productId !== productId)
-            );
-            setIds((prev) => {
-              const newSet = new Set(prev);
-              newSet.delete(productId);
-              return newSet;
-            });
-          }
         } else {
-          // Add to wishlist
-          const response = await fetch("/api/wishlist", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId, variantId }),
-          });
-
-          if (response.ok) {
-            const newItem: WishlistProviderItem = {
-              productId,
-              variantId,
-              addedAt: new Date().toISOString(),
-            };
-            setItems((prev) => [...prev, newItem]);
-            setIds((prev) => new Set([...prev, productId]));
-          }
+          await addToWishlist(productId, variantId);
+          const newItem: WishlistProviderItem = {
+            productId,
+            variantId,
+            addedAt: new Date().toISOString(),
+          };
+          setItems((prev) => [...prev, newItem]);
+          setIds((prev) => new Set([...prev, productId]));
         }
       } else {
         // For guest users, sync with database using session ID
         const guestSessionId = getOrCreateGuestId();
 
         if (ids.has(productId)) {
-          // Remove from wishlist
-          const response = await fetch(
-            `/api/wishlist?productId=${productId}&sessionId=${guestSessionId}`,
-            {
-              method: "DELETE",
-            }
+          await removeFromWishlist(productId, guestSessionId);
+          setItems((prev) =>
+            prev.filter((item) => item.productId !== productId)
           );
-
-          if (response.ok) {
-            setItems((prev) =>
-              prev.filter((item) => item.productId !== productId)
-            );
-            setIds((prev) => {
-              const newSet = new Set(prev);
-              newSet.delete(productId);
-              return newSet;
-            });
-          }
-        } else {
-          // Add to wishlist
-          const response = await fetch("/api/wishlist", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              productId,
-              variantId,
-              sessionId: guestSessionId,
-            }),
+          setIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(productId);
+            return newSet;
           });
-
-          if (response.ok) {
-            const newItem: WishlistProviderItem = {
-              productId,
-              variantId,
-              addedAt: new Date().toISOString(),
-            };
-            setItems((prev) => [...prev, newItem]);
-            setIds((prev) => new Set([...prev, productId]));
-          }
+        } else {
+          await addToWishlist(productId, variantId, guestSessionId);
+          const newItem: WishlistProviderItem = {
+            productId,
+            variantId,
+            addedAt: new Date().toISOString(),
+          };
+          setItems((prev) => [...prev, newItem]);
+          setIds((prev) => new Set([...prev, productId]));
         }
       }
     } catch (error) {

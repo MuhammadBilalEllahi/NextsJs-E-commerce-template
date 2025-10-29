@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { ArrowLeft, Save, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { getContentPage, updateContentPage } from "@/lib/api/admin/content";
 
 interface ContentPage {
   id: string;
@@ -58,10 +59,8 @@ function EditContentPageContent() {
 
   const fetchContentPage = async () => {
     try {
-      const response = await fetch(`/api/admin/content/${slug}`);
-      const data = await response.json();
-
-      if (response.ok) {
+      const data = await getContentPage(slug as string);
+      if (data) {
         setContentPage(data);
         setFormData({
           slug: slug || data.slug,
@@ -102,22 +101,10 @@ function EditContentPageContent() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/admin/content/${slug}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setHasUnsavedChanges(false);
-        alert("Content page updated successfully!");
-        // Refresh the page data
-        await fetchContentPage();
-      } else {
-        alert(data.error || "Failed to update content page");
-      }
+      await updateContentPage(slug as string, formData);
+      setHasUnsavedChanges(false);
+      alert("Content page updated successfully!");
+      await fetchContentPage();
     } catch (error) {
       console.error("Error updating content page:", error);
       alert("An error occurred while updating the content page");

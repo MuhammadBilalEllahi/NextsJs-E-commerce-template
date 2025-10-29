@@ -12,6 +12,7 @@ import { AccountNavigation } from "@/components/account/account-navigation";
 import { Save, User, Phone, MapPin, Edit, X } from "lucide-react";
 import { UserTypes } from "@/models/constants/constants";
 import { UserProfile } from "@/types/types";
+import { getProfile, updateProfile } from "@/lib/api/account/profile";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -30,17 +31,14 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/user/profile");
-      if (response.ok) {
-        const data = await response.json();
-        setProfile(data.user);
-        setFormData({
-          firstName: data.user.firstName || "",
-          lastName: data.user.lastName || "",
-          phone: data.user.phone || "",
-          city: data.user.city || "",
-        });
-      }
+      const data = await getProfile();
+      setProfile(data.user);
+      setFormData({
+        firstName: data.user.firstName || "",
+        lastName: data.user.lastName || "",
+        phone: data.user.phone || "",
+        city: data.user.city || "",
+      });
     } catch (error) {
       console.error("Error fetching profile:", error);
     } finally {
@@ -61,20 +59,9 @@ export default function ProfilePage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/user/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setProfile(data.user);
-        alert("Profile updated successfully!");
-      } else {
-        const error = await response.json();
-        alert(error.error || "Failed to update profile");
-      }
+      const data = await updateProfile(formData);
+      setProfile(data.user);
+      alert("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile. Please try again.");

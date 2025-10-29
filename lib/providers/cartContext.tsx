@@ -12,6 +12,7 @@ import {
 import { useAuth } from "./authProvider";
 import { getOrCreateGuestId, clearGuestId } from "@/lib/utils/uuid";
 import { CartItem } from "@/types/types";
+import { getCart as apiGetCart, syncCart as apiSyncCart } from "@/lib/api/cart";
 
 type State = {
   items: CartItem[];
@@ -202,35 +203,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       try {
         dispatch({ type: CartActionTypes.SET_SYNCING, payload: true });
-        const params = new URLSearchParams();
-        if (userId) params.append("userId", userId);
-        if (sessionId) params.append("sessionId", sessionId);
-        const response = await fetch(`/api/cart?${params.toString()}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            items: items.map((item) => {
-              const mappedItem = {
-                productId: item.productId,
-                variantId: item.variantId || null,
-                quantity: item.qty,
-                priceSnapshot: item.price,
-                label: item.variantLabel || null,
-                slug: item.slug,
-                sku: item.sku || null,
-                name: item.name,
-                image: item.image,
-              };
-              return mappedItem;
-            }),
-            userId,
-            sessionId,
-          }) as any,
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to sync cart with backend");
-        }
+        await apiSyncCart(
+          items,
+          { userId: userId || undefined, sessionId: sessionId || undefined },
+          operation
+        );
 
         dispatch({ type: CartActionTypes.SET_SYNCED });
       } catch (error) {
@@ -260,31 +237,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const params = new URLSearchParams();
-      if (userId) params.append("userId", userId);
-      if (sessionId) params.append("sessionId", sessionId);
-
-      const response = await fetch(`/api/cart?${params.toString()}`);
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.cart && data.cart.items) {
-          const items = data.cart.items.map((item: any) => ({
-            id: item.variantId
-              ? `${item.productId}-${item.variantId}`
-              : item.productId,
-            name: item.name || "Product",
-            price: item.priceSnapshot,
-            image: item.image,
-            qty: item.quantity,
-            variantId: item.variantId,
-            variantLabel: item.label,
-            productId: item.productId,
-            slug: item.slug,
-            sku: item.sku,
-          }));
-          dispatch({ type: CartActionTypes.HYDRATE, payload: items });
-        }
+      const data = await apiGetCart({
+        userId: userId || undefined,
+        sessionId: sessionId || undefined,
+      });
+      if (data.cart && data.cart.items) {
+        const items = data.cart.items.map((item: any) => ({
+          id: item.variantId
+            ? `${item.productId}-${item.variantId}`
+            : item.productId,
+          name: item.name || "Product",
+          price: item.priceSnapshot,
+          image: item.image,
+          qty: item.quantity,
+          variantId: item.variantId,
+          variantLabel: item.label,
+          productId: item.productId,
+          slug: item.slug,
+          sku: item.sku,
+        }));
+        dispatch({ type: CartActionTypes.HYDRATE, payload: items });
       }
     } catch (error) {
       console.error("Failed to refresh cart:", error);

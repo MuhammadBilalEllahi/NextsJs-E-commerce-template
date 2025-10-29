@@ -59,6 +59,12 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import { TiptapMenuBar } from "@/components/admin/blogs/tiptap-menu-bar";
 import NextImage from "next/image";
+import {
+  listBlogs,
+  saveBlog,
+  deleteBlog as deleteBlogApi,
+  toggleBlogStatus,
+} from "@/lib/api/admin/blogs";
 
 interface Blog {
   id: string;
@@ -128,11 +134,8 @@ export default function BlogsPage() {
 
   const fetchBlogs = async () => {
     try {
-      const response = await fetch("/api/admin/blogs");
-      const data = await response.json();
-      if (data.success) {
-        setBlogs(data.blogs);
-      }
+      const data = await listBlogs();
+      if (data.success) setBlogs(data.blogs);
     } catch (error) {
       console.error("Error fetching blogs:", error);
     } finally {
@@ -192,15 +195,7 @@ export default function BlogsPage() {
         formDataToSend.append("id", editingBlog.id);
       }
 
-      const url = editingBlog ? "/api/admin/blogs" : "/api/admin/blogs";
-      const method = editingBlog ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        body: formDataToSend,
-      });
-
-      const data = await response.json();
+      const data = await saveBlog(formDataToSend, Boolean(editingBlog));
       if (data.success) {
         await fetchBlogs();
         setIsDialogOpen(false);
@@ -249,13 +244,7 @@ export default function BlogsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch("/api/admin/blogs", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id }),
-      });
-
-      const data = await response.json();
+      const data = await deleteBlogApi(id);
       if (data.success) {
         await fetchBlogs();
         setSuccess("Blog deleted successfully!");
@@ -270,13 +259,7 @@ export default function BlogsPage() {
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const response = await fetch("/api/admin/blogs", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id, isActive: !currentStatus }),
-      });
-
-      const data = await response.json();
+      const data = await toggleBlogStatus(id, !currentStatus);
       if (data.success) {
         await fetchBlogs();
         setSuccess(

@@ -48,6 +48,7 @@ import {
 import { formatCurrency } from "@/lib/constants/currency";
 import { TCS_STATUS } from "@/models/constants/constants";
 import { TCSTrackingHistory } from "@/types/types";
+import { listTcsOrders, actOnTcsOrder } from "@/lib/api/admin/tcs-orders";
 
 export default function TCSOrdersManagement() {
   const [tcsOrders, setTcsOrders] = useState<any[]>([]);
@@ -76,15 +77,12 @@ export default function TCSOrdersManagement() {
   const fetchTCSOrders = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "10",
-        ...(searchTerm && { search: searchTerm }),
-        ...(statusFilter && { status: statusFilter }),
+      const data = await listTcsOrders({
+        page,
+        limit: 10,
+        search: searchTerm,
+        status: statusFilter,
       });
-
-      const response = await fetch(`/api/admin/tcs-orders?${params}`);
-      const data = await response.json();
 
       if (data.success) {
         setTcsOrders(data.data);
@@ -104,15 +102,7 @@ export default function TCSOrdersManagement() {
   ) => {
     try {
       setActionLoading(orderId);
-      const response = await fetch(`/api/admin/tcs-orders/${orderId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action, ...actionData }),
-      });
-
-      const data = await response.json();
+      const data = await actOnTcsOrder(orderId, action, actionData);
       if (data.success) {
         await fetchTCSOrders();
         if (action === "track" && data.data?.courier?.trackingHistory) {
@@ -193,12 +183,15 @@ export default function TCSOrdersManagement() {
                 />
               </div>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select
+              value={statusFilter || "all"}
+              onValueChange={(v) => setStatusFilter(v === "all" ? "" : v)}
+            >
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 {Object.values(TCS_STATUS).map((status) => (
                   <SelectItem key={status} value={status}>
                     {status.replace("_", " ").toUpperCase()}

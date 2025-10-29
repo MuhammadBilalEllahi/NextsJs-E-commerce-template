@@ -54,6 +54,12 @@ import {
   Loader2,
   MessageSquare,
 } from "lucide-react";
+import {
+  listTestimonials,
+  saveTestimonial,
+  deleteTestimonial,
+  toggleTestimonialStatus,
+} from "@/lib/api/admin/testimonials";
 
 interface Testimonial {
   id: string;
@@ -84,11 +90,8 @@ export default function TestimonialsPage() {
 
   const fetchTestimonials = async () => {
     try {
-      const response = await fetch("/api/admin/testimonials");
-      const data = await response.json();
-      if (data.success) {
-        setTestimonials(data.testimonials);
-      }
+      const data = await listTestimonials();
+      if (data.success) setTestimonials(data.testimonials);
     } catch (error) {
       console.error("Error fetching testimonials:", error);
     } finally {
@@ -102,22 +105,10 @@ export default function TestimonialsPage() {
     setSuccess("");
 
     try {
-      const url = editingTestimonial
-        ? "/api/admin/testimonials"
-        : "/api/admin/testimonials";
-      const method = editingTestimonial ? "PUT" : "POST";
-
       const payload = editingTestimonial
         ? { id: editingTestimonial.id, ...formData }
         : formData;
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
+      const data = await saveTestimonial(payload, Boolean(editingTestimonial));
       if (data.success) {
         await fetchTestimonials();
         setIsDialogOpen(false);
@@ -153,13 +144,7 @@ export default function TestimonialsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch("/api/admin/testimonials", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id }),
-      });
-
-      const data = await response.json();
+      const data = await deleteTestimonial(id);
       if (data.success) {
         await fetchTestimonials();
         setSuccess("Testimonial deleted successfully!");
@@ -174,13 +159,7 @@ export default function TestimonialsPage() {
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const response = await fetch("/api/admin/testimonials", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id, isActive: !currentStatus }),
-      });
-
-      const data = await response.json();
+      const data = await toggleTestimonialStatus(id, !currentStatus);
       if (data.success) {
         await fetchTestimonials();
         setSuccess(

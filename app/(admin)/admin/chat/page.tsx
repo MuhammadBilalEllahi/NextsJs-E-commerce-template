@@ -41,6 +41,11 @@ import {
   Send,
   Loader2,
 } from "lucide-react";
+import {
+  listChatInquiries,
+  sendChatReply,
+  updateChatInquiry,
+} from "@/lib/api/admin/chat-inquiries";
 
 interface ChatMessage {
   id?: string;
@@ -116,16 +121,11 @@ export default function ChatInquiriesAdminPage() {
   const fetchInquiries = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
-      if (filters.status) params.append("status", filters.status);
-      if (filters.priority) params.append("priority", filters.priority);
-      if (filters.category) params.append("category", filters.category);
-
-      const response = await fetch(
-        `/api/admin/chat-inquiries?${params.toString()}`
-      );
-      const data = await response.json();
-
+      const data = await listChatInquiries({
+        status: filters.status,
+        priority: filters.priority,
+        category: filters.category,
+      });
       if (data.success) {
         setInquiries(data.inquiries);
         setStats(data.stats);
@@ -142,16 +142,7 @@ export default function ChatInquiriesAdminPage() {
 
     try {
       setSending(true);
-      const response = await fetch("/api/admin/chat-inquiries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          inquiryId: selected.id,
-          message: reply,
-        }),
-      });
-
-      const data = await response.json();
+      const data = await sendChatReply(selected.id, reply);
 
       if (data.success) {
         setReply("");
@@ -179,16 +170,7 @@ export default function ChatInquiriesAdminPage() {
     if (!selected) return;
 
     try {
-      const response = await fetch("/api/admin/chat-inquiries", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          inquiryId: selected.id,
-          [field]: value,
-        }),
-      });
-
-      const data = await response.json();
+      const data = await updateChatInquiry(selected.id, field, value);
 
       if (data.success) {
         // Update the selected inquiry

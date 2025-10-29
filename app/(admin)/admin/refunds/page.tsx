@@ -28,6 +28,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { AdminRefund } from "@/types/types";
+import { listRefunds, updateRefund } from "@/lib/api/admin/refunds";
 
 export default function AdminRefundsPage() {
   const { user } = useAuth();
@@ -54,16 +55,11 @@ export default function AdminRefundsPage() {
   const fetchRefunds = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
-      if (filters.status && filters.status !== "all")
-        params.append("status", filters.status);
-      if (filters.search) params.append("search", filters.search);
-
-      const response = await fetch(`/api/admin/refunds?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setRefunds(data.refunds || []);
-      }
+      const data = await listRefunds({
+        status: filters.status,
+        search: filters.search,
+      });
+      setRefunds(data.refunds || []);
     } catch (error) {
       console.error("Error fetching refunds:", error);
     } finally {
@@ -123,24 +119,14 @@ export default function AdminRefundsPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/admin/refunds", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: (selectedRefund as any).id,
-          ...updateForm,
-          refundDurationLimit: updateForm.refundDurationLimit,
-        }),
+      await updateRefund({
+        id: (selectedRefund as any).id,
+        ...updateForm,
+        refundDurationLimit: updateForm.refundDurationLimit,
       });
-
-      if (response.ok) {
-        alert("Refund updated successfully!");
-        setShowUpdateModal(false);
-        fetchRefunds();
-      } else {
-        const error = await response.json();
-        alert(error.error || "Failed to update refund");
-      }
+      alert("Refund updated successfully!");
+      setShowUpdateModal(false);
+      fetchRefunds();
     } catch (error) {
       console.error("Error updating refund:", error);
       alert("Failed to update refund. Please try again.");

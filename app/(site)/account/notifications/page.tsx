@@ -23,6 +23,11 @@ import {
   Eye,
 } from "lucide-react";
 import { Notification } from "@/types/types";
+import {
+  listNotifications,
+  markNotificationsRead,
+  markAllNotificationsRead,
+} from "@/lib/api/account/notifications";
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -37,16 +42,12 @@ export default function NotificationsPage() {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
-      if (filters.type) params.append("type", filters.type);
-      if (filters.isRead !== "") params.append("isRead", filters.isRead);
-
-      const response = await fetch(`/api/notifications?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setNotifications(data.notifications || []);
-        setUnreadCount(data.unreadCount || 0);
-      }
+      const data = await listNotifications({
+        type: filters.type,
+        isRead: filters.isRead,
+      });
+      setNotifications(data.notifications || []);
+      setUnreadCount(data.unreadCount || 0);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     } finally {
@@ -102,15 +103,8 @@ export default function NotificationsPage() {
 
   const markAsRead = async (notificationIds: string[]) => {
     try {
-      const response = await fetch("/api/notifications", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ notificationIds }),
-      });
-
-      if (response.ok) {
-        fetchNotifications();
-      }
+      await markNotificationsRead(notificationIds);
+      fetchNotifications();
     } catch (error) {
       console.error("Error marking notifications as read:", error);
     }
@@ -118,15 +112,8 @@ export default function NotificationsPage() {
 
   const markAllAsRead = async () => {
     try {
-      const response = await fetch("/api/notifications", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ markAllAsRead: true }),
-      });
-
-      if (response.ok) {
-        fetchNotifications();
-      }
+      await markAllNotificationsRead();
+      fetchNotifications();
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
     }

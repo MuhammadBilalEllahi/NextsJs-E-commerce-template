@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Refund } from "@/types/types";
+import { getMyRefunds } from "@/lib/api/account/refunds";
 
 export default function CustomerRefundsPage() {
   const [refunds, setRefunds] = useState<Refund[]>([]);
@@ -39,16 +40,8 @@ export default function CustomerRefundsPage() {
   const fetchRefunds = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
-      if (filters.status && filters.status !== "all")
-        params.append("status", filters.status);
-      if (filters.search) params.append("search", filters.search);
-
-      const response = await fetch(`/api/refunds?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setRefunds(data.refunds || []);
-      }
+      const data = await getMyRefunds();
+      setRefunds(data.refunds || []);
     } catch (error) {
       console.error("Error fetching refunds:", error);
     } finally {

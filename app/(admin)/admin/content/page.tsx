@@ -8,6 +8,11 @@ import { Trash2, Edit, Plus, Eye, Database } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ContentPage } from "@/types";
+import {
+  listContentPages,
+  deleteContentPage,
+  seedContentPages,
+} from "@/lib/api/admin/content";
 
 export default function ContentCreatorPage() {
   const router = useRouter();
@@ -16,11 +21,8 @@ export default function ContentCreatorPage() {
 
   const fetchContentPages = async () => {
     try {
-      const response = await fetch("/api/admin/content");
-      const data = await response.json();
-      if (response.ok) {
-        setContentPages(data);
-      }
+      const data = await listContentPages();
+      setContentPages(data);
     } catch (error) {
       console.error("Error fetching content pages:", error);
     } finally {
@@ -38,17 +40,9 @@ export default function ContentCreatorPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/content/${slug}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        await fetchContentPages();
-        alert("Content page deleted successfully!");
-      } else {
-        const data = await response.json();
-        alert(data.error || "Failed to delete content page");
-      }
+      await deleteContentPage(slug);
+      await fetchContentPages();
+      alert("Content page deleted successfully!");
     } catch (error) {
       console.error("Error deleting content page:", error);
       alert("An error occurred while deleting the content page");
@@ -65,20 +59,11 @@ export default function ContentCreatorPage() {
     }
 
     try {
-      const response = await fetch("/api/admin/content/seed", {
-        method: "POST",
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        await fetchContentPages();
-        alert(
-          `Seed data applied successfully!\nCreated: ${data.results.created}\nUpdated: ${data.results.updated}\nSkipped: ${data.results.skipped}`
-        );
-      } else {
-        alert(data.error || "Failed to apply seed data");
-      }
+      const data = await seedContentPages();
+      await fetchContentPages();
+      alert(
+        `Seed data applied successfully!\nCreated: ${data.results.created}\nUpdated: ${data.results.updated}\nSkipped: ${data.results.skipped}`
+      );
     } catch (error) {
       console.error("Error applying seed data:", error);
       alert("An error occurred while applying seed data");

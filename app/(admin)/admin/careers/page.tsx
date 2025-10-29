@@ -60,6 +60,12 @@ import {
   Loader2,
   Building,
 } from "lucide-react";
+import {
+  listCareers,
+  saveCareer,
+  deleteCareer,
+  toggleCareerStatus,
+} from "@/lib/api/admin/careers";
 
 interface Career {
   id: string;
@@ -93,11 +99,8 @@ export default function CareersPage() {
 
   const fetchCareers = async () => {
     try {
-      const response = await fetch("/api/admin/careers");
-      const data = await response.json();
-      if (data.success) {
-        setCareers(data.careers);
-      }
+      const data = await listCareers();
+      if (data.success) setCareers(data.careers);
     } catch (error) {
       console.error("Error fetching careers:", error);
     } finally {
@@ -111,20 +114,10 @@ export default function CareersPage() {
     setSuccess("");
 
     try {
-      const url = editingCareer ? "/api/admin/careers" : "/api/admin/careers";
-      const method = editingCareer ? "PUT" : "POST";
-
       const payload = editingCareer
         ? { id: editingCareer.id, ...formData }
         : formData;
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
+      const data = await saveCareer(payload);
       if (data.success) {
         await fetchCareers();
         setIsDialogOpen(false);
@@ -164,11 +157,7 @@ export default function CareersPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/admin/careers?id=${id}`, {
-        method: "DELETE",
-      });
-
-      const data = await response.json();
+      const data = await deleteCareer(id);
       if (data.success) {
         await fetchCareers();
         setSuccess("Job posting deleted successfully!");
@@ -183,13 +172,7 @@ export default function CareersPage() {
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const response = await fetch("/api/admin/careers", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id, isActive: !currentStatus }),
-      });
-
-      const data = await response.json();
+      const data = await toggleCareerStatus(id, !currentStatus);
       if (data.success) {
         await fetchCareers();
         setSuccess(

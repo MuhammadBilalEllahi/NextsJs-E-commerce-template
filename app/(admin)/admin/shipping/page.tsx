@@ -15,6 +15,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Edit, Trash2, Save, X } from "lucide-react";
 import { ShippingMethod, Location } from "@/types/types";
+import {
+  listShippingMethods,
+  saveShippingMethod,
+  deleteShippingMethod,
+} from "@/lib/api/admin/shipping-methods";
 
 export default function ShippingPage() {
   const [methods, setMethods] = useState<ShippingMethod[]>([]);
@@ -41,11 +46,8 @@ export default function ShippingPage() {
 
   const fetchShippingMethods = async () => {
     try {
-      const response = await fetch("/api/admin/shipping-methods");
-      if (response.ok) {
-        const data = await response.json();
-        setMethods(data.methods);
-      }
+      const data = await listShippingMethods();
+      setMethods(data.methods);
     } catch (error) {
       console.error("Failed to fetch shipping methods:", error);
     }
@@ -53,16 +55,8 @@ export default function ShippingPage() {
 
   const handleSave = async (method: ShippingMethod) => {
     try {
-      const url = (method as any).id
-        ? `/api/admin/shipping-methods/${(method as any).id}`
-        : "/api/admin/shipping-methods";
-      const response = await fetch(url, {
-        method: (method as any).id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(method),
-      });
-
-      if (response.ok) {
+      await saveShippingMethod(method);
+      {
         await fetchShippingMethods();
         setEditingMethod(null);
         setIsAdding(false);
@@ -89,11 +83,8 @@ export default function ShippingPage() {
       return;
 
     try {
-      const response = await fetch(`/api/admin/shipping-methods/${id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
+      await deleteShippingMethod(id);
+      {
         await fetchShippingMethods();
       }
     } catch (error) {

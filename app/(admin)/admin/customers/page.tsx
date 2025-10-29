@@ -11,6 +11,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CURRENCY } from "@/lib/constants";
+import {
+  listCustomers,
+  getCustomerOrdersByEmail,
+  getCustomerCart,
+} from "@/lib/api/admin/customers";
 
 type Customer = {
   id: string;
@@ -41,21 +46,13 @@ export default function CustomersAdminPage() {
 
   useEffect(() => {
     setLoading(true);
-    const params = new URLSearchParams();
-    params.set("page", String(page));
-    params.set("limit", String(limit));
-    if (q) params.set("q", q);
-    fetch(`/api/admin/customers?${params.toString()}`, { cache: "no-store" })
-      .then(async (res) => {
-        if (!res.ok) {
-          const j = await res.json().catch(() => ({ error: res.statusText }));
-          throw new Error(j.error || "Failed to load customers");
-        }
-        return res.json();
-      })
+    listCustomers({ page, limit, q })
       .then((j) => {
         setCustomers(j.customers || []);
         setTotal(j.pagination?.total || 0);
+      })
+      .catch((err) => {
+        console.error(err);
       })
       .finally(() => setLoading(false));
   }, [page, limit, q]);
@@ -81,27 +78,14 @@ export default function CustomersAdminPage() {
     setModalCart(null);
     setModalOpen(true);
     try {
-      // Fetch orders by email
-      const ordersRes = await fetch(
-        `/api/admin/customers/orders/${encodeURIComponent(c.email)}/orders`,
-        { cache: "no-store" }
-      );
-      if (ordersRes.ok) {
-        const j = await ordersRes.json();
-        setModalOrders(j.orders || []);
-      }
-      // Fetch cart only for registered users
+      const orders = await getCustomerOrdersByEmail(c.email);
+      setModalOrders(orders.orders || []);
       if (c.type === "registered") {
-        const cartRes = await fetch(`/api/admin/customers/cart/${c.id}/cart`, {
-          cache: "no-store",
+        const cart = await getCustomerCart(c.id);
+        setModalCart({
+          items: cart.items || [],
+          currency: cart.currency || CURRENCY.SYMBOL,
         });
-        if (cartRes.ok) {
-          const j = await cartRes.json();
-          setModalCart({
-            items: j.items || [],
-            currency: j.currency || CURRENCY.SYMBOL,
-          });
-        }
       }
     } catch (e) {
       // noop; modal shows whatever loaded

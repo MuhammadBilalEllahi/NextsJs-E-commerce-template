@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { ArrowLeft, Save, Eye, EyeOff, Plus } from "lucide-react";
 import Link from "next/link";
+import { createContentPage } from "@/lib/api/admin/content";
 
 export default function CreateContentPage() {
   const router = useRouter();
@@ -48,20 +49,9 @@ export default function CreateContentPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/admin/content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Content page created successfully!");
-        router.push("/admin/content");
-      } else {
-        alert(data.error || "Failed to create content page");
-      }
+      await createContentPage(formData);
+      alert("Content page created successfully!");
+      router.push("/admin/content");
     } catch (error) {
       console.error("Error creating content page:", error);
       alert("An error occurred while creating the content page");

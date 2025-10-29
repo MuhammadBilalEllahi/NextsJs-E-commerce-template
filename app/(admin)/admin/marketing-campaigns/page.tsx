@@ -7,6 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  listCampaigns,
+  saveCampaign,
+  deleteCampaign,
+} from "@/lib/api/admin/marketing-campaigns";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -74,11 +79,8 @@ export default function MarketingCampaignsPage() {
 
   const fetchCampaigns = async () => {
     try {
-      const response = await fetch("/api/admin/marketing-campaigns");
-      const data = await response.json();
-      if (data.success) {
-        setCampaigns(data.campaigns);
-      }
+      const data = await listCampaigns();
+      if (data.success) setCampaigns(data.campaigns);
     } catch (error) {
       console.error("Error fetching campaigns:", error);
     } finally {
@@ -89,22 +91,10 @@ export default function MarketingCampaignsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const url = editingCampaign
-        ? "/api/admin/marketing-campaigns"
-        : "/api/admin/marketing-campaigns";
-      const method = editingCampaign ? "PUT" : "POST";
-
       const payload = editingCampaign
         ? { id: editingCampaign.id, ...formData }
         : formData;
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
+      const data = await saveCampaign(payload, Boolean(editingCampaign));
       if (data.success) {
         await fetchCampaigns();
         setIsDialogOpen(false);
@@ -140,10 +130,7 @@ export default function MarketingCampaignsPage() {
     if (!confirm("Are you sure you want to delete this campaign?")) return;
 
     try {
-      const response = await fetch(`/api/admin/marketing-campaigns?id=${id}`, {
-        method: "DELETE",
-      });
-      const data = await response.json();
+      const data = await deleteCampaign(id);
       if (data.success) {
         await fetchCampaigns();
       }
