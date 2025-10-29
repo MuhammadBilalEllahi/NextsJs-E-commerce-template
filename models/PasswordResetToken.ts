@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import crypto from "crypto";
+import { MODELS } from "./constants/constants";
 
 export interface PasswordResetTokenDocument extends Document {
   userId: mongoose.Types.ObjectId;
@@ -22,7 +23,7 @@ export interface PasswordResetTokenModel
 const PasswordResetTokenSchema = new Schema<PasswordResetTokenDocument>({
   userId: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: MODELS.USER,
     required: true,
   },
   token: {
@@ -83,8 +84,8 @@ PasswordResetTokenSchema.methods.markAsUsed = async function () {
   await this.save();
 };
 
-export default mongoose.models.PasswordResetToken ||
+export default mongoose.models[MODELS.PASSWORD_RESET_TOKEN] ||
   mongoose.model<PasswordResetTokenDocument, PasswordResetTokenModel>(
-    "PasswordResetToken",
+    MODELS.PASSWORD_RESET_TOKEN,
     PasswordResetTokenSchema
   );

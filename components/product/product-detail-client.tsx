@@ -31,7 +31,7 @@ import {
 import { useCart } from "@/lib/providers/cartContext";
 
 import { formatCurrency } from "@/lib/constants/currency";
-import { Product, Review, Variant } from "@/types";
+import { Product, Review, Variant } from "@/types/types";
 
 interface ProductDetailClientProps {
   product: Product & {

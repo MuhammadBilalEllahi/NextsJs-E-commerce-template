@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product/product-card";
 import { Search, X, TrendingUp } from "lucide-react";
 import { getAllProducts } from "@/database/data-service";
-import { Product } from "@/types";
+import { Product } from "@/types/types";
 
 interface SearchSheetProps {
   isOpen: boolean;

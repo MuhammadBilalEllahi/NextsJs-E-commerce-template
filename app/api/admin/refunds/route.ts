@@ -5,7 +5,7 @@ import Refund from "@/models/Refund";
 import { RefundZodSchema } from "@/models/Refund";
 import Order from "@/models/Order";
 import { authOptions } from "@/lib/auth";
-import { AdminRefund } from "@/types";
+import { AdminRefund } from "@/types/types";
 
 // GET - Get all refunds (admin only)
 export async function GET(req: NextRequest) {

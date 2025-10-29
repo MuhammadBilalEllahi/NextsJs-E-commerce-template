@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 import { z } from "zod";
 
 const brandSchema = new Schema({

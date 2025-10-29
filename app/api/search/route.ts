@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Product from "@/models/Product";
 import dbConnect from "@/database/mongodb";
-import { Product as ProductType } from "@/types";
+import { Product as ProductType } from "@/types/types";
 
 export async function GET(req: NextRequest) {
   try {

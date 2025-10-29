@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Order, OrderItem, Address, Refund } from "@/types";
+import { Order, OrderItem, Address, Refund } from "@/types/types";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X, ArrowLeft } from "lucide-react";
 import { getAllProducts } from "@/database/data-service";
-import { Product } from "@/types";
+import { Product } from "@/types/types";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();

@@ -20,7 +20,7 @@ import {
   Building,
   CreditCard,
 } from "lucide-react";
-import { Address } from "@/types";
+import { Address } from "@/types/types";
 
 export default function AddressesPage() {
   const [addresses, setAddresses] = useState<Address[]>([]);

@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 import { z } from "zod";
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 
 const ProductSchema = new Schema({
   name: { type: String, required: true },
@@ -95,4 +95,4 @@ export const productZodSchema = z
   );
 
 export default mongoose.models[MODELS.PRODUCT] ||
-  mongoose.model(MODELS.PRODUCT.toString(), ProductSchema);
+  mongoose.model(MODELS.PRODUCT, ProductSchema);

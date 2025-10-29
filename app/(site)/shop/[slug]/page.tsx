@@ -2,7 +2,7 @@ import { CategoryClient } from "@/components/shop/category-client";
 import { getAllProducts, getAllCategories } from "@/database/data-service";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { Category } from "@/types";
+import { Category } from "@/types/types";
 import { absoluteUrl, buildCollectionPageJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";

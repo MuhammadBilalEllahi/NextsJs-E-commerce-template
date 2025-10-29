@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Product } from "@/types";
+import { Product } from "@/types/types";
 import { ProductCard } from "@/components/product/product-card";
 
 export function HomeSpecialProducts({

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Product, Category } from "@/types";
+import { Product, Category } from "@/types/types";
 import { FiltersSidebar } from "@/components/shop/filters-sidebar";
 import { MobileFiltersSheet } from "@/components/shop/mobile-filters-sheet";
 import { ViewControls } from "@/components/shop/view-controls";

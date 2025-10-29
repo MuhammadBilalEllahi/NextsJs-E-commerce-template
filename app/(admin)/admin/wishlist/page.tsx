@@ -18,7 +18,7 @@ import {
   Calendar,
 } from "lucide-react";
 import Link from "next/link";
-import { WishlistItem, Pagination } from "@/types";
+import { WishlistItem, Pagination } from "@/types/types";
 import Image from "next/image";
 
 export default function AdminWishlistPage() {

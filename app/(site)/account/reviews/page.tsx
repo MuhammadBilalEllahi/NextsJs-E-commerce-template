@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 import { fetchUserReviews, submitReview } from "@/lib/api/reviews/reviews";
-import { Review } from "@/types";
+import { Review } from "@/types/types";
 
 export default function UserReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AddToWishlistButton } from "@/components/wishlist/wishlist-button";
 import { useCart } from "@/lib/providers/cartContext";
-import type { Brand, Product, Variant } from "@/types";
+import type { Brand, Product, Variant } from "@/types/types";
 import { ShoppingCart, Star, Eye } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import { useState, useRef, useEffect } from "react";

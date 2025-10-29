@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
-import { ContactFormData } from "@/types";
+import { ContactFormData } from "@/types/types";
 
 const subjects = [
   "General Inquiry",

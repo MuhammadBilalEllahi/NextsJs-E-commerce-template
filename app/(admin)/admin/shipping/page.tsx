@@ -14,7 +14,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Edit, Trash2, Save, X } from "lucide-react";
-import { ShippingMethod, Location } from "@/types";
+import { ShippingMethod, Location } from "@/types/types";
 
 export default function ShippingPage() {
   const [methods, setMethods] = useState<ShippingMethod[]>([]);

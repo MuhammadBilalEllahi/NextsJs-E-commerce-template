@@ -12,7 +12,7 @@ import {
   Navigation,
   Star,
 } from "lucide-react";
-import { Branch } from "@/types";
+import { Branch } from "@/types/types";
 import Image from "next/image";
 
 interface BranchInfoProps {

@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import dbConnect from "@/database/mongodb";
 import Order from "@/models/Order";
 import Product from "@/models/Product";
-import { ORDER_STATUS } from "@/models/constants";
+import { ORDER_STATUS } from "@/lib/constants";
 import Refund from "@/models/Refund";
 
 export async function GET() {

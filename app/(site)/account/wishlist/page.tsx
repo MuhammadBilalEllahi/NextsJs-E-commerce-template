@@ -12,7 +12,7 @@ import { ProductCard } from "@/components/product/product-card";
 import { YouMayAlsoLike } from "@/components/product/you-may-also-like";
 import { RecentlyViewed } from "@/components/product/recently-viewed";
 
-import { Product, WishlistItem } from "@/types";
+import { Product, WishlistItem } from "@/types/types";
 
 export default function WishlistPage() {
   const { ids, clear, isLoading } = useWishlist();

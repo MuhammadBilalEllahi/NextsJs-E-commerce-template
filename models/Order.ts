@@ -6,7 +6,7 @@ import {
   ORDER_STATUS,
   ORDER_TYPE,
   PAYMENT_TYPE,
-} from "@/models/constants";
+} from "@/models/constants/constants";
 
 const OrderItemSchema = new mongoose.Schema(
   {

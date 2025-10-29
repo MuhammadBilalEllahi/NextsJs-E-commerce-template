@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Trash2, Edit, Plus, Eye, Database } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ContentPage } from "@/types/types";
+import { ContentPage } from "@/types";
 
 export default function ContentCreatorPage() {
   const router = useRouter();

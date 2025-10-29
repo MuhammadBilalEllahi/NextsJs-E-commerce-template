@@ -1,4 +1,4 @@
-import { GlobalSettings } from "@/types";
+import { GlobalSettings } from "@/types/types";
 
 export const API_URL_GLOBAL_SETTINGS = "/api/admin/global-settings";
 

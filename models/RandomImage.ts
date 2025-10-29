@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { MODELS } from "@/models/constants/constants";
 
 export interface RandomImageDocument extends Document {
   name: string;
@@ -48,7 +49,7 @@ const RandomImageSchema = new Schema<RandomImageDocument>(
     },
     uploadedBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: MODELS.USER,
       required: true,
     },
     uploadedAt: {
@@ -66,5 +67,5 @@ RandomImageSchema.index({ category: 1, isActive: 1 });
 RandomImageSchema.index({ tags: 1 });
 RandomImageSchema.index({ uploadedBy: 1 });
 
-export default mongoose.models.RandomImage ||
-  mongoose.model<RandomImageDocument>("RandomImage", RandomImageSchema);
+export default mongoose.models[MODELS.RANDOM_IMAGE] ||
+  mongoose.model<RandomImageDocument>(MODELS.RANDOM_IMAGE, RandomImageSchema);

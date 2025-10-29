@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { DeliveryInfo } from "@/types";
+import { DeliveryInfo } from "@/types/types";
 
 export function HomeDeliveryInfo() {
   const deliveryOptions: DeliveryInfo[] = [

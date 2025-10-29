@@ -40,7 +40,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ImportHistoryItem } from "@/types";
+import { ImportHistoryItem } from "@/types/types";
 
 interface ImportHistoryProps {
   onUndoComplete: () => void;

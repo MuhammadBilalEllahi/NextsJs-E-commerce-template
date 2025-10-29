@@ -10,7 +10,7 @@ import {
   TCSCancelRequest,
   TCSPickupStatusResponse,
   TCSPaymentDetailsResponse,
-} from "@/types";
+} from "@/types/types";
 
 class TCSService {
   private baseUrl: string;

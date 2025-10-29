@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { MODELS, ORDER_TYPE } from "@/models/constants";
+import { MODELS, ORDER_TYPE } from "@/models/constants/constants";
 
 const ShippingMethodSchema = new mongoose.Schema({
   name: { type: String, required: true }, // e.g., "Home Delivery", "TCS"

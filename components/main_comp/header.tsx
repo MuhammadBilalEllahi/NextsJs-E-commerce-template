@@ -7,7 +7,7 @@ import { useWishlist } from "@/lib/providers/wishlistProvider";
 import { CartSheet } from "@/components/cart/cart-sheet";
 import { HomeSearchBar } from "@/components/home/home-search-bar";
 import { AuthButton } from "@/components/auth/auth-button";
-import { Category } from "@/types";
+import { Category } from "@/types/types";
 import { useAuth } from "@/lib/providers/authProvider";
 // import { useEffect, useState } from "react"
 

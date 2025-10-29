@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
+import { MODELS } from "@/models/constants/constants";
 
 export interface ChatMessage {
   id?: string;
@@ -134,7 +135,7 @@ ChatInquirySchema.index({ status: 1, lastMessageAt: -1 });
 ChatInquirySchema.index({ assignedTo: 1, status: 1 });
 
 const ChatInquiry: Model<ChatInquiryDocument> =
-  mongoose.models.ChatInquiry ||
-  mongoose.model<ChatInquiryDocument>("ChatInquiry", ChatInquirySchema);
+  mongoose.models[MODELS.CHAT_INQUIRY] ||
+  mongoose.model<ChatInquiryDocument>(MODELS.CHAT_INQUIRY, ChatInquirySchema);
 
 export default ChatInquiry;

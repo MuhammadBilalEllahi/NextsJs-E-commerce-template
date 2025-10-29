@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CreateBranchData } from "@/types";
+import { CreateBranchData } from "@/types/types";
 import {
   MapPin,
   Phone,

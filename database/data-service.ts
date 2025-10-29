@@ -54,7 +54,7 @@ import {
   Branch as BranchType,
   GlobalSettings as GlobalSettingsType,
   Banner as BannerType,
-} from "@/types";
+} from "@/types/types";
 
 // Helper function to convert MongoDB document to frontend type
 function convertProductToFrontendType(product: any): ProductType {

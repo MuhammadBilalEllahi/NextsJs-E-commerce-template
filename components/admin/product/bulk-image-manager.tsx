@@ -51,7 +51,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { RandomImage } from "@/types";
+import { RandomImage } from "@/types/types";
 import Image from "next/image";
 
 interface BulkImageManagerProps {

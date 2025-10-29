@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
+import { MODELS } from "@/models/constants/constants";
 
 export interface MarketingCampaignDocument extends mongoose.Document {
   name: string;
@@ -52,7 +53,7 @@ const MarketingCampaignSchema = new Schema<MarketingCampaignDocument>(
     bouncedCount: { type: Number, default: 0 },
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: MODELS.USER,
       required: true,
     },
   },
@@ -66,11 +67,10 @@ MarketingCampaignSchema.index({ createdBy: 1 });
 MarketingCampaignSchema.index({ createdAt: -1 });
 
 const MarketingCampaign: Model<MarketingCampaignDocument> =
-  mongoose.models.MarketingCampaign ||
+  mongoose.models[MODELS.MARKETING_CAMPAIGN] ||
   mongoose.model<MarketingCampaignDocument>(
-    "MarketingCampaign",
+    MODELS.MARKETING_CAMPAIGN,
     MarketingCampaignSchema
   );
 
 export default MarketingCampaign;
-

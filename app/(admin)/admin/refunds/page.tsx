@@ -27,7 +27,7 @@ import {
   User,
   Calendar,
 } from "lucide-react";
-import { AdminRefund } from "@/types";
+import { AdminRefund } from "@/types/types";
 
 export default function AdminRefundsPage() {
   const { user } = useAuth();

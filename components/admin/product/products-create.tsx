@@ -36,7 +36,7 @@ import {
 // removed duplicate import of category services above
 import { createBrand, fetchBrands } from "@/lib/api/admin/brand/brand";
 import { createProduct } from "@/lib/api/admin/product/products";
-import { Brand, Category, VariantDraft, CreateBrandData } from "@/types";
+import { Brand, Category, VariantDraft, CreateBrandData } from "@/types/types";
 import Image from "next/image";
 import { useToast, toastPresets } from "@/components/ui/toast";
 

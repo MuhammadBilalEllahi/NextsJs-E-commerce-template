@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { FAQ } from "@/types";
+import { FAQ } from "@/types/types";
 
 interface FAQEnhancedProps {
   productId?: string;

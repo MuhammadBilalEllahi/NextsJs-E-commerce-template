@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getContentPage } from "@/database/data-service";
 import { notFound } from "next/navigation";
-import { ContentPage } from "@/types";
+import { ContentPage } from "@/types/types";
 
 interface DynamicContentPageProps {
   params: Promise<{ slug: string }>;

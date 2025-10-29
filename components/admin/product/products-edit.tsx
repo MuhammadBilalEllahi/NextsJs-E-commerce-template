@@ -36,7 +36,7 @@ import {
   updateCategory,
 } from "@/lib/api/admin/category/categories";
 import { createBrand } from "@/lib/api/admin/brand/brand";
-import { Brand, Category, Product, Variant } from "@/types";
+import { Brand, Category, Product, Variant } from "@/types/types";
 import Image from "next/image";
 
 interface ProductsEditAdminUIProps {

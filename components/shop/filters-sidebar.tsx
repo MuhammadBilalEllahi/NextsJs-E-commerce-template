@@ -11,7 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Category, Product } from "@/types";
+import { Category, Product } from "@/types/types";
 import { Loader2 } from "lucide-react";
 import { formatPriceRange } from "@/lib/constants/currency";
 

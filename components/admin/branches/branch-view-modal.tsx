@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Branch } from "@/types";
+import { Branch } from "@/types/types";
 import {
   MapPin,
   Phone,

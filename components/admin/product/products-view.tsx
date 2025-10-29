@@ -22,7 +22,7 @@ import {
   Hash,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/constants/currency";
-import { Product, Variant, Brand, Category } from "@/types";
+import { Product, Variant, Brand, Category } from "@/types/types";
 import Image from "next/image";
 interface ProductsViewAdminUIProps {
   product: Product;

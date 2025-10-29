@@ -1,11 +1,14 @@
-
 import mongoose from "mongoose";
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 import { z } from "zod";
 
 // Variant Schema
 const VariantSchema = new mongoose.Schema({
-  product: { type: mongoose.Schema.Types.ObjectId, ref: MODELS.PRODUCT, required: true },
+  product: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: MODELS.PRODUCT,
+    required: true,
+  },
   sku: { type: String, unique: true },
   slug: { type: String, unique: true }, // Variant slug for URLs
   label: String, // "500g", "1kg", "2kg"
@@ -16,15 +19,15 @@ const VariantSchema = new mongoose.Schema({
 
   isActive: {
     type: Boolean,
-    default: false
+    default: false,
   },
   isOutOfStock: {
     type: Boolean,
-    default: false
+    default: false,
   },
 
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
 });
 
 // Zod Validation
@@ -38,8 +41,8 @@ export const variantZodSchema = z.object({
   stock: z.number().int().nonnegative(),
   isActive: z.boolean().optional(),
   isOutOfStock: z.boolean().optional(),
-  images: z.array(z.string().url()).optional()
+  images: z.array(z.string().url()).optional(),
 });
 
-
-export default mongoose.models[MODELS.VARIANT] || mongoose.model(MODELS.VARIANT, VariantSchema);
+export default mongoose.models[MODELS.VARIANT] ||
+  mongoose.model(MODELS.VARIANT, VariantSchema);

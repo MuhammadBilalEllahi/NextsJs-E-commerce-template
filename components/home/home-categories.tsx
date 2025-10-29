@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Category } from "@/types";
+import { Category } from "@/types/types";
 import Image from "next/image";
 
 export function HomeCategories({ categories }: { categories: Category[] }) {

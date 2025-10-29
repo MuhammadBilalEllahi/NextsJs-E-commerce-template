@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { downloadCSV } from "@/lib/csv";
 import { OrderDetailsSidebar } from "@/components/admin/orders/order-details-sidebar";
-import { AdminOrder, OrderHistory, Address, OrderItem } from "@/types";
+import { AdminOrder, OrderHistory, Address, OrderItem } from "@/types/types";
 
 export default function OrdersAdminPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);

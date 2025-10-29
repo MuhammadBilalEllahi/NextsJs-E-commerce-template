@@ -46,8 +46,8 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/constants/currency";
-import { TCS_STATUS } from "@/models/constants";
-import { TCSTrackingHistory } from "@/types";
+import { TCS_STATUS } from "@/lib/constants";
+import { TCSTrackingHistory } from "@/types/types";
 
 export default function TCSOrdersManagement() {
   const [tcsOrders, setTcsOrders] = useState<any[]>([]);

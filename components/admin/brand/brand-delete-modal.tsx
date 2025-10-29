@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AlertTriangle } from "lucide-react";
-import { Brand } from "@/types";
+import { Brand } from "@/types/types";
 import Image from "next/image";
 
 interface BrandDeleteModalProps {

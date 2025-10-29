@@ -8,7 +8,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Category } from "@/types";
+import { Category } from "@/types/types";
 import { FiltersSidebar } from "@/components/shop/filters-sidebar";
 
 export function MobileFiltersSheet({

@@ -1,4 +1,4 @@
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 import mongoose from "mongoose";
 import { z } from "zod";
 
@@ -31,4 +31,4 @@ GlobalSettingsSchema.pre("save", function (next) {
 });
 
 export default mongoose.models[MODELS.GLOBAL_SETTINGS] ||
-  mongoose.model(MODELS.GLOBAL_SETTINGS.toString(), GlobalSettingsSchema);
+  mongoose.model(MODELS.GLOBAL_SETTINGS, GlobalSettingsSchema);

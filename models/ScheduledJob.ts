@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 
 export const SCHEDULE_TYPES = {
   CHECKOUT_COMPLETE: "sendCheckoutCompleteEmail",

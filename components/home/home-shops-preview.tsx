@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShopLocations } from "@/types";
+import { ShopLocations } from "@/types/types";
 import { ExternalLink, PhoneIcon } from "lucide-react";
 import Image from "next/image";
 

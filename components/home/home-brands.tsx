@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Brand } from "@/types";
+import { Brand } from "@/types/types";
 import Image from "next/image";
 
 export function HomeBrands({ brands }: { brands: Brand[] }) {

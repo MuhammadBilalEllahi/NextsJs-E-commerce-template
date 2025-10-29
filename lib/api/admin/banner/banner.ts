@@ -1,4 +1,4 @@
-import { CreateBannerData, GlobalSettings } from "@/types";
+import { CreateBannerData, GlobalSettings } from "@/types/types";
 
 export const API_URL_BANNER_ADMIN = "/api/admin/banner";
 export const API_URL_GLOBAL_SETTINGS = "/api/admin/global-settings";

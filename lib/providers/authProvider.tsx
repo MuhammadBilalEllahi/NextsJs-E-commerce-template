@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { getSession, signIn, signOut, useSession } from "next-auth/react";
 import { handleCartMergeOnAuth } from "@/middleware";
 import { CART_STORAGE_KEY, CartActionTypes, useCart } from "./cartContext";
-import { User } from "@/types";
+import { User } from "@/types/types";
 
 interface AuthContextType {
   user: User | null;

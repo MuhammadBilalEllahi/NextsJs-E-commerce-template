@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { MODELS } from "./constants";
+import { MODELS } from "@/models/constants/constants";
 
 export interface IContentPage extends Document {
   slug: string;

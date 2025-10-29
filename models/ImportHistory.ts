@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { MODELS } from "@/models/constants/constants";
 
 export interface ImportHistoryDocument extends Document {
   importId: string;
@@ -39,7 +40,7 @@ const ImportHistorySchema = new Schema<ImportHistoryDocument>(
     },
     importedBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: MODELS.USER,
       required: true,
     },
     importedAt: {
@@ -71,7 +72,7 @@ const ImportHistorySchema = new Schema<ImportHistoryDocument>(
       {
         productId: {
           type: Schema.Types.ObjectId,
-          ref: "Product",
+          ref: MODELS.PRODUCT,
           required: true,
         },
         productName: {
@@ -86,7 +87,7 @@ const ImportHistorySchema = new Schema<ImportHistoryDocument>(
           {
             variantId: {
               type: Schema.Types.ObjectId,
-              ref: "Variant",
+              ref: MODELS.VARIANT,
               required: true,
             },
             variantSku: {
@@ -108,7 +109,7 @@ const ImportHistorySchema = new Schema<ImportHistoryDocument>(
     undoneAt: Date,
     undoneBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: MODELS.USER,
     },
   },
   {
@@ -120,5 +121,8 @@ const ImportHistorySchema = new Schema<ImportHistoryDocument>(
 ImportHistorySchema.index({ importedBy: 1, importedAt: -1 });
 ImportHistorySchema.index({ isUndone: 1 });
 
-export default mongoose.models.ImportHistory ||
-  mongoose.model<ImportHistoryDocument>("ImportHistory", ImportHistorySchema);
+export default mongoose.models[MODELS.IMPORT_HISTORY] ||
+  mongoose.model<ImportHistoryDocument>(
+    MODELS.IMPORT_HISTORY,
+    ImportHistorySchema
+  );

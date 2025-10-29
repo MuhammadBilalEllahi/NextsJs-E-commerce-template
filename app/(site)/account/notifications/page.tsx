@@ -22,7 +22,7 @@ import {
   Gift,
   Eye,
 } from "lucide-react";
-import { Notification } from "@/types";
+import { Notification } from "@/types/types";
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);

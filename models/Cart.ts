@@ -1,6 +1,6 @@
 // models/Cart.ts
 import mongoose from "mongoose";
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 import { CURRENCY } from "@/lib/constants";
 
 const CartItemSchema = new mongoose.Schema(

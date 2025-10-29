@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
+import { MODELS } from "@/models/constants/constants";
 
 export interface CareerDocument extends mongoose.Document {
   title: string;
@@ -22,8 +23,7 @@ const CareerSchema = new Schema<CareerDocument>(
 );
 
 const Career: Model<CareerDocument> =
-  mongoose.models.Career ||
-  mongoose.model<CareerDocument>("Career", CareerSchema);
+  mongoose.models[MODELS.CAREER] ||
+  mongoose.model<CareerDocument>(MODELS.CAREER, CareerSchema);
 
 export default Career;
-

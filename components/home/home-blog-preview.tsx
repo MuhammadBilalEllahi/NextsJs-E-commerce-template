@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import type { Blog } from "@/types";
+import type { Blog } from "@/types/types";
 import Image from "next/image";
 
 export function HomeBlogPreview({ blogs }: { blogs: Blog[] }) {

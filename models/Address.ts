@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { z } from "zod";
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 
 // Address sub-schema for embedded use (like in User model and Order model)
 export const AddressSubSchema = new mongoose.Schema(

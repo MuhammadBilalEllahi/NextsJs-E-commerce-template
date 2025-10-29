@@ -25,7 +25,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/constants/currency";
-import { OrderDetails } from "@/types";
+import { OrderDetails } from "@/types/types";
 
 interface OrderDetailsSidebarProps {
   orderId: string | null;

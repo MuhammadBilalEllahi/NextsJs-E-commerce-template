@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ProductDetailClient } from "@/components/product/product-detail-client";
 import { getAllProducts, getProductBySlug } from "@/database/data-service";
-import { Product, Review } from "@/types";
+import { Product, Review } from "@/types/types";
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,

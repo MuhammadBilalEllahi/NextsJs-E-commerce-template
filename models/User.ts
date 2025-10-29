@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { z } from "zod";
-import { MODELS, UserTypes } from "@/models/constants";
+import { MODELS, UserTypes } from "@/models/constants/constants";
 import { AddressSubSchema, AddressSubZodSchema } from "@/models/Address";
 
 const UserSchema = new mongoose.Schema({

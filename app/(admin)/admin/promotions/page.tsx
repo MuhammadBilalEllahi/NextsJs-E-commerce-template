@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Coupon } from "@/types";
+import { Coupon } from "@/types/types";
 
 export default function PromotionsAdminPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);

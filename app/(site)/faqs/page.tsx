@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getContentPage } from "@/database/data-service";
 import { notFound } from "next/navigation";
-import { ContentPage } from "@/types/types";
+import { ContentPage } from "@/types";
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,

@@ -9,7 +9,7 @@ import Category from "@/models/Category";
 import BrandProducts from "@/models/BrandProducts";
 import CategoryProducts from "@/models/CategoryProducts";
 import ImportHistory from "@/models/ImportHistory";
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 import { v4 as uuidv4 } from "uuid";
 
 interface CSVRow {

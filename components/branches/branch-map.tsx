@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Clock, ExternalLink } from "lucide-react";
-import { Branch } from "@/types";
+import { Branch } from "@/types/types";
 import Image from "next/image";
 
 interface BranchMapProps {

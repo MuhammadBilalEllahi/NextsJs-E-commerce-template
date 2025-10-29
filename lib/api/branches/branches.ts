@@ -1,6 +1,6 @@
 const API_URL_BRANCHES = "/api/admin/branches";
 
-import { Branch, BranchesResponse } from "@/types";
+import { Branch, BranchesResponse } from "@/types/types";
 
 // Fetch all active branches for public use
 export const fetchAllBranches = async (): Promise<Branch[]> => {

@@ -3,7 +3,7 @@
 import React from "react";
 import { ExternalLink, PhoneIcon } from "lucide-react";
 import Link from "next/link";
-import { Branch } from "@/types";
+import { Branch } from "@/types/types";
 import Image from "next/image";
 export default function StackedCards({ branches }: { branches: Branch[] }) {
   return (

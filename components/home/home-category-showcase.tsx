@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from "lucide-react";
-import { Category } from "@/types";
+import { Category } from "@/types/types";
 import { ProductCard } from "@/components/product/product-card";
 import { getProductsByCategory } from "@/database/data-service";
 import Image from "next/image";

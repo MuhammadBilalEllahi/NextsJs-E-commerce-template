@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Upload, X } from "lucide-react";
-import { Brand } from "@/types";
+import { Brand } from "@/types/types";
 import Image from "next/image";
 
 interface BrandEditModalProps {

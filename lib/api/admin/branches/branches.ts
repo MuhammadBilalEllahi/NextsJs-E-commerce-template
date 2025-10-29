@@ -4,7 +4,7 @@ import {
   CreateBranchData,
   Branch,
   UpdateBranchData,
-} from "@/types";
+} from "@/types/types";
 
 const API_URL_BRANCHES = "/api/admin/branches";
 

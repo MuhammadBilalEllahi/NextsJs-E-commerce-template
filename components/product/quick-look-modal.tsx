@@ -13,9 +13,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useCart } from "@/lib/providers/cartContext";
-import type { Product } from "@/types";
+import type { Product } from "@/types/types";
 import { formatCurrency } from "@/lib/constants/currency";
-import { Variant } from "@/types";
+import { Variant } from "@/types/types";
 
 interface QuickLookModalProps {
   product: Product & {

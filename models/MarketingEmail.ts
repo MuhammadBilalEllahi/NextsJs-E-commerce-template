@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
+import { MODELS } from "./constants/constants";
 
 export interface MarketingEmailDocument extends mongoose.Document {
   email: string;
@@ -44,7 +45,7 @@ const MarketingEmailSchema = new Schema<MarketingEmailDocument>(
       {
         campaignId: {
           type: Schema.Types.ObjectId,
-          ref: "MarketingCampaign",
+          ref: MODELS.MARKETING_CAMPAIGN,
           required: true,
         },
         campaignName: { type: String, required: true },
@@ -68,9 +69,9 @@ MarketingEmailSchema.index({ isActive: 1 });
 MarketingEmailSchema.index({ "campaigns.campaignId": 1 });
 
 const MarketingEmail: Model<MarketingEmailDocument> =
-  mongoose.models.MarketingEmail ||
+  mongoose.models[MODELS.MARKETING_EMAIL] ||
   mongoose.model<MarketingEmailDocument>(
-    "MarketingEmail",
+    MODELS.MARKETING_EMAIL,
     MarketingEmailSchema
   );
 

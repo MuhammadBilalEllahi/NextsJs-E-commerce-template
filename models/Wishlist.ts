@@ -1,17 +1,22 @@
 import mongoose from "mongoose";
 import { z } from "zod";
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 
-const WishlistSchema = new mongoose.Schema({
+export interface WishlistDocument extends mongoose.Document {
+  user: mongoose.Types.ObjectId;
+  sessionId: string;
+  product: mongoose.Types.ObjectId;
+  variant: mongoose.Types.ObjectId;
+  addedAt: Date;
+  isActive: boolean;
+}
+const WishlistSchema = new mongoose.Schema<WishlistDocument>({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.USER,
     default: null,
   },
-  sessionId: {
-    type: String,
-    default: null,
-  }, // for guest users
+  sessionId: { type: String, default: null }, // for guest users
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: MODELS.PRODUCT,
@@ -46,4 +51,4 @@ export const wishlistZodSchema = z.object({
 });
 
 export default mongoose.models[MODELS.WISHLIST] ||
-  mongoose.model(MODELS.WISHLIST, WishlistSchema);
+  mongoose.model<WishlistDocument>(MODELS.WISHLIST, WishlistSchema);

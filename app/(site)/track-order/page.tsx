@@ -17,7 +17,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/constants/currency";
-import { OrderData, TCSOrderData, TrackingData } from "@/types";
+import { OrderData, TCSOrderData, TrackingData } from "@/types/types";
 import { useSearchParams } from "next/navigation";
 
 export default function TrackOrderPage() {

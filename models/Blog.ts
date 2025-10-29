@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
+import { MODELS } from "@/models/constants/constants";
 
 export interface BlogDocument extends mongoose.Document {
   title: string;
@@ -26,6 +27,7 @@ const BlogSchema = new Schema<BlogDocument>(
 );
 
 const Blog: Model<BlogDocument> =
-  mongoose.models.Blog || mongoose.model<BlogDocument>("Blog", BlogSchema);
+  mongoose.models[MODELS.BLOG] ||
+  mongoose.model<BlogDocument>(MODELS.BLOG, BlogSchema);
 
 export default Blog;

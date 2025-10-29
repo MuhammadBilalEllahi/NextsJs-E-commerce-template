@@ -32,7 +32,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { BranchCreateModal } from "@/components/admin/branches/branch-create-modal";
 import { BranchEditModal } from "@/components/admin/branches/branch-edit-modal";
 import { BranchViewModal } from "@/components/admin/branches/branch-view-modal";
-import { Branch, CreateBranchData, UpdateBranchData } from "@/types";
+import { Branch, CreateBranchData, UpdateBranchData } from "@/types/types";
 import Image from "next/image";
 export default function BranchesAdminPage() {
   const {

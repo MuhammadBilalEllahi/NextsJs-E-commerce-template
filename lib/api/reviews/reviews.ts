@@ -1,4 +1,4 @@
-import { PaginatedResponse, Review } from "@/types";
+import { PaginatedResponse, Review } from "@/types/types";
 
 export const API_URL_REVIEWS = "/api/reviews";
 export const API_URL_REVIEWS_CAN_REVIEW = "/api/reviews/can-review";

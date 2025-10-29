@@ -1,4 +1,4 @@
-import { Category } from "@/types";
+import { Category } from "@/types/types";
 
 export const API_URL_CATEGORY_ADMIN = "/api/admin/category";
 

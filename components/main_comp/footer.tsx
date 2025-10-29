@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { NewsletterInline } from "@/components/home/home-newsletter";
 import { getAllCategories } from "@/database/data-service";
-import { Category } from "@/types";
+import { Category } from "@/types/types";
 import {
   SITE_NAME,
   SITE_NAME_FIRST,

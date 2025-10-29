@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import Order from "@/models/Order";
 import Review from "@/models/Review";
 import dbConnect from "@/database/mongodb";
-import { ORDER_STATUS } from "@/models/constants";
+import { ORDER_STATUS } from "@/lib/constants";
 
 export async function GET(request: NextRequest) {
   try {

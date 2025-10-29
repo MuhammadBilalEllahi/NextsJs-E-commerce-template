@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
+import { MODELS } from "@/models/constants/constants";
 
 export interface JobApplicationDocument extends mongoose.Document {
   job: mongoose.Types.ObjectId;
@@ -17,7 +18,7 @@ const JobApplicationSchema = new Schema<JobApplicationDocument>(
   {
     job: {
       type: Schema.Types.ObjectId,
-      ref: "Career",
+      ref: MODELS.CAREER,
       required: true,
       index: true,
     },
@@ -37,9 +38,9 @@ const JobApplicationSchema = new Schema<JobApplicationDocument>(
 );
 
 const JobApplication: Model<JobApplicationDocument> =
-  mongoose.models.JobApplication ||
+  mongoose.models[MODELS.JOB_APPLICATION] ||
   mongoose.model<JobApplicationDocument>(
-    "JobApplication",
+    MODELS.JOB_APPLICATION,
     JobApplicationSchema
   );
 

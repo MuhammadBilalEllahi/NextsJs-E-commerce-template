@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import dbConnect from "@/database/mongodb";
 import Order from "@/models/Order";
-import { ORDER_STATUS } from "@/models/constants";
+import { ORDER_STATUS } from "@/lib/constants";
 import whatsappService from "@/lib/api/whatsapp/whatsappService";
 
 // PUT - Update order status and send WhatsApp notification

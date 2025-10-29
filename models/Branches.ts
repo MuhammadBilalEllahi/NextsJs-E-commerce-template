@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 import { z } from "zod";
 const Schema = mongoose.Schema;
 

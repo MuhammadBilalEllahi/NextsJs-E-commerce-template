@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
 import { usePreloadedData } from "@/lib/hooks/use-preloaded-data";
 import { CURRENCY } from "@/lib/constants";
-import { Category, Product } from "@/types";
+import { Category, Product } from "@/types/types";
 
 interface HoverNavigationProps {
   isOpen: boolean;

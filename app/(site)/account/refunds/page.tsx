@@ -25,7 +25,7 @@ import {
   FileText,
 } from "lucide-react";
 import Link from "next/link";
-import { Refund } from "@/types";
+import { Refund } from "@/types/types";
 
 export default function CustomerRefundsPage() {
   const [refunds, setRefunds] = useState<Refund[]>([]);

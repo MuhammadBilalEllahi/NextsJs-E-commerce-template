@@ -10,8 +10,8 @@ import { useAuth } from "@/lib/providers/authProvider";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { AccountNavigation } from "@/components/account/account-navigation";
 import { Save, User, Phone, MapPin, Edit, X } from "lucide-react";
-import { UserTypes } from "@/models/constants";
-import { UserProfile } from "@/types";
+import { UserTypes } from "@/models/constants/constants";
+import { UserProfile } from "@/types/types";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);

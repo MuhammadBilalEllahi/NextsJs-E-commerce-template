@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Banner, GlobalSettings } from "@/types";
+import { Banner, GlobalSettings } from "@/types/types";
 import Image from "next/image";
 
 export function HomeHero({

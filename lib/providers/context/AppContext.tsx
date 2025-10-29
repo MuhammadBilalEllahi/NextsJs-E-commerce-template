@@ -9,7 +9,7 @@ import {
   useState,
   useEffect,
 } from "react";
-import { User } from "@/types";
+import { User } from "@/types/types";
 
 type AppContextType = {
   router: ReturnType<typeof useRouter>;

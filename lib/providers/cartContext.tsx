@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useAuth } from "./authProvider";
 import { getOrCreateGuestId, clearGuestId } from "@/lib/utils/uuid";
-import { CartItem } from "@/types";
+import { CartItem } from "@/types/types";
 
 type State = {
   items: CartItem[];

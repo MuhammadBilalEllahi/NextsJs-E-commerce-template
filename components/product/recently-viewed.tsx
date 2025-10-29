@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { getAllProducts } from "@/database/data-service";
-import type { Product } from "@/types";
+import type { Product } from "@/types/types";
 
 export function RecentlyViewed({ currentId }: { currentId: string }) {
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);

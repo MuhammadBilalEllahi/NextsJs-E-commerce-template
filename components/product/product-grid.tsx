@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { cn } from "@/lib/utils/utils";
-import { Product } from "@/types";
+import { Product } from "@/types/types";
 
 export function ProductGrid({
   products = [],

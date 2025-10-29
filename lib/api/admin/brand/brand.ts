@@ -1,4 +1,4 @@
-import { Brand, CreateBrandData } from "@/types";
+import { Brand, CreateBrandData } from "@/types/types";
 
 export const API_URL_BRAND_ADMIN = "/api/admin/brand";
 

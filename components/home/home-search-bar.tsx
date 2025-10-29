@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTrendingProducts } from "@/database/data-service";
 import { formatCurrency } from "@/lib/constants/currency";
-import { Category, Product, ProductListItem } from "@/types";
+import { Category, Product, ProductListItem } from "@/types/types";
 
 export function HomeSearchBar({ categories }: { categories: Category[] }) {
   const [q, setQ] = useState("");

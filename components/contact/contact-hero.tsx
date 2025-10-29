@@ -1,7 +1,7 @@
 import { Phone, Mail, Clock } from "lucide-react";
 import { ContactForm } from "./contact-form";
 
-import { Branch } from "@/types";
+import { Branch } from "@/types/types";
 
 interface ContactHeroProps {
   branches: Branch[];

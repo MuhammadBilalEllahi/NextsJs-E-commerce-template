@@ -1,4 +1,5 @@
 export const MODELS = {
+  COUNTER: "Counter",
   PRODUCT: "Product",
   USER: "User",
   VARIANT: "Variant",
@@ -21,7 +22,17 @@ export const MODELS = {
   NOTIFICATION: "Notification",
   ADDRESS: "Address",
   REFUND: "Refund",
+  IMPORT_HISTORY: "ImportHistory",
   CONTENT_PAGE: "ContentPage",
+  BLOG: "Blog",
+  CAREER: "Career",
+  CHAT_INQUIRY: "ChatInquiry",
+  TESTIMONIAL: "Testimonial",
+  JOB_APPLICATION: "JobApplication",
+  MARKETING_EMAIL: "MarketingEmail",
+  MARKETING_CAMPAIGN: "MarketingCampaign",
+  PASSWORD_RESET_TOKEN: "PasswordResetToken",
+  RANDOM_IMAGE: "RandomImage",
 };
 
 export const ORDER_TYPE = {

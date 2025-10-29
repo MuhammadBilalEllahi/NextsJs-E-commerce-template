@@ -33,7 +33,7 @@ import {
 } from "@/lib/api/admin/banner/banner";
 import { updateGlobalSettings } from "@/lib/api/admin/global-settings/global-settings";
 import Image from "next/image";
-import { Banner, GlobalSettings, CreateBannerData } from "@/types";
+import { Banner, GlobalSettings, CreateBannerData } from "@/types/types";
 
 // interface Banner {
 //   id: string;

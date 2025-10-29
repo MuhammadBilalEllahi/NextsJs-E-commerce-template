@@ -20,7 +20,7 @@ import {
   submitReview,
   fetchProductReviews,
 } from "@/lib/api/reviews/reviews";
-import { Review } from "@/types";
+import { Review } from "@/types/types";
 
 interface ReviewsProps {
   productId: string;

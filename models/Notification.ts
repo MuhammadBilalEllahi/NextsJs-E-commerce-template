@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { z } from "zod";
-import { MODELS } from "@/models/constants";
+import { MODELS } from "@/models/constants/constants";
 
 const NotificationSchema = new mongoose.Schema({
   user: {
