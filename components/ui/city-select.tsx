@@ -1,20 +1,23 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { Input } from "./input"
-import { Label } from "./label"
-import { Check, ChevronsUpDown, Search } from "lucide-react"
-import { cn } from "@/lib/utils/utils"
-import { Button } from "./button"
-import { PAKISTAN_CITIES, MAJOR_CITIES } from "@/lib/constants/cities"
+import { useState, useRef, useEffect } from "react";
+import { Input } from "./input";
+import { Label } from "./label";
+import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { cn } from "@/lib/utils/utils";
+import { Button } from "./button";
+import { getCityOptions } from "@/lib/geo";
+import { DEFAULT_COUNTRY, DEFAULT_STATE } from "@/lib/constants/site";
 
 interface CitySelectProps {
-  value: string
-  onChange: (value: string) => void
-  label?: string
-  placeholder?: string
-  required?: boolean
-  className?: string
+  value: string;
+  onChange: (value: string) => void;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
+  className?: string;
+  countryCode?: string; // ISO country code (e.g., "PK")
+  stateCode?: string; // State/province code (e.g., "PB")
 }
 
 export function CitySelect({
@@ -23,25 +26,54 @@ export function CitySelect({
   label = "City",
   placeholder = "Select a city...",
   required = false,
-  className
+  className,
+  countryCode = "PK", // Default to Pakistan
+  stateCode = "PB", // Default to Punjab
 }: CitySelectProps) {
-  const [open, setOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filteredCities, setFilteredCities] = useState<string[]>([])
-  const triggerRef = useRef<HTMLButtonElement>(null)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [allCities, setAllCities] = useState<string[]>([]);
+  const [filteredCities, setFilteredCities] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load cities from geo module
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    (async () => {
+      try {
+        const cities = await getCityOptions(countryCode, stateCode);
+        if (!mounted) return;
+        setAllCities(cities.map((c) => c.label));
+        setFilteredCities(cities.map((c) => c.label));
+      } catch (error) {
+        console.error("Failed to load cities:", error);
+        if (mounted) {
+          setAllCities([]);
+          setFilteredCities([]);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [countryCode, stateCode]);
 
   // Filter cities based on search query
   useEffect(() => {
     if (searchQuery.trim() === "") {
-      setFilteredCities(MAJOR_CITIES)
+      setFilteredCities(allCities);
     } else {
-      const filtered = PAKISTAN_CITIES.filter(city =>
+      const filtered = allCities.filter((city) =>
         city.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      setFilteredCities(filtered)
+      );
+      setFilteredCities(filtered);
     }
-  }, [searchQuery])
+  }, [searchQuery, allCities]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -51,28 +83,28 @@ export function CitySelect({
         !dropdownRef.current.contains(event.target as Node) &&
         !triggerRef.current?.contains(event.target as Node)
       ) {
-        setOpen(false)
-        setSearchQuery("")
+        setOpen(false);
+        setSearchQuery("");
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleCitySelect = (city: string) => {
-    onChange(city)
-    setOpen(false)
-    setSearchQuery("")
-  }
+    onChange(city);
+    setOpen(false);
+    setSearchQuery("");
+  };
 
   const handleTriggerClick = () => {
-    setOpen(!open)
+    setOpen(!open);
     if (!open) {
-      setSearchQuery("")
-      setFilteredCities(MAJOR_CITIES)
+      setSearchQuery("");
+      setFilteredCities(allCities);
     }
-  }
+  };
 
   return (
     <div className={cn("relative", className)}>
@@ -81,7 +113,7 @@ export function CitySelect({
           {label}
         </Label>
       )}
-      
+
       <Button
         ref={triggerRef}
         type="button"
@@ -91,7 +123,9 @@ export function CitySelect({
         className="w-full justify-between h-10 px-3 py-2 text-sm"
         onClick={handleTriggerClick}
       >
-        <span className={cn("block truncate", !value && "text-muted-foreground")}>
+        <span
+          className={cn("block truncate", !value && "text-muted-foreground")}
+        >
           {value || placeholder}
         </span>
         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -118,7 +152,11 @@ export function CitySelect({
 
           {/* Cities List */}
           <div className="max-h-48 overflow-y-auto">
-            {filteredCities.length > 0 ? (
+            {loading ? (
+              <div className="px-3 py-2 text-sm text-neutral-500 dark:text-neutral-400 text-center">
+                Loading cities...
+              </div>
+            ) : filteredCities.length > 0 ? (
               filteredCities.map((city) => (
                 <button
                   key={city}
@@ -129,24 +167,28 @@ export function CitySelect({
                   onClick={() => handleCitySelect(city)}
                 >
                   <span className="block truncate">{city}</span>
-                  {value === city && (
-                    <Check className="ml-auto h-4 w-4" />
-                  )}
+                  {value === city && <Check className="ml-auto h-4 w-4" />}
                 </button>
               ))
             ) : (
               <div className="px-3 py-2 text-sm text-neutral-500 dark:text-neutral-400">
-                No cities found.
+                {searchQuery
+                  ? "No cities found."
+                  : "No cities available. Please select a country and state."}
               </div>
             )}
           </div>
 
           {/* Show total count */}
-          <div className="px-3 py-2 text-xs text-neutral-500 dark:text-neutral-400 border-t border-neutral-200 dark:border-neutral-700">
-            {searchQuery ? `${filteredCities.length} of ${PAKISTAN_CITIES.length} cities` : `${PAKISTAN_CITIES.length} cities available`}
-          </div>
+          {!loading && (
+            <div className="px-3 py-2 text-xs text-neutral-500 dark:text-neutral-400 border-t border-neutral-200 dark:border-neutral-700">
+              {searchQuery
+                ? `${filteredCities.length} of ${allCities.length} cities`
+                : `${allCities.length} cities available`}
+            </div>
+          )}
         </div>
       )}
     </div>
-  )
+  );
 }
