@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
 
-    const productId = formData.get("product")?.toString();
+    const productId = formData.get("productId")?.toString();
     const sku = formData.get("sku")?.toString();
     const label = formData.get("label")?.toString();
     const slug = formData.get("slug")?.toString();
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
     const isActive = formData.get("isActive") === "true";
     const isOutOfStock = formData.get("isOutOfStock") === "true";
 
+    console.log("formData", formData);
     if (!productId || !sku || price <= 0) {
       return NextResponse.json(
         { error: "Missing required fields" },

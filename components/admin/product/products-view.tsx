@@ -92,11 +92,15 @@ export default function ProductsViewAdminUI({
                       <Image
                         width={100}
                         height={100}
-                        src={product.images[0] as string}
+                        src={
+                          typeof image === "string"
+                            ? image
+                            : URL.createObjectURL(image)
+                        }
                         alt={`Product image ${index + 1}`}
                         className="w-fit h-32 object-cover rounded-lg border hover:border-blue-400 transition-colors"
                       />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
+                      <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
                         <span className="text-white opacity-0 group-hover:opacity-100 text-sm font-medium">
                           Click to view
                         </span>
@@ -178,26 +182,20 @@ export default function ProductsViewAdminUI({
                     Base Price
                   </label>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-semibold">
+                    <span
+                      className={`text-lg font-semibold ${
+                        product?.discount > 0 ? "line-through" : ""
+                      }`}
+                    >
                       {formatCurrency(product?.price || 0)}
                     </span>
                     {product?.discount > 0 && (
-                      <>
-                        <span className="text-sm text-muted-foreground line-through">
-                          {formatCurrency(
-                            (product?.price || 0) +
-                              ((product?.price || 0) *
-                                (product?.discount || 0)) /
-                                100
-                          )}
-                        </span>
-                        <Badge
-                          variant="secondary"
-                          className="bg-red-100 text-red-800"
-                        >
-                          -{product?.discount}%
-                        </Badge>
-                      </>
+                      <Badge
+                        variant="secondary"
+                        className="bg-red-100 text-red-800"
+                      >
+                        -{product?.discount}%
+                      </Badge>
                     )}
                   </div>
                   {product?.discount > 0 && (
@@ -360,26 +358,20 @@ export default function ProductsViewAdminUI({
                         Price
                       </label>
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-semibold">
+                        <span
+                          className={`text-lg font-semibold ${
+                            variant?.discount > 0 ? "line-through" : ""
+                          }`}
+                        >
                           {formatCurrency(variant?.price || 0)}
                         </span>
                         {variant?.discount > 0 && (
-                          <>
-                            <span className="text-sm text-muted-foreground line-through">
-                              {formatCurrency(
-                                (variant?.price || 0) +
-                                  ((variant?.price || 0) *
-                                    (variant?.discount || 0)) /
-                                    100
-                              )}
-                            </span>
-                            <Badge
-                              variant="secondary"
-                              className="bg-red-100 text-red-800"
-                            >
-                              -{variant.discount}%
-                            </Badge>
-                          </>
+                          <Badge
+                            variant="secondary"
+                            className="bg-red-100 text-red-800"
+                          >
+                            -{variant.discount}%
+                          </Badge>
                         )}
                       </div>
                       {variant.discount > 0 && (
@@ -491,16 +483,15 @@ export default function ProductsViewAdminUI({
       {/* Image Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-background/25 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative max-w-4xl max-h-full">
+          <div className="relative w-4xl h-full ">
             <Image
-              width={100}
-              height={100}
+              fill
               src={selectedImage}
               alt="Full size view"
-              className="max-w-full max-h-full object-contain rounded-lg"
+              className=" object-contain w-full h-full rounded-lg"
             />
             <Button
               variant="ghost"

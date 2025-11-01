@@ -4,10 +4,23 @@ import type { Redis as RedisType } from "ioredis";
 
 class RedisClient {
   private static instance: RedisType;
+  private static isDisabled: boolean | undefined;
 
   private constructor() {}
 
+  private static isRedisDisabled(): boolean {
+    if (RedisClient.isDisabled === undefined) {
+      RedisClient.isDisabled = process.env.REDIS_ENABLED === "false";
+    }
+    console.debug("RedisClient.isDisabled", RedisClient.isDisabled);
+    return RedisClient.isDisabled;
+  }
+
   private static getClient(): RedisType {
+    if (this.isRedisDisabled()) {
+      throw new Error("Redis is disabled");
+    }
+
     if (!RedisClient.instance) {
       RedisClient.instance = new Redis(
         process.env.REDIS_URL || "redis://localhost:6379"
@@ -19,6 +32,7 @@ class RedisClient {
 
   // STRING
   static async get(key: string): Promise<string | null> {
+    if (this.isRedisDisabled()) return null;
     return await this.getClient().get(key);
   }
 
@@ -27,6 +41,7 @@ class RedisClient {
     value: string,
     expirySeconds?: number
   ): Promise<"OK"> {
+    if (this.isRedisDisabled()) return "OK";
     const client = this.getClient();
     if (expirySeconds) {
       return await client.set(key, value, "EX", expirySeconds);
@@ -35,6 +50,7 @@ class RedisClient {
   }
 
   static async del(key: string): Promise<number> {
+    if (this.isRedisDisabled()) return 0;
     return await this.getClient().del(key);
   }
 
@@ -44,35 +60,43 @@ class RedisClient {
     field: string,
     value: string
   ): Promise<number> {
+    if (this.isRedisDisabled()) return 0;
     return await this.getClient().hset(key, field, value);
   }
 
   static async hget(key: string, field: string): Promise<string | null> {
+    if (this.isRedisDisabled()) return null;
     return await this.getClient().hget(key, field);
   }
 
   static async hdel(key: string, field: string): Promise<number> {
+    if (this.isRedisDisabled()) return 0;
     return await this.getClient().hdel(key, field);
   }
 
   static async hgetall(key: string): Promise<Record<string, string>> {
+    if (this.isRedisDisabled()) return {};
     return await this.getClient().hgetall(key);
   }
 
   // LIST
   static async lpush(key: string, ...values: string[]): Promise<number> {
+    if (this.isRedisDisabled()) return 0;
     return await this.getClient().lpush(key, ...values);
   }
 
   static async rpush(key: string, ...values: string[]): Promise<number> {
+    if (this.isRedisDisabled()) return 0;
     return await this.getClient().rpush(key, ...values);
   }
 
   static async lpop(key: string): Promise<string | null> {
+    if (this.isRedisDisabled()) return null;
     return await this.getClient().lpop(key);
   }
 
   static async rpop(key: string): Promise<string | null> {
+    if (this.isRedisDisabled()) return null;
     return await this.getClient().rpop(key);
   }
 
@@ -81,28 +105,34 @@ class RedisClient {
     start: number,
     stop: number
   ): Promise<string[]> {
+    if (this.isRedisDisabled()) return [];
     return await this.getClient().lrange(key, start, stop);
   }
 
   // KEYS
   static async exists(key: string): Promise<number> {
+    if (this.isRedisDisabled()) return 0;
     return await this.getClient().exists(key);
   }
 
   static async expire(key: string, seconds: number): Promise<number> {
+    if (this.isRedisDisabled()) return 0;
     return await this.getClient().expire(key, seconds);
   }
 
   static async ttl(key: string): Promise<number> {
+    if (this.isRedisDisabled()) return -2; // -2 means key doesn't exist
     return await this.getClient().ttl(key);
   }
 
   static async keys(pattern: string): Promise<string[]> {
+    if (this.isRedisDisabled()) return [];
     return await this.getClient().keys(pattern);
   }
 
   // PUB/SUB (optional)
   static async publish(channel: string, message: string): Promise<number> {
+    if (this.isRedisDisabled()) return 0;
     return await this.getClient().publish(channel, message);
   }
 
@@ -110,6 +140,7 @@ class RedisClient {
     channel: string,
     callback: (message: string) => void
   ): Promise<void> {
+    if (this.isRedisDisabled()) return;
     const sub = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
     await sub.subscribe(channel);
     sub.on("message", (_channel, message) => {
@@ -119,8 +150,11 @@ class RedisClient {
 
   // Close connection (for cleanup, testing, etc.)
   static async disconnect(): Promise<void> {
-    await this.getClient().quit();
-    RedisClient.instance = null as any;
+    if (this.isRedisDisabled()) return;
+    if (RedisClient.instance) {
+      await this.getClient().quit();
+      RedisClient.instance = null as any;
+    }
   }
 }
 

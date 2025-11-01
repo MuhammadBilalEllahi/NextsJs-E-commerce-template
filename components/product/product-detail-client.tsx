@@ -148,7 +148,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     );
   }
 
-  console.debug("product.reviews", product.reviews);
+  console.debug("[THE PRODUCT] product", product);
 
   const handleAddToCart = () => {
     if (isAdding) return;
@@ -169,6 +169,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           productId: String(product.id),
           slug: product.slug,
           sku: selectedVariant.label, // Use label as SKU
+          stock: selectedVariant.stock,
         },
         quantity
       );
@@ -182,6 +183,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           image: product.images[0] as string,
           productId: String(product.id),
           slug: product.slug,
+          stock: product.stock,
         },
         quantity
       );

@@ -281,8 +281,9 @@ export default function ProductsEditAdminUI({
           )
         );
       } else {
+        console.log("creating new variant", editingVariant, product);
         // Create new variant
-        fd.append("product", product.id);
+        fd.append("productId", product._id);
         fd.append("sku", editingVariant.sku);
         fd.append("label", editingVariant.label);
         if (editingVariant.slug) fd.append("slug", editingVariant.slug);

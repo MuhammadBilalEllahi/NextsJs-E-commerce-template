@@ -1,3 +1,6 @@
+// If any change is not refleted in UI, then clear the site cache from browser.
+// This happens if browser has cached the content of recurring opened site
+
 export const SITE_NAME = null; // "Dehli Mirch";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://evanto.ignites.studio";

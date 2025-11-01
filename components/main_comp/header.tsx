@@ -1,14 +1,13 @@
 // "use client"
 
 import Link from "next/link";
-import { ShoppingCart, Heart, ShoppingBag } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import { useCart } from "@/lib/providers/cartContext";
 import { useWishlist } from "@/lib/providers/wishlistProvider";
 import { CartSheet } from "@/components/cart/cart-sheet";
 import { HomeSearchBar } from "@/components/home/home-search-bar";
 import { AuthButton } from "@/components/auth/auth-button";
 import { Category } from "@/types/types";
-import { useAuth } from "@/lib/providers/authProvider";
 import {
   SITE_NAME,
   SITE_NAME_FIRST,
@@ -17,8 +16,7 @@ import {
 // import { useEffect, useState } from "react"
 
 export function Header({ categories }: { categories?: Category[] }) {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth(); // Destructure isLoading as well
-  const { count, isAdding, refreshCart, isHydrated } = useCart();
+  const { count, isAdding, isHydrated } = useCart();
   const { ids: wishlistIds } = useWishlist();
 
   return (

@@ -27,6 +27,7 @@ export function ProductCard({
   const [isQuickLookOpen, setIsQuickLookOpen] = useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
 
+  console.log("[THE PRODUCT] product", product);
   // Get the first available image: variant image -> product images -> product image -> placeholder
   const getDisplayImage = () => {
     if (
@@ -126,6 +127,7 @@ export function ProductCard({
         variantId: firstVariant.id,
         variantLabel: firstVariant.label,
         slug: product.slug,
+        stock: firstVariant.stock,
       };
       console.debug("Adding to cart:", cartItem);
       console.debug("variantLabel being sent:", cartItem.variantLabel);
@@ -145,6 +147,7 @@ export function ProductCard({
           image: getDisplayImage() as string,
           productId: product.id,
           slug: product.slug,
+          stock: product.stock,
         },
         1
       );

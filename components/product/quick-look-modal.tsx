@@ -155,6 +155,7 @@ export function QuickLookModal({
           productId: String(product.id),
           slug: product.slug,
           sku: selectedVariant.label,
+          stock: selectedVariant.stock,
         },
         quantity
       );
@@ -170,6 +171,7 @@ export function QuickLookModal({
             ("/placeholder.svg" as string),
           productId: String(product.id),
           slug: product.slug,
+          stock: product.stock,
         },
         quantity
       );

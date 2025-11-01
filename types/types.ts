@@ -566,6 +566,7 @@ export type CartItem = {
   variantLabel?: string;
   productId: string;
   slug: string;
+  stock: number;
   sku?: string;
 };
 // ===== WISHLIST TYPES =====

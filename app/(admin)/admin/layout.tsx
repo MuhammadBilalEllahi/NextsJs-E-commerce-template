@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/utils";
 import {
@@ -15,7 +15,6 @@ import {
   MessageCircle,
   CreditCard,
   Shield,
-  LogOut,
   Building2,
   Truck,
   Heart,
@@ -26,13 +25,7 @@ import {
   Star,
   ChevronLeft,
   ChevronRight,
-  Bell,
-  Moon,
-  Sun,
-  Palette,
 } from "lucide-react";
-import LogOutButton from "./components/buttons/LogOutButton";
-// import { Metadata } from "next";
 
 const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -72,8 +65,11 @@ import { Geist_Mono, Poppins } from "next/font/google";
 import "@/app/(site)/globals.css";
 
 import { RootProviders } from "@/lib/providers/rootProvider";
-import { SITE_NAME } from "@/lib/constants/site";
-import { AuthButton } from "@/components/auth/auth-button";
+import {
+  SITE_NAME,
+  SITE_NAME_FIRST,
+  SITE_NAME_SECOND,
+} from "@/lib/constants/site";
 import { AdminNavbar } from "@/components/admin/sidebar/AdminNavbar";
 
 const poppins = Poppins({
@@ -118,7 +114,13 @@ export default function RootLayout({
                   <div className="flex items-center justify-between px-3 py-2 border-b">
                     <div className="flex items-center gap-2">
                       <Link href="/" className="font-semibold tracking-wide">
-                        {collapsed ? "" : `${SITE_NAME} Admin`}
+                        {collapsed
+                          ? ""
+                          : `${
+                              SITE_NAME
+                                ? SITE_NAME
+                                : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+                            } Admin`}
                       </Link>
                     </div>
                     <button

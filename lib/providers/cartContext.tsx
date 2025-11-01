@@ -343,19 +343,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateQty = async (id: string, qty: number) => {
-    const newItems = state.items.map((i) =>
-      i.id === id ? { ...i, qty: Math.max(1, qty) } : i
+    console.log("updateQty", id, qty, state);
+    state.items.map((i) =>
+      i.id === id && i.stock >= qty
+        ? dispatch({ type: CartActionTypes.UPDATE_QTY, payload: { id, qty } })
+        : { ...i, qty: Math.max(1, qty) }
     );
-
-    // Optimistic update
-    dispatch({ type: CartActionTypes.UPDATE_QTY, payload: { id, qty } });
-
-    // Sync with backend
-    // try {
-    //   await syncCartWithBackend(newItems, 'update')
-    // } catch (error) {
-    //   console.error("Failed to update item quantity in backend:", error)
-    // }
   };
 
   const clear = async () => {

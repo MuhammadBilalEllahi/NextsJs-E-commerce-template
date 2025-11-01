@@ -17,7 +17,6 @@ import { getWishlist } from "@/lib/api/wishlist";
 
 export default function WishlistPage() {
   const { ids, clear, isLoading } = useWishlist();
-  const { add } = useCart();
   const { isAuthenticated } = useAuth();
   const [wishlistData, setWishlistData] = useState<WishlistItem[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);

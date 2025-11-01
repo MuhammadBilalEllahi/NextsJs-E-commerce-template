@@ -22,21 +22,6 @@ import {
 } from "@/lib/cacheConstants";
 import Branch from "@/models/Branches";
 import ContentPage from "@/models/ContentPage";
-// Import database types for MongoDB documents
-import {
-  ProductDB,
-  ReviewDB,
-  VariantDB,
-  BrandDB,
-  CategoryDB,
-  UserDB,
-  ContentPageDB,
-  BlogDB,
-  FAQDB,
-  BranchDB,
-  GlobalSettingsDB,
-  BannerDB,
-} from "@/types/database";
 
 // Import frontend types for transformed data
 import {
@@ -58,6 +43,10 @@ import {
 
 // Helper function to convert MongoDB document to frontend type
 function convertProductToFrontendType(product: any): ProductType {
+  console.debug(
+    "product in convertProductToFrontendType",
+    JSON.stringify(product, null, 2)
+  );
   return {
     id: String(product._id),
     slug: product.slug,
@@ -69,10 +58,12 @@ function convertProductToFrontendType(product: any): ProductType {
     categories: product.categories || [],
     brand: product.brand?.name || "Dehli Mirch",
     stock:
-      product.variants?.reduce(
-        (sum: number, v: any) => sum + (v.stock || 0),
-        0
-      ) || 0,
+      product.variants?.length > 0
+        ? product.variants?.reduce(
+            (sum: number, v: any) => sum + (v.stock || 0),
+            0
+          )
+        : product.stock || 0,
     discount: product.discount || 0,
     ratingAvg: product.ratingAvg || 0,
     reviewCount: product.reviewCount || 0,
@@ -137,6 +128,13 @@ function convertProductToListType(product: any): any {
     slug: product.slug,
     name: product.name,
     description: product.description,
+    stock:
+      product.variants?.length > 0
+        ? product.variants?.reduce(
+            (sum: number, v: any) => sum + (v.stock || 0),
+            0
+          )
+        : product.stock || 0,
     price: (product?.variants as any)?.[0]?.price ?? product?.price ?? 0,
     images: product.images,
     image:
@@ -173,9 +171,7 @@ export async function getAllBranches() {
     if (cachedBranches) {
       return JSON.parse(cachedBranches);
     }
-    const branches = (await Branch.find({ isActive: true }).lean<
-      BranchDB[]
-    >()) as BranchDB[];
+    const branches = (await Branch.find({ isActive: true }).lean()) as any[];
     if (branches.length > 0) {
       await RedisClient.set(
         CACHE_BRANCH_KEY,
@@ -197,9 +193,7 @@ export async function getGlobalSettings() {
     if (cachedSettings) {
       return JSON.parse(cachedSettings);
     }
-    const globalSettings = (await GlobalSettings.findOne(
-      {}
-    ).lean<GlobalSettingsDB>()) as GlobalSettingsDB;
+    const globalSettings = (await GlobalSettings.findOne({}).lean()) as any;
     if (globalSettings) {
       await RedisClient.set(
         CACHE_GLOBAL_SETTINGS_KEY,
@@ -222,9 +216,8 @@ export async function getAllBanners() {
       return JSON.parse(cachedBanners);
     }
     const banners = (await Banner.find({ isActive: true })
-      .lean<BannerDB[]>()
       .sort({ createdAt: -1 })
-      .lean<BannerDB[]>()) as BannerDB[];
+      .lean()) as any[];
 
     // Filter out expired banners
     const activeBanners = banners.filter((banner) => {
@@ -398,7 +391,10 @@ export async function getAllProducts() {
       .lean()) as any[];
 
     // console.debug("products in getAllProducts", JSON.stringify(products, null, 2));
-
+    console.debug(
+      "products in getAllProducts convertProductToFrontendType\n\n",
+      products.map((product: any) => convertProductToFrontendType(product))
+    );
     return products.map((product: any) =>
       convertProductToFrontendType(product)
     );
@@ -537,64 +533,25 @@ export async function getAllActiveBrands() {
 export async function getProductBySlug(slug: string) {
   try {
     await dbConnect();
-    const product = (await Product.findOne({ slug, isActive: true })
+
+    const product = (await Product.findOne({
+      slug,
+      isActive: true,
+      isOutOfStock: false,
+    })
       .populate("brand", "name")
       .populate("categories", "name")
-      .populate("variants")
+      .populate("reviews", "user rating comment createdAt")
+      .populate({
+        path: "variants",
+        match: { isActive: true, isOutOfStock: false },
+      })
+      .sort({ createdAt: -1 })
       .lean()) as any;
-    // .lean();
 
     if (!product) return null;
 
-    // Filter and sort variants: available first, then out-of-stock
-    const availableVariants: any[] = (product.variants || []).filter(
-      (variant: any) =>
-        variant.isActive && !variant.isOutOfStock && variant.stock > 0
-    );
-
-    const outOfStockVariants: any[] = (product.variants || []).filter(
-      (variant: any) =>
-        variant.isActive && (variant.isOutOfStock || variant.stock <= 0)
-    );
-
-    // Combine: available first, then out-of-stock
-    const sortedVariants = [...availableVariants, ...outOfStockVariants];
-
-    return {
-      id: String(product._id),
-      slug: product.slug,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      images: product.images,
-      rating: product.ratingAvg,
-      ingredients: product.ingredients,
-      instructions: "", // Can be added later
-      category: product.categories?.[0]?.name || "spices",
-      brand: product.brand?.name || "Dehli Mirch",
-      stock: availableVariants.reduce(
-        (sum: number, v: any) => sum + (v.stock || 0),
-        0
-      ),
-      tags: [], // Can be added later
-      variants: sortedVariants.map((variant: any) => ({
-        id: String(variant._id),
-        label: variant.label,
-        price: variant.price,
-        stock: variant.stock,
-        isActive: variant.isActive,
-        isOutOfStock: variant.isOutOfStock,
-        images: variant.images,
-      })),
-      reviews:
-        product.reviews?.map((review: any) => ({
-          id: String(review._id),
-          user: review.user?.name || "Anonymous",
-          rating: review.rating,
-          comment: review.comment,
-          date: review.createdAt,
-        })) || [],
-    };
+    return convertProductToFrontendType(product);
   } catch (error) {
     console.error("Error fetching product by slug:", error);
     return null;

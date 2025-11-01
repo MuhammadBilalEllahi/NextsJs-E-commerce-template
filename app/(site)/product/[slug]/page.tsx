@@ -30,9 +30,9 @@ export async function generateMetadata({
   const description =
     product.description || "Premium spice product from Dehli Mirch.";
   const url = absoluteUrl(`/product/${slug}`);
-  const images = (product.images || []).map((i: string) =>
-    i.startsWith("http") ? i : absoluteUrl(i)
-  );
+  const images = (product.images || [])
+    .filter((i): i is string => typeof i === "string")
+    .map((i: string) => (i.startsWith("http") ? i : absoluteUrl(i)));
 
   return {
     title,
@@ -68,25 +68,31 @@ export default async function Page({
   // Ensure review data is properly formatted
   const fixedProduct = {
     ...product,
-    reviews:
-      product.reviews?.map((review: Review) => ({
-        ...review,
-        id: String(review.id), // Keep as string to match interface
-      })) ?? [],
+    reviews: Array.isArray(product.reviews)
+      ? product.reviews.map((review: Review) => ({
+          ...review,
+          id: String(review.id), // Keep as string to match interface
+        }))
+      : [],
+    images: Array.isArray(product.images)
+      ? product.images.filter((i): i is string => typeof i === "string")
+      : [],
   };
 
   const canonical = buildCanonical(`/product/${slug}`);
   const productJsonLd = buildProductJsonLd({
     name: fixedProduct.name,
     description: fixedProduct.description,
-    images: fixedProduct.images,
+    images: Array.isArray(fixedProduct.images)
+      ? fixedProduct.images.filter((i): i is string => typeof i === "string")
+      : [],
     price: fixedProduct.price,
     currency: CURRENCY.SYMBOL,
-    inStock: !fixedProduct.stock,
+    inStock: fixedProduct.stock > 0 && !fixedProduct.isOutOfStock,
     aggregateRating:
-      fixedProduct.reviews.length > 0
+      Array.isArray(fixedProduct.reviews) && fixedProduct.reviews.length > 0
         ? {
-            ratingValue: fixedProduct.rating || 0,
+            ratingValue: fixedProduct.ratingAvg || 0,
             reviewCount: fixedProduct.reviews.length,
           }
         : null,

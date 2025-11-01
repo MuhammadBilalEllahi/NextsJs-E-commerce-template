@@ -21,8 +21,7 @@ export function RootProviders({ children }: { children: ReactNode }) {
             <AuthProvider>
               <CartProvider>
                 <WishlistProvider>
-                  {children}
-                  <Toaster />
+                  <Toaster>{children}</Toaster>
                 </WishlistProvider>
               </CartProvider>
             </AuthProvider>
