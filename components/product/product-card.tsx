@@ -120,7 +120,7 @@ export function ProductCard({
 
       const cartItem = {
         id: product.id,
-        name: product.name,
+        name: `${product.name} - ${firstVariant.label}`,
         price: firstVariant.price as number,
         image: getDisplayImage() as string,
         productId: product.id,
@@ -142,12 +142,12 @@ export function ProductCard({
       add(
         {
           id: product.id,
-          name: product.name,
+          name: `${product.name} - ${product.variants?.[0]?.label ?? ""}`,
           price: product.variants?.[0]?.price ?? product.price,
           image: getDisplayImage() as string,
           productId: product.id,
           slug: product.slug,
-          stock: product.stock,
+          stock: product.variants?.[0]?.stock ?? product.stock,
         },
         1
       );

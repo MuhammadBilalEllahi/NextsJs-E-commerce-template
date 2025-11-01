@@ -283,7 +283,7 @@ export default function ProductsEditAdminUI({
       } else {
         console.log("creating new variant", editingVariant, product);
         // Create new variant
-        fd.append("productId", product._id);
+        fd.append("productId", product.id);
         fd.append("sku", editingVariant.sku);
         fd.append("label", editingVariant.label);
         if (editingVariant.slug) fd.append("slug", editingVariant.slug);
@@ -1080,7 +1080,7 @@ export default function ProductsEditAdminUI({
                               className="w-16 h-16 rounded object-cover border hover:border-blue-400 transition-colors"
                               alt={`Variant image ${imgIndex + 1}`}
                             />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded flex items-center justify-center">
+                            <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded flex items-center justify-center">
                               <span className="text-white opacity-0 group-hover:opacity-100 text-xs font-medium">
                                 Click to view
                               </span>

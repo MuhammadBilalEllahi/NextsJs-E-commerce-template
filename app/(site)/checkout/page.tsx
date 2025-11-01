@@ -41,6 +41,29 @@ import { createCheckout } from "@/lib/api/checkout";
 export default function CheckoutPage() {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  const [buyNowItem, setBuyNowItem] = useState<any>(null);
+  const [isBuyNow, setIsBuyNow] = useState(false);
+
+  // Check for buy now on mount
+  useEffect(() => {
+    const buyNowParam = new URLSearchParams(window.location.search).get(
+      "buyNow"
+    );
+    if (buyNowParam === "true") {
+      const stored = sessionStorage.getItem("buyNowItem");
+      if (stored) {
+        try {
+          const item = JSON.parse(stored);
+          setBuyNowItem(item);
+          setIsBuyNow(true);
+        } catch (e) {
+          console.error("Failed to parse buyNowItem:", e);
+        }
+      }
+    }
+  }, []);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [shippingMethod, setShippingMethod] = useState("home_delivery");
@@ -48,6 +71,11 @@ export default function CheckoutPage() {
   const [emailNewsletter, setEmailNewsletter] = useState(true);
   const [saveInfo, setSaveInfo] = useState(true);
   const { items, subtotal, clear, syncAll } = useCart();
+
+  // Calculate items and subtotal based on buy now or cart
+  const displayItems = isBuyNow && buyNowItem ? [buyNowItem] : items;
+  const displaySubtotal =
+    isBuyNow && buyNowItem ? buyNowItem.price * buyNowItem.qty : subtotal;
 
   // Address management states
   const [savedAddresses, setSavedAddresses] = useState([]);
@@ -84,7 +112,7 @@ export default function CheckoutPage() {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
   const [shippingFee, setShippingFee] = useState(0);
   const [tcsFee, setTcsFee] = useState(0);
-  const [orderTotal, setOrderTotal] = useState(subtotal);
+  const [orderTotal, setOrderTotal] = useState(displaySubtotal);
 
   // Geo options and selections for shipping form
   const [countryOptions, setCountryOptions] = useState<
@@ -159,9 +187,11 @@ export default function CheckoutPage() {
   };
 
   useEffect(() => {
-    syncCartBackend();
+    if (!isBuyNow) {
+      syncCartBackend();
+    }
     fetchSavedAddresses();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isBuyNow]);
 
   const fetchShippingMethods = async () => {
     try {
@@ -169,14 +199,14 @@ export default function CheckoutPage() {
         city: formData.city,
         state: "Punjab",
         country: "Pakistan",
-        subtotal: subtotal.toString(),
+        subtotal: displaySubtotal.toString(),
       });
 
       const data = await getShippingMethods({
         city: formData.city,
         state: "Punjab",
         country: "Pakistan",
-        subtotal,
+        subtotal: displaySubtotal,
       });
       if (data) {
         setShippingMethods(data.methods);
@@ -206,8 +236,8 @@ export default function CheckoutPage() {
 
   // Calculate total with shipping fees
   useEffect(() => {
-    setOrderTotal(subtotal + shippingFee + tcsFee);
-  }, [subtotal, shippingFee, tcsFee]);
+    setOrderTotal(displaySubtotal + shippingFee + tcsFee);
+  }, [displaySubtotal, shippingFee, tcsFee]);
 
   // Fetch shipping methods when city changes
   useEffect(() => {
@@ -432,14 +462,14 @@ export default function CheckoutPage() {
                   formData.countryCode + formData.phoneNumber,
                 country: "PK",
               },
-        items: items.map((item) => ({
+        items: displayItems.map((item) => ({
           productId: item.productId,
           variantId: item.variantId,
           qty: item.qty,
           price: item.price,
           variantLabel: item.variantLabel,
         })),
-        subtotal,
+        subtotal: displaySubtotal,
         shippingFee,
         total: orderTotal,
         userId: user?.id || null,
@@ -448,7 +478,11 @@ export default function CheckoutPage() {
 
       try {
         const result = await createCheckout(orderData);
-        clear();
+        if (!isBuyNow) {
+          sessionStorage.removeItem("buyNowItem");
+        } else {
+          clear();
+        }
         router.push(
           `/order/success?orderId=${result.orderId}&refId=${result.refId}`
         );
@@ -463,7 +497,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (items.length === 0) {
+  if (displayItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto text-center">
@@ -1186,7 +1220,7 @@ export default function CheckoutPage() {
 
               {/* Product List */}
               <div className="space-y-3 mb-6">
-                {items.map((item) => (
+                {displayItems.map((item) => (
                   <div key={item.id} className="flex items-center gap-3">
                     <div className="relative">
                       <Image
@@ -1213,7 +1247,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 ))}
-                {items.length > 3 && (
+                {displayItems.length > 3 && (
                   <div className="text-center py-2 text-sm text-neutral-600 dark:text-neutral-400">
                     Scroll for more items ↓
                   </div>
@@ -1236,8 +1270,8 @@ export default function CheckoutPage() {
               {/* Order Totals */}
               <div className="space-y-3 border-t pt-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span>Subtotal • {items.length} items</span>
-                  <span>{formatCurrency(subtotal)}</span>
+                  <span>Subtotal • {displayItems.length} items</span>
+                  <span>{formatCurrency(displaySubtotal)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="flex items-center gap-1">

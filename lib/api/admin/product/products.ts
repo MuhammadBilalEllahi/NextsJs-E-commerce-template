@@ -71,15 +71,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
       throw new Error("Failed to fetch products");
     }
     const data = await response.json();
-
-    // Add default values for missing fields
-    const productsWithDefaults = (data.products || []).map((product: any) => ({
-      ...product,
-      isOutOfStock: product.isOutOfStock || false,
-      isActive: product.isActive || false,
-    }));
-
-    return productsWithDefaults;
+    return data.products;
   } catch (err: any) {
     console.error("Error fetching products:", err);
     throw new Error(err.message || "Failed to fetch products");

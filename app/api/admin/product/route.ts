@@ -307,7 +307,13 @@ export async function GET() {
         },
       ])
       .lean();
-    return NextResponse.json({ products }, { status: 200 });
+    const serializedProducts = products.map((p) => ({
+      id: (p as any)._id.toString(),
+      ...p,
+      _id: undefined,
+    }));
+
+    return NextResponse.json({ products: serializedProducts }, { status: 200 });
   } catch (err: any) {
     console.error("Error fetching products:", err);
     return NextResponse.json(

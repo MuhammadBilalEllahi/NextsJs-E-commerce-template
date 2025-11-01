@@ -190,10 +190,48 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     }
   };
 
+  // const handleBuyNow = () => {
+  //   handleAddToCart();
+  //   // Redirect to checkout
+  //   window.location.href = "/checkout";
+  // };
+
   const handleBuyNow = () => {
-    handleAddToCart();
+    // Skip cart, pass product data directly via sessionStorage
+    const buyNowItem =
+      hasVariants && selectedVariant
+        ? {
+            id: `${String(product.id)}-${selectedVariant.id}`,
+            name: `${product.name} - ${selectedVariant.label}`,
+            title: `${product.name} - ${selectedVariant.label}`, // Add title for checkout display
+            price: selectedVariant.price,
+            image:
+              (currentImages[0] as string) || (product.images[0] as string),
+            variantId: selectedVariant.id,
+            variantLabel: selectedVariant.label,
+            productId: String(product.id),
+            slug: product.slug,
+            sku: selectedVariant.label,
+            stock: selectedVariant.stock,
+            qty: quantity,
+          }
+        : {
+            id: String(product.id),
+            name: product.name,
+            title: product.name, // Add title for checkout display
+            price: product.price,
+            image: product.images[0] as string,
+            productId: String(product.id),
+            slug: product.slug,
+            stock: product.stock,
+            qty: quantity,
+          };
+
+    // Store buy now item in sessionStorage
+    sessionStorage.setItem("buyNowItem", JSON.stringify(buyNowItem));
+
     // Redirect to checkout
-    window.location.href = "/checkout";
+    window.location.href = "/checkout?buyNow=true";
   };
 
   const subtotal = currentPrice * quantity;

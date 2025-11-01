@@ -101,11 +101,19 @@ export async function POST(req: Request) {
       );
     }
 
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      {
+        $addToSet: { variants: variant[0]._id },
+      },
+      { session }
+    );
     await session.commitTransaction();
 
     const createdVariant = await Variant.findById(variant[0].id).populate(
       "product"
     );
+
     return NextResponse.json({ variant: createdVariant });
   } catch (err: any) {
     await session.abortTransaction();
