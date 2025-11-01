@@ -9,6 +9,11 @@ import { HomeSearchBar } from "@/components/home/home-search-bar";
 import { AuthButton } from "@/components/auth/auth-button";
 import { Category } from "@/types/types";
 import { useAuth } from "@/lib/providers/authProvider";
+import {
+  SITE_NAME,
+  SITE_NAME_FIRST,
+  SITE_NAME_SECOND,
+} from "@/lib/constants/site";
 // import { useEffect, useState } from "react"
 
 export function Header({ categories }: { categories?: Category[] }) {
@@ -24,8 +29,14 @@ export function Header({ categories }: { categories?: Category[] }) {
           href="/"
           className="font-extrabold text-xl tracking-tight flex-shrink-0"
         >
-          <span className="text-primary">Dehli</span>{" "}
-          <span className="text-foreground">Mirch</span>
+          {SITE_NAME ? (
+            <span className="text-primary">{SITE_NAME}</span>
+          ) : (
+            <>
+              <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
+              <span className="text-foreground">{SITE_NAME_SECOND}</span>
+            </>
+          )}
         </Link>
 
         {/* Search Bar - Hidden on mobile */}

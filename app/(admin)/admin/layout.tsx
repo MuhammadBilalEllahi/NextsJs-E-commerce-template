@@ -74,8 +74,6 @@ import "@/app/(site)/globals.css";
 import { RootProviders } from "@/lib/providers/rootProvider";
 import { SITE_NAME } from "@/lib/constants/site";
 import { AuthButton } from "@/components/auth/auth-button";
-import { useTheme } from "next-themes";
-import { useThemeColor } from "@/lib/providers/themeProvider";
 import { AdminNavbar } from "@/components/admin/sidebar/AdminNavbar";
 
 const poppins = Poppins({

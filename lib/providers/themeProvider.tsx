@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { DEFAULT_THEME } from "../constants/site";
 
 type ThemeName = "classic" | "emerald" | "rose" | "amber";
 
@@ -36,7 +37,7 @@ function applyThemeClass(theme: ThemeName) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeName>("classic");
+  const [theme, setThemeState] = useState<ThemeName>(DEFAULT_THEME);
 
   useEffect(() => {
     const saved =
@@ -44,7 +45,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         (localStorage.getItem(THEME_STORAGE_KEY) as ThemeName | null)) ||
       null;
     const initial: ThemeName =
-      saved && ALL_THEMES.includes(saved) ? saved : "classic";
+      saved && ALL_THEMES.includes(saved) ? saved : DEFAULT_THEME;
     setThemeState(initial);
     applyThemeClass(initial);
   }, []);
@@ -58,7 +59,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const cycleTheme = useCallback(() => {
-    const current = theme ?? "classic";
+    const current = theme ?? DEFAULT_THEME;
     const idx = ALL_THEMES.indexOf(current);
     const next = ALL_THEMES[(idx + 1) % ALL_THEMES.length];
     if (typeof window !== "undefined") {

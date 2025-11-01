@@ -1,10 +1,16 @@
 // Centralized SEO helpers for canonical URLs, site metadata, and JSON-LD builders
 
+import {
+  SITE_NAME_FIRST,
+  SITE_NAME_SECOND,
+  SITE_NAME,
+  SITE_URL,
+  SITE_OG_IMAGE,
+  X_PAGE_ID,
+} from "@/lib/constants";
+
 export const getSiteUrl = (): string => {
-  const envUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
-  if (envUrl) return envUrl;
-  // Default fallback for local/dev
-  return "http://localhost:3000";
+  return SITE_URL.replace(/\/$/, "");
 };
 
 export const absoluteUrl = (path: string): string => {
@@ -21,20 +27,22 @@ export const buildCanonical = (pathname: string): string => {
 
 export const defaultOpenGraph = {
   type: "website" as const,
-  siteName: "Dehli Mirch",
+  siteName: SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`,
   images: [
     {
-      url: "/dehli-mirch-og-banner.png",
+      url: SITE_OG_IMAGE,
       width: 1200,
       height: 630,
-      alt: "Dehli Mirch — Authentic Spices, Pickles, Snacks",
+      alt: `${
+        SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+      } — Authentic Spices, Pickles, Snacks`,
     },
   ],
 };
 
 export const defaultTwitter = {
   card: "summary_large_image" as const,
-  creator: "@dehlimirch",
+  creator: `@${X_PAGE_ID}`,
 };
 
 // JSON-LD builders
@@ -99,9 +107,9 @@ export function buildOrganizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Dehli Mirch",
+    name: SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`,
     url: getSiteUrl(),
-    logo: absoluteUrl("/placeholder-logo.png"),
+    logo: absoluteUrl(SITE_OG_IMAGE),
   };
 }
 
@@ -110,7 +118,7 @@ export function buildWebSiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Dehli Mirch",
+    name: SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`,
     url,
     potentialAction: {
       "@type": "SearchAction",

@@ -23,6 +23,7 @@ const nextConfig = {
           }
         : false,
   },
+  optimizeFonts: false,
 };
 
 module.exports = nextConfig;

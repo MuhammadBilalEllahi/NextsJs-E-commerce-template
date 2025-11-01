@@ -27,27 +27,43 @@ import {
 import StackedCards from "@/components/home/BranchSlidableCard";
 import { HomeDeliveryInfo } from "@/components/home/HomeDeliveryInfo";
 import { absoluteUrl } from "@/lib/seo";
-import { SITE_NAME } from "@/lib/constants/site";
+import {
+  SITE_FAVICON,
+  SITE_NAME,
+  SITE_NAME_FIRST,
+  SITE_NAME_SECOND,
+} from "@/lib/constants/site";
 import { HomeTestimonials } from "@/components/home/home-testimonials";
 
 export const metadata: Metadata = {
-  title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
-  description: `Shop premium spices, masalas, pickles, and snacks at ${SITE_NAME}. Fast delivery and authentic flavor.`,
+  title: `${
+    SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+  } — Authentic Spices, Pickles, Snacks`,
+  description: `Shop premium spices, masalas, pickles, and snacks at ${
+    SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+  }. Fast delivery and authentic flavor.`,
   alternates: { canonical: "/" },
-  applicationName: SITE_NAME,
+  applicationName: SITE_NAME
+    ? SITE_NAME
+    : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`,
   openGraph: {
-    title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
+    title: `${
+      SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+    } — Authentic Spices, Pickles, Snacks`,
     description:
       "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
     url: absoluteUrl("/"),
   },
   twitter: {
-    title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
+    title: `${
+      SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+    } — Authentic Spices, Pickles, Snacks`,
     description:
       "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: SITE_FAVICON,
+    // icon: [{ url: SITE_FAVICON }],
   },
 };
 

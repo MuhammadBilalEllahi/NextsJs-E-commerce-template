@@ -16,18 +16,33 @@ import { HeaderWithCategories } from "@/components/main_comp/header-with-categor
 import CartSheetWrapper from "@/components/cart/CartSheetWrapper";
 import { BottomNav } from "@/components/main_comp/bottom-nav";
 import { ChatWidget } from "@/components/chat/chat-widget";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/constants/site";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_NAME_SECOND,
+  SITE_NAME_FIRST,
+  SITE_URL,
+  FACEBOOK_PAGE_ID,
+  INSTAGRAM_PAGE_ID,
+  X_PAGE_ID,
+  SITE_FAVICON,
+  SITE_APPLE_TOUCH_ICON,
+} from "@/lib/constants/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  ),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
-    template: `%s | ${SITE_NAME}`,
+    default: `${
+      SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+    } — Authentic Spices, Pickles, Snacks`,
+    template: `%s | ${
+      SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+    }`,
   },
   description: SITE_DESCRIPTION,
-  applicationName: SITE_NAME,
+  applicationName: SITE_NAME
+    ? SITE_NAME
+    : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`,
   alternates: {
     canonical: "/",
   },
@@ -44,21 +59,25 @@ export const metadata: Metadata = {
   },
   openGraph: {
     ...defaultOpenGraph,
-    title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
+    title: `${
+      SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+    } — Authentic Spices, Pickles, Snacks`,
     description:
       "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
     url: absoluteUrl("/"),
   },
   twitter: {
     ...defaultTwitter,
-    title: `${SITE_NAME} — Authentic Spices, Pickles, Snacks`,
+    title: `${
+      SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
+    } — Authentic Spices, Pickles, Snacks`,
     description:
       "Premium South Asian spices and snacks with a modern, spicy aesthetic.",
     images: ["/dehli-mirch-og-banner.png"],
   },
   icons: {
-    icon: [{ url: "/favicon.ico" }],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+    icon: [{ url: SITE_FAVICON }],
+    apple: [{ url: SITE_APPLE_TOUCH_ICON, sizes: "180x180" }],
   },
 };
 
@@ -94,13 +113,15 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: SITE_NAME,
-              url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+              name: SITE_NAME
+                ? SITE_NAME
+                : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`,
+              url: SITE_URL,
               logo: "/placeholder-logo.png",
               sameAs: [
-                "https://www.facebook.com/",
-                "https://www.instagram.com/",
-                "https://x.com/",
+                `https://www.facebook.com/${FACEBOOK_PAGE_ID}`,
+                `https://www.instagram.com/${INSTAGRAM_PAGE_ID}`,
+                `https://x.com/${X_PAGE_ID}`,
               ],
             }),
           }}

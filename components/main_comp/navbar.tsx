@@ -115,10 +115,18 @@ export function Navbar() {
                 <SheetHeader>
                   <div className="flex items-center gap-2">
                     <span className="font-extrabold text-xl tracking-tight">
-                      <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
-                      <span className="text-foreground">
-                        {SITE_NAME_SECOND}
-                      </span>
+                      {SITE_NAME ? (
+                        <span className="text-primary">{SITE_NAME}</span>
+                      ) : (
+                        <>
+                          <span className="text-primary">
+                            {SITE_NAME_FIRST}
+                          </span>{" "}
+                          <span className="text-foreground">
+                            {SITE_NAME_SECOND}
+                          </span>
+                        </>
+                      )}
                     </span>
                   </div>
                 </SheetHeader>
@@ -159,8 +167,14 @@ export function Navbar() {
               href="/"
               className="font-extrabold text-xl tracking-tight flex-shrink-0 lg:hidden"
             >
-              <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
-              <span className="text-foreground">{SITE_NAME_SECOND}</span>
+              {SITE_NAME ? (
+                <span className="text-primary">{SITE_NAME}</span>
+              ) : (
+                <>
+                  <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
+                  <span className="text-foreground">{SITE_NAME_SECOND}</span>
+                </>
+              )}
             </Link>
           )}
 
@@ -170,8 +184,14 @@ export function Navbar() {
               href="/"
               className="font-extrabold text-xl tracking-tight flex-shrink-0 hidden lg:block"
             >
-              <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
-              <span className="text-foreground">{SITE_NAME_SECOND}</span>
+              {SITE_NAME ? (
+                <span className="text-primary">{SITE_NAME}</span>
+              ) : (
+                <>
+                  <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
+                  <span className="text-foreground">{SITE_NAME_SECOND}</span>
+                </>
+              )}
             </Link>
           )}
 

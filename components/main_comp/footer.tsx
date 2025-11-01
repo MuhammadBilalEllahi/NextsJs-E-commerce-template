@@ -21,8 +21,14 @@ export async function Footer() {
       <div className="container mx-auto px-4 py-10 grid gap-8 md:grid-cols-4">
         <div>
           <div className="font-extrabold text-lg tracking-tight mb-2">
-            <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
-            <span className="text-foreground">{SITE_NAME_SECOND}</span>
+            {SITE_NAME ? (
+              <span className="text-primary">{SITE_NAME}</span>
+            ) : (
+              <>
+                <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
+                <span className="text-foreground">{SITE_NAME_SECOND}</span>
+              </>
+            )}
           </div>
           <p className="text-sm text-foreground dark:text-foreground/40">
             Heat you can taste, tradition you can trust.
@@ -140,7 +146,15 @@ export async function Footer() {
       </div>
       <div className="border-t py-4 text-center text-xs text-foreground dark:text-foreground/40">
         © {new Date().getFullYear()}{" "}
-        <span className="text-primary">{SITE_NAME}</span>. All rights reserved.
+        {SITE_NAME ? (
+          <span className="text-primary">{SITE_NAME}</span>
+        ) : (
+          <>
+            <span className="text-primary">{SITE_NAME_FIRST}</span>{" "}
+            <span className="text-foreground">{SITE_NAME_SECOND}</span>
+          </>
+        )}
+        . All rights reserved.
       </div>
     </footer>
   );
