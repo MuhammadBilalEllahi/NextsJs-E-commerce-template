@@ -59,11 +59,9 @@ export default function ContentCreatorPage() {
     }
 
     try {
-      const data = await seedContentPages();
+      await seedContentPages();
       await fetchContentPages();
-      alert(
-        `Seed data applied successfully!\nCreated: ${data.results.created}\nUpdated: ${data.results.updated}\nSkipped: ${data.results.skipped}`
-      );
+      alert("Seed data applied successfully!");
     } catch (error) {
       console.error("Error applying seed data:", error);
       alert("An error occurred while applying seed data");

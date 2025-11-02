@@ -1,83 +1,155 @@
+/**
+ * Hybrid Search API
+ * Combines MongoDB keyword search with RAG semantic search
+ */
+
 import { NextRequest, NextResponse } from "next/server";
-import Product from "@/models/Product";
-import dbConnect from "@/database/mongodb";
-import { Product as ProductType } from "@/types/types";
+import mcpTools from "@/lib/tools";
+import { ragSearch } from "@/lib/rag";
+import { logUserBehavior } from "@/lib/logging/userBehavior";
 
-export async function GET(req: NextRequest) {
+export const runtime = "nodejs";
+
+interface SearchResult {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  relevanceScore: number;
+  source: "keyword" | "semantic" | "hybrid";
+  image?: string;
+}
+
+/**
+ * Merge and rank results from keyword and semantic search
+ */
+function mergeResults(
+  keywordResults: any[],
+  semanticResults: any[]
+): SearchResult[] {
+  const merged = new Map<string, SearchResult>();
+
+  // Add keyword results
+  keywordResults.forEach((result, index) => {
+    merged.set(result.id, {
+      id: result.id,
+      name: result.name || "Product",
+      price: result.price || 0,
+      description: result.description || "",
+      relevanceScore: 1 - index / keywordResults.length, // Higher for top results
+      source: "keyword",
+      image: result.image,
+    });
+  });
+
+  // Merge semantic results
+  semanticResults.forEach((result) => {
+    const doc = result.document;
+    const existingResult = merged.get(doc.productId || doc.id);
+
+    if (existingResult) {
+      // Boost score for items found in both searches
+      existingResult.relevanceScore =
+        (existingResult.relevanceScore + result.score) / 2 + 0.2;
+      existingResult.source = "hybrid";
+    } else {
+      merged.set(doc.productId || doc.id, {
+        id: doc.productId || doc.id,
+        name: doc.metadata?.name || "Product",
+        price: doc.metadata?.price || 0,
+        description: doc.content,
+        relevanceScore: result.score,
+        source: "semantic",
+      });
+    }
+  });
+
+  // Convert to array and sort by relevance
+  return Array.from(merged.values())
+    .sort((a, b) => b.relevanceScore - a.relevanceScore)
+    .slice(0, 20); // Return top 20 results
+}
+
+/**
+ * POST /api/search
+ * Hybrid search combining keyword and semantic search
+ */
+export async function POST(request: NextRequest) {
   try {
-    await dbConnect();
+    const { query, userId } = await request.json();
 
-    const { searchParams } = new URL(req.url);
-    const query = searchParams.get("q");
-    const limit = parseInt(searchParams.get("limit") || "10");
-
-    if (!query || query.trim().length === 0) {
-      return NextResponse.json({ products: [] });
+    if (!query || typeof query !== "string") {
+      return NextResponse.json(
+        { success: false, error: "Invalid query" },
+        { status: 400 }
+      );
     }
 
-    // Search products by name, description, brand, and categories
-    const products = (await Product.find({
-      $and: [
-        { isActive: true, isOutOfStock: false },
-        {
-          $or: [
-            { name: { $regex: query, $options: "i" } },
-            { description: { $regex: query, $options: "i" } },
-            { "brand.name": { $regex: query, $options: "i" } },
-            { "categories.name": { $regex: query, $options: "i" } },
-          ],
-        },
-      ],
-    })
-      .populate("brand", "name")
-      .populate("categories", "name")
-      .populate("variants", "price")
-      .populate({
-        path: "variants",
-        match: { isActive: true, isOutOfStock: false },
-      })
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .lean()) as any[];
+    console.log(`[Hybrid Search] Query: "${query}"`);
 
-    const formattedProducts = products.map((product: any) => {
-      const firstImage = Array.isArray(product?.images)
-        ? product.images[0]
-        : undefined;
+    // Run keyword and semantic search in parallel
+    const [keywordResults, ragResults] = await Promise.all([
+      mcpTools.searchProducts(query),
+      ragSearch(query, 10, "products"),
+    ]);
 
-      const brandName =
-        (product?.brand && typeof product.brand === "object"
-          ? product.brand?.name
-          : undefined) || "Dehli Mirch";
+    // Merge and rank results
+    const products = mergeResults(
+      keywordResults,
+      ragResults.results
+    );
 
-      const firstCategory = Array.isArray(product?.categories)
-        ? product.categories[0]
-        : undefined;
+    // Log search behavior
+    if (userId) {
+      logUserBehavior(userId, "search", {
+        query,
+        resultsCount: products.length,
+        hasKeywordResults: keywordResults.length > 0,
+        hasSemanticResults: ragResults.results.length > 0,
+      });
+    }
 
-      const categoryName =
-        (firstCategory &&
-          (typeof firstCategory === "object"
-            ? firstCategory?.name
-            : firstCategory)) ||
-        "spices";
-
-      return {
-        id: String(product._id),
-        slug: product.slug,
-        name: product.name,
-        price: product?.variants?.[0]?.price ?? product?.price ?? 0,
-        images: product.images,
-        image: firstImage,
-        brand: brandName,
-        ratingAvg: product.ratingAvg || 0,
-        reviewCount: product.reviewCount || 0,
-        category: categoryName,
-      };
+    return NextResponse.json({
+      success: true,
+      products,
+      ragResults: {
+        topResult: ragResults.topResult,
+        totalFound: ragResults.totalFound,
+      },
+      metadata: {
+        keywordMatches: keywordResults.length,
+        semanticMatches: ragResults.results.length,
+        hybridResults: products.filter((p) => p.source === "hybrid").length,
+        searchTime: ragResults.searchTime,
+      },
     });
-
-    return NextResponse.json({ products: formattedProducts });
-  } catch (error) {
-    console.error("Search error:", error);
-    return NextResponse.json({ error: "Search failed" }, { status: 500 });
+  } catch (error: any) {
+    console.error("[Hybrid Search] Error:", error);
+    return NextResponse.json(
+      { success: false, error: error.message || "Search failed" },
+      { status: 500 }
+    );
   }
+}
+
+/**
+ * GET /api/search
+ * Get popular searches or suggestions
+ */
+export async function GET() {
+  return NextResponse.json({
+    success: true,
+    suggestions: [
+      "red chili powder",
+      "garam masala",
+      "pickle",
+      "organic spices",
+      "turmeric",
+    ],
+    popularSearches: [
+      "spicy products",
+      "cooking essentials",
+      "traditional spices",
+    ],
+  });
 }

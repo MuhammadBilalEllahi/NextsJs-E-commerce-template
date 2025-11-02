@@ -1,0 +1,264 @@
+{
+  "documents": [
+    {
+      "id": "doc_001",
+      "content": "Red chili powder is made from dried red chillies ground into a fine powder. It adds heat and color to dishes. Available in various heat levels from mild to very hot.",
+      "category": "products",
+      "productId": "prod_001",
+      "metadata": {
+        "type": "product_description",
+        "price": 299,
+        "stock": 150
+      },
+      "embedding": [0.2, 0.5, 0.8, 0.3, 0.6, 0.1, 0.9, 0.4]
+    },
+    {
+      "id": "doc_002",
+      "content": "Garam masala is a blend of ground spices common in Indian cuisine. Contains cumin, coriander, cardamom, cloves, black pepper, cinnamon, and nutmeg.",
+      "category": "products",
+      "productId": "prod_002",
+      "metadata": {
+        "type": "product_description",
+        "price": 399,
+        "stock": 85
+      },
+      "embedding": [0.3, 0.4, 0.7, 0.5, 0.8, 0.2, 0.6, 0.3]
+    },
+    {
+      "id": "doc_003",
+      "content": "Turmeric powder has anti-inflammatory properties and is essential in curry dishes. Adds golden color and earthy flavor. Known for health benefits.",
+      "category": "products",
+      "productId": "prod_003",
+      "metadata": {
+        "type": "product_description",
+        "price": 250,
+        "stock": 200
+      },
+      "embedding": [0.1, 0.6, 0.9, 0.2, 0.7, 0.3, 0.5, 0.4]
+    },
+    {
+      "id": "doc_004",
+      "content": "How to place an order: Add items to cart, proceed to checkout, enter shipping address, select payment method (COD available), and confirm order.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "ordering"
+      },
+      "embedding": [0.5, 0.3, 0.6, 0.8, 0.4, 0.7, 0.2, 0.9]
+    },
+    {
+      "id": "doc_005",
+      "content": "Shipping policy: Free shipping on orders above Rs. 1000. Standard delivery takes 3-5 business days. TCS courier available for outside Lahore.",
+      "category": "help",
+      "metadata": {
+        "type": "policy",
+        "topic": "shipping"
+      },
+      "embedding": [0.4, 0.7, 0.5, 0.6, 0.3, 0.8, 0.1, 0.2]
+    },
+    {
+      "id": "doc_006",
+      "content": "Return and refund policy: Products can be returned within 7 days of delivery. Item must be unused and in original packaging. Full refund processed within 5-7 business days.",
+      "category": "help",
+      "metadata": {
+        "type": "policy",
+        "topic": "returns"
+      },
+      "embedding": [0.6, 0.2, 0.4, 0.7, 0.5, 0.3, 0.8, 0.6]
+    },
+    {
+      "id": "doc_007",
+      "content": "Pickle varieties include mango pickle, mixed vegetable pickle, and lemon pickle. Made with traditional recipes using authentic spices and premium ingredients.",
+      "category": "products",
+      "productId": "prod_007",
+      "metadata": {
+        "type": "product_description",
+        "price": 350,
+        "stock": 120
+      },
+      "embedding": [0.7, 0.3, 0.5, 0.4, 0.6, 0.9, 0.2, 0.8]
+    },
+    {
+      "id": "doc_008",
+      "content": "Payment methods: We accept Cash on Delivery (COD) for all orders. Online payment options coming soon. No hidden charges.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "payment"
+      },
+      "embedding": [0.8, 0.4, 0.3, 0.5, 0.7, 0.2, 0.6, 0.1]
+    },
+    {
+      "id": "doc_009",
+      "content": "Kashmiri red chili is known for its vibrant color and mild heat. Perfect for adding color to dishes without making them too spicy.",
+      "category": "products",
+      "productId": "prod_009",
+      "metadata": {
+        "type": "product_description",
+        "price": 450,
+        "stock": 60
+      },
+      "embedding": [0.2, 0.8, 0.6, 0.3, 0.5, 0.4, 0.7, 0.9]
+    },
+    {
+      "id": "doc_010",
+      "content": "Track your order: Use your order ID or email to track shipment status. Tracking information updated within 24 hours of dispatch.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "tracking"
+      },
+      "embedding": [0.5, 0.6, 0.7, 0.8, 0.2, 0.3, 0.4, 0.5]
+    },
+    {
+      "id": "doc_011",
+      "content": "How to return your order: Products can be returned within 7 days of delivery. Items must be unused and in original packaging. Initiate return through your account or contact support.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "returns"
+      },
+      "embedding": [0.6, 0.2, 0.4, 0.7, 0.5, 0.3, 0.8, 0.6]
+    },
+    {
+      "id": "doc_012",
+      "content": "Shipping costs: Free shipping on orders above Rs. 1000. Standard delivery Rs. 150. TCS courier Rs. 200 for outside Lahore. Estimated delivery 3-5 business days.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "shipping"
+      },
+      "embedding": [0.4, 0.7, 0.5, 0.6, 0.3, 0.8, 0.1, 0.2]
+    },
+    {
+      "id": "doc_013",
+      "content": "Refund process: Refunds processed within 5-7 business days after return approval. Amount credited to original payment method or store credit as per your choice.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "refund"
+      },
+      "embedding": [0.7, 0.3, 0.5, 0.4, 0.6, 0.9, 0.2, 0.8]
+    },
+    {
+      "id": "doc_014",
+      "content": "Order cancellation: Orders can be cancelled within 2 hours of placement. After dispatch, cancellation not possible but you can return upon delivery.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "cancellation"
+      },
+      "embedding": [0.5, 0.4, 0.6, 0.8, 0.3, 0.7, 0.2, 0.5]
+    },
+    {
+      "id": "doc_015",
+      "content": "Product quality guarantee: All products are sourced from certified suppliers. Quality checked before dispatch. 100% money-back guarantee if not satisfied.",
+      "category": "help",
+      "metadata": {
+        "type": "policy",
+        "topic": "quality"
+      },
+      "embedding": [0.8, 0.4, 0.3, 0.5, 0.7, 0.2, 0.6, 0.1]
+    },
+    {
+      "id": "doc_016",
+      "content": "Contact support: Available Monday-Saturday 9 AM to 6 PM. Email: support@delhimirch.com, WhatsApp: +92-300-1234567, Phone: 042-123456789.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "contact"
+      },
+      "embedding": [0.3, 0.6, 0.8, 0.4, 0.5, 0.2, 0.7, 0.3]
+    },
+    {
+      "id": "doc_017",
+      "content": "Bulk orders: Special discounts available for bulk purchases. Minimum order 10kg. Contact our sales team for custom quotes and packaging options.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "bulk"
+      },
+      "embedding": [0.4, 0.5, 0.7, 0.3, 0.8, 0.6, 0.2, 0.4]
+    },
+    {
+      "id": "doc_018",
+      "content": "Gift packaging: Complimentary gift packaging available on request. Custom gift messages can be added. Perfect for festivals and special occasions.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "gift"
+      },
+      "embedding": [0.6, 0.3, 0.5, 0.7, 0.4, 0.8, 0.3, 0.6]
+    },
+    {
+      "id": "doc_019",
+      "content": "Product warranty: All products come with quality guarantee. Defective items can be replaced within 14 days. Electronics have 6-month manufacturer warranty.",
+      "category": "help",
+      "metadata": {
+        "type": "policy",
+        "topic": "warranty"
+      },
+      "embedding": [0.5, 0.7, 0.4, 0.6, 0.3, 0.8, 0.2, 0.5]
+    },
+    {
+      "id": "doc_020",
+      "content": "Payment security: All transactions are encrypted with SSL. We never store complete card details. Support for COD, credit/debit cards, and online banking.",
+      "category": "help",
+      "metadata": {
+        "type": "policy",
+        "topic": "payment_security"
+      },
+      "embedding": [0.8, 0.4, 0.3, 0.5, 0.7, 0.2, 0.6, 0.1]
+    },
+    {
+      "id": "doc_021",
+      "content": "Delivery options: Standard delivery 3-5 days, Express delivery 1-2 days (extra charges apply). Free delivery on orders above Rs. 1000 within Lahore.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "delivery"
+      },
+      "embedding": [0.4, 0.7, 0.5, 0.6, 0.3, 0.8, 0.1, 0.2]
+    },
+    {
+      "id": "doc_022",
+      "content": "Order tracking: Track your order using order ID or email. Real-time updates via SMS and email. Tracking link sent within 24 hours of dispatch.",
+      "category": "help",
+      "metadata": {
+        "type": "faq",
+        "topic": "tracking"
+      },
+      "embedding": [0.5, 0.6, 0.7, 0.8, 0.2, 0.3, 0.4, 0.5]
+    },
+    {
+      "id": "doc_023",
+      "content": "Product freshness: All spices are packed fresh upon order. Best before dates clearly mentioned. Store in cool, dry place for maximum freshness.",
+      "category": "help",
+      "metadata": {
+        "type": "info",
+        "topic": "freshness"
+      },
+      "embedding": [0.3, 0.5, 0.8, 0.4, 0.6, 0.7, 0.2, 0.4]
+    },
+    {
+      "id": "doc_024",
+      "content": "Loyalty program: Earn 1 point per Rs. 100 spent. Redeem points for discounts. VIP members get early access to sales and exclusive deals.",
+      "category": "help",
+      "metadata": {
+        "type": "info",
+        "topic": "loyalty"
+      },
+      "embedding": [0.7, 0.4, 0.6, 0.5, 0.8, 0.3, 0.2, 0.6]
+    },
+    {
+      "id": "doc_025",
+      "content": "Recipe suggestions: Each product page includes recipe ideas. Subscribe to our newsletter for weekly recipe inspiration using our products.",
+      "category": "help",
+      "metadata": {
+        "type": "info",
+        "topic": "recipes"
+      },
+      "embedding": [0.6, 0.5, 0.7, 0.4, 0.3, 0.8, 0.2, 0.5]
+    }
+  ]
+}

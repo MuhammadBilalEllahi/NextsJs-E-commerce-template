@@ -28,6 +28,7 @@ import {
   SITE_FAVICON,
   SITE_APPLE_TOUCH_ICON,
 } from "@/lib/constants/site";
+import AIAssistant from "@/components/AIAssistant";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -139,6 +140,7 @@ export default function RootLayout({
             <Navbar />
             <main id="main" className="flex-1">
               {children}
+              <AIAssistant userId="guest" />
             </main>
             <ChatWidget />
             <CartSheetWrapper />
