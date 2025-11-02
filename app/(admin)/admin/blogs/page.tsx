@@ -60,24 +60,13 @@ import Link from "@tiptap/extension-link";
 import { TiptapMenuBar } from "@/components/admin/blogs/tiptap-menu-bar";
 import NextImage from "next/image";
 import {
-  listBlogs,
-  saveBlog,
+  fetchBlogs as fetchBlogsApi,
+  createBlog,
+  updateBlog,
   deleteBlog as deleteBlogApi,
   toggleBlogStatus,
 } from "@/lib/api/admin/blogs";
-
-interface Blog {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt?: string;
-  content: string;
-  image?: string;
-  tags: string[];
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Blog, CreateBlogData, UpdateBlogData } from "@/types/types";
 
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -134,8 +123,8 @@ export default function BlogsPage() {
 
   const fetchBlogs = async () => {
     try {
-      const data = await listBlogs();
-      if (data.success) setBlogs(data.blogs);
+      const data = await fetchBlogsApi();
+      setBlogs(data);
     } catch (error) {
       console.error("Error fetching blogs:", error);
     } finally {
@@ -179,46 +168,56 @@ export default function BlogsPage() {
     setSuccess("");
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("title", formData.title);
-      formDataToSend.append("slug", formData.slug);
-      formDataToSend.append("excerpt", formData.excerpt);
-      formDataToSend.append("content", formData.content);
-      formDataToSend.append("tags", formData.tags);
-      formDataToSend.append("isActive", formData.isActive.toString());
-
-      if (imageFile) {
-        formDataToSend.append("image", imageFile);
-      }
+      const tagsArray = formData.tags
+        ? formData.tags.split(",").map((t) => t.trim())
+        : [];
 
       if (editingBlog) {
-        formDataToSend.append("id", editingBlog.id);
+        const data: UpdateBlogData = {
+          id: editingBlog.id,
+          title: formData.title,
+          excerpt: formData.excerpt,
+          content: formData.content,
+          tags: tagsArray,
+          image: imageFile || undefined,
+          isActive: formData.isActive,
+        };
+        await updateBlog(data);
+      } else {
+        if (!imageFile) {
+          alert("Image is required");
+          return;
+        }
+        const data: CreateBlogData = {
+          title: formData.title,
+          excerpt: formData.excerpt,
+          content: formData.content,
+          tags: tagsArray,
+          image: imageFile,
+          isActive: formData.isActive,
+        };
+        await createBlog(data);
       }
 
-      const data = await saveBlog(formDataToSend, Boolean(editingBlog));
-      if (data.success) {
-        await fetchBlogs();
-        setIsDialogOpen(false);
-        setEditingBlog(null);
-        setFormData({
-          title: "",
-          slug: "",
-          excerpt: "",
-          content: "",
-          image: "",
-          tags: "",
-          isActive: true,
-        });
-        setImageFile(null);
-        setImagePreview("");
-        setSuccess(
-          editingBlog
-            ? "Blog updated successfully!"
-            : "Blog created successfully!"
-        );
-      } else {
-        setError(data.error || "Failed to save blog");
-      }
+      await fetchBlogs();
+      setIsDialogOpen(false);
+      setEditingBlog(null);
+      setFormData({
+        title: "",
+        slug: "",
+        excerpt: "",
+        content: "",
+        image: "",
+        tags: "",
+        isActive: true,
+      });
+      setImageFile(null);
+      setImagePreview("");
+      setSuccess(
+        editingBlog
+          ? "Blog updated successfully!"
+          : "Blog created successfully!"
+      );
     } catch (error) {
       console.error("Error saving blog:", error);
       setError("Failed to save blog");
@@ -244,13 +243,9 @@ export default function BlogsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const data = await deleteBlogApi(id);
-      if (data.success) {
-        await fetchBlogs();
-        setSuccess("Blog deleted successfully!");
-      } else {
-        setError(data.error || "Failed to delete blog");
-      }
+      await deleteBlogApi(id);
+      await fetchBlogs();
+      setSuccess("Blog deleted successfully!");
     } catch (error) {
       console.error("Error deleting blog:", error);
       setError("Failed to delete blog");
@@ -259,15 +254,11 @@ export default function BlogsPage() {
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const data = await toggleBlogStatus(id, !currentStatus);
-      if (data.success) {
-        await fetchBlogs();
-        setSuccess(
-          `Blog ${!currentStatus ? "activated" : "deactivated"} successfully!`
-        );
-      } else {
-        setError(data.error || "Failed to update blog status");
-      }
+      await toggleBlogStatus(id, !currentStatus);
+      await fetchBlogs();
+      setSuccess(
+        `Blog ${!currentStatus ? "activated" : "deactivated"} successfully!`
+      );
     } catch (error) {
       console.error("Error updating blog status:", error);
       setError("Failed to update blog status");

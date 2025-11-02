@@ -19,20 +19,11 @@ import {
   deleteBrand,
   toggleBrandStatus,
 } from "@/lib/api/admin/brand/brand";
+import { Brand, CreateBrandData, UpdateBrandData } from "@/types/types";
 import BrandCreateModal from "@/components/admin/brand/brand-create-modal";
 import BrandEditModal from "@/components/admin/brand/brand-edit-modal";
 import BrandDeleteModal from "@/components/admin/brand/brand-delete-modal";
 import Image from "next/image";
-
-type Brand = {
-  id: string;
-  name: string;
-  description: string;
-  logo?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
 
 export default function BrandsAdminPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -64,34 +55,38 @@ export default function BrandsAdminPage() {
     }
   };
 
-  const handleCreateBrand = async (brandData: {
-    name: string;
-    description: string;
-    logo: File | null;
-  }) => {
+  const handleCreateBrand = async (brandData: CreateBrandData) => {
     try {
-      await createBrand(brandData as any);
+      await createBrand(brandData);
       await loadBrands();
       setShowCreateModal(false);
     } catch (error) {
       console.error("Failed to create brand:", error);
+      alert(
+        "Error: " +
+          (error instanceof Error ? error.message : "Failed to create brand")
+      );
     }
   };
 
-  const handleEditBrand = async (brandData: {
-    name: string;
-    description: string;
-    logo: File | null;
-  }) => {
+  const handleEditBrand = async (brandData: Omit<UpdateBrandData, "id">) => {
     if (!selectedBrand) return;
 
     try {
-      await updateBrand((selectedBrand as any).id, brandData as any);
+      const updateData: UpdateBrandData = {
+        id: selectedBrand.id,
+        ...brandData,
+      };
+      await updateBrand(updateData);
       await loadBrands();
       setShowEditModal(false);
       setSelectedBrand(null);
     } catch (error) {
       console.error("Failed to update brand:", error);
+      alert(
+        "Error: " +
+          (error instanceof Error ? error.message : "Failed to update brand")
+      );
     }
   };
 

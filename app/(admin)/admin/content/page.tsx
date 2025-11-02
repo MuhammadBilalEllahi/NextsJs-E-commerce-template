@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Trash2, Edit, Plus, Eye, Database } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ContentPage } from "@/types";
+import { ContentPage } from "@/types/types";
 import {
-  listContentPages,
+  fetchContentPages as fetchContentPagesApi,
   deleteContentPage,
   seedContentPages,
 } from "@/lib/api/admin/content";
@@ -21,7 +21,7 @@ export default function ContentCreatorPage() {
 
   const fetchContentPages = async () => {
     try {
-      const data = await listContentPages();
+      const data = await fetchContentPagesApi();
       setContentPages(data);
     } catch (error) {
       console.error("Error fetching content pages:", error);

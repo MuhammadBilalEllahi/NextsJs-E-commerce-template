@@ -1,9 +1,13 @@
-import { Category } from "@/types/types";
+import {
+  Category,
+  CreateCategoryData,
+  UpdateCategoryData,
+} from "@/types/types";
 
 export const API_URL_CATEGORY_ADMIN = "/api/admin/category";
 
 // fetch all categories
-export const fetchCategories = async () => {
+export const fetchCategories = async (): Promise<Category[]> => {
   const res = await fetch(API_URL_CATEGORY_ADMIN);
   const data = await res.json();
   if (!res.ok) {
@@ -26,26 +30,29 @@ export const fetchCategories = async () => {
 };
 
 // create a new category
-export const createCategory = async (category: Category) => {
-  // console.debug("[createCategory]", category)
-
-  const formData = new FormData();
-  // formData.append("id", category.id);
-  if (category.name) formData.append("name", category.name);
-  if (category.parent !== undefined) formData.append("parent", category.parent);
-  if (category.description)
-    formData.append("description", category.description);
-  if (category.isActive !== undefined)
-    formData.append("isActive", category.isActive.toString());
-
-  if (category.image && (category.image as any) instanceof File) {
-    formData.append("image", category.image);
+export const createCategory = async (
+  categoryData: CreateCategoryData
+): Promise<Category> => {
+  if (!categoryData.name) {
+    throw new Error("Category name is required");
   }
 
-  // console.debug("[createCategory]", formData)
-  const res = await fetch(`${API_URL_CATEGORY_ADMIN}`, {
+  const fd = new FormData();
+  fd.append("name", categoryData.name);
+  if (categoryData.parent !== undefined)
+    fd.append("parent", categoryData.parent);
+  if (categoryData.description)
+    fd.append("description", categoryData.description);
+  if (categoryData.isActive !== undefined)
+    fd.append("isActive", categoryData.isActive.toString());
+
+  if (categoryData.image && categoryData.image instanceof File) {
+    fd.append("image", categoryData.image);
+  }
+
+  const res = await fetch(API_URL_CATEGORY_ADMIN, {
     method: "POST",
-    body: formData,
+    body: fd,
   });
 
   const data = await res.json();
@@ -58,28 +65,33 @@ export const createCategory = async (category: Category) => {
     throw new Error(message);
   }
   const c = data.category || {};
-  return { ...c, id: c.id || c._id } as any;
+  return { ...c, id: c.id || c._id };
 };
 
-export const updateCategory = async (category: Category) => {
-  const formData = new FormData();
-  formData.append("id", category.id);
-  if (category.name) formData.append("name", category.name);
-  if (category.parent !== undefined) formData.append("parent", category.parent);
-  if (category.description)
-    formData.append("description", category.description);
-  if (category.isActive !== undefined)
-    formData.append("isActive", category.isActive.toString());
-
-  // If the image is a File, append it, otherwise skip (keep old URL)
-  if (category.image && (category.image as any) instanceof File) {
-    formData.append("image", category.image);
+export const updateCategory = async (
+  categoryData: UpdateCategoryData
+): Promise<Category> => {
+  if (!categoryData.id || !categoryData.name) {
+    throw new Error("Category ID and name are required");
   }
 
-  // console.debug("[updateCategory]", formData)
-  const res = await fetch(`${API_URL_CATEGORY_ADMIN}`, {
+  const fd = new FormData();
+  fd.append("id", categoryData.id);
+  fd.append("name", categoryData.name);
+  if (categoryData.parent !== undefined)
+    fd.append("parent", categoryData.parent);
+  if (categoryData.description)
+    fd.append("description", categoryData.description);
+  if (categoryData.isActive !== undefined)
+    fd.append("isActive", categoryData.isActive.toString());
+
+  if (categoryData.image && categoryData.image instanceof File) {
+    fd.append("image", categoryData.image);
+  }
+
+  const res = await fetch(API_URL_CATEGORY_ADMIN, {
     method: "PUT",
-    body: formData,
+    body: fd,
   });
 
   const data = await res.json();
@@ -92,5 +104,5 @@ export const updateCategory = async (category: Category) => {
     throw new Error(message);
   }
   const c = data.category || {};
-  return { ...c, id: c.id || c._id } as any;
+  return { ...c, id: c.id || c._id };
 };

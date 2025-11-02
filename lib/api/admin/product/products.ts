@@ -1,3 +1,17 @@
+import { useState } from "react";
+import {
+  Product as ProductType,
+  CreateProductData as CreateProductDataType,
+  UpdateProductData as UpdateProductDataType,
+} from "@/types/types";
+
+const API_URL_PRODUCT_ADMIN = "/api/admin/product";
+
+// Re-export types for backward compatibility
+export type Product = ProductType;
+export type CreateProductData = CreateProductDataType;
+export type UpdateProductData = UpdateProductDataType;
+
 export async function updateProductById(productId: string, formData: FormData) {
   const res = await fetch(
     `/api/admin/product?id=${encodeURIComponent(productId)}`,
@@ -9,57 +23,6 @@ export async function updateProductById(productId: string, formData: FormData) {
   const j = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(j.error || "Failed to update product");
   return j;
-}
-import { useState } from "react";
-
-const API_URL_PRODUCT_ADMIN = "/api/admin/product";
-
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  ingredients?: string;
-  price: number;
-  stock: number;
-  discount: number;
-  brand: { id: string; name: string };
-  categories: { id: string; name: string }[];
-  images: string[];
-  variants: any[];
-  isActive: boolean;
-  isOutOfStock: boolean;
-  isFeatured: boolean;
-  isTopSelling: boolean;
-  isNewArrival: boolean;
-  isBestSelling: boolean;
-  slug: string;
-  createdAt: string;
-  updatedAt: string;
-  isGrocery: boolean;
-  isSpecial: boolean;
-}
-
-export interface CreateProductData {
-  name: string;
-  description: string;
-  ingredients?: string;
-  price: number;
-  stock: number;
-  discount: number;
-  brand: string;
-  categories: string[];
-  images: (string | File)[];
-  slug?: string;
-  variants: any[];
-  isActive: boolean;
-  isOutOfStock: boolean;
-  isGrocery: boolean;
-  isSpecial: boolean;
-}
-
-export interface UpdateProductData extends Partial<CreateProductData> {
-  id: string;
-  images?: (string | File)[];
 }
 
 // Fetch all products

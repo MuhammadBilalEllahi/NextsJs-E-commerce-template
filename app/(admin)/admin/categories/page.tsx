@@ -15,16 +15,12 @@ import {
   createCategory,
   updateCategory,
 } from "@/lib/api/admin/category/categories";
+import {
+  Category,
+  CreateCategoryData,
+  UpdateCategoryData,
+} from "@/types/types";
 import Image from "next/image";
-
-type Category = {
-  id: string;
-  name: string;
-  parent?: { id: string; name: string };
-  description?: string;
-  image?: string;
-  isActive?: boolean;
-};
 
 export default function CategoriesAdminPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -46,7 +42,11 @@ export default function CategoriesAdminPage() {
     if (cat) {
       setEditing(cat);
       setName(cat.name);
-      setParent(cat.parent?.id || "");
+      setParent(
+        typeof cat.parent === "object" && cat.parent !== null
+          ? (cat.parent as any).id
+          : cat.parent || ""
+      );
       setDescription(cat.description || "");
       setImage(cat.image || null);
       setIsActive(cat.isActive || false);
@@ -64,27 +64,28 @@ export default function CategoriesAdminPage() {
   const saveCategory = async () => {
     if (!name) return;
     try {
-      let data: any = {
-        name,
-        parent: parent || undefined,
-        description,
-        isActive,
-      };
-
-      // handle image upload (if File object)
-      if (image && image instanceof File) {
-        data.image = image; // Pass File directly
-      } else if (typeof image === "string") {
-        data.image = image; // old URL
-      }
-
       if (editing) {
-        const updated = await updateCategory({ id: editing.id, ...data });
+        const updateData: UpdateCategoryData = {
+          id: editing.id,
+          name,
+          parent: parent || undefined,
+          description,
+          isActive,
+          image: image instanceof File ? image : undefined,
+        };
+        const updated = await updateCategory(updateData);
         setCategories((prev) =>
           prev.map((c) => (c.id === editing.id ? updated : c))
         );
       } else {
-        const newCat = await createCategory(data);
+        const createData: CreateCategoryData = {
+          name,
+          parent: parent || undefined,
+          description,
+          isActive,
+          image: image instanceof File ? image : null,
+        };
+        const newCat = await createCategory(createData);
         setCategories((prev) => [newCat, ...prev]);
       }
 
@@ -97,6 +98,7 @@ export default function CategoriesAdminPage() {
       setIsActive(false);
     } catch (err: any) {
       console.error(err.message);
+      alert("Error: " + err.message);
     }
   };
 
@@ -216,7 +218,11 @@ export default function CategoriesAdminPage() {
                 {categories.map((c) => (
                   <tr key={c.id} className="border-t">
                     <td className="p-3">{c.name}</td>
-                    <td className="p-3">{c.parent?.name || "—"}</td>
+                    <td className="p-3">
+                      {typeof c.parent === "object" && c.parent !== null
+                        ? (c.parent as any).name
+                        : "—"}
+                    </td>
                     <td className="p-3">{c.description || "—"}</td>
                     <td className="p-3">
                       <span

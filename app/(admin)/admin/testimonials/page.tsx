@@ -55,20 +55,17 @@ import {
   MessageSquare,
 } from "lucide-react";
 import {
-  listTestimonials,
-  saveTestimonial,
+  fetchTestimonials as fetchTestimonialsApi,
+  createTestimonial,
+  updateTestimonial,
   deleteTestimonial,
   toggleTestimonialStatus,
 } from "@/lib/api/admin/testimonials";
-
-interface Testimonial {
-  id: string;
-  author: string;
-  quote: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import {
+  Testimonial,
+  CreateTestimonialData,
+  UpdateTestimonialData,
+} from "@/types/types";
 
 export default function TestimonialsPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -90,8 +87,8 @@ export default function TestimonialsPage() {
 
   const fetchTestimonials = async () => {
     try {
-      const data = await listTestimonials();
-      if (data.success) setTestimonials(data.testimonials);
+      const data = await fetchTestimonialsApi();
+      setTestimonials(data);
     } catch (error) {
       console.error("Error fetching testimonials:", error);
     } finally {
@@ -105,27 +102,38 @@ export default function TestimonialsPage() {
     setSuccess("");
 
     try {
-      const payload = editingTestimonial
-        ? { id: editingTestimonial.id, ...formData }
-        : formData;
-      const data = await saveTestimonial(payload, Boolean(editingTestimonial));
-      if (data.success) {
-        await fetchTestimonials();
-        setIsDialogOpen(false);
-        setEditingTestimonial(null);
-        setFormData({
-          author: "",
-          quote: "",
-          isActive: true,
-        });
-        setSuccess(
-          editingTestimonial
-            ? "Testimonial updated successfully!"
-            : "Testimonial created successfully!"
-        );
+      if (editingTestimonial) {
+        const data: UpdateTestimonialData = {
+          id: editingTestimonial.id,
+          author: formData.author,
+          quote: formData.quote,
+          rating: 5, // Default rating
+          isActive: formData.isActive,
+        };
+        await updateTestimonial(data);
       } else {
-        setError(data.error || "Failed to save testimonial");
+        const data: CreateTestimonialData = {
+          author: formData.author,
+          quote: formData.quote,
+          rating: 5, // Default rating
+          isActive: formData.isActive,
+        };
+        await createTestimonial(data);
       }
+
+      await fetchTestimonials();
+      setIsDialogOpen(false);
+      setEditingTestimonial(null);
+      setFormData({
+        author: "",
+        quote: "",
+        isActive: true,
+      });
+      setSuccess(
+        editingTestimonial
+          ? "Testimonial updated successfully!"
+          : "Testimonial created successfully!"
+      );
     } catch (error) {
       console.error("Error saving testimonial:", error);
       setError("Failed to save testimonial");
@@ -144,13 +152,9 @@ export default function TestimonialsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const data = await deleteTestimonial(id);
-      if (data.success) {
-        await fetchTestimonials();
-        setSuccess("Testimonial deleted successfully!");
-      } else {
-        setError(data.error || "Failed to delete testimonial");
-      }
+      await deleteTestimonial(id);
+      await fetchTestimonials();
+      setSuccess("Testimonial deleted successfully!");
     } catch (error) {
       console.error("Error deleting testimonial:", error);
       setError("Failed to delete testimonial");
@@ -159,17 +163,13 @@ export default function TestimonialsPage() {
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const data = await toggleTestimonialStatus(id, !currentStatus);
-      if (data.success) {
-        await fetchTestimonials();
-        setSuccess(
-          `Testimonial ${
-            !currentStatus ? "activated" : "deactivated"
-          } successfully!`
-        );
-      } else {
-        setError(data.error || "Failed to update testimonial status");
-      }
+      await toggleTestimonialStatus(id, !currentStatus);
+      await fetchTestimonials();
+      setSuccess(
+        `Testimonial ${
+          !currentStatus ? "activated" : "deactivated"
+        } successfully!`
+      );
     } catch (error) {
       console.error("Error updating testimonial status:", error);
       setError("Failed to update testimonial status");

@@ -61,22 +61,13 @@ import {
   Building,
 } from "lucide-react";
 import {
-  listCareers,
-  saveCareer,
+  fetchCareers as fetchCareersApi,
+  createCareer,
+  updateCareer,
   deleteCareer,
   toggleCareerStatus,
 } from "@/lib/api/admin/careers";
-
-interface Career {
-  id: string;
-  title: string;
-  location: string;
-  type: string;
-  description?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Career, CreateCareerData, UpdateCareerData } from "@/types/types";
 
 export default function CareersPage() {
   const [careers, setCareers] = useState<Career[]>([]);
@@ -99,8 +90,8 @@ export default function CareersPage() {
 
   const fetchCareers = async () => {
     try {
-      const data = await listCareers();
-      if (data.success) setCareers(data.careers);
+      const data = await fetchCareersApi();
+      setCareers(data);
     } catch (error) {
       console.error("Error fetching careers:", error);
     } finally {
@@ -114,29 +105,48 @@ export default function CareersPage() {
     setSuccess("");
 
     try {
-      const payload = editingCareer
-        ? { id: editingCareer.id, ...formData }
-        : formData;
-      const data = await saveCareer(payload);
-      if (data.success) {
-        await fetchCareers();
-        setIsDialogOpen(false);
-        setEditingCareer(null);
-        setFormData({
-          title: "",
-          location: "",
-          type: "",
-          description: "",
-          isActive: true,
-        });
-        setSuccess(
-          editingCareer
-            ? "Job posting updated successfully!"
-            : "Job posting created successfully!"
-        );
+      if (editingCareer) {
+        const data: UpdateCareerData = {
+          id: editingCareer.id,
+          title: formData.title,
+          location: formData.location,
+          type: formData.type,
+          department: formData.type,
+          description: formData.description || "",
+          requirements: [],
+          responsibilities: [],
+          isActive: formData.isActive,
+        };
+        await updateCareer(data);
       } else {
-        setError(data.error || "Failed to save job posting");
+        const data: CreateCareerData = {
+          title: formData.title,
+          location: formData.location,
+          type: formData.type,
+          department: formData.type,
+          description: formData.description || "",
+          requirements: [],
+          responsibilities: [],
+          isActive: formData.isActive,
+        };
+        await createCareer(data);
       }
+
+      await fetchCareers();
+      setIsDialogOpen(false);
+      setEditingCareer(null);
+      setFormData({
+        title: "",
+        location: "",
+        type: "",
+        description: "",
+        isActive: true,
+      });
+      setSuccess(
+        editingCareer
+          ? "Job posting updated successfully!"
+          : "Job posting created successfully!"
+      );
     } catch (error) {
       console.error("Error saving job posting:", error);
       setError("Failed to save job posting");
@@ -157,13 +167,9 @@ export default function CareersPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const data = await deleteCareer(id);
-      if (data.success) {
-        await fetchCareers();
-        setSuccess("Job posting deleted successfully!");
-      } else {
-        setError(data.error || "Failed to delete job posting");
-      }
+      await deleteCareer(id);
+      await fetchCareers();
+      setSuccess("Job posting deleted successfully!");
     } catch (error) {
       console.error("Error deleting job posting:", error);
       setError("Failed to delete job posting");
@@ -172,17 +178,13 @@ export default function CareersPage() {
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const data = await toggleCareerStatus(id, !currentStatus);
-      if (data.success) {
-        await fetchCareers();
-        setSuccess(
-          `Job posting ${
-            !currentStatus ? "activated" : "deactivated"
-          } successfully!`
-        );
-      } else {
-        setError(data.error || "Failed to update job posting status");
-      }
+      await toggleCareerStatus(id, !currentStatus);
+      await fetchCareers();
+      setSuccess(
+        `Job posting ${
+          !currentStatus ? "activated" : "deactivated"
+        } successfully!`
+      );
     } catch (error) {
       console.error("Error updating job posting status:", error);
       setError("Failed to update job posting status");

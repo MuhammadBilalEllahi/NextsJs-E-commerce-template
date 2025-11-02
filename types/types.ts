@@ -40,6 +40,23 @@ export interface ContentPage {
   updatedAt: string;
 }
 
+export interface CreateContentPageData {
+  slug: string;
+  title: string;
+  content: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  isActive?: boolean;
+  parentSlug?: string;
+  sortOrder?: number;
+  showInFooter?: boolean;
+  showInHeader?: boolean;
+}
+
+export interface UpdateContentPageData extends CreateContentPageData {
+  id: string;
+}
+
 // ===== ORDER TYPES =====
 export interface OrderItem {
   productName: string;
@@ -539,7 +556,14 @@ export interface Brand {
 export interface CreateBrandData {
   name: string;
   description: string;
-  logo?: File;
+  logo?: File | null;
+}
+
+export interface UpdateBrandData {
+  id: string;
+  name: string;
+  description: string;
+  logo?: File | string | null;
 }
 
 // ===== CATEGORY TYPES =====
@@ -552,6 +576,18 @@ export interface Category {
   image?: string;
   isActive: boolean;
   createdAt: string;
+}
+
+export interface CreateCategoryData {
+  name: string;
+  parent?: string;
+  description?: string;
+  image?: File | string | null;
+  isActive?: boolean;
+}
+
+export interface UpdateCategoryData extends CreateCategoryData {
+  id: string;
 }
 
 // ===== CART TYPES =====
@@ -804,17 +840,149 @@ export interface AnalyticsData {
 
 // ===== BLOG TYPES =====
 export interface Blog {
+  id: string;
   slug: string;
   title: string;
   excerpt: string;
   content: string;
   image: string;
   tags: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
+export interface CreateBlogData {
+  title: string;
+  excerpt: string;
+  content: string;
+  image: File | null;
+  tags: string[];
+  isActive?: boolean;
+}
+
+export interface UpdateBlogData {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  image?: File | string | null;
+  tags: string[];
+  isActive?: boolean;
+}
+
+// ===== TESTIMONIAL TYPES =====
 export interface Testimonial {
+  id: string;
   author: string;
   quote: string;
+  rating: number;
+  position?: string;
+  company?: string;
+  avatar?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTestimonialData {
+  author: string;
+  quote: string;
+  rating: number;
+  position?: string;
+  company?: string;
+  avatar?: File | null;
+  isActive?: boolean;
+}
+
+export interface UpdateTestimonialData {
+  id: string;
+  author: string;
+  quote: string;
+  rating: number;
+  position?: string;
+  company?: string;
+  avatar?: File | string | null;
+  isActive?: boolean;
+}
+
+// ===== CAREER TYPES =====
+export interface Career {
+  id: string;
+  title: string;
+  department: string;
+  location: string;
+  type: string; // full-time, part-time, contract
+  description: string;
+  requirements: string[];
+  responsibilities: string[];
+  salary?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCareerData {
+  title: string;
+  department: string;
+  location: string;
+  type: string;
+  description: string;
+  requirements: string[];
+  responsibilities: string[];
+  salary?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateCareerData extends CreateCareerData {
+  id: string;
+}
+
+// ===== MARKETING CAMPAIGN TYPES =====
+export interface MarketingCampaign {
+  id: string;
+  name: string;
+  description: string;
+  type: string; // email, sms, push, social
+  status: string; // draft, scheduled, active, completed, paused
+  startDate: string;
+  endDate: string;
+  targetAudience: string;
+  budget?: number;
+  metrics?: {
+    sent?: number;
+    delivered?: number;
+    opened?: number;
+    clicked?: number;
+    converted?: number;
+  };
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMarketingCampaignData {
+  name: string;
+  description: string;
+  type: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  targetAudience: string;
+  budget?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateMarketingCampaignData
+  extends CreateMarketingCampaignData {
+  id: string;
+  metrics?: {
+    sent?: number;
+    delivered?: number;
+    opened?: number;
+    clicked?: number;
+    converted?: number;
+  };
 }
 
 // ===== MOCK DATA TYPES (for backward compatibility) =====

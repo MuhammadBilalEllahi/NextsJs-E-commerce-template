@@ -1,13 +1,18 @@
-import { Brand, CreateBrandData } from "@/types/types";
+import { Brand, CreateBrandData, UpdateBrandData } from "@/types/types";
 
 export const API_URL_BRAND_ADMIN = "/api/admin/brand";
 
-export const createBrand = async (brand: CreateBrandData) => {
-  if (!brand.name) return;
+export const createBrand = async (
+  brandData: CreateBrandData
+): Promise<Brand> => {
+  if (!brandData.name) {
+    throw new Error("Brand name is required");
+  }
+
   const fd = new FormData();
-  fd.append("name", brand.name);
-  if (brand.description) fd.append("description", brand.description);
-  if (brand.logo) fd.append("logo", brand.logo);
+  fd.append("name", brandData.name);
+  if (brandData.description) fd.append("description", brandData.description);
+  if (brandData.logo) fd.append("logo", brandData.logo);
 
   const res = await fetch(API_URL_BRAND_ADMIN, { method: "POST", body: fd });
   const data = await res.json();
@@ -18,11 +23,11 @@ export const createBrand = async (brand: CreateBrandData) => {
     throw new Error(message);
   }
   const b = data.brand || {};
-  return { ...b, id: b.id || b._id } as any;
+  return { ...b, id: b.id || b._id };
 };
 
 // fetch all brands
-export const fetchBrands = async () => {
+export const fetchBrands = async (): Promise<Brand[]> => {
   const res = await fetch(API_URL_BRAND_ADMIN);
   const data = await res.json();
   if (!res.ok) {
@@ -34,13 +39,19 @@ export const fetchBrands = async () => {
 };
 
 // update brand
-export const updateBrand = async (id: string, brand: Brand) => {
-  if (!brand.name) return;
+export const updateBrand = async (
+  brandData: UpdateBrandData
+): Promise<Brand> => {
+  if (!brandData.id || !brandData.name) {
+    throw new Error("Brand ID and name are required");
+  }
+
   const fd = new FormData();
-  fd.append("id", id);
-  fd.append("name", brand.name);
-  if (brand.description) fd.append("description", brand.description);
-  if (brand.logo) fd.append("logo", brand.logo);
+  fd.append("id", brandData.id);
+  fd.append("name", brandData.name);
+  if (brandData.description) fd.append("description", brandData.description);
+  if (brandData.logo && brandData.logo instanceof File)
+    fd.append("logo", brandData.logo);
 
   const res = await fetch(API_URL_BRAND_ADMIN, { method: "PUT", body: fd });
   const data = await res.json();
@@ -51,7 +62,7 @@ export const updateBrand = async (id: string, brand: Brand) => {
     throw new Error(message);
   }
   const b = data.brand || {};
-  return { ...b, id: b.id || b._id } as any;
+  return { ...b, id: b.id || b._id };
 };
 
 // delete brand

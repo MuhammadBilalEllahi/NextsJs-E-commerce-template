@@ -7,10 +7,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  listCampaigns,
-  saveCampaign,
-  deleteCampaign,
+  fetchMarketingCampaigns,
+  createMarketingCampaign,
+  updateMarketingCampaign,
+  deleteMarketingCampaign,
 } from "@/lib/api/admin/marketing-campaigns";
+import {
+  MarketingCampaign,
+  CreateMarketingCampaignData,
+  UpdateMarketingCampaignData,
+} from "@/types/types";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +32,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Plus,
   Edit,
   Trash2,
@@ -37,28 +51,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-interface MarketingCampaign {
-  id: string;
-  name: string;
-  subject: string;
-  content: string;
-  template: string;
-  status: "draft" | "scheduled" | "sending" | "sent" | "paused" | "cancelled";
-  scheduledAt?: string;
-  sentAt?: string;
-  totalRecipients: number;
-  sentCount: number;
-  openedCount: number;
-  clickedCount: number;
-  bouncedCount: number;
-  createdBy: {
-    name: string;
-    email: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
 export default function MarketingCampaignsPage() {
   const [campaigns, setCampaigns] = useState<MarketingCampaign[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,10 +59,13 @@ export default function MarketingCampaignsPage() {
     useState<MarketingCampaign | null>(null);
   const [formData, setFormData] = useState({
     name: "",
-    subject: "",
-    content: "",
-    template: "default",
-    scheduledAt: "",
+    description: "",
+    type: "email",
+    status: "draft",
+    startDate: "",
+    endDate: "",
+    targetAudience: "",
+    budget: 0,
   });
 
   useEffect(() => {
@@ -79,8 +74,8 @@ export default function MarketingCampaignsPage() {
 
   const fetchCampaigns = async () => {
     try {
-      const data = await listCampaigns();
-      if (data.success) setCampaigns(data.campaigns);
+      const data = await fetchMarketingCampaigns();
+      setCampaigns(data);
     } catch (error) {
       console.error("Error fetching campaigns:", error);
     } finally {
@@ -91,22 +86,32 @@ export default function MarketingCampaignsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const payload = editingCampaign
-        ? { id: editingCampaign.id, ...formData }
-        : formData;
-      const data = await saveCampaign(payload, Boolean(editingCampaign));
-      if (data.success) {
-        await fetchCampaigns();
-        setIsDialogOpen(false);
-        setEditingCampaign(null);
-        setFormData({
-          name: "",
-          subject: "",
-          content: "",
-          template: "default",
-          scheduledAt: "",
-        });
+      if (editingCampaign) {
+        const data: UpdateMarketingCampaignData = {
+          id: editingCampaign.id,
+          ...formData,
+        };
+        await updateMarketingCampaign(data);
+      } else {
+        const data: CreateMarketingCampaignData = {
+          ...formData,
+        };
+        await createMarketingCampaign(data);
       }
+
+      await fetchCampaigns();
+      setIsDialogOpen(false);
+      setEditingCampaign(null);
+      setFormData({
+        name: "",
+        description: "",
+        type: "email",
+        status: "draft",
+        startDate: "",
+        endDate: "",
+        targetAudience: "",
+        budget: 0,
+      });
     } catch (error) {
       console.error("Error saving campaign:", error);
     }
@@ -116,12 +121,17 @@ export default function MarketingCampaignsPage() {
     setEditingCampaign(campaign);
     setFormData({
       name: campaign.name,
-      subject: campaign.subject,
-      content: campaign.content,
-      template: campaign.template,
-      scheduledAt: campaign.scheduledAt
-        ? new Date(campaign.scheduledAt).toISOString().slice(0, 16)
+      description: campaign.description,
+      type: campaign.type,
+      status: campaign.status,
+      startDate: campaign.startDate
+        ? new Date(campaign.startDate).toISOString().split("T")[0]
         : "",
+      endDate: campaign.endDate
+        ? new Date(campaign.endDate).toISOString().split("T")[0]
+        : "",
+      targetAudience: campaign.targetAudience,
+      budget: campaign.budget || 0,
     });
     setIsDialogOpen(true);
   };
@@ -130,10 +140,8 @@ export default function MarketingCampaignsPage() {
     if (!confirm("Are you sure you want to delete this campaign?")) return;
 
     try {
-      const data = await deleteCampaign(id);
-      if (data.success) {
-        await fetchCampaigns();
-      }
+      await deleteMarketingCampaign(id);
+      await fetchCampaigns();
     } catch (error) {
       console.error("Error deleting campaign:", error);
     }
@@ -183,10 +191,13 @@ export default function MarketingCampaignsPage() {
                 setEditingCampaign(null);
                 setFormData({
                   name: "",
-                  subject: "",
-                  content: "",
-                  template: "default",
-                  scheduledAt: "",
+                  description: "",
+                  type: "email",
+                  status: "draft",
+                  startDate: "",
+                  endDate: "",
+                  targetAudience: "",
+                  budget: 0,
                 });
               }}
             >
@@ -216,61 +227,110 @@ export default function MarketingCampaignsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Email Subject
+                  Description
                 </label>
-                <Input
-                  value={formData.subject}
+                <Textarea
+                  value={formData.description}
                   onChange={(e) =>
-                    setFormData({ ...formData, subject: e.target.value })
+                    setFormData({ ...formData, description: e.target.value })
                   }
-                  placeholder="Enter email subject"
+                  placeholder="Campaign description"
+                  rows={3}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Template
-                </label>
+                <label className="block text-sm font-medium mb-1">Type</label>
                 <Select
-                  value={formData.template}
+                  value={formData.type}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, template: value })
+                    setFormData({ ...formData, type: value })
                   }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="default">Default</SelectItem>
-                    <SelectItem value="promotional">Promotional</SelectItem>
-                    <SelectItem value="newsletter">Newsletter</SelectItem>
+                    <SelectItem value="email">Email</SelectItem>
+                    <SelectItem value="sms">SMS</SelectItem>
+                    <SelectItem value="push">Push Notification</SelectItem>
+                    <SelectItem value="social">Social Media</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
+                <label className="block text-sm font-medium mb-1">Status</label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, status: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="paused">Paused</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Start Date
+                  </label>
+                  <Input
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) =>
+                      setFormData({ ...formData, startDate: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    End Date
+                  </label>
+                  <Input
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) =>
+                      setFormData({ ...formData, endDate: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+              <div>
                 <label className="block text-sm font-medium mb-1">
-                  Schedule (Optional)
+                  Target Audience
                 </label>
                 <Input
-                  type="datetime-local"
-                  value={formData.scheduledAt}
+                  value={formData.targetAudience}
                   onChange={(e) =>
-                    setFormData({ ...formData, scheduledAt: e.target.value })
+                    setFormData({ ...formData, targetAudience: e.target.value })
                   }
+                  placeholder="e.g., All customers, New users, etc."
+                  required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Email Content
+                  Budget ($)
                 </label>
-                <Textarea
-                  value={formData.content}
+                <Input
+                  type="number"
+                  value={formData.budget}
                   onChange={(e) =>
-                    setFormData({ ...formData, content: e.target.value })
+                    setFormData({ ...formData, budget: Number(e.target.value) })
                   }
-                  placeholder="Enter email content (HTML supported)"
-                  rows={10}
-                  required
+                  placeholder="0"
+                  min="0"
                 />
               </div>
               <div className="flex justify-end space-x-2">
@@ -290,88 +350,83 @@ export default function MarketingCampaignsPage() {
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
-        {campaigns.map((campaign) => (
-          <Card key={campaign.id}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    {campaign.name}
-                    <Badge className={getStatusColor(campaign.status)}>
-                      {campaign.status}
-                    </Badge>
-                  </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {campaign.subject}
-                  </p>
-                </div>
-                <div className="flex space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEdit(campaign)}
+      <Card>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Target</TableHead>
+                <TableHead>Budget</TableHead>
+                <TableHead>Dates</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {campaigns.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={8}
+                    className="text-center text-muted-foreground"
                   >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDelete(campaign.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm">
-                    {campaign.sentCount}/{campaign.totalRecipients} sent
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Eye className="h-4 w-4 text-green-600" />
-                  <span className="text-sm">{campaign.openedCount} opened</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MousePointer className="h-4 w-4 text-purple-600" />
-                  <span className="text-sm">
-                    {campaign.clickedCount} clicked
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-red-600" />
-                  <span className="text-sm">
-                    {campaign.bouncedCount} bounced
-                  </span>
-                </div>
-              </div>
-              <div className="text-sm text-gray-600">
-                Created by {campaign.createdBy.name} on{" "}
-                {formatDate(campaign.createdAt)}
-                {campaign.scheduledAt && (
-                  <span className="ml-4">
-                    <Calendar className="h-4 w-4 inline mr-1" />
-                    Scheduled for {formatDate(campaign.scheduledAt)}
-                  </span>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {campaigns.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No marketing campaigns found.</p>
-          <p className="text-sm text-gray-400 mt-2">
-            Create your first campaign to get started.
-          </p>
-        </div>
-      )}
+                    No campaigns found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                campaigns.map((campaign) => (
+                  <TableRow key={campaign.id}>
+                    <TableCell className="font-medium">
+                      {campaign.name}
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate">
+                      {campaign.description}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{campaign.type}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(campaign.status)}>
+                        {campaign.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{campaign.targetAudience}</TableCell>
+                    <TableCell>${campaign.budget || 0}</TableCell>
+                    <TableCell className="text-sm">
+                      <div>
+                        {new Date(campaign.startDate).toLocaleDateString()}
+                      </div>
+                      <div className="text-muted-foreground">
+                        to {new Date(campaign.endDate).toLocaleDateString()}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(campaign)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(campaign.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
