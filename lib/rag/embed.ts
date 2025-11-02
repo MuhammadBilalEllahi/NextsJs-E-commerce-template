@@ -3,11 +3,21 @@
  * Handles query embedding and similarity computation
  */
 
+import { generateEmbedding } from "../embeddings/openai";
+
 /**
- * Mock embedding function - converts text to vector
- * In production, replace with actual embedding model (e.g., OpenAI embeddings)
+ * Generate embedding for query
+ * Automatically uses configured provider (OpenAI/Cohere/Mock)
  */
-export function embedQuery(query: string): number[] {
+export async function embedQuery(query: string): Promise<number[]> {
+  // Use unified embedding function
+  return await generateEmbedding(query);
+}
+
+/**
+ * Mock embedding function (fallback/legacy)
+ */
+export function embedQueryMock(query: string): number[] {
   // Mock embedding based on simple heuristics
   // In production, use actual embedding API
   const words = query.toLowerCase().split(/\s+/);
