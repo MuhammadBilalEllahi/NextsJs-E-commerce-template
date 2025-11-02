@@ -1,0 +1,104 @@
+// Import all models to ensure they are registered with Mongoose
+// Import dependencies before models that reference them
+import "@/models/User";
+import "@/models/Category";
+import "@/models/Brand";
+import "@/models/Variant";
+import "@/models/Review";
+import "@/models/Product";
+import "@/models/FAQ";
+import "@/models/Cart";
+import "@/models/Order";
+import "@/models/Address";
+import "@/models/Reservation";
+import "@/models/AbandonCartInfo";
+import "@/models/BrandProducts";
+import "@/models/CategoryProducts";
+import "@/models/Banner";
+import "@/models/Counter";
+import "@/models/Wishlist";
+import "@/models/Notification";
+import "@/models/Refund";
+import "@/models/ContentPage";
+import "@/models/Blog";
+import "@/models/Career";
+import "@/models/Testimonial";
+import "@/models/JobApplication";
+import "@/models/MarketingEmail";
+import "@/models/MarketingCampaign";
+import "@/models/ChatInquiry";
+
+// Export all models for convenience
+export { default as User } from "@/models/User";
+export { default as Product } from "@/models/Product";
+export { default as Category } from "@/models/Category";
+export { default as Brand } from "@/models/Brand";
+export { default as Review } from "@/models/Review";
+export { default as FAQ } from "@/models/FAQ";
+export { default as Variant } from "@/models/Variant";
+export { default as Cart } from "@/models/Cart";
+export { default as Order } from "@/models/Order";
+export { AddressSubSchema } from "@/models/Address";
+export { default as Reservation } from "@/models/Reservation";
+export { default as AbandonCartInfo } from "@/models/AbandonCartInfo";
+export { default as BrandProducts } from "@/models/BrandProducts";
+export { default as CategoryProducts } from "@/models/CategoryProducts";
+export { default as Banner } from "@/models/Banner";
+export { default as Counter } from "@/models/Counter";
+export { default as Wishlist } from "@/models/Wishlist";
+export { default as Notification } from "@/models/Notification";
+export { default as Refund } from "@/models/Refund";
+export { default as Address } from "@/models/Address";
+export { default as ContentPage } from "@/models/ContentPage";
+export { default as Blog } from "@/models/Blog";
+export { default as Career } from "@/models/Career";
+export { default as Testimonial } from "@/models/Testimonial";
+export { default as JobApplication } from "@/models/JobApplication";
+export { default as MarketingEmail } from "@/models/MarketingEmail";
+export { default as MarketingCampaign } from "@/models/MarketingCampaign";
+export { default as ChatInquiry } from "@/models/ChatInquiry";
+export { default as ShippingMethod } from "@/models/ShippingMethod";
+export { default as GlobalSettings } from "@/models/GlobalSettings";
+export { default as PasswordResetToken } from "@/models/PasswordResetToken";
+export { default as Branch } from "@/models/Branches";
+export { default as RandomImage } from "@/models/RandomImage";
+export { default as ImportHistory } from "@/models/ImportHistory";
+export { default as ScheduledJob } from "@/models/ScheduledJob";
+
+// Export Zod schemas
+export { brandZodSchema } from "@/models/Brand";
+export { categorySchema } from "@/models/Category";
+export { productZodSchema } from "@/models/Product";
+export { variantZodSchema } from "@/models/Variant";
+export { reviewZodSchema } from "@/models/Review";
+export { zodBannerSchema } from "@/models/Banner";
+export { wishlistZodSchema } from "@/models/Wishlist";
+export { NotificationZodSchema } from "@/models/Notification";
+export { RefundZodSchema } from "@/models/Refund";
+export { AddressZodSchema, AddressSubZodSchema } from "@/models/Address";
+export { abandonedCartZodSchema } from "@/models/AbandonCartInfo";
+export { blogZodSchema } from "@/models/Blog";
+export { brandProductsZodSchema } from "@/models/BrandProducts";
+export { categoryProductsZodSchema } from "@/models/CategoryProducts";
+export { careerZodSchema } from "@/models/Career";
+export { cartZodSchema, cartItemZodSchema } from "@/models/Cart";
+export { contentPageZodSchema } from "@/models/ContentPage";
+export { counterZodSchema } from "@/models/Counter";
+export { importHistoryZodSchema } from "@/models/ImportHistory";
+export { jobApplicationZodSchema } from "@/models/JobApplication";
+export { marketingCampaignZodSchema } from "@/models/MarketingCampaign";
+export { marketingEmailZodSchema } from "@/models/MarketingEmail";
+export { orderZodSchema, orderItemZodSchema } from "@/models/Order";
+export { passwordResetTokenZodSchema } from "@/models/PasswordResetToken";
+export { randomImageZodSchema } from "@/models/RandomImage";
+export { reservationZodSchema } from "@/models/Reservation";
+export { scheduledJobZodSchema } from "@/models/ScheduledJob";
+export {
+  shippingMethodZodSchema,
+  shippingMethodLocationZod,
+} from "@/models/ShippingMethod";
+export { testimonialZodSchema } from "@/models/Testimonial";
+export {
+  chatInquiryZodSchema,
+  chatMessageZodSchema,
+} from "@/models/ChatInquiry";
