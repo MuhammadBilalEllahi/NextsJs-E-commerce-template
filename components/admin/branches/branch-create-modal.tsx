@@ -50,7 +50,7 @@ export function BranchCreateModal({
     location: "",
     city: "",
     state: "",
-    country: "Pakistan",
+    country: DEFAULT_COUNTRY,
     postalCode: "",
     manager: "",
     openingHours: {
@@ -252,7 +252,7 @@ export function BranchCreateModal({
         location: "",
         city: "",
         state: "",
-        country: "Pakistan",
+        country: DEFAULT_COUNTRY,
         postalCode: "",
         manager: "",
         openingHours: {
@@ -290,7 +290,7 @@ export function BranchCreateModal({
       location: "",
       city: "",
       state: "",
-      country: "Pakistan",
+      country: DEFAULT_COUNTRY,
       postalCode: "",
       manager: "",
       openingHours: {
