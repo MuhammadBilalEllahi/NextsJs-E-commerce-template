@@ -6,7 +6,7 @@ import { getSession, signIn, signOut, useSession } from "next-auth/react";
 import { handleCartMergeOnAuth } from "@/middleware";
 import { CART_STORAGE_KEY, CartActionTypes, useCart } from "./cartContext";
 import { User } from "@/types/types";
-import { registerApi, getMe } from "@/lib/api/auth";
+import { signupApi, getMe } from "@/lib/api/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -16,11 +16,11 @@ interface AuthContextType {
     email: string,
     password: string
   ) => Promise<{ success: boolean; error?: string; user?: User | null }>;
-  register: (
+  signup: (
     name: string,
     email: string,
     password: string
-  ) => Promise<{ success: boolean; error?: string; user?: User }>;
+  ) => Promise<{ success: boolean; error?: string | Error; user?: User }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -76,10 +76,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const signup = async (name: string, email: string, password: string) => {
     setIsFormLoading(true);
     try {
-      const data = await registerApi({ name, email, password });
+      const data = await signupApi({ name, email, password });
       if (data?.success) {
         const loginResult = await signIn("credentials", {
           email,
@@ -111,11 +111,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       //     return { success: true, user }
       //   }
       // }
+      console.debug("Registration data\\[providers\\authProvider.tsx]:", data);
 
       return { success: false, error: data?.error || "Registration failed" };
     } catch (error) {
-      console.error("Registration error:", error);
-      return { success: false, error: "Network error" };
+      console.error("Registration error\\[providers\\authProvider.tsx]:", error);
+      return { success: false, error: error?.message || "Network error" };
     } finally {
       setIsFormLoading(false);
     }
@@ -144,7 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated,
     isLoading,
     login,
-    register,
+    signup,
     logout,
     refreshUser,
   };

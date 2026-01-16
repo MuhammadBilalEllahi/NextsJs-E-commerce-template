@@ -70,7 +70,7 @@ import {
   updateJobApplicationStatus,
   sendApplicationEmail,
 } from "@/lib/api/admin/job-applications";
-import { listCareers } from "@/lib/api/admin/careers";
+import { listCareersPublic } from "@/lib/api/careers";
 
 interface JobApplication {
   id: string;
@@ -139,7 +139,7 @@ export default function JobApplicationsPage() {
 
   const fetchCareers = async () => {
     try {
-      const data = await listCareers();
+      const data = await listCareersPublic();
       if (data.success) setCareers(data.careers);
     } catch (error) {
       console.error("Error fetching careers:", error);

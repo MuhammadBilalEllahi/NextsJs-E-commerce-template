@@ -18,7 +18,7 @@ export default function SignupPage() {
     password: "",
     confirmPassword: "",
   });
-  const { register } = useAuth();
+  const { signup } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +39,7 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      const result = await register(
+      const result = await signup(
         formData.name,
         formData.email,
         formData.password
@@ -50,6 +50,7 @@ export default function SignupPage() {
           router.push("/");
         }, 1500);
       } else {
+        console.debug("Registration data: [page.tsx\\signup]", result);
         setError(result.error || "Registration failed");
       }
     } catch {

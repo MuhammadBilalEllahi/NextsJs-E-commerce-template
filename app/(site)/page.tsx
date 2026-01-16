@@ -34,6 +34,7 @@ import {
   SITE_NAME_SECOND,
 } from "@/lib/constants/site";
 import { HomeTestimonials } from "@/components/home/home-testimonials";
+import { Blog } from "@/types";
 
 export const metadata: Metadata = {
   title: `${
@@ -164,7 +165,7 @@ export default async function HomePage() {
       </section>
 
       <section className="container mx-auto px-4 py-10 md:py-14">
-        <HomeBlogPreview blogs={blogs} />
+        <HomeBlogPreview blogs={blogs as Blog[]} />
       </section>
 
       <HomeDeliveryInfo />

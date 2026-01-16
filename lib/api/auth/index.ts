@@ -22,12 +22,12 @@ export async function logoutApi() {
   return true;
 }
 
-export async function registerApi(payload: {
+export async function signupApi(payload: {
   email: string;
   password: string;
   name?: string;
 }) {
-  const res = await fetch("/api/auth/register", {
+  const res = await fetch("/api/auth/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
