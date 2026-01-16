@@ -1,10 +1,6 @@
-export type AdminCartQuery = {
-  page?: number;
-  limit?: number;
-  search?: string;
-  userId?: string;
-  sessionId?: string;
-};
+import { AdminCartQuery } from "@/types";
+
+const API_URL_ADMIN_CART = "/api/admin/cart";
 
 export async function listAdminCarts(query: AdminCartQuery) {
   const params = new URLSearchParams();
@@ -13,7 +9,7 @@ export async function listAdminCarts(query: AdminCartQuery) {
   if (query.search) params.set("search", query.search);
   if (query.userId) params.set("userId", query.userId);
   if (query.sessionId) params.set("sessionId", query.sessionId);
-  const res = await fetch(`/api/admin/cart?${params.toString()}`, {
+  const res = await fetch(`${API_URL_ADMIN_CART}?${params.toString()}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to load carts");
@@ -21,7 +17,7 @@ export async function listAdminCarts(query: AdminCartQuery) {
 }
 
 export async function deleteAdminCart(id: string) {
-  const res = await fetch(`/api/admin/cart?id=${encodeURIComponent(id)}`, {
+  const res = await fetch(`${API_URL_ADMIN_CART}?id=${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
   const j = await res.json().catch(() => ({}));

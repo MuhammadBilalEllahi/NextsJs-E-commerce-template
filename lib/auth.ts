@@ -3,11 +3,13 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/database/mongodb";
+import { AUTH_PROVIDER_TYPE } from "./providers/authProvider";
+
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      name: AUTH_PROVIDER_TYPE,
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },

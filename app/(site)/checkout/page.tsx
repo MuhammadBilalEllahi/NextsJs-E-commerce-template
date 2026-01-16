@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CitySelect } from "@/components/ui/city-select";
 import { getCountryOptions, getStateOptions, getCityOptions } from "@/lib/geo";
-import { DEFAULT_COUNTRY, DEFAULT_STATE } from "@/lib/constants/site";
+import { DEFAULT_COUNTRY, DEFAULT_PHONE_CODE, DEFAULT_STATE, DEFAULT_CITY } from "@/lib/constants/site";
 import {
   Select,
   SelectContent,
@@ -92,7 +92,7 @@ export default function CheckoutPage() {
     address: "",
     city: "",
     postal: "",
-    countryCode: "+92",
+    countryCode: DEFAULT_PHONE_CODE,
     phoneNumber: "",
   });
 
@@ -103,7 +103,7 @@ export default function CheckoutPage() {
     address: "",
     city: "",
     postal: "",
-    countryCode: "+92",
+    countryCode: DEFAULT_PHONE_CODE,
     phoneNumber: "",
   });
 
@@ -197,15 +197,15 @@ export default function CheckoutPage() {
     try {
       const params = new URLSearchParams({
         city: formData.city,
-        state: "Punjab",
-        country: "Pakistan",
+        state: DEFAULT_STATE,
+        country: DEFAULT_COUNTRY,
         subtotal: displaySubtotal.toString(),
       });
 
       const data = await getShippingMethods({
         city: formData.city,
-        state: "Punjab",
-        country: "Pakistan",
+        state: DEFAULT_STATE,
+        country: DEFAULT_COUNTRY,
         subtotal: displaySubtotal,
       });
       if (data) {
@@ -217,7 +217,7 @@ export default function CheckoutPage() {
         );
         const tcs = data.methods.find((m: any) => m.type === "tcs");
 
-        if (formData.city.toLowerCase() === "lahore" && homeDelivery) {
+        if (formData.city.toLowerCase() === DEFAULT_CITY.toLowerCase() && homeDelivery) {
           setSelectedShippingMethod(homeDelivery);
           setShippingFee(homeDelivery.shippingFee);
           setTcsFee(homeDelivery.tcsFee);
@@ -249,7 +249,7 @@ export default function CheckoutPage() {
   // Set default city to Lahore if not set
   useEffect(() => {
     if (!formData.city) {
-      setFormData((prev) => ({ ...prev, city: "Lahore" }));
+      setFormData((prev) => ({ ...prev, city: DEFAULT_CITY }));
     }
   }, []);
 
@@ -402,7 +402,7 @@ export default function CheckoutPage() {
         address: "",
         city: "",
         postal: "",
-        countryCode: "+92",
+        countryCode: DEFAULT_PHONE_CODE,
         phoneNumber: "",
       });
     }
@@ -558,8 +558,8 @@ export default function CheckoutPage() {
         lastName: formData.lastName,
         address: formData.address,
         city: formData.city,
-        state: "Punjab", // Default state
-        country: "Pakistan",
+        state: DEFAULT_STATE, // Default state
+        country: DEFAULT_COUNTRY,
         postalCode: formData.postal,
         phone: formData.countryCode + formData.phoneNumber,
         countryCode: formData.countryCode,

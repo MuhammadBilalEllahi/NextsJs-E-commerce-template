@@ -1,8 +1,6 @@
-export type CustomersQuery = {
-  page?: number;
-  limit?: number;
-  q?: string;
-};
+import { CustomersQuery } from "@/types";
+
+const API_URL_ADMIN_CUSTOMERS = "/api/admin/customers";
 
 export async function listCustomers({
   page = 1,
@@ -14,7 +12,7 @@ export async function listCustomers({
     limit: String(limit),
   });
   if (q) params.set("q", q);
-  const res = await fetch(`/api/admin/customers?${params.toString()}`, {
+  const res = await fetch(`${API_URL_ADMIN_CUSTOMERS}?${params.toString()}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to load customers");
@@ -23,7 +21,7 @@ export async function listCustomers({
 
 export async function getCustomerOrdersByEmail(email: string) {
   const res = await fetch(
-    `/api/admin/customers/orders/${encodeURIComponent(email)}/orders`,
+    `${API_URL_ADMIN_CUSTOMERS}/orders/${encodeURIComponent(email)}/orders`,
     { cache: "no-store" }
   );
   if (!res.ok) throw new Error("Failed to load customer orders");
@@ -31,7 +29,7 @@ export async function getCustomerOrdersByEmail(email: string) {
 }
 
 export async function getCustomerCart(userId: string) {
-  const res = await fetch(`/api/admin/customers/cart/${userId}/cart`, {
+  const res = await fetch(`${API_URL_ADMIN_CUSTOMERS}/cart/${userId}/cart`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to load customer cart");

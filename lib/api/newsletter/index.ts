@@ -1,5 +1,9 @@
+const API_URL_NEWSLETTER = "/api/newsletter";
+const API_URL_UNSUBSCRIBE = "/api/unsubscribe";
+
+
 export async function subscribeNewsletter(email: string) {
-  const res = await fetch("/api/newsletter", {
+  const res = await fetch(API_URL_NEWSLETTER, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -10,7 +14,7 @@ export async function subscribeNewsletter(email: string) {
 }
 
 export async function unsubscribeNewsletter(token: string) {
-  const res = await fetch("/api/unsubscribe", {
+  const res = await fetch(API_URL_UNSUBSCRIBE, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token }),

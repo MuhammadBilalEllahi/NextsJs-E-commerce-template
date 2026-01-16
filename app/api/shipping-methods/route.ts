@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import ShippingMethod from "@/models/ShippingMethod";
 import dbConnect from "@/database/mongodb";
+import { DEFAULT_COUNTRY ,DEFAULT_STATE} from "@/lib/constants/site";
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,8 +9,8 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const city = searchParams.get("city");
-    const state = searchParams.get("state") || "Punjab";
-    const country = searchParams.get("country") || "Pakistan";
+    const state = searchParams.get("state") || DEFAULT_STATE;
+    const country = searchParams.get("country") || DEFAULT_COUNTRY;
     const subtotal = parseFloat(searchParams.get("subtotal") || "0");
 
     // Get active shipping methods

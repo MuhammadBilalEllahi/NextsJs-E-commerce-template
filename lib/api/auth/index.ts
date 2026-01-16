@@ -1,12 +1,17 @@
+const API_URL_AUTH = "/api/auth";
+const API_URL_AUTH_ME = `${API_URL_AUTH}/me`;
+const API_URL_AUTH_LOGIN = `${API_URL_AUTH}/login`;
+const API_URL_AUTH_LOGOUT = `${API_URL_AUTH}/logout`;
+const API_URL_AUTH_SIGNUP = `${API_URL_AUTH}/signup`;
 export async function getMe() {
-  const res = await fetch("/api/auth/me", { cache: "no-store" });
+  const res = await fetch(API_URL_AUTH_ME, { cache: "no-store" });
   const j = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(j.error || "Failed to load session");
   return j;
 }
 
 export async function loginApi(email: string, password: string) {
-  const res = await fetch("/api/auth/login", {
+  const res = await fetch(API_URL_AUTH_LOGIN, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -17,7 +22,7 @@ export async function loginApi(email: string, password: string) {
 }
 
 export async function logoutApi() {
-  const res = await fetch("/api/auth/logout", { method: "POST" });
+  const res = await fetch(API_URL_AUTH_LOGOUT, { method: "POST" });
   if (!res.ok) throw new Error("Logout failed");
   return true;
 }
@@ -27,7 +32,7 @@ export async function signupApi(payload: {
   password: string;
   name?: string;
 }) {
-  const res = await fetch("/api/auth/signup", {
+  const res = await fetch(API_URL_AUTH_SIGNUP, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

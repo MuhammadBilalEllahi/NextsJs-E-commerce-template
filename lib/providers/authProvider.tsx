@@ -25,6 +25,8 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
 }
 
+export const AUTH_PROVIDER_TYPE = "credentials";
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -47,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setIsFormLoading(true);
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn(AUTH_PROVIDER_TYPE, {
         email,
         password,
         redirect: false,
@@ -81,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await signupApi({ name, email, password });
       if (data?.success) {
-        const loginResult = await signIn("credentials", {
+        const loginResult = await signIn(AUTH_PROVIDER_TYPE, {
           email,
           password,
           redirect: false,
@@ -114,7 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.debug("Registration data\\[providers\\authProvider.tsx]:", data);
 
       return { success: false, error: data?.error || "Registration failed" };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error\\[providers\\authProvider.tsx]:", error);
       return { success: false, error: error?.message || "Network error" };
     } finally {

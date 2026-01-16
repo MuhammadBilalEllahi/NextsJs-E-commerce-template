@@ -1,3 +1,5 @@
+import { GUEST_CART_ID_STORAGE_KEY } from "@/lib/cacheConstants";
+
 // Generate a UUID v4 for guest cart identification
 export function generateUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -11,13 +13,13 @@ export function generateUUID(): string {
 export function getOrCreateGuestId(): string {
   if (typeof window === "undefined") return "";
 
-  const storageKey = "dm-guest-cart-id";
-  let guestId = localStorage.getItem(storageKey);
+  
+  let guestId = localStorage.getItem(GUEST_CART_ID_STORAGE_KEY);
 
   if (!guestId) {
     guestId = generateUUID();
     console.debug("GUEST ID", guestId);
-    localStorage.setItem(storageKey, guestId);
+    localStorage.setItem(GUEST_CART_ID_STORAGE_KEY, guestId);
   }
 
   return guestId;
@@ -27,6 +29,6 @@ export function getOrCreateGuestId(): string {
 export function clearGuestId(): void {
   if (typeof window === "undefined") return;
 
-  const storageKey = "dm-guest-cart-id";
-  localStorage.removeItem(storageKey);
+  
+  localStorage.removeItem(GUEST_CART_ID_STORAGE_KEY);
 }

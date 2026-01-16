@@ -1,13 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { MODELS } from "@/models/constants/constants";
 import { z } from "zod";
+import { ABANDONED_CART_STATUS } from "@/models/constants/constants";
 
-const ABANDONED_CART_STATUS = {
-  PENDING: "pending",
-  ABANDONED: "abandoned",
-  CONVERTED: "converted",
-  EXPIRED: "expired",
-};
 
 export interface AbandonedCartDocument extends mongoose.Document {
   uuidv4: string;

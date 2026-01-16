@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { MODELS } from "@/models/constants/constants";
 import { z } from "zod";
+import { DEFAULT_COUNTRY } from "@/lib/constants/site";
 const Schema = mongoose.Schema;
 
 export interface BranchDocument extends mongoose.Document {
@@ -42,7 +43,7 @@ const BranchSchema = new Schema<BranchDocument>({
   // Additional fields for better management
   city: { type: String, required: true },
   state: { type: String, required: true },
-  country: { type: String, default: "Pakistan" },
+  country: { type: String, default: DEFAULT_COUNTRY },
   postalCode: { type: String },
   manager: { type: String },
   openingHours: {
@@ -115,7 +116,7 @@ export const zodBranchSchema = z.object({
   location: z.string().min(1, "Location is required"),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
-  country: z.string().default("Pakistan"),
+  country: z.string().default(DEFAULT_COUNTRY),
   postalCode: z.string().optional(),
   manager: z.string().optional(),
   openingHours: z.object({

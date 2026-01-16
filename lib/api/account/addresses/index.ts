@@ -1,12 +1,13 @@
+const API_URL_ADDRESSES = "/api/addresses";
 export async function listAddresses() {
-  const res = await fetch("/api/addresses", { cache: "no-store" });
+  const res = await fetch(API_URL_ADDRESSES, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to load addresses");
   return res.json();
 }
 
 export async function saveAddress(payload: any) {
   const hasId = Boolean(payload?.id);
-  const res = await fetch("/api/addresses", {
+  const res = await fetch(API_URL_ADDRESSES, {
     method: hasId ? "PUT" : "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -17,7 +18,7 @@ export async function saveAddress(payload: any) {
 }
 
 export async function deleteAddress(id: string) {
-  const res = await fetch(`/api/addresses?id=${encodeURIComponent(id)}`, {
+  const res = await fetch(`${API_URL_ADDRESSES}?id=${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
   const j = await res.json().catch(() => ({}));

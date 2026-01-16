@@ -1,5 +1,8 @@
+const API_URL_AUTH_PASSWORD = "/api/auth";
+const API_URL_AUTH_PASSWORD_RESET_REQUEST = `${API_URL_AUTH_PASSWORD}/reset-password/request`;
+const API_URL_AUTH_PASSWORD_RESET_CONFIRM = `${API_URL_AUTH_PASSWORD}/reset-password/confirm`;
 export async function requestPasswordReset(email: string) {
-  const res = await fetch("/api/auth/reset-password/request", {
+  const res = await fetch(API_URL_AUTH_PASSWORD_RESET_REQUEST, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -10,7 +13,7 @@ export async function requestPasswordReset(email: string) {
 }
 
 export async function confirmPasswordReset(token: string, newPassword: string) {
-  const res = await fetch("/api/auth/reset-password/confirm", {
+  const res = await fetch(API_URL_AUTH_PASSWORD_RESET_CONFIRM, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, newPassword }),

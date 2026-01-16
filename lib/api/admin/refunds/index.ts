@@ -1,13 +1,11 @@
-export type RefundsQuery = {
-  status?: string;
-  search?: string;
-};
+import { RefundsQuery } from "@/types";
 
+const API_URL_ADMIN_REFUNDS = "/api/admin/refunds";
 export async function listRefunds({ status = "", search = "" }: RefundsQuery) {
   const params = new URLSearchParams();
   if (status && status !== "all") params.set("status", status);
   if (search) params.set("search", search);
-  const res = await fetch(`/api/admin/refunds?${params.toString()}`, {
+  const res = await fetch(`${API_URL_ADMIN_REFUNDS}?${params.toString()}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to load refunds");
@@ -15,7 +13,7 @@ export async function listRefunds({ status = "", search = "" }: RefundsQuery) {
 }
 
 export async function updateRefund(payload: any) {
-  const res = await fetch("/api/admin/refunds", {
+  const res = await fetch(API_URL_ADMIN_REFUNDS, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

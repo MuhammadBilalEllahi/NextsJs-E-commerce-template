@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import dbConnect from "@/database/mongodb";
 import User from "@/models/User";
+import mongoose from "mongoose";
 
 export async function GET(req: NextRequest) {
   try {
@@ -21,20 +22,27 @@ export async function GET(req: NextRequest) {
       .select("-passwordHash")
       .lean();
 
-    if (!user) {
+    if (!user || Array.isArray(user)) {
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }
       );
     }
 
+    const userDoc = user as unknown as {
+      _id: mongoose.Types.ObjectId;
+      email: string;
+      name: string;
+      role: string;
+    };
+
     return NextResponse.json({
       success: true,
       user: {
-        id: user._id.toString(),
-        email: user.email,
-        name: user.name,
-        role: user.role,
+        id: userDoc._id.toString(),
+        email: userDoc.email,
+        name: userDoc.name,
+        role: userDoc.role,
       },
     });
   } catch (error) {

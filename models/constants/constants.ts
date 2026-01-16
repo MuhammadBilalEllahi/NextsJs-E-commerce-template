@@ -94,3 +94,10 @@ export const TCS_PICKUP_STATUS = {
   PICKED_UP: "picked_up",
   FAILED: "failed",
 };
+
+export const ABANDONED_CART_STATUS = {
+  PENDING: "pending",
+  ABANDONED: "abandoned",
+  CONVERTED: "converted",
+  EXPIRED: "expired",
+};

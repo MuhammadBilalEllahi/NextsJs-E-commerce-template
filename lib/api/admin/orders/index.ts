@@ -1,9 +1,5 @@
-export type OrdersQuery = {
-  page?: number;
-  limit?: number;
-  status?: string;
-  search?: string;
-};
+export const API_URL_ADMIN_ORDERS = "/api/admin/orders";
+import { OrdersQuery } from "@/types";
 
 export async function listOrders({
   page = 1,
@@ -17,7 +13,7 @@ export async function listOrders({
   });
   if (status) params.set("status", status);
   if (search) params.set("search", search);
-  const res = await fetch(`/api/admin/orders?${params.toString()}`, {
+  const res = await fetch(`${API_URL_ADMIN_ORDERS}?${params.toString()}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to load orders");
@@ -32,7 +28,7 @@ export async function updateOrderStatus(
   const payload: any = { orderId, status, changedBy: "admin" };
   if (status === "cancelled" && cancellationReason)
     payload.cancellationReason = cancellationReason;
-  const res = await fetch("/api/admin/orders", {
+  const res = await fetch(API_URL_ADMIN_ORDERS, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -42,7 +38,7 @@ export async function updateOrderStatus(
 }
 
 export async function updateOrderTracking(orderId: string, tracking: string) {
-  const res = await fetch("/api/admin/orders", {
+  const res = await fetch(API_URL_ADMIN_ORDERS, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ orderId, tracking }),

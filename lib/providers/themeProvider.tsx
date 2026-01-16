@@ -9,8 +9,9 @@ import {
   useState,
 } from "react";
 import { DEFAULT_THEME } from "../constants/site";
+import { ALL_THEMES, THEME_CLASS_PREFIX, THEME_STORAGE_KEY } from "../cacheConstants";
 
-type ThemeName = "classic" | "emerald" | "rose" | "amber";
+export type ThemeName = "classic" | "emerald" | "rose" | "amber";
 
 type ThemeContextValue = {
   theme: ThemeName;
@@ -20,9 +21,6 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-const THEME_STORAGE_KEY = "dm-color-theme";
-const THEME_CLASS_PREFIX = "theme-";
-const ALL_THEMES: ThemeName[] = ["classic", "emerald", "rose", "amber"];
 
 function applyThemeClass(theme: ThemeName) {
   if (typeof document === "undefined") return;

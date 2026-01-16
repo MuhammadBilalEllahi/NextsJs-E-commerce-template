@@ -1,12 +1,13 @@
 // Centralized SEO helpers for canonical URLs, site metadata, and JSON-LD builders
 
 import {
-  SITE_NAME_FIRST,
-  SITE_NAME_SECOND,
-  SITE_NAME,
+
   SITE_URL,
   SITE_OG_IMAGE,
   X_PAGE_ID,
+  SITE_NAME_FULL,
+  CURRENCY,
+  SITE_DESCRIPTION,
 } from "@/lib/constants";
 
 export const getSiteUrl = (): string => {
@@ -27,15 +28,13 @@ export const buildCanonical = (pathname: string): string => {
 
 export const defaultOpenGraph = {
   type: "website" as const,
-  siteName: SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`,
+  siteName: SITE_NAME_FULL,
   images: [
     {
       url: SITE_OG_IMAGE,
       width: 1200,
       height: 630,
-      alt: `${
-        SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`
-      } — Authentic Spices, Pickles, Snacks`,
+      alt: `${SITE_NAME_FULL} — ${SITE_DESCRIPTION}`,
     },
   ],
 };
@@ -67,7 +66,7 @@ export function buildProductJsonLd(input: ProductSeoInput) {
     sku,
     brandName,
     price,
-    currency = "USD",
+    currency = CURRENCY.CODE,
     inStock = true,
     aggregateRating,
     url,
@@ -107,7 +106,7 @@ export function buildOrganizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`,
+    name: SITE_NAME_FULL,
     url: getSiteUrl(),
     logo: absoluteUrl(SITE_OG_IMAGE),
   };
@@ -118,7 +117,7 @@ export function buildWebSiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: SITE_NAME ? SITE_NAME : `${SITE_NAME_FIRST} ${SITE_NAME_SECOND}`,
+    name: SITE_NAME_FULL,
     url,
     potentialAction: {
       "@type": "SearchAction",

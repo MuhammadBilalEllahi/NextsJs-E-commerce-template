@@ -7,7 +7,7 @@ import { Check, ChevronsUpDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import { Button } from "./button";
 import { getCityOptions } from "@/lib/geo";
-import { DEFAULT_COUNTRY, DEFAULT_STATE } from "@/lib/constants/site";
+import { DEFAULT_COUNTRY, DEFAULT_STATE, DEFAULT_ISO_COUNTRY_CODE, DEFAULT_ISO_STATE_CODE } from "@/lib/constants/site";
 
 interface CitySelectProps {
   value: string;
@@ -27,8 +27,8 @@ export function CitySelect({
   placeholder = "Select a city...",
   required = false,
   className,
-  countryCode = "PK", // Default to Pakistan
-  stateCode = "PB", // Default to Punjab
+  countryCode = DEFAULT_ISO_COUNTRY_CODE, // Default to Pakistan
+  stateCode = DEFAULT_ISO_STATE_CODE, // Default to Punjab
 }: CitySelectProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");

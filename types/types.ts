@@ -776,7 +776,7 @@ export interface OrderEmailData {
   tcsInfo?: {
     consignmentNumber: string;
     estimatedDelivery: string;
-    isOutsideLahore: boolean;
+    isOutsideCity: boolean;
   };
 }
 
@@ -1208,7 +1208,7 @@ export interface TrackingData {
   tcsOrder: TCSOrderData | null;
   latestTracking: unknown;
   deliveryInfo: {
-    isOutsideLahore: boolean;
+    isOutsideCity: boolean;
     estimatedDays: number;
     deliveryDate: string;
     isDelivered: boolean;
@@ -1450,3 +1450,69 @@ export interface TCSPaymentDetailsResponse {
     responseTime: string;
   };
 }
+
+export type CreateRefundPayload = {
+  order: string;
+  product: string;
+  quantity: number;
+  amount: number;
+  reason: string;
+  customerNotes?: string;
+};
+export type AdminCartQuery = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  userId?: string;
+  sessionId?: string;
+};
+
+export type ChatFilters = {
+  status?: string;
+  priority?: string;
+  category?: string;
+};
+
+export type CustomersQuery = {
+  page?: number;
+  limit?: number;
+  q?: string;
+};
+export type OrdersQuery = {
+  page?: number;
+  limit?: number;
+  status?: string;
+  search?: string;
+};
+export type RefundsQuery = {
+  status?: string;
+  search?: string;
+};
+export type TcsOrdersQuery = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+};
+export type AdminWishlistQuery = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  userId?: string;
+  productId?: string;
+};
+export type CartIdentifier = {
+  userId?: string | null;
+  sessionId?: string | null;
+};
+export type FAQQuery = { category?: string; search?: string };
+export type ShippingQuery = {
+  city: string;
+  state: string;
+  country: string;
+  subtotal: number | string;
+};
+export type ChatEvent = {
+  sessionId: string;
+  payload: any;
+};

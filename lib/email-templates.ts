@@ -1,6 +1,8 @@
 // Email templates for marketing campaigns
 
 import { CURRENCY } from "./constants";
+import { SITE_NAME_FIRST, SITE_NAME_SECOND } from "./constants/site";
+import { SITE_NAME_FULL } from "./constants/site";
 
 export const emailTemplates = {
   default: {
@@ -10,8 +12,8 @@ export const emailTemplates = {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #dc2626, #ea580c, #16a34a); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="margin: 0; font-size: 24px;">
-            <span style="color: #dc2626;">Dehli</span> 
-            <span style="color: #16a34a;">Mirch</span>
+            <span style="color: #dc2626;">${SITE_NAME_FIRST}</span> 
+            <span style="color: #16a34a;">${SITE_NAME_SECOND}</span>
           </h1>
           <p style="margin: 10px 0 0 0; opacity: 0.9;">Heat you can taste, tradition you can trust</p>
         </div>
@@ -26,7 +28,7 @@ export const emailTemplates = {
             <a href="{{unsubscribeUrl}}" style="color: #6b7280; text-decoration: none;">Unsubscribe</a> | 
             <a href="{{baseUrl}}" style="color: #6b7280; text-decoration: none;">Visit our website</a>
           </p>
-          <p>&copy; {{year}} Dehli Mirch. All rights reserved.</p>
+          <p>&copy; {{year}} ${SITE_NAME_FULL}. All rights reserved.</p>
         </div>
       </div>
     `,
@@ -39,8 +41,8 @@ export const emailTemplates = {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #dc2626, #ea580c, #16a34a); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="margin: 0; font-size: 24px;">
-            <span style="color: #dc2626;">Dehli</span> 
-            <span style="color: #16a34a;">Mirch</span>
+            <span style="color: #dc2626;">${SITE_NAME_FIRST}</span> 
+            <span style="color: #16a34a;">${SITE_NAME_SECOND}</span>
           </h1>
           <p style="margin: 10px 0 0 0; opacity: 0.9;">Heat you can taste, tradition you can trust</p>
         </div>
@@ -58,7 +60,7 @@ export const emailTemplates = {
             <a href="{{unsubscribeUrl}}" style="color: #6b7280; text-decoration: none;">Unsubscribe</a> | 
             <a href="{{baseUrl}}" style="color: #6b7280; text-decoration: none;">Visit our website</a>
           </p>
-          <p>&copy; {{year}} Dehli Mirch. All rights reserved.</p>
+          <p>&copy; {{year}} ${SITE_NAME_FULL}. All rights reserved.</p>
         </div>
       </div>
     `,
@@ -71,8 +73,8 @@ export const emailTemplates = {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #dc2626, #ea580c, #16a34a); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="margin: 0; font-size: 24px;">
-            <span style="color: #dc2626;">Dehli</span> 
-            <span style="color: #16a34a;">Mirch</span>
+            <span style="color: #dc2626;">${SITE_NAME_FIRST}</span> 
+            <span style="color: #16a34a;">${SITE_NAME_SECOND}</span>
           </h1>
           <p style="margin: 10px 0 0 0; opacity: 0.9;">Heat you can taste, tradition you can trust</p>
         </div>
@@ -91,7 +93,7 @@ export const emailTemplates = {
             <a href="{{unsubscribeUrl}}" style="color: #6b7280; text-decoration: none;">Unsubscribe</a> | 
             <a href="{{baseUrl}}" style="color: #6b7280; text-decoration: none;">Visit our website</a>
           </p>
-          <p>&copy; {{year}} Dehli Mirch. All rights reserved.</p>
+          <p>&copy; {{year}} ${SITE_NAME_FULL}. All rights reserved.</p>
         </div>
       </div>
     `,
@@ -151,7 +153,7 @@ export interface OrderEmailData {
   tcsInfo?: {
     consignmentNumber: string;
     estimatedDelivery: string;
-    isOutsideLahore: boolean;
+    isOutsideCity: boolean;
   };
 }
 
@@ -202,14 +204,14 @@ export function generateOrderConfirmationEmail(data: OrderEmailData): string {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Order Confirmation #${data.orderId} - Dehli Mirch</title>
+        <title>Order Confirmation #${data.orderId} - ${SITE_NAME_FULL}</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1a1a1a; background-color: #f8f9fa;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%); padding: 32px 24px; text-align: center;">
             <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px;">
-                <span style="color: #ffffff;">Dehli</span> <span style="color: #ffffff;">Mirch</span>
+                <span style="color: #ffffff;">${SITE_NAME_FIRST}</span> <span style="color: #ffffff;">${SITE_NAME_SECOND}</span>
             </div>
             <div style="color: rgba(255, 255, 255, 0.9); font-size: 14px; font-weight: 500;">Heat you can taste, tradition you can trust.</div>
         </div>
@@ -343,7 +345,7 @@ export function generateOrderConfirmationEmail(data: OrderEmailData): string {
                           data.tcsInfo.estimatedDelivery
                         }</div>
                         <div><strong>Delivery Area:</strong> ${
-                          data.tcsInfo.isOutsideLahore
+                          data.tcsInfo.isOutsideCity
                             ? "Outside Lahore"
                             : "Lahore"
                         }</div>
@@ -367,11 +369,11 @@ export function generateOrderConfirmationEmail(data: OrderEmailData): string {
         <!-- Footer -->
         <div style="background-color: #f8f9fa; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0;">
             <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px;">
-                <span style="color: #dc2626;">Dehli</span> <span style="color: #16a34a;">Mirch</span>
+                <span style="color: #dc2626;">${SITE_NAME_FIRST}</span> <span style="color: #16a34a;">${SITE_NAME_SECOND}</span>
             </div>
             <div style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">Authentic Spices, Pickles, Snacks</div>
                 <div style="font-size: 12px; color: #9ca3af;">
-                    Thank you for choosing Dehli Mirch! We appreciate your business.
+                    Thank you for choosing ${SITE_NAME_FULL}! We appreciate your business.
             </div>
         </div>
     </div>
@@ -390,14 +392,14 @@ export function generatePasswordResetEmail(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Your Password - Dehli Mirch</title>
+    <title>Reset Your Password - ${SITE_NAME_FULL}</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1a1a1a; background-color: #f8f9fa;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #dc2626 0%, #16a34a 100%); padding: 32px 24px; text-align: center;">
             <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px;">
-                <span style="color: #ffffff;">Dehli</span> <span style="color: #ffffff;">Mirch</span>
+                <span style="color: #ffffff;">${SITE_NAME_FIRST}</span> <span style="color: #ffffff;">${SITE_NAME_SECOND}</span>
             </div>
             <div style="color: rgba(255, 255, 255, 0.9); font-size: 14px; font-weight: 500;">Heat you can taste, tradition you can trust.</div>
         </div>
@@ -409,7 +411,7 @@ export function generatePasswordResetEmail(
                 <p style="color: #6b7280; margin-bottom: 24px;">Hello ${data.userName},</p>
                 
                 <p style="color: #6b7280; margin-bottom: 24px;">
-                    We received a request to reset your password for your Dehli Mirch account. 
+                      We received a request to reset your password for your ${SITE_NAME_FULL} account. 
                     Click the button below to create a new password:
                 </p>
             
@@ -448,7 +450,7 @@ export function generatePasswordResetEmail(
         <!-- Footer -->
         <div style="background-color: #f8f9fa; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0;">
             <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px;">
-                <span style="color: #dc2626;">Dehli</span> <span style="color: #16a34a;">Mirch</span>
+                <span style="color: #dc2626;">${SITE_NAME_FIRST}</span> <span style="color: #16a34a;">${SITE_NAME_SECOND}</span>
             </div>
             <div style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">Authentic Spices, Pickles, Snacks</div>
                 <div style="font-size: 12px; color: #9ca3af;">

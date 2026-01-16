@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { z } from "zod";
 import { MODELS } from "@/models/constants/constants";
+import { DEFAULT_COUNTRY, DEFAULT_PHONE_CODE, DEFAULT_STATE } from "@/lib/constants/site";
 
 // Address sub-schema for embedded use (like in User model and Order model)
 export const AddressSubSchema = new mongoose.Schema(
@@ -11,10 +12,10 @@ export const AddressSubSchema = new mongoose.Schema(
     address: { type: String }, // Using 'address' to match checkout structure
     city: { type: String },
     state: { type: String },
-    country: { type: String, default: "Pakistan" },
+    country: { type: String, default: DEFAULT_COUNTRY },
     postalCode: { type: String },
     phone: { type: String },
-    countryCode: { type: String, default: "+92" },
+    countryCode: { type: String, default: DEFAULT_PHONE_CODE },
     isDefault: { type: Boolean, default: false },
   },
   { id: false }
@@ -51,11 +52,11 @@ const AddressSchema = new mongoose.Schema<AddressDocument>({
   lastName: { type: String, required: true },
   address: { type: String, required: true }, // Using 'address' to match checkout structure
   city: { type: String, required: true },
-  state: { type: String, default: "Punjab" },
-  country: { type: String, default: "Pakistan" },
+  state: { type: String, default: DEFAULT_STATE },
+  country: { type: String, default: DEFAULT_COUNTRY },
   postalCode: { type: String },
   phone: { type: String, required: true },
-  countryCode: { type: String, default: "+92" },
+  countryCode: { type: String, default: DEFAULT_PHONE_CODE },
   isDefault: { type: Boolean, default: false },
   isBilling: { type: Boolean, default: false },
   isShipping: { type: Boolean, default: true },
@@ -92,11 +93,11 @@ export const AddressZodSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   address: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required"),
-  state: z.string().default("Punjab"),
-  country: z.string().default("Pakistan"),
+  state: z.string().default(DEFAULT_STATE),
+  country: z.string().default(DEFAULT_COUNTRY),
   postalCode: z.string().optional(),
   phone: z.string().min(1, "Phone number is required"),
-  countryCode: z.string().default("+92"),
+  countryCode: z.string().default(DEFAULT_PHONE_CODE),
   isDefault: z.boolean().default(false),
   isBilling: z.boolean().default(false),
   isShipping: z.boolean().default(true),

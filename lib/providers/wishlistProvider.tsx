@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./authProvider";
 import { getOrCreateGuestId } from "@/lib/utils/uuid";
 
-const STORAGE_KEY = "dm-wishlist";
+
 
 import { WishlistItem, WishlistProviderItem } from "@/types/types";
 import {
@@ -12,6 +12,7 @@ import {
   addToWishlist,
   removeFromWishlist,
 } from "@/lib/api/wishlist";
+import { WISHLIST_STORAGE_KEY } from "../cacheConstants";
 
 type WishlistCtx = {
   ids: Set<string>;
@@ -34,7 +35,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   // Load wishlist from localStorage on mount
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(WISHLIST_STORAGE_KEY);
       const storedItems = raw
         ? (JSON.parse(raw) as WishlistProviderItem[])
         : [];
@@ -56,7 +57,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   // Save to localStorage whenever items change
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(items));
     } catch {
       // ignore
     }

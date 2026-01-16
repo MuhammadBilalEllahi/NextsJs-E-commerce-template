@@ -1,3 +1,4 @@
+const API_URL_NOTIFICATIONS = "/api/notifications";
 export type NotificationFilters = { type?: string; isRead?: string };
 
 export async function listNotifications(filters: NotificationFilters = {}) {
@@ -5,7 +6,7 @@ export async function listNotifications(filters: NotificationFilters = {}) {
   if (filters.type) params.set("type", filters.type);
   if (filters.isRead !== undefined && filters.isRead !== "")
     params.set("isRead", String(filters.isRead));
-  const res = await fetch(`/api/notifications?${params.toString()}`, {
+  const res = await fetch(`${API_URL_NOTIFICATIONS}?${params.toString()}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to load notifications");
@@ -13,7 +14,7 @@ export async function listNotifications(filters: NotificationFilters = {}) {
 }
 
 export async function markNotificationsRead(notificationIds: string[]) {
-  const res = await fetch("/api/notifications", {
+  const res = await fetch(API_URL_NOTIFICATIONS, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ notificationIds }),
@@ -24,7 +25,7 @@ export async function markNotificationsRead(notificationIds: string[]) {
 }
 
 export async function markAllNotificationsRead() {
-  const res = await fetch("/api/notifications", {
+  const res = await fetch(API_URL_NOTIFICATIONS, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ markAllAsRead: true }),

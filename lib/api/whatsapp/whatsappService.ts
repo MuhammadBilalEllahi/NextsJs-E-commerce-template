@@ -3,6 +3,7 @@ import {
   getWhatsAppConfig,
   validateWhatsAppConfig,
 } from "@/lib/utils/whatsappConfig";
+import { DEFAULT_PHONE_CODE } from "@/lib/constants/site";
 
 // WhatsApp Business API service for sending order notifications
 class WhatsAppService {
@@ -263,13 +264,13 @@ class WhatsAppService {
     let cleanPhone = phone.replace(/\D/g, "");
 
     // If it doesn't start with country code, add Pakistan code
-    if (!cleanPhone.startsWith("92")) {
+    if (!cleanPhone.startsWith(DEFAULT_PHONE_CODE)) {
       if (cleanPhone.startsWith("0")) {
         // Remove leading 0 and add 92
-        cleanPhone = "92" + cleanPhone.substring(1);
+        cleanPhone = DEFAULT_PHONE_CODE + cleanPhone.substring(1);
       } else {
         // Add 92 prefix
-        cleanPhone = "92" + cleanPhone;
+        cleanPhone = DEFAULT_PHONE_CODE + cleanPhone;
       }
     }
 

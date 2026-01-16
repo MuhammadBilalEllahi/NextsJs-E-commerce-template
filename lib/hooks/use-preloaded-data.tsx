@@ -5,6 +5,7 @@ import {
   getAllCategoriesWithProducts,
   getAllActiveBrands,
 } from "@/database/data-service";
+import { CACHE_EXPIRY_TIME, PRELOAD_CACHE_KEY } from "../cacheConstants";
 
 interface PreloadedData {
   categories: any[];
@@ -19,9 +20,6 @@ let globalPreloadedData: PreloadedData = {
   isLoaded: false,
 };
 
-// Cache keys and expiry times
-const PRELOAD_CACHE_KEY = "dehli_mirch_preload_data";
-const CACHE_EXPIRY_TIME = 30 * 60 * 1000; // 30 minutes
 
 // Helper function to check if cache is expired
 const isCacheExpired = (timestamp: number) => {

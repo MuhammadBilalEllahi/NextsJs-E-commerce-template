@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { MODELS, ORDER_TYPE } from "@/models/constants/constants";
 import { z } from "zod";
+import { DEFAULT_COUNTRY, DEFAULT_STATE } from "@/lib/constants/site";
 
 export interface ShippingMethodLocation {
   city: string;
@@ -40,8 +41,8 @@ const ShippingMethodSchema = new mongoose.Schema<ShippingMethodDocument>({
   locations: [
     {
       city: { type: String, required: true }, // e.g., "Lahore", "Karachi"
-      state: { type: String, default: "Punjab" },
-      country: { type: String, default: "Pakistan" },
+      state: { type: String, default: DEFAULT_STATE },
+      country: { type: String, default: DEFAULT_COUNTRY },
       shippingFee: { type: Number, required: true, default: 0 },
       tcsFee: { type: Number, default: 0 }, // TCS courier charges
       estimatedDays: { type: Number, default: 1 }, // Estimated delivery days
@@ -84,8 +85,8 @@ export default (mongoose.models[MODELS.SHIPPING_METHOD] as any) ||
 
 export const shippingMethodLocationZod = z.object({
   city: z.string().min(1),
-  state: z.string().default("Punjab"),
-  country: z.string().default("Pakistan"),
+  state: z.string().default(DEFAULT_STATE),
+  country: z.string().default(DEFAULT_COUNTRY),
   shippingFee: z.number().nonnegative(),
   tcsFee: z.number().nonnegative().default(0),
   estimatedDays: z.number().int().positive().default(1),
