@@ -20,6 +20,7 @@ import {
   saveShippingMethod,
   deleteShippingMethod,
 } from "@/lib/api/admin/shipping-methods";
+import { DEFAULT_COUNTRY, DEFAULT_STATE } from "@/lib/constants/site";
 
 export default function ShippingPage() {
   const [methods, setMethods] = useState<ShippingMethod[]>([]);
@@ -95,8 +96,8 @@ export default function ShippingPage() {
   const addLocation = (method: ShippingMethod) => {
     const newLocation: Location = {
       city: "",
-      state: "Punjab",
-      country: "Pakistan",
+      state: DEFAULT_STATE,
+      country: DEFAULT_COUNTRY,
       shippingFee: 0,
       tcsFee: 0,
       estimatedDays: 1,

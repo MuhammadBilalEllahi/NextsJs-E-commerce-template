@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
             order: formattedOrder,
             tcsOrder: null,
             deliveryInfo: {
-              isOutsideLahore: tcsService.isOutsideLahore(
+              isOutsideCity: tcsService.isOutsideCity(
                 order.shippingAddress.city
               ),
               estimatedDays: tcsService.getEstimatedDeliveryDays(
@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
           : null,
         latestTracking: latestTracking,
         deliveryInfo: {
-          isOutsideLahore: tcsService.isOutsideLahore(
+          isOutsideCity: tcsService.isOutsideCity(
             order.shippingAddress.city
           ),
           estimatedDays: tcsService.getEstimatedDeliveryDays(
@@ -195,7 +195,7 @@ export async function GET(req: NextRequest) {
           order: formattedOrder,
           tcsOrder: null,
           deliveryInfo: {
-            isOutsideLahore: false,
+            isOutsideCity: false,
             estimatedDays: 1,
             shippingMethod: order.shippingMethod,
           },

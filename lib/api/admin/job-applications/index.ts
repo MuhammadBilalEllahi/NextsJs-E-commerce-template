@@ -1,11 +1,14 @@
+const API_URL_ADMIN_JOB_APPLICATIONS = "/api/admin/job-applications";
+const API_URL_ADMIN_SEND_APPLICATION_EMAIL = "/api/admin/send-application-email";
+
 export async function listJobApplications() {
-  const res = await fetch("/api/admin/job-applications", { cache: "no-store" });
+  const res = await fetch(API_URL_ADMIN_JOB_APPLICATIONS, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to load applications");
   return res.json();
 }
 
 export async function deleteJobApplication(id: string) {
-  const res = await fetch("/api/admin/job-applications", {
+  const res = await fetch(API_URL_ADMIN_JOB_APPLICATIONS, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id }),
@@ -17,7 +20,7 @@ export async function deleteJobApplication(id: string) {
 }
 
 export async function updateJobApplicationStatus(id: string, status: string) {
-  const res = await fetch("/api/admin/job-applications", {
+  const res = await fetch(API_URL_ADMIN_JOB_APPLICATIONS, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id, status }),
@@ -38,7 +41,7 @@ export async function sendApplicationEmail(payload: {
   contactEmail?: string;
   contactPhone?: string;
 }) {
-  const res = await fetch("/api/admin/send-application-email", {
+  const res = await fetch(API_URL_ADMIN_SEND_APPLICATION_EMAIL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

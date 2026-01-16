@@ -1,10 +1,6 @@
-export type AdminWishlistQuery = {
-  page?: number;
-  limit?: number;
-  search?: string;
-  userId?: string;
-  productId?: string;
-};
+import { AdminWishlistQuery } from "@/types";
+
+const API_URL_ADMIN_WISHLIST = "/api/admin/wishlist";
 
 export async function listAdminWishlist(query: AdminWishlistQuery) {
   const params = new URLSearchParams();
@@ -13,7 +9,7 @@ export async function listAdminWishlist(query: AdminWishlistQuery) {
   if (query.search) params.set("search", query.search);
   if (query.userId) params.set("userId", query.userId);
   if (query.productId) params.set("productId", query.productId);
-  const res = await fetch(`/api/admin/wishlist?${params.toString()}`, {
+  const res = await fetch(`${API_URL_ADMIN_WISHLIST}?${params.toString()}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to load wishlist");
@@ -21,7 +17,7 @@ export async function listAdminWishlist(query: AdminWishlistQuery) {
 }
 
 export async function deleteAdminWishlistItem(id: string) {
-  const res = await fetch(`/api/admin/wishlist?id=${encodeURIComponent(id)}`, {
+  const res = await fetch(`${API_URL_ADMIN_WISHLIST}?id=${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
   const j = await res.json().catch(() => ({}));

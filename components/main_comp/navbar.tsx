@@ -19,6 +19,7 @@ import {
   SITE_NAME_FIRST,
   SITE_NAME_SECOND,
 } from "@/lib/constants/site";
+import { UserTypes } from "@/models/constants/constants";
 
 export function Navbar() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth(); // Destructure isLoading as well
@@ -95,6 +96,8 @@ export function Navbar() {
     { href: "/contact", label: "Contact" },
   ];
 
+  const isAdmin = user?.role.toLowerCase() !== UserTypes.CUSTOMER.toLowerCase();
+  
   return (
     <>
       <HoverDataPreloader />
@@ -131,7 +134,7 @@ export function Navbar() {
                   </div>
                 </SheetHeader>
                 <div className="mt-6">
-                  <nav className="flex flex-col space-y-4">
+                  <nav className="flex flex-col space-y-4 px-[15px]">
                     {nav.map((n, i) => (
                       <Link
                         key={`${n.href}-${i}`}
@@ -289,14 +292,14 @@ export function Navbar() {
             </button>
 
             {/* Color Theme Cycle */}
-            <button
+            {isAdmin && <button
               onClick={cycleTheme}
               title={`Theme: ${colorTheme}`}
               aria-label="Cycle color theme"
               className="h-8 w-8 inline-flex items-center justify-center rounded-full hover:text-primary/10 dark:hover:text-primary/90 transition-colors"
             >
               <Palette className="h-4 w-4" />
-            </button>
+            </button>}
           </div>
         </div>
       </nav>

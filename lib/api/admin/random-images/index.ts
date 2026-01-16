@@ -1,6 +1,10 @@
+import { API_URL_ADMIN_PRODUCT } from "../product/import";
+
+const API_URL_ADMIN_RANDOM_IMAGES = "/api/admin/random-images";
+const API_URL_ADMIN_PRODUCT_BULK_IMAGES = `${API_URL_ADMIN_PRODUCT}/bulk-images`;
 export async function listRandomImages(category: string, limit = 50) {
   const res = await fetch(
-    `/api/admin/random-images?category=${encodeURIComponent(
+    `${API_URL_ADMIN_RANDOM_IMAGES}?category=${encodeURIComponent(
       category
     )}&limit=${encodeURIComponent(String(limit))}`,
     { cache: "no-store" }
@@ -11,7 +15,7 @@ export async function listRandomImages(category: string, limit = 50) {
 }
 
 export async function uploadRandomImages(formData: FormData) {
-  const res = await fetch("/api/admin/random-images", {
+  const res = await fetch(API_URL_ADMIN_RANDOM_IMAGES, {
     method: "POST",
     body: formData,
   });
@@ -22,7 +26,7 @@ export async function uploadRandomImages(formData: FormData) {
 
 export async function deleteRandomImage(id: string) {
   const res = await fetch(
-    `/api/admin/random-images?id=${encodeURIComponent(id)}`,
+    `${API_URL_ADMIN_RANDOM_IMAGES}?id=${encodeURIComponent(id)}`,
     { method: "DELETE" }
   );
   if (!res.ok) throw new Error("Failed to delete image");
@@ -37,7 +41,7 @@ export async function applyBulkImages(payload: {
   category: string | null;
   randomCount: number | null;
 }) {
-  const res = await fetch("/api/admin/product/bulk-images", {
+  const res = await fetch(API_URL_ADMIN_PRODUCT_BULK_IMAGES, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

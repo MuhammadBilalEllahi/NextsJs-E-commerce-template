@@ -1,17 +1,15 @@
 import { EventEmitter } from "events";
 
-type ChatEvent = {
-  sessionId: string;
-  payload: any;
-};
+import { CHAT_BUS_EVENT_PREFIX } from "../cacheConstants";
+import { ChatEvent } from "@/types/types";
 
 class ChatBus extends EventEmitter {
   public emitMessage(sessionId: string, payload: any) {
-    this.emit(`chat:${sessionId}`, { sessionId, payload } as ChatEvent);
+    this.emit(`${CHAT_BUS_EVENT_PREFIX}${sessionId}`, { sessionId, payload } as ChatEvent);
   }
 
   public subscribe(sessionId: string, listener: (e: ChatEvent) => void) {
-    const eventName = `chat:${sessionId}`;
+    const eventName = `${CHAT_BUS_EVENT_PREFIX}${sessionId}`;
     this.on(eventName, listener);
     return () => this.off(eventName, listener);
   }

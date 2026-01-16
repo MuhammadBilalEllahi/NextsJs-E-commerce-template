@@ -1,6 +1,8 @@
+import { API_URL_ADMIN_PRODUCT } from "./import";
+const API_URL_ADMIN_PRODUCT_UNDO = `${API_URL_ADMIN_PRODUCT}/undo`;
 export async function listImportHistories(limit = 20) {
   const res = await fetch(
-    `/api/admin/product/undo?limit=${encodeURIComponent(String(limit))}`,
+    `${API_URL_ADMIN_PRODUCT_UNDO}?limit=${encodeURIComponent(String(limit))}`,
     { cache: "no-store" }
   );
   const j = await res.json().catch(() => ({}));
@@ -13,7 +15,7 @@ export async function undoImport(payload: {
   productId?: string;
   variantId?: string;
 }) {
-  const res = await fetch("/api/admin/product/undo", {
+  const res = await fetch(API_URL_ADMIN_PRODUCT_UNDO, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

@@ -1,5 +1,6 @@
+const API_URL_ADMIN_SHIPPING_METHODS = "/api/admin/shipping-methods";
 export async function listShippingMethods() {
-  const res = await fetch("/api/admin/shipping-methods", { cache: "no-store" });
+  const res = await fetch(API_URL_ADMIN_SHIPPING_METHODS, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to load shipping methods");
   return res.json();
 }
@@ -8,8 +9,8 @@ export async function saveShippingMethod(method: any) {
   const hasId = Boolean((method as any).id);
   const res = await fetch(
     hasId
-      ? `/api/admin/shipping-methods/${(method as any).id}`
-      : "/api/admin/shipping-methods",
+      ? `${API_URL_ADMIN_SHIPPING_METHODS}/${(method as any).id}`
+      : API_URL_ADMIN_SHIPPING_METHODS,
     {
       method: hasId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
@@ -22,7 +23,7 @@ export async function saveShippingMethod(method: any) {
 }
 
 export async function deleteShippingMethod(id: string) {
-  const res = await fetch(`/api/admin/shipping-methods/${id}`, {
+  const res = await fetch(`${API_URL_ADMIN_SHIPPING_METHODS}/${id}`, {
     method: "DELETE",
   });
   const j = await res.json().catch(() => ({}));

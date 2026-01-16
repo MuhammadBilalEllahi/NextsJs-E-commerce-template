@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CitySelect } from "@/components/ui/city-select";
 import { getCountryOptions, getStateOptions, getCityOptions } from "@/lib/geo";
-import { DEFAULT_COUNTRY, DEFAULT_STATE } from "@/lib/constants/site";
+import { DEFAULT_COUNTRY, DEFAULT_PHONE_CODE, DEFAULT_STATE } from "@/lib/constants/site";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -53,11 +53,11 @@ export default function AddressesPage() {
     lastName: "",
     address: "",
     city: "",
-    state: "Punjab",
-    country: "Pakistan",
+    state: DEFAULT_STATE,
+    country: DEFAULT_COUNTRY,
     postalCode: "",
     phone: "",
-    countryCode: "+92",
+    countryCode: DEFAULT_PHONE_CODE,
     isDefault: false,
     isBilling: false,
     isShipping: true,
@@ -170,11 +170,11 @@ export default function AddressesPage() {
       lastName: "",
       address: "",
       city: "",
-      state: "Punjab",
-      country: "Pakistan",
+      state: DEFAULT_STATE,
+      country: DEFAULT_COUNTRY,
       postalCode: "",
       phone: "",
-      countryCode: "+92",
+      countryCode: DEFAULT_PHONE_CODE,
       isDefault: false,
       isBilling: false,
       isShipping: true,

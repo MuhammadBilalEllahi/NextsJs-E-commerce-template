@@ -54,7 +54,7 @@ export function BranchEditModal({
     location: "",
     city: "",
     state: "",
-    country: "Pakistan",
+    country: DEFAULT_COUNTRY,
     postalCode: "",
     manager: "",
     openingHours: {

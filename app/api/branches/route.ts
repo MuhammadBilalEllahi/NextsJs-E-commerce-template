@@ -26,7 +26,13 @@ export async function GET(request: Request) {
 
     const branches = await Branch.find(query).sort({ branchNumber: 1 }).lean();
 
-    return NextResponse.json(branches);
+    // Convert _id to string for Next.js client component compatibility
+    const serializedBranches = branches.map((branch: any) => ({
+      ...branch,
+      _id: branch._id?.toString() || branch._id,
+    }));
+
+    return NextResponse.json(serializedBranches);
   } catch (error: any) {
     console.error("Error fetching branches:", error);
     return NextResponse.json(

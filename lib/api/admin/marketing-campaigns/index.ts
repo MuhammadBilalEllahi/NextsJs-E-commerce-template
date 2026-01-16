@@ -4,7 +4,7 @@ import {
   UpdateMarketingCampaignData,
 } from "@/types/types";
 
-export const API_URL_MARKETING_CAMPAIGNS_ADMIN = "/api/admin/marketing-campaigns";
+const API_URL_MARKETING_CAMPAIGNS_ADMIN = "/api/admin/marketing-campaigns";
 
 export async function fetchMarketingCampaigns(): Promise<MarketingCampaign[]> {
   const res = await fetch(API_URL_MARKETING_CAMPAIGNS_ADMIN, {

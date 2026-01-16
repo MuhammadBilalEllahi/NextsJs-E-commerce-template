@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     const shouldUseTCS =
       forceCreate ||
       order.shippingMethod === "tcs" ||
-      tcsService.isOutsideLahore(order.shippingAddress.city);
+      tcsService.isOutsideCity(order.shippingAddress.city);
 
     if (!shouldUseTCS) {
       return NextResponse.json(

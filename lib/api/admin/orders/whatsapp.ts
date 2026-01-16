@@ -1,9 +1,11 @@
+import { API_URL_ADMIN_ORDERS } from "./index";
+
 export async function sendOrderWhatsApp(
   orderId: string,
   type: "confirmation" | "status"
 ) {
   const res = await fetch(
-    `/api/admin/orders/${encodeURIComponent(orderId)}/whatsapp`,
+    `${API_URL_ADMIN_ORDERS}/${encodeURIComponent(orderId)}/whatsapp`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -10,7 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { ArrowLeft, Save, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { getContentPage, updateContentPage } from "@/lib/api/admin/content";
+import { fetchContentPageBySlug, updateContentPage } from "@/lib/api/admin/content";
+import { UpdateContentPageData } from "@/types/types";
 
 interface ContentPage {
   id: string;
@@ -59,7 +60,7 @@ function EditContentPageContent() {
 
   const fetchContentPage = async () => {
     try {
-      const data = await getContentPage(slug as string);
+      const data = await fetchContentPageBySlug(slug as string);
       if (data) {
         setContentPage(data);
         setFormData({
@@ -101,7 +102,7 @@ function EditContentPageContent() {
     setIsSubmitting(true);
 
     try {
-      await updateContentPage(slug as string, formData);
+      await updateContentPage(slug as string, formData as UpdateContentPageData);
       setHasUnsavedChanges(false);
       alert("Content page updated successfully!");
       await fetchContentPage();

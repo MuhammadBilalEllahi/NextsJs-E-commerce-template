@@ -11,6 +11,7 @@ import {
   TCSPickupStatusResponse,
   TCSPaymentDetailsResponse,
 } from "@/types/types";
+import { DEFAULT_CITY, DEFAULT_ISO_CITY_CODE } from "@/lib/constants/site";
 
 class TCSService {
   private baseUrl: string;
@@ -247,8 +248,8 @@ class TCSService {
   }
 
   // Heuristics for shipping config (kept for backward-compatibility). Prefer using shipping methods API.
-  isOutsideLahore(cityName: string): boolean {
-    const lahoreVariations = ["lahore", "lhr", "لاہور"];
+  isOutsideCity(cityName: string): boolean {
+    const lahoreVariations = [DEFAULT_CITY.toLowerCase(), DEFAULT_ISO_CITY_CODE.toLowerCase(), "لاہور"];
     return !lahoreVariations.some((variation) =>
       cityName.toLowerCase().includes(variation.toLowerCase())
     );
@@ -256,7 +257,7 @@ class TCSService {
 
   // Heuristics for estimated days (kept for backward-compatibility)
   getEstimatedDeliveryDays(cityName: string): number {
-    if (!this.isOutsideLahore(cityName)) {
+    if (!this.isOutsideCity(cityName)) {
       return 1; // Same day for Lahore
     }
 

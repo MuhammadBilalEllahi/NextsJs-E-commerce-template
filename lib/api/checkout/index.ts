@@ -1,5 +1,6 @@
+const API_URL_CHECKOUT = "/api/checkout";
 export async function createCheckout(orderData: any) {
-  const res = await fetch("/api/checkout", {
+  const res = await fetch(API_URL_CHECKOUT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(orderData),

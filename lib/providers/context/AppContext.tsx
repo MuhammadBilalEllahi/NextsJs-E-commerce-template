@@ -11,6 +11,7 @@ import {
 } from "react";
 import { User } from "@/types/types";
 import { getMe, loginApi, logoutApi } from "@/lib/api/auth";
+import { SESSION_TOKEN_KEY } from "@/lib/cacheConstants";
 
 type AppContextType = {
   router: ReturnType<typeof useRouter>;
@@ -37,6 +38,7 @@ type AppContextType = {
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 };
+
 
 export const AppContext = createContext<AppContextType | null>(null);
 
@@ -105,7 +107,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const checkIfCookiePresentThenCheckAuth = async () => {
-    const sessionToken = await cookieStore.get("session-token");
+    const sessionToken = await cookieStore.get(SESSION_TOKEN_KEY);
     if (sessionToken) {
       checkAuth();
     }

@@ -4,8 +4,7 @@ import {
   CreateProductData as CreateProductDataType,
   UpdateProductData as UpdateProductDataType,
 } from "@/types/types";
-
-const API_URL_PRODUCT_ADMIN = "/api/admin/product";
+import { API_URL_ADMIN_PRODUCT } from "./import";
 
 // Re-export types for backward compatibility
 export type Product = ProductType;
@@ -14,7 +13,7 @@ export type UpdateProductData = UpdateProductDataType;
 
 export async function updateProductById(productId: string, formData: FormData) {
   const res = await fetch(
-    `/api/admin/product?id=${encodeURIComponent(productId)}`,
+    `${API_URL_ADMIN_PRODUCT}?id=${encodeURIComponent(productId)}`,
     {
       method: "PUT",
       body: formData,
@@ -28,7 +27,7 @@ export async function updateProductById(productId: string, formData: FormData) {
 // Fetch all products
 export const fetchProducts = async (): Promise<Product[]> => {
   try {
-    const response = await fetch(API_URL_PRODUCT_ADMIN);
+    const response = await fetch(API_URL_ADMIN_PRODUCT);
     // console.debug("[fetchProducts] response:", response);
     if (!response.ok) {
       throw new Error("Failed to fetch products");
@@ -107,7 +106,7 @@ export const createProduct = async (
     }
     // console.debug("[createProduct] formData:", formData);
 
-    const response = await fetch(API_URL_PRODUCT_ADMIN, {
+    const response = await fetch(API_URL_ADMIN_PRODUCT, {
       method: "POST",
       // headers: {
       //   "Content-Type": "multipart/form-data",
@@ -133,7 +132,7 @@ export const createProduct = async (
 export const deleteProduct = async (productId: string): Promise<void> => {
   try {
     // console.debug("[deleteProduct] productId:", productId);
-    const response = await fetch(`${API_URL_PRODUCT_ADMIN}?id=${productId}`, {
+    const response = await fetch(`${API_URL_ADMIN_PRODUCT}?id=${productId}`, {
       method: "DELETE",
     });
 
@@ -149,7 +148,7 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 // Get a single product by ID
 export const fetchProductById = async (productId: string): Promise<Product> => {
   try {
-    const response = await fetch(`${API_URL_PRODUCT_ADMIN}?id=${productId}`);
+    const response = await fetch(`${API_URL_ADMIN_PRODUCT}?id=${productId}`);
     if (!response.ok) {
       throw new Error("Failed to fetch product");
     }

@@ -5,6 +5,7 @@ import Branches, {
 } from "@/models/Branches";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
+import { DEFAULT_COUNTRY } from "@/lib/constants/site";
 
 export async function GET(req: Request) {
   try {
@@ -42,8 +43,14 @@ export async function GET(req: Request) {
       Branches.countDocuments(query),
     ]);
 
+    // Convert _id to string for Next.js client component compatibility
+    const serializedBranches = branches.map((branch: any) => ({
+      ...branch,
+      _id: branch._id?.toString() || branch._id,
+    }));
+
     return NextResponse.json({
-      branches,
+      branches: serializedBranches,
       pagination: {
         page,
         limit,
@@ -117,7 +124,7 @@ export async function POST(req: Request) {
       location: body.get("location"),
       city: body.get("city"),
       state: body.get("state"),
-      country: body.get("country") || "Pakistan",
+      country: body.get("country") || DEFAULT_COUNTRY,
       postalCode: body.get("postalCode"),
       manager: body.get("manager") || "",
       logo: "", // Temporary empty string

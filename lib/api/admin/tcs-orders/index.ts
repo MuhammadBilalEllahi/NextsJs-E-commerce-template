@@ -1,9 +1,6 @@
-export type TcsOrdersQuery = {
-  page?: number;
-  limit?: number;
-  search?: string;
-  status?: string;
-};
+import { TcsOrdersQuery } from "@/types";
+const API_URL_ADMIN_TCS_ORDERS = "/api/admin/tcs-orders";
+
 
 export async function listTcsOrders({
   page = 1,
@@ -17,7 +14,7 @@ export async function listTcsOrders({
   });
   if (search) params.set("search", search);
   if (status) params.set("status", status);
-  const res = await fetch(`/api/admin/tcs-orders?${params.toString()}`, {
+  const res = await fetch(`${API_URL_ADMIN_TCS_ORDERS}?${params.toString()}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to load TCS orders");
@@ -29,7 +26,7 @@ export async function actOnTcsOrder(
   action: string,
   actionData?: Record<string, unknown>
 ) {
-  const res = await fetch(`/api/admin/tcs-orders/${orderId}`, {
+  const res = await fetch(`${API_URL_ADMIN_TCS_ORDERS}/${orderId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action, ...(actionData || {}) }),

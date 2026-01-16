@@ -270,7 +270,7 @@ export async function POST(req: NextRequest) {
           ? {
               consignmentNumber: order.tracking,
               estimatedDelivery: order.courier?.estimatedDelivery,
-              isOutsideLahore: tcsService.isOutsideLahore(shippingAddress.city),
+              isOutsideCity: tcsService.isOutsideCity(shippingAddress.city),
             }
           : null,
       },

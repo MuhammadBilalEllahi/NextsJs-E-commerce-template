@@ -68,6 +68,7 @@ import {
   toggleCareerStatus,
 } from "@/lib/api/admin/careers";
 import { Career, CreateCareerData, UpdateCareerData } from "@/types/types";
+import { DEFAULT_CITY, DEFAULT_COUNTRY } from "@/lib/constants/site";
 
 export default function CareersPage() {
   const [careers, setCareers] = useState<Career[]>([]);
@@ -264,7 +265,7 @@ export default function CareersPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, location: e.target.value })
                     }
-                    placeholder="e.g., Lahore, Pakistan"
+                    placeholder={`e.g., ${DEFAULT_CITY}, ${DEFAULT_COUNTRY}`}
                     required
                   />
                 </div>

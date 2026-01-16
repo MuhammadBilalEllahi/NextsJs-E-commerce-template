@@ -1,15 +1,13 @@
-import { CartItem } from "@/types/types";
+import { CartIdentifier, CartItem } from "@/types/types";
 
-export type CartIdentifier = {
-  userId?: string | null;
-  sessionId?: string | null;
-};
+const API_URL_CART = "/api/cart";
+
 
 export async function getCart(params: CartIdentifier) {
   const search = new URLSearchParams();
   if (params.userId) search.set("userId", params.userId);
   if (params.sessionId) search.set("sessionId", params.sessionId);
-  const res = await fetch(`/api/cart?${search.toString()}`, {
+  const res = await fetch(`${API_URL_CART}?${search.toString()}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to load cart");
@@ -24,7 +22,7 @@ export async function syncCart(
   const search = new URLSearchParams();
   if (params.userId) search.set("userId", params.userId);
   if (params.sessionId) search.set("sessionId", params.sessionId);
-  const res = await fetch(`/api/cart?${search.toString()}`, {
+  const res = await fetch(`${API_URL_CART}?${search.toString()}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
