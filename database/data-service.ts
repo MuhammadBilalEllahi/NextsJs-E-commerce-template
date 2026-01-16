@@ -172,14 +172,21 @@ export async function getAllBranches() {
       return JSON.parse(cachedBranches);
     }
     const branches = (await Branch.find({ isActive: true }).lean()) as any[];
-    if (branches.length > 0) {
+    
+    // Convert _id to string for Next.js client component compatibility
+    const serializedBranches = branches.map((branch: any) => ({
+      ...branch,
+      _id: branch._id?.toString() || branch._id,
+    }));
+    
+    if (serializedBranches.length > 0) {
       await RedisClient.set(
         CACHE_BRANCH_KEY,
-        JSON.stringify(branches),
+        JSON.stringify(serializedBranches),
         CACHE_EXPIRE_TIME
       );
     }
-    return branches;
+    return serializedBranches;
   } catch (error) {
     console.error("Error fetching branches:", error);
     return [];

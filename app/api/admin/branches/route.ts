@@ -43,8 +43,14 @@ export async function GET(req: Request) {
       Branches.countDocuments(query),
     ]);
 
+    // Convert _id to string for Next.js client component compatibility
+    const serializedBranches = branches.map((branch: any) => ({
+      ...branch,
+      _id: branch._id?.toString() || branch._id,
+    }));
+
     return NextResponse.json({
-      branches,
+      branches: serializedBranches,
       pagination: {
         page,
         limit,
